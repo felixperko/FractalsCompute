@@ -1,0 +1,191 @@
+package de.felixperko.fractals.system.systems.BasicSystem;
+
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.imageio.ImageIO;
+
+import de.felixperko.fractals.data.Chunk;
+import de.felixperko.fractals.data.ChunkFactory;
+import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
+import de.felixperko.fractals.system.Numbers.DoubleNumber;
+import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
+import de.felixperko.fractals.system.Numbers.infra.Number;
+import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
+import de.felixperko.fractals.system.parameters.ParamSupplier;
+import de.felixperko.fractals.system.parameters.StaticParamSupplier;
+import de.felixperko.fractals.system.systems.infra.CalcSystem;
+import de.felixperko.fractals.system.task.FractalsTask;
+import de.felixperko.fractals.system.task.TaskManager;
+import de.felixperko.fractals.system.thread.AbstractFractalsThread;
+import de.felixperko.fractals.util.NumberUtil;
+
+public class BasicTaskManager extends AbstractFractalsThread implements TaskManager<BasicTask>{
+	
+	public BasicTaskManager(CalcSystem system) {
+		super(system);
+	}
+
+	BufferedImage testImage;
+	
+	int chunkSize = 100;
+
+	ChunkFactory chunkFactory = new ChunkFactory(chunkSize);
+	NumberFactory numberFactory = new NumberFactory(DoubleNumber.class, DoubleComplexNumber.class);
+	
+	Chunk[][] chunks;
+	List<BasicTask> openTasks = new ArrayList<>();
+	
+	ComplexNumber midpoint;
+	Number zoom;
+	int width;
+	int height;
+	
+	List<BasicTask> finishedTasks = new ArrayList<>();
+	
+	Map<String, ParamSupplier> currentParameters = null;
+	
+	boolean calculate = false;
+	
+	int openChunks = 0;
+	
+	long startTime = 0;
+	
+	@Override
+	public void run() {
+		mainLoop : while (!stopped) {
+			while (!calculate) {
+				try {
+					Thread.sleep(1);
+				} catch (InterruptedException e) {
+					if (stopped)
+						break mainLoop;
+					e.printStackTrace();
+				}
+			}
+			tick();
+		}
+	}
+	
+	@Override
+	public boolean setParameters(Map<String, ParamSupplier> params) {
+		try {
+			midpoint = (ComplexNumber) params.get("midpoint").get(0);
+			zoom = (Number) params.get("zoom").get(0);
+			width = (Integer) params.get("width").get(0);
+			height = (Integer) params.get("height").get(0);
+			
+			Number pixelzoom = numberFactory.createNumber(1./width);
+			pixelzoom.mult(zoom);
+			params.put("pixelzoom", new StaticParamSupplier("pixelzoom", pixelzoom));
+			
+			currentParameters = params;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		testImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		
+		return true;
+	}
+
+	@Override
+	public void startTasks() {
+		int dimX = width/chunkSize;
+		int dimY = height/chunkSize;
+		chunks = new Chunk[dimX][dimY];
+		openChunks = dimX*dimY;
+		startTime = System.nanoTime();
+		for (int x = 0 ; x < dimX ; x++) {
+			for (int y = 0 ; y < dimY ; y++) {
+				Chunk chunk = chunkFactory.createChunk(x, y);
+				chunks[x][y] = chunk;
+				ComplexNumber chunkPos = numberFactory.createComplexNumber(x/(double)dimX-0.5, y/(double)dimX-0.5);
+				chunkPos.multNumber(zoom);
+				chunkPos.add(midpoint);
+				synchronized(this) {
+					Map<String, ParamSupplier> taskParameters = new HashMap<>(currentParameters);
+					taskParameters.putAll(currentParameters);
+					openTasks.add(new BasicTask(chunk, taskParameters, chunkPos));
+					calculate = true;
+				}
+			}
+		}
+	}
+	
+	@Override
+	public synchronized List<BasicTask> getTasks(int count) {
+		int size = openTasks.size();
+		if (size == 0)
+			return null;
+		if (count > size)
+			count = size;
+		List<BasicTask> tasks = new ArrayList<>();
+		for (int i = 0 ; i < count ; i++)
+			tasks.add(openTasks.get(i));
+		if (count < size)
+			openTasks.removeAll(tasks);
+		else
+			openTasks.clear();
+		return tasks;
+	}
+
+	@Override
+	public synchronized void taskFinished(BasicTask task) {
+		finishedTasks.add(task);
+		System.out.println("task finished");
+	}
+	
+	public synchronized void tick() {
+		for (BasicTask task : finishedTasks) {
+			int chunkSize = task.chunk.getChunkSize();
+			int cx = chunkSize*task.chunk.getChunkX();
+			int cy = chunkSize*task.chunk.getChunkY();
+			for (int i = 0 ; i < task.chunk.getArrayLength() ; i++) {
+				int x = i / chunkSize + cx;
+				int y = i % chunkSize + cy;
+				double value = task.chunk.getValue(i);
+				if (value > 0) {
+					float hue = (float)Math.log(value);
+					int color = Color.HSBtoRGB(hue, 0.4f, 0.6f);
+					testImage.setRGB(x, y, color);
+				}
+			}
+			openChunks--;
+			if (openChunks == 0) { //finished
+				try {
+					long endTime = System.nanoTime();
+					System.out.println("calculated in "+NumberUtil.getElapsedTimeInS(startTime, 2)+"s.");
+					ImageIO.write(testImage, "png", new File("test.png"));
+					System.out.println("done!");
+					system.stop();
+					System.exit(0);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		finishedTasks.clear();
+	}
+
+	@Override
+	public void endTasks() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void reset() {
+		// TODO Auto-generated method stub
+		
+	}
+
+}
