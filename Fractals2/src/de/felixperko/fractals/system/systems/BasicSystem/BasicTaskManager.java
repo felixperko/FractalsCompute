@@ -112,9 +112,9 @@ public class BasicTaskManager extends AbstractFractalsThread implements TaskMana
 				chunkPos.multNumber(zoom);
 				chunkPos.add(midpoint);
 				synchronized(this) {
-					Map<String, ParamSupplier> taskParameters = new HashMap<>(currentParameters);
-					taskParameters.putAll(currentParameters);
-					openTasks.add(new BasicTask(chunk, taskParameters, chunkPos));
+//					Map<String, ParamSupplier> taskParameters = new HashMap<>(currentParameters);
+//					taskParameters.putAll(currentParameters);
+					openTasks.add(new BasicTask(chunk, currentParameters, chunkPos));
 					calculate = true;
 				}
 			}

@@ -20,13 +20,13 @@ public class BasicTask extends AbstractFractalsTask {
 	Chunk chunk;
 	Map<String, ParamSupplier> parameters;
 	
-	AbstractFractalsCalculator calculator = new NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator();
+	AbstractFractalsCalculator calculator = new MandelbrotCalculator();
 	
 	public BasicTask(Chunk chunk, Map<String, ParamSupplier> taskParameters, ComplexNumber chunkPos) {
 		this.chunk = chunk;
-		this.parameters = taskParameters;
-		taskParameters.put("chunkpos", new StaticParamSupplier("chunkpos", chunkPos));
-		taskParameters.put("chunksize", new StaticParamSupplier("chunksize", (Integer)chunk.getChunkSize()));
+		this.parameters = new HashMap<>(taskParameters);
+		this.parameters.put("chunkpos", new StaticParamSupplier("chunkpos", chunkPos));
+		this.parameters.put("chunksize", new StaticParamSupplier("chunksize", (Integer)chunk.getChunkSize()));
 	}
 
 	@Override
