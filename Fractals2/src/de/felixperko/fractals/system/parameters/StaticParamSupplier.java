@@ -16,7 +16,12 @@ public class StaticParamSupplier implements ParamSupplier {
 	}
 
 	@Override
-	public Object get(int pixel) {
+	public Object get(int pixel, int sample) {
 		return obj;
+	}
+
+	@Override
+	public ParamSupplier copy() {
+		return new StaticParamSupplier(name, obj);
 	}
 }

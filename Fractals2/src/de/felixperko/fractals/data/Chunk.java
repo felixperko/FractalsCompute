@@ -57,7 +57,7 @@ public class Chunk {
 	}
 	
 
-	public void incrementSampleCount() {
-		sampleCount++;
+	public void incrementSampleCount(int i) {
+		sampleCount += i;
 	}
 }

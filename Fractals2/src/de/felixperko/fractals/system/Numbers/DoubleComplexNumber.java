@@ -52,14 +52,14 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 
 	@Override
 	public void pow(DoubleComplexNumber other) {
+		if (real == 0 && imag == 0)
+			return;
 		if (other.imag == 0) {
 			if (other.real == 2) //just squared
 				square();
 			else { //real power
 				double abs = absDouble();
-				double logReal = 0;
-				if (abs != 0)
-					logReal = Math.log(abs);
+				double logReal = Math.log(abs);
 				double logImag = Math.atan2(imag, real);
 				//mult
 				logReal = logReal*other.real;
@@ -79,6 +79,7 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 //			    real = modulus_ans*Math.cos(x_log_im);
 //			    imag = modulus_ans*Math.sin(x_log_im);
 		}
+//		other = (DoubleComplexNumber) other.copy();
 //		if (other.imag == 0 && other.real == 2) {
 //			square();
 //		}

@@ -2,5 +2,6 @@ package de.felixperko.fractals.system.parameters;
 
 public interface ParamSupplier {
 	public String getName();
-	public Object get(int pixel);
+	public Object get(int pixel, int sample);
+	public ParamSupplier copy();
 }

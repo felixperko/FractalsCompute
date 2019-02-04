@@ -35,7 +35,7 @@ public class BasicTaskManager extends AbstractFractalsThread implements TaskMana
 
 	BufferedImage testImage;
 	
-	int chunkSize = 100;
+	int chunkSize = 250;
 
 	ChunkFactory chunkFactory = new ChunkFactory(chunkSize);
 	NumberFactory numberFactory = new NumberFactory(DoubleNumber.class, DoubleComplexNumber.class);
@@ -55,6 +55,8 @@ public class BasicTaskManager extends AbstractFractalsThread implements TaskMana
 	boolean calculate = false;
 	
 	int openChunks = 0;
+	
+	int totalChunkCount = 0;
 	
 	long startTime = 0;
 	
@@ -77,10 +79,10 @@ public class BasicTaskManager extends AbstractFractalsThread implements TaskMana
 	@Override
 	public boolean setParameters(Map<String, ParamSupplier> params) {
 		try {
-			midpoint = (ComplexNumber) params.get("midpoint").get(0);
-			zoom = (Number) params.get("zoom").get(0);
-			width = (Integer) params.get("width").get(0);
-			height = (Integer) params.get("height").get(0);
+			midpoint = (ComplexNumber) params.get("midpoint").get(0,0);
+			zoom = (Number) params.get("zoom").get(0,0);
+			width = (Integer) params.get("width").get(0,0);
+			height = (Integer) params.get("height").get(0,0);
 			
 			Number pixelzoom = numberFactory.createNumber(1./width);
 			pixelzoom.mult(zoom);
@@ -103,19 +105,22 @@ public class BasicTaskManager extends AbstractFractalsThread implements TaskMana
 		int dimY = height/chunkSize;
 		chunks = new Chunk[dimX][dimY];
 		openChunks = dimX*dimY;
+		totalChunkCount = openChunks;
 		startTime = System.nanoTime();
+		int id = 0;
 		for (int x = 0 ; x < dimX ; x++) {
 			for (int y = 0 ; y < dimY ; y++) {
 				Chunk chunk = chunkFactory.createChunk(x, y);
 				chunks[x][y] = chunk;
-				ComplexNumber chunkPos = numberFactory.createComplexNumber(x/(double)dimX-0.5, y/(double)dimX-0.5);
-				chunkPos.multNumber(zoom);
-				chunkPos.add(midpoint);
 				synchronized(this) {
+					ComplexNumber chunkPos = numberFactory.createComplexNumber(x/(double)dimX-0.5, y/(double)dimX-0.5);
+					chunkPos.multNumber(zoom);
+					chunkPos.add(midpoint);
 //					Map<String, ParamSupplier> taskParameters = new HashMap<>(currentParameters);
 //					taskParameters.putAll(currentParameters);
-					openTasks.add(new BasicTask(chunk, currentParameters, chunkPos));
+					openTasks.add(new BasicTask(id, chunk, currentParameters, chunkPos));
 					calculate = true;
+					id++;
 				}
 			}
 		}
@@ -141,7 +146,7 @@ public class BasicTaskManager extends AbstractFractalsThread implements TaskMana
 	@Override
 	public synchronized void taskFinished(BasicTask task) {
 		finishedTasks.add(task);
-		System.out.println("task finished");
+		System.out.println("task finished "+task.id+"/"+totalChunkCount);
 	}
 	
 	public synchronized void tick() {
@@ -154,7 +159,7 @@ public class BasicTaskManager extends AbstractFractalsThread implements TaskMana
 				int y = i % chunkSize + cy;
 				double value = task.chunk.getValue(i);
 				if (value > 0) {
-					float hue = (float)Math.log(value);
+					float hue = (float)Math.log(Math.log(value));
 					int color = Color.HSBtoRGB(hue, 0.4f, 0.6f);
 					testImage.setRGB(x, y, color);
 				}

@@ -40,7 +40,8 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	public void stop() {
 		if (onStop()) {
 			state = CalcSystemState.STOPPED;
-			threads.forEach(t -> t.stopThread());
+			for (FractalsThread thread : threads)
+				thread.stopThread();
 		}
 	}
 
