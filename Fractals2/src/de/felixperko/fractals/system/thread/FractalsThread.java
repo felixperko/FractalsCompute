@@ -1,9 +1,12 @@
 package de.felixperko.fractals.system.thread;
 
-public interface FractalsThread {
+import de.felixperko.fractals.system.systems.infra.LifeCycleComponent;
 
-	void stopThread();
+public interface FractalsThread extends LifeCycleComponent{
 
 	void start();
+	void continueThread();
+	void pauseThread();
+	void stopThread();
 
 }

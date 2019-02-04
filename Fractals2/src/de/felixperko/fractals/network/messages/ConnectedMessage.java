@@ -9,14 +9,15 @@ public class ConnectedMessage extends Message {
 	private static final long serialVersionUID = -1809347006971064792L;
 	
 	SenderInfo clientInfo;
-
+	
 	public ConnectedMessage(ClientConnection clientConnection) {
 		this.clientInfo = clientConnection.getSenderInfo();
 	}
 
 	@Override
 	protected void process() {
-		FractalsMain.clientStateHolder.stateClientInfo.setValue(clientInfo);
+		
+		connection.setSenderInfo(clientInfo);
 		log.log("Got client info!");
 		answer(new ConnectedAckMessage());
 	}

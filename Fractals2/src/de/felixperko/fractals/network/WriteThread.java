@@ -9,9 +9,12 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import de.felixperko.fractals.ThreadManager;
+import de.felixperko.fractals.system.systems.infra.LifeCycleState;
+import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.util.CategoryLogger;
 
-public class WriteThread extends FractalsThread {
+public class WriteThread extends AbstractFractalsThread {
 	
 	static int ID_COUNTER = 0;
 	
@@ -29,8 +32,8 @@ public class WriteThread extends FractalsThread {
 	
 	private CategoryLogger listenLogger; //used to buffer logger for listen thread until its creation
 	
-	public WriteThread(Socket socket) {
-		super("writeThread_"+ID_COUNTER++, 5);
+	public WriteThread(ThreadManager threadManager, Socket socket) {
+		super(threadManager);
 		this.socket = socket;
 	}
 
@@ -39,16 +42,24 @@ public class WriteThread extends FractalsThread {
 			InputStream inStream = socket.getInputStream();
 			out = new ObjectOutputStream(socket.getOutputStream());
 			in = new ObjectInputStream(inStream);
-			listenThread = new ListenThread(this, in);
+			listenThread = new ListenThread(threadManager, this, in);
 			if (listenLogger != null)
 				listenThread.setLogger(listenLogger);
 			listenThread.start();
 			
-			while (!Thread.interrupted()) {
+			while (getLifeCycleState() != LifeCycleState.STOPPED) {
 				
-				while (pendingMessages.isEmpty() && !Thread.interrupted()) {
+				while (getLifeCycleState() == LifeCycleState.PAUSED) {
+					try {
+						Thread.sleep(1);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				
+				while (pendingMessages.isEmpty()) {
 					tick();
-					setPhase(PHASE_IDLE);
+					setLifeCycleState(LifeCycleState.IDLE);
 					try {
 						Thread.sleep(1);
 					} catch (InterruptedException e) {
@@ -57,7 +68,7 @@ public class WriteThread extends FractalsThread {
 					}
 				}
 				
-				setPhase(PHASE_WORKING);
+				setLifeCycleState(LifeCycleState.RUNNING);
 				Iterator<Message> it = pendingMessages.iterator();
 				while (it.hasNext()) {
 					if (closeConnection)
@@ -92,7 +103,8 @@ public class WriteThread extends FractalsThread {
 	
 	public void closeConnection() {
 		closeConnection = true;
-		interrupt();
+		if (getLifeCycleState() == LifeCycleState.PAUSED)
+			continueThread();
 	}
 
 	public boolean isCloseConnection() {

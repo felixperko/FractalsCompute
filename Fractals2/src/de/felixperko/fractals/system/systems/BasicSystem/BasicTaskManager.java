@@ -12,6 +12,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.imageio.ImageIO;
 
+import de.felixperko.fractals.ThreadManager;
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.ChunkFactory;
 import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
@@ -22,15 +23,17 @@ import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
 import de.felixperko.fractals.system.parameters.ParamSupplier;
 import de.felixperko.fractals.system.parameters.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
+import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.system.task.TaskManager;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
+import de.felixperko.fractals.system.thread.AbstractSystemThread;
 import de.felixperko.fractals.util.NumberUtil;
 
-public class BasicTaskManager extends AbstractFractalsThread implements TaskManager<BasicTask>{
+public class BasicTaskManager extends AbstractSystemThread implements TaskManager<BasicTask>{
 	
-	public BasicTaskManager(CalcSystem system) {
-		super(system);
+	public BasicTaskManager(ThreadManager threadManager, CalcSystem system) {
+		super(threadManager, system);
 	}
 
 	BufferedImage testImage;
@@ -62,13 +65,11 @@ public class BasicTaskManager extends AbstractFractalsThread implements TaskMana
 	
 	@Override
 	public void run() {
-		mainLoop : while (!stopped) {
-			while (!calculate) {
+		mainLoop : while (getLifeCycleState() != LifeCycleState.STOPPED) {
+			while (getLifeCycleState() == LifeCycleState.PAUSED || !calculate) {//calculate = false -> pause()
 				try {
 					Thread.sleep(1);
 				} catch (InterruptedException e) {
-					if (stopped)
-						break mainLoop;
 					e.printStackTrace();
 				}
 			}

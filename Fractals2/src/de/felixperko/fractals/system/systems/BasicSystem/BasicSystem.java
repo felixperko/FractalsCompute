@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.felixperko.fractals.ThreadManager;
 import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
 import de.felixperko.fractals.system.Numbers.DoubleNumber;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
@@ -34,6 +35,12 @@ public class BasicSystem extends AbstractCalcSystem {
 	
 	List<FractalsThread> managedThreads = new ArrayList<>();
 	
+	ThreadManager threadManager;
+	
+	public BasicSystem(ThreadManager threadManager) {
+		this.threadManager = threadManager;
+	}
+	
 	@Override
 	public boolean onInit(HashMap<String, String> settings) {
 		NumberFactory numberFactory = new NumberFactory(DoubleNumber.class, DoubleComplexNumber.class);
@@ -58,13 +65,13 @@ public class BasicSystem extends AbstractCalcSystem {
 //		//params.put("pow", new StaticParamSupplier("pow", new DoubleComplexNumber(new DoubleNumber(2), new DoubleNumber(Math.PI))));
 //		params.put("limit", new StaticParamSupplier("limit", (Double)(0.2)));
 		
-		managedThreads.add(taskManager = new BasicTaskManager(this));
+		managedThreads.add(taskManager = new BasicTaskManager(threadManager, this));
 		taskManager.setParameters(params);
 		
 		LocalTaskProvider taskProvider = new LocalTaskProvider(taskManager);
 		
 		for (int i = 0 ; i < THREAD_COUNT ; i++){
-			managedThreads.add(new CalculateFractalsThread(this, taskProvider));
+			managedThreads.add(new CalculateFractalsThread(threadManager, this, taskProvider));
 		}
 //		managedThreads.add(calcThread = new CalculateFractalsThread(this, taskProvider));
 //		managedThreads.add(calcThread2 = new CalculateFractalsThread(this, taskProvider));

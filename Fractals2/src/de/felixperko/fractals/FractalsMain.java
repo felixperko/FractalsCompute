@@ -4,6 +4,7 @@ import java.lang.reflect.GenericArrayType;
 import java.util.HashMap;
 import java.util.UUID;
 
+import de.felixperko.fractals.network.NetworkManager;
 import de.felixperko.fractals.system.systems.BasicSystem.BasicSystem;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.CalcSystemFactory;
@@ -22,11 +23,17 @@ public class FractalsMain {
 	
 	static HashMap<String, Class<? extends CalcSystem>> availableSystems = new HashMap<>();
 	
+	static ThreadManager threadManager;
+	static NetworkManager networkManager;
+	
 	public static void main(String[] args) {
 		if ((parameters = parseParameters(args)) == null)
 			System.exit(0);
 		
 		insertAvailableSystems();
+		
+		threadManager = new ThreadManager();
+		networkManager = new NetworkManager(threadManager);
 		
 		initSystem();
 	}

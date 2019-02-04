@@ -15,6 +15,7 @@ public class ChunkUpdateMessage extends Message {
 
 	@Override
 	protected void process() {
+		//TODO receive chunk
 		FractalsMain.threadManager.getCalcPixelThread(FractalsMain.mainWindow.getMainRenderer()).addChunk(chunk);
 	}
 	

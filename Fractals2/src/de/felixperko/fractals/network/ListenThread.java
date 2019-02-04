@@ -4,9 +4,12 @@ import java.awt.Color;
 import java.io.ObjectInputStream;
 import java.net.SocketException;
 
+import de.felixperko.fractals.ThreadManager;
+import de.felixperko.fractals.system.systems.infra.LifeCycleState;
+import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.util.CategoryLogger;
 
-public class ListenThread extends FractalsThread {
+public class ListenThread extends AbstractFractalsThread {
 	
 	final static CategoryLogger LOGGER_GENERIC = new CategoryLogger("com/server/generic/in", Color.MAGENTA);
 
@@ -18,20 +21,29 @@ public class ListenThread extends FractalsThread {
 	ObjectInputStream in;
 	boolean closeConnection = false;
 
-	public ListenThread(WriteThread writeThread, ObjectInputStream in) {
-		super("listenThread_"+ID_COUNTER++, 5);
+	public ListenThread(ThreadManager threadManager, WriteThread writeThread, ObjectInputStream in) {
+		super(threadManager);
 		this.writeThread = writeThread;
 		this.in = in;
 	}
 	
 	@Override
 	public void run() {
-
-		while (!closeConnection) {
+		
+		while (!closeConnection && getLifeCycleState() != LifeCycleState.STOPPED) {
+			
+			while (getLifeCycleState() == LifeCycleState.PAUSED) {
+				try {
+					Thread.sleep(1);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
+			
 			try {
-				setPhase(PHASE_WAITING);
+				setLifeCycleState(LifeCycleState.IDLE);
 				Message msg = (Message) in.readObject();
-				setPhase(PHASE_WORKING);
+				setLifeCycleState(LifeCycleState.RUNNING);
 				msg.received(writeThread.getConnection(), log);
 			} catch (SocketException e) {
 				log.log("lost connection");
@@ -40,6 +52,8 @@ public class ListenThread extends FractalsThread {
 				e.printStackTrace();
 			}
 		}
+		
+		setLifeCycleState(LifeCycleState.STOPPED);
 	}
 
 	public boolean isCloseConnection() {

@@ -24,6 +24,17 @@ public class ServerConnection implements Connection{
 
 	@Override
 	public SenderInfo getSenderInfo() {
-		return null;
+		throw new IllegalArgumentException("ServerConnection has no SenderInfo");
+	}
+
+	@Override
+	public void setSenderInfo(SenderInfo clientInfo) {
+		throw new IllegalArgumentException("ServerConnection has no SenderInfo");
+	}
+
+	
+	@Override
+	public NetworkManager getNetworkManager() {
+		throw new IllegalArgumentException("ServerConnection has no NetworkManager");
 	}
 }

@@ -10,7 +10,7 @@ import de.felixperko.fractals.system.thread.FractalsThread;
 
 public abstract class AbstractCalcSystem implements CalcSystem {
 	
-	CalcSystemState state = CalcSystemState.NOT_INITIALIZED;
+	LifeCycleState state = LifeCycleState.NOT_INITIALIZED;
 	
 	List<FractalsThread> threads = new ArrayList<>();
 	
@@ -19,35 +19,30 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	@Override
 	public void init(HashMap<String, String> settings) {
 		if (onInit(settings))
-			state = CalcSystemState.INITIALIZED;
+			state = LifeCycleState.INITIALIZED;
 	}
 
 	@Override
 	public void start() {
 		if (onStart()) {
-			state = CalcSystemState.RUNNING;
+			state = LifeCycleState.RUNNING;
 		}
 	}
 
 	@Override
 	public void pause() {
 		if (onPause()) {
-			state = CalcSystemState.PAUSED;
+			state = LifeCycleState.PAUSED;
 		}
 	}
 
 	@Override
 	public void stop() {
 		if (onStop()) {
-			state = CalcSystemState.STOPPED;
+			state = LifeCycleState.STOPPED;
 			for (FractalsThread thread : threads)
 				thread.stopThread();
 		}
-	}
-
-	@Override
-	public CalcSystemState getSystemState() {
-		return state;
 	}
 	
 	public void addThread(FractalsThread thread) {
@@ -58,5 +53,14 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	public abstract boolean onStart();
 	public abstract boolean onPause();
 	public abstract boolean onStop();
-
+	
+	@Override
+	public LifeCycleState getLifeCycleState() {
+		return state;
+	}
+	
+	@Override
+	public void setLifeCycleState(LifeCycleState state) {
+		this.state = state;
+	}
 }
