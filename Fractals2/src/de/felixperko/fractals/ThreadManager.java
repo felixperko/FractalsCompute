@@ -12,7 +12,7 @@ public class ThreadManager {
 	List<FractalsThread> threads = new CopyOnWriteArrayList<>();
 
 	public ServerWriteThread startServerWriteThread(Socket accept) {
-		ServerWriteThread thread = new ServerWriteThread(accept);
+		ServerWriteThread thread = new ServerWriteThread(this, accept);
 		threads.add(thread);
 		thread.start();
 		return thread;

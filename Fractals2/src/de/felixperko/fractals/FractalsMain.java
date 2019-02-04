@@ -46,7 +46,7 @@ public class FractalsMain {
 			System.exit(0);
 		}
 		systemFactory = new ClassSystemFactory(availableSystems.get(systemName));
-		CalcSystem system = systemFactory.createSystem();
+		CalcSystem system = systemFactory.createSystem(threadManager);
 		system.init(null);
 		system.start();
 	}

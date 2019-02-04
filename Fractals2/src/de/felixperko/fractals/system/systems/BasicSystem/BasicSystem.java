@@ -25,7 +25,11 @@ import de.felixperko.fractals.system.thread.FractalsThread;
 
 public class BasicSystem extends AbstractCalcSystem {
 
-	public static final int THREAD_COUNT = 4;
+	public BasicSystem(ThreadManager threadManager) {
+		super(threadManager);
+	}
+
+	public static final int THREAD_COUNT = 12;
 
 	TaskFactory factory_task = new ClassTaskFactory(BasicTask.class);
 	
@@ -35,29 +39,23 @@ public class BasicSystem extends AbstractCalcSystem {
 	
 	List<FractalsThread> managedThreads = new ArrayList<>();
 	
-	ThreadManager threadManager;
-	
-	public BasicSystem(ThreadManager threadManager) {
-		this.threadManager = threadManager;
-	}
-	
 	@Override
 	public boolean onInit(HashMap<String, String> settings) {
 		NumberFactory numberFactory = new NumberFactory(DoubleNumber.class, DoubleComplexNumber.class);
 		Map<String, ParamSupplier> params = new HashMap<>();
-		int samplesDim = 1;
-		params.put("width", new StaticParamSupplier("width", (Integer)1000));
-		params.put("height", new StaticParamSupplier("height", (Integer)1000));
-		params.put("midpoint", new StaticParamSupplier("midpoint", new DoubleComplexNumber(new DoubleNumber(1), new DoubleNumber(0.5))));
-		params.put("zoom", new StaticParamSupplier("zoom", numberFactory.createNumber(4)));
-		params.put("iterations", new StaticParamSupplier("iterations", (Integer)500));
+		int samplesDim = 2;
+		params.put("width", new StaticParamSupplier("width", (Integer)4000));
+		params.put("height", new StaticParamSupplier("height", (Integer)4000));
+		params.put("midpoint", new StaticParamSupplier("midpoint", new DoubleComplexNumber(new DoubleNumber(0.251), new DoubleNumber(0.00004849892910689283399687005))));
+		params.put("zoom", new StaticParamSupplier("zoom", numberFactory.createNumber(4./50000.)));
+		params.put("iterations", new StaticParamSupplier("iterations", (Integer)50000));
 		params.put("samples", new StaticParamSupplier("samples", (Integer)(samplesDim*samplesDim)));
 		
 		params.put("start", new StaticParamSupplier("start", new DoubleComplexNumber(new DoubleNumber(0.0), new DoubleNumber(0.0))));
 //		params.put("c", new StaticParamSupplier("c", new DoubleComplexNumber(new DoubleNumber(0.5), new DoubleNumber(0.3))));
 //		params.put("start", new CoordinateParamSupplier("start", numberFactory));
 		params.put("c", new CoordinateBasicShiftParamSupplier("c", numberFactory, samplesDim));
-		params.put("pow", new StaticParamSupplier("pow", new DoubleComplexNumber(new DoubleNumber(2), new DoubleNumber(Math.PI))));
+		params.put("pow", new StaticParamSupplier("pow", new DoubleComplexNumber(new DoubleNumber(2), new DoubleNumber(0))));
 		params.put("limit", new StaticParamSupplier("limit", (Double)100.));
 		
 //		params.put("c", new StaticParamSupplier("c", new DoubleComplexNumber(new DoubleNumber(0.0), new DoubleNumber(0.0))));

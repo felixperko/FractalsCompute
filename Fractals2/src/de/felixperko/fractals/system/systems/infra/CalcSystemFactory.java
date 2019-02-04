@@ -1,5 +1,8 @@
 package de.felixperko.fractals.system.systems.infra;
 
+import de.felixperko.fractals.ThreadManager;
+
 public interface CalcSystemFactory {
-	public CalcSystem createSystem();
+
+	CalcSystem createSystem(ThreadManager threadManager);
 }

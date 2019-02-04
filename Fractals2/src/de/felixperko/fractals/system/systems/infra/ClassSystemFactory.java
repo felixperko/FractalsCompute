@@ -2,6 +2,8 @@ package de.felixperko.fractals.system.systems.infra;
 
 import java.lang.reflect.InvocationTargetException;
 
+import de.felixperko.fractals.ThreadManager;
+
 public class ClassSystemFactory implements CalcSystemFactory{
 	
 	Class<? extends CalcSystem> cls;
@@ -11,9 +13,9 @@ public class ClassSystemFactory implements CalcSystemFactory{
 	}
 	
 	@Override
-	public CalcSystem createSystem() {
+	public CalcSystem createSystem(ThreadManager threadManager) {
 		try {
-			return cls.getConstructor().newInstance();
+			return cls.getConstructor(ThreadManager.class).newInstance(threadManager);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import de.felixperko.fractals.ThreadManager;
 import de.felixperko.fractals.system.task.TaskManager;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.system.thread.FractalsThread;
@@ -15,6 +16,12 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	List<FractalsThread> threads = new ArrayList<>();
 	
 	TaskManager taskManager;
+	
+	protected ThreadManager threadManager;
+	
+	public AbstractCalcSystem(ThreadManager threadManager) {
+		this.threadManager = threadManager;
+	}
 	
 	@Override
 	public void init(HashMap<String, String> settings) {
