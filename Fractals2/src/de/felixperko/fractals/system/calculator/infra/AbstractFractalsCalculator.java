@@ -14,6 +14,8 @@ public abstract class AbstractFractalsCalculator implements FractalsCalculator {
 	
 	Class<? extends AbstractFractalsCalculator> fieldClass;
 	
+	boolean cancelled = false;
+	
 	public AbstractFractalsCalculator(Class<? extends AbstractFractalsCalculator> fieldClass) {
 		this.fieldClass = fieldClass;
 	}
@@ -47,5 +49,15 @@ public abstract class AbstractFractalsCalculator implements FractalsCalculator {
 				}
 			}
 		}
+	}
+	
+	@Override
+	public boolean isCancelled() {
+		return cancelled;
+	}
+	
+	@Override
+	public void setCancelled() {
+		cancelled = true;
 	}
 }

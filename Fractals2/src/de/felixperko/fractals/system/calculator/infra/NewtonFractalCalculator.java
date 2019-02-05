@@ -25,8 +25,11 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 		double limit = (Double) p_limit.get(0,0); //TODO arbitrary precision
 		int it = (Integer) p_iterations.get(0,0);
 		int samples = (Integer) p_samples.get(0, 0);
+		loop : 
 		for (int pixel = 0 ; pixel < chunk.getArrayLength() ; pixel++) {
 			for (int sample = 0 ; sample < samples ; sample++){
+				if (cancelled)
+					break loop;
 				ComplexNumber current = ((ComplexNumber) p_start.get(pixel, sample)).copy();
 				boolean test = current.realDouble() == -2. && current.realImag() == -2.;
 				ComplexNumber c = (ComplexNumber) p_c.get(pixel, sample);

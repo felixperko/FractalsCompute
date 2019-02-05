@@ -1,18 +1,12 @@
 package de.felixperko.fractals.system.parameters;
 
-public class StaticParamSupplier implements ParamSupplier {
+public class StaticParamSupplier extends AbstractParamSupplier {
 	
-	String name;
 	Object obj;
 	
 	public StaticParamSupplier(String name, Object obj) {
-		this.name = name;
+		super(name);
 		this.obj = obj;
-	}
-
-	@Override
-	public String getName() {
-		return name;
 	}
 
 	@Override

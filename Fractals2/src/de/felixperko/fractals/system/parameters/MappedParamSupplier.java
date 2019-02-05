@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public abstract class MappedParamSupplier extends VaryingParamSupplier{
+public abstract class MappedParamSupplier extends AbstractParamSupplier{
 	
+	private static final long serialVersionUID = 6838402763464871572L;
+
 	public MappedParamSupplier(String name) {
 		super(name);
 	}

@@ -8,6 +8,8 @@ import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
 
 public abstract class CoordinateParamSupplier extends MappedParamSupplier {
 	
+	private static final long serialVersionUID = -8190334359234597063L;
+	
 	NumberFactory numberFactory;
 	
 	public CoordinateParamSupplier(String name, NumberFactory numberFactory) {

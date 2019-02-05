@@ -34,8 +34,11 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 		int samples = (Integer) p_samples.get(0,0);
 //		if (chunk.getChunkX() == 5 && chunk.getChunkY() == 10)
 //			System.out.println("test chunk");
+		loop : 
 		for (int pixel = 0 ; pixel < chunk.getArrayLength() ; pixel++) {
 			for (int sample = 0 ; sample < samples ; sample++){
+				if (cancelled)
+					break loop;
 				double res = -1;
 				ComplexNumber current = ((ComplexNumber) p_start.get(pixel,sample)).copy();
 				ComplexNumber c = ((ComplexNumber) p_c.get(pixel,sample)).copy();

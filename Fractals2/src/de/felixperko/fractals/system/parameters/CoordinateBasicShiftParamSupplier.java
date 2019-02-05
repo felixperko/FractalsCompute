@@ -5,7 +5,9 @@ import de.felixperko.fractals.system.Numbers.infra.Number;
 import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
 
 public class CoordinateBasicShiftParamSupplier extends CoordinateParamSupplier {
-
+	
+	private static final long serialVersionUID = 2317887367642326504L;
+	
 	ComplexNumber[] shifts;
 	int dim = 0;
 	
