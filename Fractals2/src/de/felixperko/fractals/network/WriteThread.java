@@ -9,7 +9,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import de.felixperko.fractals.ThreadManager;
+import de.felixperko.fractals.manager.Managers;
+import de.felixperko.fractals.manager.ThreadManager;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.util.CategoryLogger;
@@ -32,8 +33,8 @@ public class WriteThread extends AbstractFractalsThread {
 	
 	private CategoryLogger listenLogger; //used to buffer logger for listen thread until its creation
 	
-	public WriteThread(ThreadManager threadManager, Socket socket) {
-		super(threadManager);
+	public WriteThread(Managers managers, Socket socket) {
+		super(managers);
 		this.socket = socket;
 	}
 
@@ -42,7 +43,7 @@ public class WriteThread extends AbstractFractalsThread {
 			InputStream inStream = socket.getInputStream();
 			out = new ObjectOutputStream(socket.getOutputStream());
 			in = new ObjectInputStream(inStream);
-			listenThread = new ListenThread(threadManager, this, in);
+			listenThread = new ListenThread(managers, this, in);
 			if (listenLogger != null)
 				listenThread.setLogger(listenLogger);
 			listenThread.start();

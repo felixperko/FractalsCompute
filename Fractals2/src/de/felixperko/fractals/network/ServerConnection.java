@@ -1,5 +1,7 @@
 package de.felixperko.fractals.network;
 
+import de.felixperko.fractals.manager.NetworkManager;
+
 /**
  * connection to the server
  */

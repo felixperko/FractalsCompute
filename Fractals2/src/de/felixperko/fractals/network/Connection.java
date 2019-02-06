@@ -1,5 +1,7 @@
 package de.felixperko.fractals.network;
 
+import de.felixperko.fractals.manager.NetworkManager;
+
 public interface Connection {
 	public void writeMessage(Message msg);
 

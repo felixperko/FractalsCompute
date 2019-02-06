@@ -6,7 +6,7 @@ import de.felixperko.fractals.network.Message;
 
 /**
  * client -> server
- * initiates the session (client is assigned to an instance, domain and view and will receive relevant chunk/state updates)
+ * initiates the session (client is assigned to a system, layer and view and will receive relevant chunk/state updates)
  */
 public class SessionInitRequestMessage extends Message{
 	private static final long serialVersionUID = -6879047655133190298L;
@@ -21,7 +21,8 @@ public class SessionInitRequestMessage extends Message{
 	protected void process() {
 		if (!(connection instanceof ClientConnection))
 			throw new IllegalStateException("Client has recieved SessionInitRequestMessage?");
-		FractalsServerMain.dataContainer.newClient(new Client((ClientConnection)connection, configuration));
+//		FractalsServerMain.dataContainer.newClient(new Client((ClientConnection)connection, configuration));
+		connection.getNetworkManager().updateClientConfiguration(getSender(), configuration);
 		answer(new SessionInitResponseMessage());
 	}
 	

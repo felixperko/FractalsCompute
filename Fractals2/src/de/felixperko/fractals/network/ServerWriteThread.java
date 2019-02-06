@@ -3,7 +3,8 @@ package de.felixperko.fractals.network;
 import java.awt.Color;
 import java.net.Socket;
 
-import de.felixperko.fractals.ThreadManager;
+import de.felixperko.fractals.manager.Managers;
+import de.felixperko.fractals.manager.ThreadManager;
 import de.felixperko.fractals.network.messages.ConnectedMessage;
 import de.felixperko.fractals.network.messages.ReachableRequestMessage;
 import de.felixperko.fractals.util.CategoryLogger;
@@ -18,8 +19,8 @@ public class ServerWriteThread extends WriteThread {
 	long reachableRequestInterval = (long) (1/NumberUtil.NS_TO_S);
 	long lastReachableTime;
 	
-	public ServerWriteThread(ThreadManager threadManager, Socket socket) {
-		super(threadManager, socket);
+	public ServerWriteThread(Managers managers, Socket socket) {
+		super(managers, socket);
 		lastReachableTime = System.nanoTime();
 	}
 	

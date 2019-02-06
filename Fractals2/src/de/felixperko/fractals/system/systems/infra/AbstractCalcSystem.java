@@ -3,24 +3,26 @@ package de.felixperko.fractals.system.systems.infra;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
-import de.felixperko.fractals.ThreadManager;
+import de.felixperko.fractals.manager.Managers;
+import de.felixperko.fractals.manager.ThreadManager;
 import de.felixperko.fractals.system.task.TaskManager;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.system.thread.FractalsThread;
 
 public abstract class AbstractCalcSystem implements CalcSystem {
 	
+	protected UUID id = UUID.randomUUID();
+	
 	LifeCycleState state = LifeCycleState.NOT_INITIALIZED;
 	
 	List<FractalsThread> threads = new ArrayList<>();
 	
-	TaskManager taskManager;
+	protected Managers managers;
 	
-	protected ThreadManager threadManager;
-	
-	public AbstractCalcSystem(ThreadManager threadManager) {
-		this.threadManager = threadManager;
+	public AbstractCalcSystem(Managers managers) {
+		this.managers = managers;
 	}
 	
 	@Override
@@ -69,5 +71,10 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	@Override
 	public void setLifeCycleState(LifeCycleState state) {
 		this.state = state;
+	}
+	
+	@Override
+	public UUID getId() {
+		return id;
 	}
 }

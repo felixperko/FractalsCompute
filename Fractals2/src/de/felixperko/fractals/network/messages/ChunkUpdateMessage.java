@@ -19,10 +19,10 @@ public class ChunkUpdateMessage extends Message {
 		FractalsMain.threadManager.getCalcPixelThread(FractalsMain.mainWindow.getMainRenderer()).addChunk(chunk);
 	}
 	
-	@Override
-	public void logIncoming() {
-		log.log("received "+getClass().getSimpleName()+" starting at "+chunk.getStartPosition().toString());
-	}
+//	@Override
+//	public void logIncoming() {
+//		log.log("received "+getClass().getSimpleName()+" starting at "+chunk.getStartPosition().toString());
+//	}
 
 	public Chunk getChunk() {
 		return chunk;

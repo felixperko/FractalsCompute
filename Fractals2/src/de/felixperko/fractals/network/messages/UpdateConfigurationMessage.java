@@ -15,8 +15,9 @@ public class UpdateConfigurationMessage extends Message {
 	
 	@Override
 	protected void process() {
-		log.log("updating configuration: view:"+configuration.isUpdate_view()+" domain:"+configuration.isUpdate_domain()+" instance:"+configuration.isUpdate_instance());
-		FractalsServerMain.dataContainer.getClient(connection.getSenderInfo().getClientId()).configurationUpdated(configuration);
+		//log.log("updating configuration: view:"+configuration.isUpdate_view()+" domain:"+configuration.isUpdate_domain()+" instance:"+configuration.isUpdate_instance());
+		connection.getNetworkManager().updateClientConfiguration(getSender(), configuration);
+		//FractalsServerMain.dataContainer.getClient(connection.getSenderInfo().getClientId()).configurationUpdated(configuration);
 	}
 
 }

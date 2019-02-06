@@ -1,4 +1,4 @@
-package de.felixperko.fractals;
+package de.felixperko.fractals.manager;
 
 import java.net.Socket;
 import java.util.List;
@@ -10,9 +10,15 @@ import de.felixperko.fractals.system.thread.FractalsThread;
 public class ThreadManager {
 	
 	List<FractalsThread> threads = new CopyOnWriteArrayList<>();
+	
+	Managers managers;
+
+	public ThreadManager(Managers managers) {
+		this.managers = managers;
+	}
 
 	public ServerWriteThread startServerWriteThread(Socket accept) {
-		ServerWriteThread thread = new ServerWriteThread(this, accept);
+		ServerWriteThread thread = new ServerWriteThread(managers, accept);
 		threads.add(thread);
 		thread.start();
 		return thread;

@@ -12,9 +12,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.imageio.ImageIO;
 
-import de.felixperko.fractals.ThreadManager;
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.ChunkFactory;
+import de.felixperko.fractals.manager.Managers;
+import de.felixperko.fractals.manager.ThreadManager;
+import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
 import de.felixperko.fractals.system.Numbers.DoubleNumber;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
@@ -32,8 +34,8 @@ import de.felixperko.fractals.util.NumberUtil;
 
 public class BasicTaskManager extends AbstractSystemThread implements TaskManager<BasicTask>{
 	
-	public BasicTaskManager(ThreadManager threadManager, CalcSystem system) {
-		super(threadManager, system);
+	public BasicTaskManager(Managers managers, BasicSystem system) {
+		super(managers, system);
 	}
 
 	BufferedImage testImage;
@@ -152,6 +154,9 @@ public class BasicTaskManager extends AbstractSystemThread implements TaskManage
 	
 	public synchronized void tick() {
 		for (BasicTask task : finishedTasks) {
+			for (ClientConfiguration client : ((BasicSystem)system).getClients()) {
+				managers.getNetworkManager().updateChunk(client, task.chunk);
+			}
 			int chunkSize = task.chunk.getChunkSize();
 			int cx = chunkSize*task.chunk.getChunkX();
 			int cy = chunkSize*task.chunk.getChunkY();

@@ -5,7 +5,10 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 	private static final long serialVersionUID = -7127742325514423406L;
 	
 	String name;
-	boolean resetCalculation = false;
+	
+	boolean systemRelevant = false;
+	boolean layerRelevant = false;
+	boolean viewRelevant = false;
 	
 	public AbstractParamSupplier(String name) {
 		this.name = name;
@@ -16,17 +19,27 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 		return name;
 	}
 
-	@Override
-	public boolean isResetCalculation() {
-		boolean reset = resetCalculation;
-		resetCalculation = false;
-		return reset;
+	public boolean isSystemRelevant() {
+		return systemRelevant;
 	}
 
-	@Override
-	public void setResetCalculation() {
-		// TODO Auto-generated method stub
-
+	public void setSystemRelevant(boolean systemRelevant) {
+		this.systemRelevant = systemRelevant;
 	}
 
+	public boolean isLayerRelevant() {
+		return layerRelevant;
+	}
+
+	public void setLayerRelevant(boolean layerRelevant) {
+		this.layerRelevant = layerRelevant;
+	}
+
+	public boolean isViewRelevant() {
+		return viewRelevant;
+	}
+
+	public void setViewRelevant(boolean viewRelevant) {
+		this.viewRelevant = viewRelevant;
+	}
 }

@@ -4,7 +4,8 @@ import java.awt.Color;
 import java.io.ObjectInputStream;
 import java.net.SocketException;
 
-import de.felixperko.fractals.ThreadManager;
+import de.felixperko.fractals.manager.Managers;
+import de.felixperko.fractals.manager.ThreadManager;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.util.CategoryLogger;
@@ -21,8 +22,8 @@ public class ListenThread extends AbstractFractalsThread {
 	ObjectInputStream in;
 	boolean closeConnection = false;
 
-	public ListenThread(ThreadManager threadManager, WriteThread writeThread, ObjectInputStream in) {
-		super(threadManager);
+	public ListenThread(Managers managers, WriteThread writeThread, ObjectInputStream in) {
+		super(managers);
 		this.writeThread = writeThread;
 		this.in = in;
 	}

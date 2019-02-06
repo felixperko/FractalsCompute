@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
-import de.felixperko.fractals.ThreadManager;
+import de.felixperko.fractals.manager.Managers;
+import de.felixperko.fractals.manager.ThreadManager;
+import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
 import de.felixperko.fractals.system.Numbers.DoubleNumber;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
@@ -25,8 +28,8 @@ import de.felixperko.fractals.system.thread.FractalsThread;
 
 public class BasicSystem extends AbstractCalcSystem {
 
-	public BasicSystem(ThreadManager threadManager) {
-		super(threadManager);
+	public BasicSystem(Managers managers) {
+		super(managers);
 	}
 
 	public static final int THREAD_COUNT = 12;
@@ -38,6 +41,10 @@ public class BasicSystem extends AbstractCalcSystem {
 	CalculateFractalsThread calcThread2;
 	
 	List<FractalsThread> managedThreads = new ArrayList<>();
+	
+	List<ClientConfiguration> clients = new ArrayList<>();
+	
+	List<ParamSupplier> systemRelevantParameters = new ArrayList<>();
 	
 	@Override
 	public boolean onInit(HashMap<String, String> settings) {
@@ -63,13 +70,13 @@ public class BasicSystem extends AbstractCalcSystem {
 //		//params.put("pow", new StaticParamSupplier("pow", new DoubleComplexNumber(new DoubleNumber(2), new DoubleNumber(Math.PI))));
 //		params.put("limit", new StaticParamSupplier("limit", (Double)(0.2)));
 		
-		managedThreads.add(taskManager = new BasicTaskManager(threadManager, this));
+		managedThreads.add(taskManager = new BasicTaskManager(managers, this));
 		taskManager.setParameters(params);
 		
 		LocalTaskProvider taskProvider = new LocalTaskProvider(taskManager);
 		
 		for (int i = 0 ; i < THREAD_COUNT ; i++){
-			managedThreads.add(new CalculateFractalsThread(threadManager, this, taskProvider));
+			managedThreads.add(new CalculateFractalsThread(managers, this, taskProvider));
 		}
 //		managedThreads.add(calcThread = new CalculateFractalsThread(this, taskProvider));
 //		managedThreads.add(calcThread2 = new CalculateFractalsThread(this, taskProvider));
@@ -80,9 +87,6 @@ public class BasicSystem extends AbstractCalcSystem {
 	@Override
 	public boolean onStart() {
 		
-//		taskManager.start();
-//		calcThread.start();
-		//calcThread2.start();
 		for (FractalsThread thread : managedThreads)
 			thread.start();
 		
@@ -100,11 +104,68 @@ public class BasicSystem extends AbstractCalcSystem {
 
 		for (FractalsThread thread : managedThreads)
 			thread.stopThread();
-//		taskManager.stopThread();
-//		calcThread.stopThread();
-		//calcThread2.stopThread();
 		
 		return true;
+	}
+
+	
+	@Override
+	public void reset() {
+		taskManager.reset();
+	}
+
+	
+	@Override
+	public void addClient(ClientConfiguration newConfiguration) {
+		clients.add(newConfiguration);
+		
+	}
+
+	
+	@Override
+	public void changedClient(ClientConfiguration newConfiguration, ClientConfiguration oldConfiguration) {
+		
+		boolean applicable = isApplicable(newConfiguration);
+		
+		synchronized(clients) {
+			clients.remove(oldConfiguration);
+			if (applicable) {
+				clients.add(newConfiguration);
+			}
+		}
+	}
+	
+	public boolean isApplicable(ClientConfiguration config) {
+		boolean hasClient = false;
+		for (ClientConfiguration conf : clients) {
+			if (conf.getConnection() == config.getConnection()) {
+				hasClient = true;
+				break;
+			}
+		}
+		if (hasClient && clients.size() == 1)
+			return true;
+		for (ParamSupplier param : config.getSystemClientData(getId()).getClientParameters().values()) {
+			if (param.isSystemRelevant() || param.isLayerRelevant() || param.isViewRelevant()) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+
+	@Override
+	public void removeClient(ClientConfiguration oldConfiguration) {
+		clients.remove(oldConfiguration);
+	}
+
+	@Override
+	public void changeClientMaxThreadCount(int newGranted, int oldGranted) {
+		//TODO client threads
+	}
+	
+	public List<ClientConfiguration> getClients(){
+		return clients;
 	}
 
 }

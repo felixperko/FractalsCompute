@@ -2,6 +2,7 @@ package de.felixperko.fractals.network;
 
 import java.awt.Color;
 
+import de.felixperko.fractals.manager.NetworkManager;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.util.CategoryLogger;
 
