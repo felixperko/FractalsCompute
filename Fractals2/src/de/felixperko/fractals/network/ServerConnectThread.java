@@ -6,7 +6,7 @@ import java.net.ServerSocket;
 
 import de.felixperko.fractals.FractalsMain;
 import de.felixperko.fractals.manager.Managers;
-import de.felixperko.fractals.manager.NetworkManager;
+import de.felixperko.fractals.manager.ServerNetworkManager;
 import de.felixperko.fractals.manager.ThreadManager;
 import de.felixperko.fractals.system.systems.infra.LifeCycleComponent;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;

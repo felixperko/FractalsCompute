@@ -1,12 +1,13 @@
 package de.felixperko.fractals.network;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import de.felixperko.fractals.system.parameters.ParamSupplier;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 
-public class SystemInstanceClientData {
+public class SystemClientData {
 	HashMap<String, ParamSupplier> clientParameters = new HashMap<>();
 	int grantThreads;
 	
@@ -27,7 +28,7 @@ public class SystemInstanceClientData {
 	}
 
 	
-	public HashMap<String, ParamSupplier> getClientParameters() {
+	public Map<String, ParamSupplier> getClientParameters() {
 		return clientParameters;
 	}
 }

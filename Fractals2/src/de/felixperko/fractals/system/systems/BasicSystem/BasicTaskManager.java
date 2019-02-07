@@ -34,7 +34,7 @@ import de.felixperko.fractals.util.NumberUtil;
 
 public class BasicTaskManager extends AbstractSystemThread implements TaskManager<BasicTask>{
 	
-	public BasicTaskManager(Managers managers, BasicSystem system) {
+	public BasicTaskManager(Managers managers, CalcSystem system) {
 		super(managers, system);
 	}
 
@@ -75,7 +75,16 @@ public class BasicTaskManager extends AbstractSystemThread implements TaskManage
 					e.printStackTrace();
 				}
 			}
-			tick();
+			if (!tick()) {
+				setLifeCycleState(LifeCycleState.IDLE);
+				while (!tick()) {
+					try {
+						Thread.sleep(1);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 	}
 	
@@ -152,39 +161,45 @@ public class BasicTaskManager extends AbstractSystemThread implements TaskManage
 		System.out.println("task finished "+task.id+"/"+totalChunkCount);
 	}
 	
-	public synchronized void tick() {
-		for (BasicTask task : finishedTasks) {
-			for (ClientConfiguration client : ((BasicSystem)system).getClients()) {
-				managers.getNetworkManager().updateChunk(client, task.chunk);
-			}
-			int chunkSize = task.chunk.getChunkSize();
-			int cx = chunkSize*task.chunk.getChunkX();
-			int cy = chunkSize*task.chunk.getChunkY();
-			for (int i = 0 ; i < task.chunk.getArrayLength() ; i++) {
-				int x = i / chunkSize + cx;
-				int y = i % chunkSize + cy;
-				double value = task.chunk.getValue(i);
-				if (value > 0) {
-					float hue = (float)Math.log(Math.log(value));
-					int color = Color.HSBtoRGB(hue, 0.4f, 0.6f);
-					testImage.setRGB(x, y, color);
+	public boolean tick() {
+		if (finishedTasks.isEmpty())
+			return false;
+		setLifeCycleState(LifeCycleState.RUNNING);
+		synchronized(this) {
+			for (BasicTask task : finishedTasks) {
+				for (ClientConfiguration client : ((BasicSystem)system).getClients()) {
+					managers.getNetworkManager().updateChunk(client, task.chunk);
+				}
+	//			int chunkSize = task.chunk.getChunkSize();
+	//			int cx = chunkSize*task.chunk.getChunkX();
+	//			int cy = chunkSize*task.chunk.getChunkY();
+	//			for (int i = 0 ; i < task.chunk.getArrayLength() ; i++) {
+	//				int x = i / chunkSize + cx;
+	//				int y = i % chunkSize + cy;
+	//				double value = task.chunk.getValue(i);
+	//				if (value > 0) {
+	//					float hue = (float)Math.log(Math.log(value));
+	//					int color = Color.HSBtoRGB(hue, 0.4f, 0.6f);
+	//					testImage.setRGB(x, y, color);
+	//				}
+	//			}
+				openChunks--;
+				if (openChunks == 0) { //finished
+	//				try {
+	//					long endTime = System.nanoTime();
+	//					System.out.println("calculated in "+NumberUtil.getElapsedTimeInS(startTime, 2)+"s.");
+	//					ImageIO.write(testImage, "png", new File("test.png"));
+	//					System.out.println("done!");
+	//					system.stop();
+	//					System.exit(0);
+	//				} catch (IOException e) {
+	//					e.printStackTrace();
+	//				}
 				}
 			}
-			openChunks--;
-			if (openChunks == 0) { //finished
-				try {
-					long endTime = System.nanoTime();
-					System.out.println("calculated in "+NumberUtil.getElapsedTimeInS(startTime, 2)+"s.");
-					ImageIO.write(testImage, "png", new File("test.png"));
-					System.out.println("done!");
-					system.stop();
-					System.exit(0);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+			finishedTasks.clear();
 		}
-		finishedTasks.clear();
+		return true;
 	}
 
 	@Override

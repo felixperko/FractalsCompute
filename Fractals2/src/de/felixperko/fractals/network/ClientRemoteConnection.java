@@ -1,16 +1,16 @@
 package de.felixperko.fractals.network;
 
-import de.felixperko.fractals.manager.NetworkManager;
+import de.felixperko.fractals.manager.ServerNetworkManager;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 
 public class ClientRemoteConnection implements ClientConnection{
 	
 	SenderInfo info;
 	ServerWriteThread writeThread;
-	NetworkManager networkManager;
+	ServerNetworkManager networkManager;
 	CalcSystem currentSystem;
 	
-	public ClientRemoteConnection(NetworkManager networkManager, SenderInfo info, ServerWriteThread writeThread) {
+	public ClientRemoteConnection(ServerNetworkManager networkManager, SenderInfo info, ServerWriteThread writeThread) {
 		this.networkManager = networkManager;
 		this.info = info;
 		this.writeThread = writeThread;
@@ -26,7 +26,7 @@ public class ClientRemoteConnection implements ClientConnection{
 	}
 
 	@Override
-	public NetworkManager getNetworkManager() {
+	public ServerNetworkManager getNetworkManager() {
 		return networkManager;
 	}
 

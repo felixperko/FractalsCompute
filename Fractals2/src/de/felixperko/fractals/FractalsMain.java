@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import de.felixperko.fractals.manager.Managers;
-import de.felixperko.fractals.manager.NetworkManager;
+import de.felixperko.fractals.manager.ServerNetworkManager;
 import de.felixperko.fractals.manager.SystemManager;
 import de.felixperko.fractals.system.systems.BasicSystem.BasicSystem;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;

@@ -2,7 +2,7 @@ package de.felixperko.fractals.network;
 
 import java.awt.Color;
 
-import de.felixperko.fractals.manager.NetworkManager;
+import de.felixperko.fractals.manager.ServerNetworkManager;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.util.CategoryLogger;
 
@@ -12,11 +12,11 @@ public class ClientLocalConnection implements ClientConnection {
 	
 	CategoryLogger log = new CategoryLogger("com/local", Color.MAGENTA);
 	
-	NetworkManager networkManager;
+	ServerNetworkManager networkManager;
 	
 	CalcSystem currentSystem;
 	
-	public ClientLocalConnection(NetworkManager networkManager, SenderInfo localSenderInfo) {
+	public ClientLocalConnection(ServerNetworkManager networkManager, SenderInfo localSenderInfo) {
 		this.networkManager = networkManager;
 		this.senderInfo = localSenderInfo;
 	}
@@ -38,7 +38,7 @@ public class ClientLocalConnection implements ClientConnection {
 	}
 
 	@Override
-	public NetworkManager getNetworkManager() {
+	public ServerNetworkManager getNetworkManager() {
 		return networkManager;
 	}
 

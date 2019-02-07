@@ -6,7 +6,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import de.felixperko.fractals.manager.Managers;
-import de.felixperko.fractals.manager.NetworkManager;
+import de.felixperko.fractals.manager.ServerNetworkManager;
 import de.felixperko.fractals.manager.ThreadManager;
 import de.felixperko.fractals.util.CategoryLogger;
 
@@ -14,9 +14,9 @@ public class ClientWriteThread extends WriteThread{
 	
 	final static CategoryLogger superLogger = new CategoryLogger("com/client", Color.MAGENTA);
 	
-	NetworkManager networkManager;
+	ClientNetworkManager networkManager;
 	
-	public ClientWriteThread(Managers managers, NetworkManager networkManager, Socket socket) throws UnknownHostException, IOException {
+	public ClientWriteThread(Managers managers, ClientNetworkManager networkManager, Socket socket) throws UnknownHostException, IOException {
 		super(managers, socket);
 		log = superLogger.createSubLogger("out");
 		setListenLogger(new CategoryLogger("com/client/in", Color.MAGENTA));

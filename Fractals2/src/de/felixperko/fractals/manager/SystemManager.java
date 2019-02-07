@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 import java.util.UUID;
 
 import de.felixperko.fractals.network.ClientConfiguration;
-import de.felixperko.fractals.network.SystemInstanceClientData;
+import de.felixperko.fractals.network.SystemClientData;
 import de.felixperko.fractals.system.parameters.ParamSupplier;
 import de.felixperko.fractals.system.systems.BasicSystem.BasicSystem;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
@@ -15,12 +15,12 @@ import de.felixperko.fractals.system.systems.infra.ClassSystemFactory;
 
 public class SystemManager {
 	
-	static HashMap<UUID, CalcSystem> activeSystems;
+	HashMap<UUID, CalcSystem> activeSystems;
 	
-	static HashMap<String, Class<? extends CalcSystem>> availableSystems = new HashMap<>();
+	HashMap<String, ClassSystemFactory> availableSystems = new HashMap<>();
 	
-	public static String defaultSystem = "BasicSystem";
-	static CalcSystemFactory systemFactory;
+	String defaultSystem = "BasicSystem";
+//	CalcSystemFactory systemFactory;
 	
 	Managers managers;
 	
@@ -29,36 +29,47 @@ public class SystemManager {
 	}
 	
 	public void insertAvailableSystems() {
-		availableSystems.put("BasicSystem", BasicSystem.class);
+		availableSystems.put("BasicSystem", new ClassSystemFactory(BasicSystem.class));
 	}
 
 //	Map<UUID, SystemInstanceClientData> newSystemClientData = new HashMap<>();
 	
 	public void changedClientConfiguration(ClientConfiguration oldConfiguration, ClientConfiguration newConfiguration) {
-		Map<UUID, SystemInstanceClientData> oldDataMap = oldConfiguration.getSystemClientData();
-		Map<UUID, SystemInstanceClientData> newDataMap = newConfiguration.getSystemClientData();
-		for (Entry<UUID, SystemInstanceClientData> e : newConfiguration.getSystemClientData().entrySet()) {
+		
+		Map<UUID, SystemClientData> oldDataMap;
+		if (oldConfiguration != null)
+			oldDataMap = oldConfiguration.getSystemClientData();
+		else
+			oldDataMap = new HashMap<>();
+		
+		Map<UUID, SystemClientData> newDataMap = newConfiguration.getSystemClientData();
+		
+		//evaluate parameter changes for existing systems
+		for (Entry<UUID, SystemClientData> e : newDataMap.entrySet()) {
 			if (!oldDataMap.containsKey(e.getKey())) {
 //				newSystemClientData.put(e.getKey(), e.getValue());
 				CalcSystem system = activeSystems.get(e.getKey());
 				if (system == null)
 					continue;
-				system.addClient(newConfiguration);
+				system.addClient(newConfiguration, e.getValue().getClientParameters());
 			}else {
 				boolean changed = false;
-				SystemInstanceClientData newData = e.getValue();
-				SystemInstanceClientData oldData = oldConfiguration.getSystemClientData(e.getKey());
-				for (Entry<String, ParamSupplier> param : newData.getClientParameters().entrySet()) {
-					String paramName = param.getKey();
-					ParamSupplier newParam = param.getValue();
-					ParamSupplier oldParam = oldData.getClientParameter(paramName);
-					if (!newParam.equals(oldParam)) {
-						changed = true;
+				SystemClientData newData = e.getValue();
+				SystemClientData oldData = null;
+				if (oldConfiguration != null) {
+					oldData = oldConfiguration.getSystemClientData(e.getKey());
+					for (Entry<String, ParamSupplier> param : newData.getClientParameters().entrySet()) {
+						String paramName = param.getKey();
+						ParamSupplier newParam = param.getValue();
+						ParamSupplier oldParam = oldData.getClientParameter(paramName);
+						if (!newParam.equals(oldParam)) {
+							changed = true;
+						}
 					}
 				}
 				
-				int oldGranted = oldData.getGrantedThreads();
-				int newGranted = oldData.getGrantedThreads();
+				int oldGranted = oldData != null ? oldData.getGrantedThreads() : 0;
+				int newGranted = newData.getGrantedThreads();
 				
 				if (!changed && oldGranted == newGranted) {
 					continue;
@@ -76,6 +87,8 @@ public class SystemManager {
 				}
 			}
 		}
+		
+		//unregister from systems
 		for (UUID systemId : oldDataMap.keySet()) {
 			if (!newDataMap.containsKey(systemId)) {
 				CalcSystem system = activeSystems.get(systemId);
@@ -84,17 +97,52 @@ public class SystemManager {
 				system.removeClient(oldConfiguration);
 			}
 		}
+		
+		//process system requests
+		requestLoop :
+		for (SystemClientData data : newConfiguration.getSystemRequests()) {
+			//search systems if applicable
+			for (CalcSystem system : activeSystems.values()) {
+				if (system.isApplicable(newConfiguration.getConnection(), data.getClientParameters())) {
+					system.addClient(newConfiguration, data.getClientParameters());
+					continue requestLoop;
+				}
+			}
+			//no existing system applicable -> create new
+			CalcSystem system = initSystem(data);
+			if (system != null) {
+				system.addClient(newConfiguration, data.getClientParameters());
+				system.start();
+			}
+		}
 	}
 
-	public void initSystem(String systemName) {
-		if (!availableSystems.containsKey(systemName)) {
-			System.err.println("[main] system not available: '"+systemName+"'");
-			System.exit(0);
+	private CalcSystem initSystem(SystemClientData data) {
+		ParamSupplier systemNameParam = data.getClientParameter("systemName");
+		if (systemNameParam == null) {
+			System.err.println("Invalid system request: systemName parameters not set.");
+			return null;
 		}
-		systemFactory = new ClassSystemFactory(availableSystems.get(systemName));
-		CalcSystem system = systemFactory.createSystem(managers.getThreadManager());
-		system.init(null);
-		system.start();
+		String systemName = (String) systemNameParam.get(0, 0);
+		if (!availableSystems.containsKey(systemName)) {
+			System.err.println("Invalid system request: system for name doesn't exist: "+systemName);
+			return null;
+		}
+		
+		CalcSystem system = availableSystems.get(systemName).createSystem(managers);
+		return system;
 	}
+
+//	public CalcSystem initSystem(String systemName) {
+//		if (!availableSystems.containsKey(systemName)) {
+//			System.err.println("[main] system not available: '"+systemName+"'");
+//			System.exit(0);
+//		}
+//		systemFactory = new ClassSystemFactory(availableSystems.get(systemName));
+//		CalcSystem system = systemFactory.createSystem(managers.getThreadManager());
+//		system.init(null);
+//		system.start();
+//		return system;
+//	}
 
 }

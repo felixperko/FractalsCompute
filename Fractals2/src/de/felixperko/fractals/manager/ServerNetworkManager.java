@@ -22,12 +22,12 @@ import de.felixperko.fractals.util.CategoryLogger;
  * Manages connections to clients.
  */
 
-public class NetworkManager {
+public class ServerNetworkManager {
 	
 	CategoryLogger log = new CategoryLogger("com/server", Color.MAGENTA);
 	
 	SenderInfo clientSenderInfo = new SenderInfo(0);
-	ServerConnection serverConnection = null;
+//	ServerConnection serverConnection = null;
 	
 	ServerConnectThread serverConnectThread;
 	
@@ -37,7 +37,7 @@ public class NetworkManager {
 	
 	Managers managers;
 	
-	public NetworkManager(Managers managers) {
+	public ServerNetworkManager(Managers managers) {
 		this.managers = managers;
 	}
 	
@@ -57,7 +57,7 @@ public class NetworkManager {
 	public void updateClientConfiguration(SenderInfo senderInfo, ClientConfiguration newConfiguration) {
 		ClientConfiguration oldConfiguration = clients.get(senderInfo.getClientId());
 		if (newConfiguration.getConnection() == null) {
-			if (oldConfiguration != null)
+			if (oldConfiguration != null && oldConfiguration.getConnection() != null)
 				newConfiguration.setConnection(oldConfiguration.getConnection());
 			else
 				throw new IllegalArgumentException("No connection for ClientConfiguration found.");
@@ -88,11 +88,10 @@ public class NetworkManager {
 		return getClientConnection(senderInfo.getClientId());
 	}
 	
-	public Connection getServerConnection() {
-		return serverConnection;
-	}
+//	public Connection getServerConnection() {
+//		return serverConnection;
+//	}
 	
-
 	public SenderInfo getClientInfo() {
 		return clientSenderInfo;
 	}

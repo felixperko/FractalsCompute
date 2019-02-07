@@ -1,6 +1,6 @@
 package de.felixperko.fractals.network;
 
-import de.felixperko.fractals.manager.NetworkManager;
+import de.felixperko.fractals.manager.ServerNetworkManager;
 
 /**
  * connection to the server
@@ -36,7 +36,7 @@ public class ServerConnection implements Connection{
 
 	
 	@Override
-	public NetworkManager getNetworkManager() {
+	public ServerNetworkManager getNetworkManager() {
 		throw new IllegalArgumentException("ServerConnection has no NetworkManager");
 	}
 }

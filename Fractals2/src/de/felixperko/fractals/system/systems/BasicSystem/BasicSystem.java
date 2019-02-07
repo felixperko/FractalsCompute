@@ -9,6 +9,8 @@ import java.util.UUID;
 import de.felixperko.fractals.manager.Managers;
 import de.felixperko.fractals.manager.ThreadManager;
 import de.felixperko.fractals.network.ClientConfiguration;
+import de.felixperko.fractals.network.ClientConnection;
+import de.felixperko.fractals.network.Connection;
 import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
 import de.felixperko.fractals.system.Numbers.DoubleNumber;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
@@ -116,36 +118,41 @@ public class BasicSystem extends AbstractCalcSystem {
 
 	
 	@Override
-	public void addClient(ClientConfiguration newConfiguration) {
+	public void addClient(ClientConfiguration newConfiguration, Map<String, ParamSupplier> parameters) {
 		clients.add(newConfiguration);
-		
+		taskManager.setParameters(parameters);
 	}
 
 	
 	@Override
 	public void changedClient(ClientConfiguration newConfiguration, ClientConfiguration oldConfiguration) {
 		
-		boolean applicable = isApplicable(newConfiguration);
+		Map<String, ParamSupplier> newParameters = newConfiguration.getSystemClientData(getId()).getClientParameters();
+		
+		boolean applicable = isApplicable(newConfiguration.getConnection(), newParameters);
 		
 		synchronized(clients) {
-			clients.remove(oldConfiguration);
+			if (oldConfiguration != null)
+				clients.remove(oldConfiguration);
 			if (applicable) {
 				clients.add(newConfiguration);
+				taskManager.setParameters(newParameters);
 			}
 		}
 	}
 	
-	public boolean isApplicable(ClientConfiguration config) {
+	@Override
+	public boolean isApplicable(ClientConnection connection, Map<String, ParamSupplier> parameters) {
 		boolean hasClient = false;
 		for (ClientConfiguration conf : clients) {
-			if (conf.getConnection() == config.getConnection()) {
+			if (conf.getConnection() == connection) {
 				hasClient = true;
 				break;
 			}
 		}
 		if (hasClient && clients.size() == 1)
 			return true;
-		for (ParamSupplier param : config.getSystemClientData(getId()).getClientParameters().values()) {
+		for (ParamSupplier param : parameters.values()) {
 			if (param.isSystemRelevant() || param.isLayerRelevant() || param.isViewRelevant()) {
 				return false;
 			}

@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import de.felixperko.fractals.manager.Managers;
 import de.felixperko.fractals.manager.ThreadManager;
+import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.system.task.TaskManager;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.system.thread.FractalsThread;
