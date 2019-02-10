@@ -2,7 +2,7 @@ package de.felixperko.fractals.network.messages;
 
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.ClientConnection;
-import de.felixperko.fractals.network.Message;
+import de.felixperko.fractals.network.infra.Message;
 
 /**
  * client -> server

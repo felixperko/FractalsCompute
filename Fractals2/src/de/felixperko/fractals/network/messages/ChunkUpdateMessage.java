@@ -1,9 +1,10 @@
 package de.felixperko.fractals.network.messages;
 
 import de.felixperko.fractals.data.Chunk;
-import de.felixperko.fractals.network.Message;
+import de.felixperko.fractals.network.infra.Message;
+import de.felixperko.fractals.network.infra.ServerMessage;
 
-public class ChunkUpdateMessage extends Message {
+public class ChunkUpdateMessage extends ServerMessage {
 	
 	private static final long serialVersionUID = -2349690041977280160L;
 	

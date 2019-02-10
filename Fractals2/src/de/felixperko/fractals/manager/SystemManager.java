@@ -13,19 +13,17 @@ import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.CalcSystemFactory;
 import de.felixperko.fractals.system.systems.infra.ClassSystemFactory;
 
-public class SystemManager {
+public class SystemManager extends Manager{
 	
 	HashMap<UUID, CalcSystem> activeSystems;
 	
 	HashMap<String, ClassSystemFactory> availableSystems = new HashMap<>();
 	
-	String defaultSystem = "BasicSystem";
+	public String defaultSystem = "BasicSystem";
 //	CalcSystemFactory systemFactory;
 	
-	Managers managers;
-	
 	public SystemManager(Managers managers) {
-		this.managers = managers;
+		super(managers);
 	}
 	
 	public void insertAvailableSystems() {

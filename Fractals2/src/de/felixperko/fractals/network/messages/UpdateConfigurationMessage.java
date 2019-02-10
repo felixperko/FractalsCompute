@@ -1,9 +1,10 @@
 package de.felixperko.fractals.network.messages;
 
 import de.felixperko.fractals.network.ClientConfiguration;
-import de.felixperko.fractals.network.Message;
+import de.felixperko.fractals.network.infra.ClientMessage;
+import de.felixperko.fractals.network.infra.Message;
 
-public class UpdateConfigurationMessage extends Message {
+public class UpdateConfigurationMessage extends ClientMessage {
 
 	private static final long serialVersionUID = 1476570289262051108L;
 	
@@ -16,7 +17,7 @@ public class UpdateConfigurationMessage extends Message {
 	@Override
 	protected void process() {
 		//log.log("updating configuration: view:"+configuration.isUpdate_view()+" domain:"+configuration.isUpdate_domain()+" instance:"+configuration.isUpdate_instance());
-		connection.getNetworkManager().updateClientConfiguration(getSender(), configuration);
+		getConnection().getNetworkManager().updateClientConfiguration(getSender(), configuration);
 		//FractalsServerMain.dataContainer.getClient(connection.getSenderInfo().getClientId()).configurationUpdated(configuration);
 	}
 

@@ -7,14 +7,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import de.felixperko.fractals.network.ServerWriteThread;
 import de.felixperko.fractals.system.thread.FractalsThread;
 
-public class ThreadManager {
+public class ThreadManager extends Manager{
 	
 	List<FractalsThread> threads = new CopyOnWriteArrayList<>();
-	
-	Managers managers;
 
 	public ThreadManager(Managers managers) {
-		this.managers = managers;
+		super(managers);
 	}
 
 	public ServerWriteThread startServerWriteThread(Socket accept) {

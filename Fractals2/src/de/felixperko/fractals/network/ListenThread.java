@@ -6,6 +6,7 @@ import java.net.SocketException;
 
 import de.felixperko.fractals.manager.Managers;
 import de.felixperko.fractals.manager.ThreadManager;
+import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.util.CategoryLogger;

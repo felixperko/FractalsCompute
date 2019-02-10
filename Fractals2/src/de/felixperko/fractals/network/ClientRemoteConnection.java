@@ -1,6 +1,9 @@
 package de.felixperko.fractals.network;
 
+import de.felixperko.fractals.manager.ClientNetworkManager;
+import de.felixperko.fractals.manager.Manager;
 import de.felixperko.fractals.manager.ServerNetworkManager;
+import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 
 public class ClientRemoteConnection implements ClientConnection{

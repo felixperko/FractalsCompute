@@ -1,8 +1,9 @@
 package de.felixperko.fractals.network.messages;
 
-import de.felixperko.fractals.network.Message;
+import de.felixperko.fractals.network.infra.Message;
+import de.felixperko.fractals.network.infra.ServerMessage;
 
-public class ConnectedAckMessage extends Message{
+public class ConnectedAckMessage extends ServerMessage{
 
 	private static final long serialVersionUID = 4746386962938401924L;
 

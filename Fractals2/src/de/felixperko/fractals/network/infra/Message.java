@@ -1,11 +1,13 @@
-package de.felixperko.fractals.network;
+package de.felixperko.fractals.network.infra;
 
 import java.io.Serializable;
 
+import de.felixperko.fractals.network.Connection;
+import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.util.CategoryLogger;
 import de.felixperko.fractals.util.NumberUtil;
 
-public abstract class Message implements Serializable{
+public abstract class Message<C extends Connection> implements Serializable{
 	
 	private static final long serialVersionUID = 3353653767834804430L;
 
@@ -18,8 +20,6 @@ public abstract class Message implements Serializable{
 	long lastMessageTime;
 	
 	protected transient CategoryLogger log;
-	
-	protected transient Connection connection;
 	
 	public Message() {
 		
@@ -36,11 +36,10 @@ public abstract class Message implements Serializable{
 		log = comLogger;
 	}
 
-	public void setConnection(Connection connection) {
-		this.connection = connection;
-	}
+	protected abstract void setConnection(C connection);
+	public abstract C getConnection();
 	
-	public void received(Connection connection, CategoryLogger log) {
+	public void received(C connection, CategoryLogger log) {
 		this.latency = System.nanoTime()-sentTime;
 		setConnection(connection);
 		setComLogger(log);
@@ -91,6 +90,6 @@ public abstract class Message implements Serializable{
 	}
 	
 	protected void answer(Message message) {
-		connection.writeMessage(message);
+		getConnection().writeMessage(message);
 	}
 }

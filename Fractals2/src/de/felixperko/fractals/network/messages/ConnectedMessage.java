@@ -1,10 +1,11 @@
 package de.felixperko.fractals.network.messages;
 
 import de.felixperko.fractals.network.ClientConnection;
-import de.felixperko.fractals.network.Message;
 import de.felixperko.fractals.network.SenderInfo;
+import de.felixperko.fractals.network.infra.ClientMessage;
+import de.felixperko.fractals.network.infra.Message;
 
-public class ConnectedMessage extends Message {
+public class ConnectedMessage extends ClientMessage {
 
 	private static final long serialVersionUID = -1809347006971064792L;
 	
@@ -17,7 +18,7 @@ public class ConnectedMessage extends Message {
 	@Override
 	protected void process() {
 		
-		connection.setSenderInfo(clientInfo);
+		getConnection().setSenderInfo(clientInfo);
 		log.log("Got client info!");
 		answer(new ConnectedAckMessage());
 	}

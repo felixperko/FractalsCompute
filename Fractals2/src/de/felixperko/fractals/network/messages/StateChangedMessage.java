@@ -2,8 +2,8 @@ package de.felixperko.fractals.network.messages;
 
 import java.util.List;
 
-import de.felixperko.fractals.network.Message;
 import de.felixperko.fractals.network.SenderInfo;
+import de.felixperko.fractals.network.infra.Message;
 
 public class StateChangedMessage<T> extends Message {
 	

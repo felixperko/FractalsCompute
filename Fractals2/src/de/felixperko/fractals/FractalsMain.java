@@ -25,7 +25,7 @@ public class FractalsMain {
 		managers = new Managers();
 
 		managers.getSystemManager().insertAvailableSystems();
-		managers.getSystemManager().initSystem(SystemManager.defaultSystem);
+		managers.getSystemManager().initSystem(managers.getSystemManager().defaultSystem);
 	}
 	
 //	public static String getParameter(String key, String defaultValue) {

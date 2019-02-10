@@ -5,6 +5,7 @@ import java.net.Socket;
 
 import de.felixperko.fractals.manager.Managers;
 import de.felixperko.fractals.manager.ThreadManager;
+import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.network.messages.ConnectedMessage;
 import de.felixperko.fractals.network.messages.ReachableRequestMessage;
 import de.felixperko.fractals.util.CategoryLogger;

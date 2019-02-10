@@ -44,7 +44,7 @@ public class ServerConnectThread extends AbstractFractalsThread{
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				ClientRemoteConnection connection = managers.getNetworkManager().createNewClient(serverWriteThread);
+				ClientRemoteConnection connection = managers.getServerNetworkManager().createNewClient(serverWriteThread);
 				serverWriteThread.setClientConnection(connection);
 			}
 			server.close();

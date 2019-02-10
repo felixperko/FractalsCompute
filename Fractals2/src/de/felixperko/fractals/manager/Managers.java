@@ -4,7 +4,7 @@ public class Managers {
 	
 	SystemManager systemManager;
 	ThreadManager threadManager;
-	ServerNetworkManager networkManager;
+	Manager networkManager;
 	
 	public Managers() {
 		systemManager = new SystemManager(this);
@@ -20,8 +20,16 @@ public class Managers {
 		return threadManager;
 	}
 	
-	public ServerNetworkManager getNetworkManager() {
+	public Manager getNetworkManager() {
 		return networkManager;
+	}
+
+	public ServerNetworkManager getServerNetworkManager() {
+		return (ServerNetworkManager) networkManager;
+	}
+
+	public ClientNetworkManager getClientNetworkManager() {
+		return (ClientNetworkManager) networkManager;
 	}
 	
 	

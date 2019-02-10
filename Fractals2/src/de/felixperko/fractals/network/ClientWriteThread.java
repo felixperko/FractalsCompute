@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import de.felixperko.fractals.manager.ClientNetworkManager;
 import de.felixperko.fractals.manager.Managers;
 import de.felixperko.fractals.manager.ServerNetworkManager;
 import de.felixperko.fractals.manager.ThreadManager;
+import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.util.CategoryLogger;
 
 public class ClientWriteThread extends WriteThread{

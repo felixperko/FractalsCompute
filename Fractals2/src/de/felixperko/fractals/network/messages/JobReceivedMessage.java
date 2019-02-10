@@ -1,7 +1,7 @@
 package de.felixperko.fractals.network.messages;
 
-import de.felixperko.fractals.network.Message;
 import de.felixperko.fractals.network.SenderInfo;
+import de.felixperko.fractals.network.infra.Message;
 
 public class JobReceivedMessage extends Message {
 

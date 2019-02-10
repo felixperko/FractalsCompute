@@ -9,10 +9,8 @@ import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.ClientConnection;
 import de.felixperko.fractals.network.ClientLocalConnection;
 import de.felixperko.fractals.network.ClientRemoteConnection;
-import de.felixperko.fractals.network.Connection;
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.ServerConnectThread;
-import de.felixperko.fractals.network.ServerConnection;
 import de.felixperko.fractals.network.ServerWriteThread;
 import de.felixperko.fractals.network.messages.ChunkUpdateMessage;
 import de.felixperko.fractals.util.CategoryLogger;
@@ -22,12 +20,9 @@ import de.felixperko.fractals.util.CategoryLogger;
  * Manages connections to clients.
  */
 
-public class ServerNetworkManager {
+public class ServerNetworkManager extends Manager implements NetworkManager{
 	
 	CategoryLogger log = new CategoryLogger("com/server", Color.MAGENTA);
-	
-	SenderInfo clientSenderInfo = new SenderInfo(0);
-//	ServerConnection serverConnection = null;
 	
 	ServerConnectThread serverConnectThread;
 	
@@ -35,10 +30,8 @@ public class ServerNetworkManager {
 	
 	Map<Integer, ClientConfiguration> clients = new HashMap<>();
 	
-	Managers managers;
-	
 	public ServerNetworkManager(Managers managers) {
-		this.managers = managers;
+		super(managers);
 	}
 	
 	public void startServerConnectThread() {
@@ -86,14 +79,6 @@ public class ServerNetworkManager {
 	
 	public ClientConnection getClientConnection(SenderInfo senderInfo) {
 		return getClientConnection(senderInfo.getClientId());
-	}
-	
-//	public Connection getServerConnection() {
-//		return serverConnection;
-//	}
-	
-	public SenderInfo getClientInfo() {
-		return clientSenderInfo;
 	}
 
 	public void updateChunk(ClientConfiguration client, Chunk chunk) {
