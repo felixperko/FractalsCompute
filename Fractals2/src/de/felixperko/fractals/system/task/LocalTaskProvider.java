@@ -1,27 +1,49 @@
 package de.felixperko.fractals.system.task;
 
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * basic round robin implementation
+ *
+ */
 public class LocalTaskProvider implements TaskProvider {
 
-	TaskManager taskManager;
+	List<TaskManager> taskManagers = new ArrayList<>();
 	
-	public LocalTaskProvider(TaskManager taskManager) {
-		this.taskManager = taskManager;
+	int roundRobinIndex = 0;
+	
+	@Override
+	public synchronized void addTaskManager(TaskManager taskManager) {
+		taskManagers.add(taskManager);
+	}
+	
+	@Override
+	public synchronized void removeTaskManager(TaskManager taskManager) {
+		taskManagers.remove(taskManager);
 	}
 	
 	@Override
 	public FractalsTask getTask() {
-		List<FractalsTask> taskList = taskManager.getTasks(1);
-		if (taskList == null)
-			return null;
-		return taskList.get(0);
+		return getNextTask();
+	}
+	
+	protected synchronized FractalsTask getNextTask() {
+		for (int i = 0 ; i < taskManagers.size() ; i++) {
+			if (roundRobinIndex >= taskManagers.size())
+				roundRobinIndex = 0;
+			TaskManager manager = taskManagers.get(roundRobinIndex++);
+			List<FractalsTask> tasks = manager.getTasks(1);
+			if (tasks != null && tasks.size() == 1)
+				return tasks.get(0);
+		}
+		return null;
 	}
 
 	
 	@Override
 	public void finishedTask(FractalsTask task) {
-		taskManager.taskFinished(task);
+		task.getTaskManager().taskFinished(task);
 	}
 
 }

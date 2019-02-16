@@ -3,9 +3,10 @@ package de.felixperko.fractals.network;
 import java.awt.Color;
 import java.net.Socket;
 
-import de.felixperko.fractals.manager.Managers;
-import de.felixperko.fractals.manager.ThreadManager;
+import de.felixperko.fractals.manager.ServerManagers;
+import de.felixperko.fractals.manager.ServerThreadManager;
 import de.felixperko.fractals.network.infra.Message;
+import de.felixperko.fractals.network.infra.connection.ClientRemoteConnection;
 import de.felixperko.fractals.network.messages.ConnectedMessage;
 import de.felixperko.fractals.network.messages.ReachableRequestMessage;
 import de.felixperko.fractals.util.CategoryLogger;
@@ -20,7 +21,7 @@ public class ServerWriteThread extends WriteThread {
 	long reachableRequestInterval = (long) (1/NumberUtil.NS_TO_S);
 	long lastReachableTime;
 	
-	public ServerWriteThread(Managers managers, Socket socket) {
+	public ServerWriteThread(ServerManagers managers, Socket socket) {
 		super(managers, socket);
 		lastReachableTime = System.nanoTime();
 	}
@@ -48,9 +49,13 @@ public class ServerWriteThread extends WriteThread {
 
 	public void setClientConnection(ClientRemoteConnection clientConnection) {
 		this.clientConnection = clientConnection;
-		super.setConnection(clientConnection);
 		setListenLogger(superLog.createSubLogger(clientConnection.getSenderInfo().getClientId()+"/in"));
 		this.log = superLog.createSubLogger(clientConnection.getSenderInfo().getClientId()+"/out");
 		writeMessage(new ConnectedMessage(clientConnection));
+	}
+
+	@Override
+	public ClientRemoteConnection getConnection() {
+		return clientConnection;
 	}
 }

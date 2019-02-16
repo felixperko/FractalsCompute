@@ -1,8 +1,9 @@
 package de.felixperko.fractals.network.messages;
 
 import de.felixperko.fractals.network.infra.Message;
+import de.felixperko.fractals.network.infra.ServerMessage;
 
-public class ReachableRequestMessage extends Message {
+public class ReachableRequestMessage extends ServerMessage {
 
 	private static final long serialVersionUID = 7296165361042593042L;
 

@@ -3,11 +3,13 @@ package de.felixperko.fractals.system.systems.infra;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
-import de.felixperko.fractals.manager.Managers;
-import de.felixperko.fractals.manager.ThreadManager;
+import de.felixperko.fractals.manager.ServerManagers;
+import de.felixperko.fractals.manager.ServerThreadManager;
 import de.felixperko.fractals.network.ClientConfiguration;
+import de.felixperko.fractals.system.parameters.ParamSupplier;
 import de.felixperko.fractals.system.task.TaskManager;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.system.thread.FractalsThread;
@@ -20,15 +22,15 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	
 	List<FractalsThread> threads = new ArrayList<>();
 	
-	protected Managers managers;
+	protected ServerManagers managers;
 	
-	public AbstractCalcSystem(Managers managers) {
+	public AbstractCalcSystem(ServerManagers managers) {
 		this.managers = managers;
 	}
 	
 	@Override
-	public void init(HashMap<String, String> settings) {
-		if (onInit(settings))
+	public void init(Map<String, ParamSupplier> parameters) {
+		if (onInit(parameters))
 			state = LifeCycleState.INITIALIZED;
 	}
 
@@ -59,7 +61,7 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 		threads.add(thread);
 	}
 	
-	public abstract boolean onInit(HashMap<String, String> settings);
+	public abstract boolean onInit(Map<String, ParamSupplier> params);
 	public abstract boolean onStart();
 	public abstract boolean onPause();
 	public abstract boolean onStop();

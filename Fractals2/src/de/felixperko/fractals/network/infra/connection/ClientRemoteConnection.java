@@ -1,8 +1,10 @@
-package de.felixperko.fractals.network;
+package de.felixperko.fractals.network.infra.connection;
 
 import de.felixperko.fractals.manager.ClientNetworkManager;
 import de.felixperko.fractals.manager.Manager;
 import de.felixperko.fractals.manager.ServerNetworkManager;
+import de.felixperko.fractals.network.SenderInfo;
+import de.felixperko.fractals.network.ServerWriteThread;
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 

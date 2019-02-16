@@ -1,6 +1,8 @@
 package de.felixperko.fractals.manager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
@@ -15,14 +17,14 @@ import de.felixperko.fractals.system.systems.infra.ClassSystemFactory;
 
 public class SystemManager extends Manager{
 	
-	HashMap<UUID, CalcSystem> activeSystems;
+	Map<UUID, CalcSystem> activeSystems = new HashMap<>();
 	
-	HashMap<String, ClassSystemFactory> availableSystems = new HashMap<>();
+	Map<String, ClassSystemFactory> availableSystems = new HashMap<>();
 	
 	public String defaultSystem = "BasicSystem";
 //	CalcSystemFactory systemFactory;
 	
-	public SystemManager(Managers managers) {
+	public SystemManager(ServerManagers managers) {
 		super(managers);
 	}
 	
@@ -44,13 +46,13 @@ public class SystemManager extends Manager{
 		
 		//evaluate parameter changes for existing systems
 		for (Entry<UUID, SystemClientData> e : newDataMap.entrySet()) {
-			if (!oldDataMap.containsKey(e.getKey())) {
+			if (!oldDataMap.containsKey(e.getKey())) {//new parameter (didn't exist in oldDataMap)
 //				newSystemClientData.put(e.getKey(), e.getValue());
 				CalcSystem system = activeSystems.get(e.getKey());
 				if (system == null)
 					continue;
-				system.addClient(newConfiguration, e.getValue().getClientParameters());
-			}else {
+				system.addClient(newConfiguration, e.getValue());
+			} else {//parameter was changed
 				boolean changed = false;
 				SystemClientData newData = e.getValue();
 				SystemClientData oldData = null;
@@ -97,19 +99,21 @@ public class SystemManager extends Manager{
 		}
 		
 		//process system requests
+		List<SystemClientData> requests = new ArrayList<>(newConfiguration.getSystemRequests());
 		requestLoop :
-		for (SystemClientData data : newConfiguration.getSystemRequests()) {
+		for (SystemClientData data : requests) {
 			//search systems if applicable
 			for (CalcSystem system : activeSystems.values()) {
 				if (system.isApplicable(newConfiguration.getConnection(), data.getClientParameters())) {
-					system.addClient(newConfiguration, data.getClientParameters());
+					system.addClient(newConfiguration, data);
 					continue requestLoop;
 				}
 			}
 			//no existing system applicable -> create new
 			CalcSystem system = initSystem(data);
 			if (system != null) {
-				system.addClient(newConfiguration, data.getClientParameters());
+				system.init(data.getClientParameters());
+				system.addClient(newConfiguration, data);
 				system.start();
 			}
 		}

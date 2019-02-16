@@ -11,4 +11,8 @@ public class ChunkFactory {
 	public Chunk createChunk(int chunkX, int chunkY) {
 		return new Chunk(chunkX, chunkY, dimensionSize);
 	}
+
+	public int getChunkSize() {
+		return dimensionSize;
+	}
 }

@@ -1,7 +1,7 @@
 package de.felixperko.fractals.system.systems.infra;
 
 import de.felixperko.fractals.manager.Managers;
-import de.felixperko.fractals.manager.ThreadManager;
+import de.felixperko.fractals.manager.ServerThreadManager;
 
 public interface CalcSystemFactory {
 

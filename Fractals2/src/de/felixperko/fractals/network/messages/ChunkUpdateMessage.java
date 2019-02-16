@@ -1,23 +1,28 @@
 package de.felixperko.fractals.network.messages;
 
+import java.util.UUID;
+
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.network.infra.ServerMessage;
+import de.felixperko.fractals.network.infra.SystemServerMessage;
 
-public class ChunkUpdateMessage extends ServerMessage {
+public class ChunkUpdateMessage extends SystemServerMessage {
 	
 	private static final long serialVersionUID = -2349690041977280160L;
 	
 	Chunk chunk;
 	
-	public ChunkUpdateMessage(Chunk chunk) {
+	public ChunkUpdateMessage(UUID systemId, Chunk chunk) {
+		super(systemId);
 		this.chunk = chunk;
 	}
 
 	@Override
 	protected void process() {
 		//TODO receive chunk
-		FractalsMain.threadManager.getCalcPixelThread(FractalsMain.mainWindow.getMainRenderer()).addChunk(chunk);
+		getClientSystemInterface().chunkUpdated(chunk);
+//		FractalsMain.threadManager.getCalcPixelThread(FractalsMain.mainWindow.getMainRenderer()).addChunk(chunk);
 	}
 	
 //	@Override

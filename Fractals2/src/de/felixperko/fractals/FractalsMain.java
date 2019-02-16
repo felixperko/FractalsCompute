@@ -4,7 +4,7 @@ import java.lang.reflect.GenericArrayType;
 import java.util.HashMap;
 import java.util.UUID;
 
-import de.felixperko.fractals.manager.Managers;
+import de.felixperko.fractals.manager.ServerManagers;
 import de.felixperko.fractals.manager.ServerNetworkManager;
 import de.felixperko.fractals.manager.SystemManager;
 import de.felixperko.fractals.system.systems.BasicSystem.BasicSystem;
@@ -18,14 +18,19 @@ public class FractalsMain {
 //	
 //	static HashMap<String,String> parameters = new HashMap<>();
 	
-	static Managers managers;
+	static ServerManagers managers;
+	
+	public static int THREAD_COUNT = 8;
 	
 	public static void main(String[] args) {
 		
-		managers = new Managers();
+		managers = new ServerManagers();
 
 		managers.getSystemManager().insertAvailableSystems();
-		managers.getSystemManager().initSystem(managers.getSystemManager().defaultSystem);
+		
+		managers.getThreadManager().startWorkerThreads(THREAD_COUNT);
+		managers.getServerNetworkManager().startServerConnectThread();
+		//managers.getSystemManager().initSystem(managers.getSystemManager().defaultSystem);
 	}
 	
 //	public static String getParameter(String key, String defaultValue) {

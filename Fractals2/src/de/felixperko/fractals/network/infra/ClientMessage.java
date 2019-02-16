@@ -1,22 +1,43 @@
 package de.felixperko.fractals.network.infra;
 
 import de.felixperko.fractals.network.Connection;
-import de.felixperko.fractals.network.ServerConnection;
+import de.felixperko.fractals.network.SenderInfo;
+import de.felixperko.fractals.network.infra.connection.ClientConnection;
+import de.felixperko.fractals.network.infra.connection.ServerConnection;
 
-public abstract class ClientMessage extends Message<ServerConnection> {
+public abstract class ClientMessage extends Message<ClientConnection, ClientConnection> {
 	
 	private static final long serialVersionUID = -6067480185642257683L;
 	
-	ServerConnection connection;
+	ClientConnection connection;
+	ClientConnection backConnection;
 	
+	public ClientMessage() {
+		super();
+	}
+	
+	public ClientMessage(SenderInfo sender, Message<?, ?> lastMessage) {
+		super(sender, lastMessage);
+	}
+
 	@Override
-	public ServerConnection getConnection() {
+	public ClientConnection getConnection() {
 		return connection;
 	}
 
 	@Override
-	protected void setConnection(ServerConnection connection) {
+	protected void setConnection(ClientConnection connection) {
 		this.connection = connection;
+	}
+	
+	@Override
+	public ClientConnection getBackConnection() {
+		return backConnection;
+	}
+	
+	@Override
+	protected void setBackConnection(ClientConnection connection) {
+		this.backConnection = connection;
 	}
 
 }

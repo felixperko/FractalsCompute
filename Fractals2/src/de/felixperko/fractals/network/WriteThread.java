@@ -10,13 +10,14 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import de.felixperko.fractals.manager.Managers;
-import de.felixperko.fractals.manager.ThreadManager;
+import de.felixperko.fractals.manager.ServerManagers;
+import de.felixperko.fractals.manager.ServerThreadManager;
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.util.CategoryLogger;
 
-public class WriteThread extends AbstractFractalsThread {
+public abstract class WriteThread extends AbstractFractalsThread {
 	
 	static int ID_COUNTER = 0;
 	
@@ -30,7 +31,7 @@ public class WriteThread extends AbstractFractalsThread {
 	private ObjectOutputStream out;
 	protected Socket socket;
 	
-	Connection connection;
+//	Connection connection;
 	
 	private CategoryLogger listenLogger; //used to buffer logger for listen thread until its creation
 	
@@ -49,6 +50,7 @@ public class WriteThread extends AbstractFractalsThread {
 				listenThread.setLogger(listenLogger);
 			listenThread.start();
 			
+			mainLoop:
 			while (getLifeCycleState() != LifeCycleState.STOPPED) {
 				
 				while (getLifeCycleState() == LifeCycleState.PAUSED) {
@@ -71,14 +73,16 @@ public class WriteThread extends AbstractFractalsThread {
 				}
 				
 				setLifeCycleState(LifeCycleState.RUNNING);
-				Iterator<Message> it = pendingMessages.iterator();
-				while (it.hasNext()) {
-					if (closeConnection)
-						break;
-					Message msg = it.next();
-					prepareMessage(msg);
-					out.writeObject(msg);
-					it.remove();
+				synchronized(this) {
+					Iterator<Message> it = pendingMessages.iterator();
+					while (it.hasNext()) {
+						if (closeConnection)
+							break mainLoop;
+						Message msg = it.next();
+						prepareMessage(msg);
+						out.writeObject(msg);
+						it.remove();
+					}
 				}
 				out.flush();
 			}
@@ -99,7 +103,7 @@ public class WriteThread extends AbstractFractalsThread {
 	protected void tick() {
 	}
 
-	public void writeMessage(Message msg) {
+	public synchronized void writeMessage(Message msg) {
 		pendingMessages.add(msg);
 	}
 	
@@ -119,12 +123,14 @@ public class WriteThread extends AbstractFractalsThread {
 		else
 			listenThread.setLogger(listenLogger);
 	}
+
+	public abstract Connection getConnection();
 	
-	public void setConnection(Connection connection) {
-		this.connection = connection;
-	}
+//	public void setConnection(Connection connection) {
+//		this.connection = connection;
+//	}
 	
-	public Connection getConnection() {
-		return connection;
-	}
+//	public Connection getConnection() {
+//		return connection;
+//	}
 }

@@ -6,8 +6,10 @@ import java.net.ServerSocket;
 
 import de.felixperko.fractals.FractalsMain;
 import de.felixperko.fractals.manager.Managers;
+import de.felixperko.fractals.manager.ServerManagers;
 import de.felixperko.fractals.manager.ServerNetworkManager;
-import de.felixperko.fractals.manager.ThreadManager;
+import de.felixperko.fractals.manager.ServerThreadManager;
+import de.felixperko.fractals.network.infra.connection.ClientRemoteConnection;
 import de.felixperko.fractals.system.systems.infra.LifeCycleComponent;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
@@ -17,7 +19,7 @@ public class ServerConnectThread extends AbstractFractalsThread{
 
 	CategoryLogger log = new CategoryLogger("com/server", Color.MAGENTA);
 	
-	public ServerConnectThread(Managers managers) {
+	public ServerConnectThread(ServerManagers managers) {
 		super(managers);
 	}
 	
@@ -37,14 +39,13 @@ public class ServerConnectThread extends AbstractFractalsThread{
 					}
 				}
 				
-				//TODO manage write threads to send messages effortlessly
-				ServerWriteThread serverWriteThread = managers.getThreadManager().startServerWriteThread(server.accept());
+				ServerWriteThread serverWriteThread = ((ServerThreadManager) managers.getThreadManager()).startServerWriteThread(server.accept());
 				try {
 					Thread.sleep(1);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				ClientRemoteConnection connection = managers.getServerNetworkManager().createNewClient(serverWriteThread);
+				ClientRemoteConnection connection = ((ServerNetworkManager)managers.getNetworkManager()).createNewClient(serverWriteThread);
 				serverWriteThread.setClientConnection(connection);
 			}
 			server.close();

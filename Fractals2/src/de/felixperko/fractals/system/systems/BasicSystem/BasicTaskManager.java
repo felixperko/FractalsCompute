@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,14 +15,20 @@ import javax.imageio.ImageIO;
 
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.ChunkFactory;
-import de.felixperko.fractals.manager.Managers;
-import de.felixperko.fractals.manager.ThreadManager;
+import de.felixperko.fractals.manager.ServerManagers;
+import de.felixperko.fractals.manager.ServerNetworkManager;
+import de.felixperko.fractals.manager.ServerThreadManager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
 import de.felixperko.fractals.system.Numbers.DoubleNumber;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.Number;
 import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
+import de.felixperko.fractals.system.calculator.BurningShipCalculator;
+import de.felixperko.fractals.system.calculator.MandelbrotCalculator;
+import de.felixperko.fractals.system.calculator.NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator;
+import de.felixperko.fractals.system.calculator.NewtonThridPowerMinusOneCalculator;
+import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.parameters.ParamSupplier;
 import de.felixperko.fractals.system.parameters.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
@@ -34,15 +41,23 @@ import de.felixperko.fractals.util.NumberUtil;
 
 public class BasicTaskManager extends AbstractSystemThread implements TaskManager<BasicTask>{
 	
-	public BasicTaskManager(Managers managers, CalcSystem system) {
+	static Map<String, Class<? extends FractalsCalculator>> availableCalculators = new HashMap<>();
+	
+	static {
+		availableCalculators.put("MandelbrotCalculator", MandelbrotCalculator.class);
+		availableCalculators.put("BurningShipCalculator", BurningShipCalculator.class);
+		availableCalculators.put("NewtonThridPowerMinusOneCalculator", NewtonThridPowerMinusOneCalculator.class);
+		availableCalculators.put("NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator", NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator.class);
+//		availableCalculators.put("", );
+	}
+	
+	public BasicTaskManager(ServerManagers managers, CalcSystem system) {
 		super(managers, system);
 	}
 
 	BufferedImage testImage;
-	
-	int chunkSize = 250;
 
-	ChunkFactory chunkFactory = new ChunkFactory(chunkSize);
+	ChunkFactory chunkFactory;
 	NumberFactory numberFactory = new NumberFactory(DoubleNumber.class, DoubleComplexNumber.class);
 	
 	Chunk[][] chunks;
@@ -64,6 +79,8 @@ public class BasicTaskManager extends AbstractSystemThread implements TaskManage
 	int totalChunkCount = 0;
 	
 	long startTime = 0;
+	
+	Class<? extends FractalsCalculator> calculatorClass = null;
 	
 	@Override
 	public void run() {
@@ -95,6 +112,10 @@ public class BasicTaskManager extends AbstractSystemThread implements TaskManage
 			zoom = (Number) params.get("zoom").get(0,0);
 			width = (Integer) params.get("width").get(0,0);
 			height = (Integer) params.get("height").get(0,0);
+			calculatorClass = availableCalculators.get(((String)params.get("calculator").get(0, 0)));
+			if (calculatorClass == null)
+				throw new IllegalStateException("Couldn't find calculator for name: "+params.get("calculator").get(0, 0).toString());
+			chunkFactory = new ChunkFactory((int)params.get("chunkSize").get(0, 0));
 			
 			Number pixelzoom = numberFactory.createNumber(1./width);
 			pixelzoom.mult(zoom);
@@ -113,6 +134,7 @@ public class BasicTaskManager extends AbstractSystemThread implements TaskManage
 
 	@Override
 	public void startTasks() {
+		int chunkSize = chunkFactory.getChunkSize();
 		int dimX = width/chunkSize;
 		int dimY = height/chunkSize;
 		chunks = new Chunk[dimX][dimY];
@@ -120,6 +142,7 @@ public class BasicTaskManager extends AbstractSystemThread implements TaskManage
 		totalChunkCount = openChunks;
 		startTime = System.nanoTime();
 		int id = 0;
+		FractalsCalculator calculator = createCalculator();
 		for (int x = 0 ; x < dimX ; x++) {
 			for (int y = 0 ; y < dimY ; y++) {
 				Chunk chunk = chunkFactory.createChunk(x, y);
@@ -130,14 +153,23 @@ public class BasicTaskManager extends AbstractSystemThread implements TaskManage
 					chunkPos.add(midpoint);
 //					Map<String, ParamSupplier> taskParameters = new HashMap<>(currentParameters);
 //					taskParameters.putAll(currentParameters);
-					openTasks.add(new BasicTask(id, chunk, currentParameters, chunkPos));
+					openTasks.add(new BasicTask(id, this, chunk, currentParameters, chunkPos, createCalculator()));//TODO calculator for each thread not each task
 					calculate = true;
 					id++;
 				}
 			}
 		}
 	}
-	
+
+	private FractalsCalculator createCalculator() {
+		try {
+			return calculatorClass.getDeclaredConstructor().newInstance();
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
+			throw new IllegalStateException("Failed to create calculator for class: "+calculatorClass.getName());
+		}
+	}
+
 	@Override
 	public synchronized List<BasicTask> getTasks(int count) {
 		int size = openTasks.size();
@@ -168,7 +200,7 @@ public class BasicTaskManager extends AbstractSystemThread implements TaskManage
 		synchronized(this) {
 			for (BasicTask task : finishedTasks) {
 				for (ClientConfiguration client : ((BasicSystem)system).getClients()) {
-					managers.getNetworkManager().updateChunk(client, task.chunk);
+					((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, task.chunk);
 				}
 	//			int chunkSize = task.chunk.getChunkSize();
 	//			int cx = chunkSize*task.chunk.getChunkX();
@@ -185,6 +217,7 @@ public class BasicTaskManager extends AbstractSystemThread implements TaskManage
 	//			}
 				openChunks--;
 				if (openChunks == 0) { //finished
+					system.stop();
 	//				try {
 	//					long endTime = System.nanoTime();
 	//					System.out.println("calculated in "+NumberUtil.getElapsedTimeInS(startTime, 2)+"s.");

@@ -4,8 +4,12 @@ import java.awt.Color;
 import java.io.ObjectInputStream;
 import java.net.SocketException;
 
+import de.felixperko.fractals.manager.ClientManagers;
 import de.felixperko.fractals.manager.Managers;
-import de.felixperko.fractals.manager.ThreadManager;
+import de.felixperko.fractals.manager.NetworkManager;
+import de.felixperko.fractals.manager.ServerManagers;
+import de.felixperko.fractals.manager.ServerNetworkManager;
+import de.felixperko.fractals.manager.ServerThreadManager;
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
@@ -46,6 +50,7 @@ public class ListenThread extends AbstractFractalsThread {
 				setLifeCycleState(LifeCycleState.IDLE);
 				Message msg = (Message) in.readObject();
 				setLifeCycleState(LifeCycleState.RUNNING);
+				NetworkManager net = managers.getNetworkManager();
 				msg.received(writeThread.getConnection(), log);
 			} catch (SocketException e) {
 				log.log("lost connection");

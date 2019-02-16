@@ -1,8 +1,9 @@
 package de.felixperko.fractals.system.Numbers.infra;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 
-public class NumberFactory {
+public class NumberFactory implements Serializable{
 	
 	Class<? extends Number> numberClass;
 	Class<? extends ComplexNumber> complexNumberClass;

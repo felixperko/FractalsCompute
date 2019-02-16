@@ -1,5 +1,6 @@
 package de.felixperko.fractals.network;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -7,10 +8,18 @@ import java.util.UUID;
 import de.felixperko.fractals.system.parameters.ParamSupplier;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 
-public class SystemClientData {
-	HashMap<String, ParamSupplier> clientParameters = new HashMap<>();
+public class SystemClientData implements Serializable{
+	
+	private static final long serialVersionUID = -6322484739454792244L;
+	
+	Map<String, ParamSupplier> clientParameters;
 	int grantThreads;
 	
+	public SystemClientData(Map<String, ParamSupplier> clientParameters, int grantThreads) {
+		this.clientParameters = clientParameters;
+		this.grantThreads = grantThreads;
+	}
+
 	public void addClientParameter(ParamSupplier paramSupplier) {
 		clientParameters.put(paramSupplier.getName(), paramSupplier);
 	}

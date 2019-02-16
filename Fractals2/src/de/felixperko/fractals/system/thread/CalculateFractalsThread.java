@@ -1,18 +1,22 @@
 package de.felixperko.fractals.system.thread;
 
-import de.felixperko.fractals.manager.Managers;
-import de.felixperko.fractals.manager.ThreadManager;
+import de.felixperko.fractals.manager.ServerManagers;
+import de.felixperko.fractals.manager.ServerThreadManager;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.system.task.TaskProvider;
 
-public class CalculateFractalsThread extends AbstractSystemThread{
+public class CalculateFractalsThread extends AbstractFractalsThread{
 	
 	TaskProvider taskProvider;
 	
-	public CalculateFractalsThread(Managers managers, CalcSystem system, TaskProvider taskProvider) {
-		super(managers, system);
+	public CalculateFractalsThread(ServerManagers managers, TaskProvider taskProvider){
+		super(managers);
+		this.taskProvider = taskProvider;
+	}
+	
+	public void setTaskProvider(TaskProvider taskProvider) {
 		this.taskProvider = taskProvider;
 	}
 	
@@ -28,6 +32,19 @@ public class CalculateFractalsThread extends AbstractSystemThread{
 				} catch (InterruptedException e) {
 					if (state == LifeCycleState.STOPPED)
 						break mainLoop;
+				}
+			}
+			
+			//idle if no task provider is set
+			if (taskProvider == null) {
+				setLifeCycleState(LifeCycleState.IDLE);
+				while (taskProvider == null) {
+					try {
+						Thread.sleep(1);
+					} catch (InterruptedException e) {
+						if (state == LifeCycleState.STOPPED)
+							break mainLoop;
+					}
 				}
 			}
 			

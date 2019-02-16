@@ -6,13 +6,15 @@ import java.util.Map;
 
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.network.ClientConfiguration;
-import de.felixperko.fractals.network.ClientConnection;
-import de.felixperko.fractals.network.ClientLocalConnection;
-import de.felixperko.fractals.network.ClientRemoteConnection;
+import de.felixperko.fractals.network.Connection;
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.ServerConnectThread;
 import de.felixperko.fractals.network.ServerWriteThread;
+import de.felixperko.fractals.network.infra.connection.ClientConnection;
+import de.felixperko.fractals.network.infra.connection.ClientLocalConnection;
+import de.felixperko.fractals.network.infra.connection.ClientRemoteConnection;
 import de.felixperko.fractals.network.messages.ChunkUpdateMessage;
+import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.util.CategoryLogger;
 
 /**
@@ -30,19 +32,21 @@ public class ServerNetworkManager extends Manager implements NetworkManager{
 	
 	Map<Integer, ClientConfiguration> clients = new HashMap<>();
 	
-	public ServerNetworkManager(Managers managers) {
+	public ServerNetworkManager(ServerManagers managers) {
 		super(managers);
 	}
 	
 	public void startServerConnectThread() {
-		serverConnectThread = new ServerConnectThread(managers);
+		serverConnectThread = new ServerConnectThread((ServerManagers) managers);
 		serverConnectThread.start();
 	}
 	
 	public ClientRemoteConnection createNewClient(ServerWriteThread writeThread) {
 		SenderInfo info = new SenderInfo(ID_COUNTER++);
 		ClientRemoteConnection clientConnection = new ClientRemoteConnection(this, info, writeThread);
-		clients.put((Integer)clientConnection.getSenderInfo().getClientId(), new ClientConfiguration(clientConnection));
+		ClientConfiguration configuration = new ClientConfiguration();
+		configuration.setConnection(clientConnection);
+		clients.put((Integer)clientConnection.getSenderInfo().getClientId(), configuration);
 		log.log("new client connected. ID="+info.getClientId());
 		return clientConnection;
 	}
@@ -56,13 +60,15 @@ public class ServerNetworkManager extends Manager implements NetworkManager{
 				throw new IllegalArgumentException("No connection for ClientConfiguration found.");
 		}
 		clients.put(senderInfo.getClientId(), newConfiguration);
-		managers.getSystemManager().changedClientConfiguration(oldConfiguration, newConfiguration);
+		((ServerManagers)managers).getSystemManager().changedClientConfiguration(oldConfiguration, newConfiguration);
 	}
 	
 	public ClientLocalConnection createNewLocalClient() {
 		SenderInfo info = new SenderInfo(ID_COUNTER++);
 		ClientLocalConnection clientConnection = new ClientLocalConnection(this, info);
-		clients.put((Integer)clientConnection.getSenderInfo().getClientId(), new ClientConfiguration(clientConnection));
+		ClientConfiguration configuration = new ClientConfiguration();
+		configuration.setConnection(clientConnection);
+		clients.put((Integer)clientConnection.getSenderInfo().getClientId(), configuration);
 		return clientConnection;
 	}
 	
@@ -81,7 +87,7 @@ public class ServerNetworkManager extends Manager implements NetworkManager{
 		return getClientConnection(senderInfo.getClientId());
 	}
 
-	public void updateChunk(ClientConfiguration client, Chunk chunk) {
-		client.getConnection().writeMessage(new ChunkUpdateMessage(chunk));
+	public void updateChunk(ClientConfiguration client, CalcSystem system, Chunk chunk) {
+		client.getConnection().writeMessage(new ChunkUpdateMessage(system.getId(), chunk));
 	}
 }

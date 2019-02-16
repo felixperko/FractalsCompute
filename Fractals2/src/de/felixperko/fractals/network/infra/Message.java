@@ -4,10 +4,11 @@ import java.io.Serializable;
 
 import de.felixperko.fractals.network.Connection;
 import de.felixperko.fractals.network.SenderInfo;
+import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.util.CategoryLogger;
 import de.felixperko.fractals.util.NumberUtil;
 
-public abstract class Message<C extends Connection> implements Serializable{
+public abstract class Message<CONN extends Connection, BACKCONN extends Connection> implements Serializable{
 	
 	private static final long serialVersionUID = 3353653767834804430L;
 
@@ -36,12 +37,17 @@ public abstract class Message<C extends Connection> implements Serializable{
 		log = comLogger;
 	}
 
-	protected abstract void setConnection(C connection);
-	public abstract C getConnection();
+	protected abstract void setConnection(CONN connection);
+	public abstract CONN getConnection();
 	
-	public void received(C connection, CategoryLogger log) {
+	protected abstract void setBackConnection(BACKCONN connection);
+	public abstract BACKCONN getBackConnection();
+	
+	public void received(BACKCONN connection, CategoryLogger log) {
 		this.latency = System.nanoTime()-sentTime;
-		setConnection(connection);
+		if (connection == null)
+			throw new IllegalStateException("Back connection is null");
+		setBackConnection(connection);
 		setComLogger(log);
 		logIncoming();
 		process();
@@ -90,6 +96,6 @@ public abstract class Message<C extends Connection> implements Serializable{
 	}
 	
 	protected void answer(Message message) {
-		getConnection().writeMessage(message);
+		getBackConnection().writeMessage(message);
 	}
 }

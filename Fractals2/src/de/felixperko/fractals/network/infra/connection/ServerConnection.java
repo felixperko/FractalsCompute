@@ -1,20 +1,23 @@
-package de.felixperko.fractals.network;
+package de.felixperko.fractals.network.infra.connection;
 
 import de.felixperko.fractals.manager.ClientNetworkManager;
 import de.felixperko.fractals.manager.Manager;
 import de.felixperko.fractals.manager.ServerNetworkManager;
+import de.felixperko.fractals.network.ClientWriteThread;
+import de.felixperko.fractals.network.Connection;
+import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.Message;
 
 /**
  * connection to the server
  */
-public class ServerConnection implements Connection<ServerNetworkManager>{
+public class ServerConnection implements Connection<ClientNetworkManager>{
 	
 	ClientWriteThread writeToServer;
 	
-	ServerNetworkManager networkManager;
+	ClientNetworkManager networkManager;
 	
-	public ServerConnection(ServerNetworkManager networkManager){
+	public ServerConnection(ClientNetworkManager networkManager){
 		this.networkManager = networkManager;
 	}
 	
@@ -45,7 +48,7 @@ public class ServerConnection implements Connection<ServerNetworkManager>{
 
 	
 	@Override
-	public ServerNetworkManager getNetworkManager() {
+	public ClientNetworkManager getNetworkManager() {
 		return networkManager;
 	}
 }

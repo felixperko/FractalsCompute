@@ -8,6 +8,7 @@ import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.calculator.infra.AbstractFractalsCalculator;
 import de.felixperko.fractals.system.calculator.infra.AbstractPreparedFractalCalculator;
+import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.calculator.BurningShipCalculator;
 import de.felixperko.fractals.system.calculator.MandelbrotCalculator;
 import de.felixperko.fractals.system.calculator.NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator;
@@ -15,6 +16,7 @@ import de.felixperko.fractals.system.calculator.NewtonThridPowerMinusOneCalculat
 import de.felixperko.fractals.system.parameters.ParamSupplier;
 import de.felixperko.fractals.system.parameters.StaticParamSupplier;
 import de.felixperko.fractals.system.task.AbstractFractalsTask;
+import de.felixperko.fractals.system.task.TaskManager;
 
 public class BasicTask extends AbstractFractalsTask {
 	
@@ -22,11 +24,15 @@ public class BasicTask extends AbstractFractalsTask {
 	Chunk chunk;
 	Map<String, ParamSupplier> parameters;
 	
-	AbstractFractalsCalculator calculator = new MandelbrotCalculator();
+	FractalsCalculator calculator = new MandelbrotCalculator();
 	
-	public BasicTask(int id, Chunk chunk, Map<String, ParamSupplier> taskParameters, ComplexNumber chunkPos) {
+	TaskManager taskManager;
+	
+	public BasicTask(int id, TaskManager taskManager, Chunk chunk, Map<String, ParamSupplier> taskParameters, ComplexNumber chunkPos, FractalsCalculator calculator) {
 		this.id = id;
+		this.taskManager = taskManager;
 		this.chunk = chunk;
+		this.calculator = calculator;
 		this.parameters = new HashMap<>();
 		for (Entry<String, ParamSupplier> e : taskParameters.entrySet()){
 			this.parameters.put(e.getKey(), e.getValue().copy());
@@ -41,6 +47,11 @@ public class BasicTask extends AbstractFractalsTask {
 		calculator.setParams(parameters);
 		calculator.calculate(chunk);
 		chunk.incrementSampleCount((int)this.parameters.get("samples").get(0, 0));
+	}
+
+	@Override
+	public TaskManager getTaskManager() {
+		return taskManager;
 	}
 
 }

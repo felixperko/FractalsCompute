@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.system.parameters.ParamSupplier;
 
 public class ClientConfiguration implements Serializable{
@@ -17,8 +18,7 @@ public class ClientConfiguration implements Serializable{
 	List<SystemClientData> systemRequests = new ArrayList<>();
 	transient ClientConnection connectionToClient;
 	
-	public ClientConfiguration(ClientConnection clientConnection) {
-		this.connectionToClient = clientConnection;
+	public ClientConfiguration() {
 	}
 	
 	public ClientConnection getConnection() {
@@ -42,7 +42,15 @@ public class ClientConfiguration implements Serializable{
 		return data.getClientParameter(name);
 	}
 	
+	public <T> T getParameterGeneralValue(UUID systemId, String name, Class<T> cls) {
+		return (T) getParameter(systemId, name).get(0, 0);
+	}
+	
 	public List<SystemClientData> getSystemRequests(){
 		return systemRequests;
+	}
+
+	public void addRequest(SystemClientData systemClientData) {
+		systemRequests.add(systemClientData);
 	}
 }

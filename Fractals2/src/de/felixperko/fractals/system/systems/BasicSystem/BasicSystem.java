@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import de.felixperko.fractals.manager.Managers;
-import de.felixperko.fractals.manager.ThreadManager;
+import de.felixperko.fractals.manager.ServerManagers;
+import de.felixperko.fractals.manager.ServerThreadManager;
 import de.felixperko.fractals.network.ClientConfiguration;
-import de.felixperko.fractals.network.ClientConnection;
 import de.felixperko.fractals.network.Connection;
+import de.felixperko.fractals.network.SystemClientData;
+import de.felixperko.fractals.network.infra.connection.ClientConnection;
+import de.felixperko.fractals.network.messages.SystemConnectedMessage;
 import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
 import de.felixperko.fractals.system.Numbers.DoubleNumber;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
@@ -30,11 +32,9 @@ import de.felixperko.fractals.system.thread.FractalsThread;
 
 public class BasicSystem extends AbstractCalcSystem {
 
-	public BasicSystem(Managers managers) {
+	public BasicSystem(ServerManagers managers) {
 		super(managers);
 	}
-
-	public static final int THREAD_COUNT = 12;
 
 	TaskFactory factory_task = new ClassTaskFactory(BasicTask.class);
 	
@@ -49,37 +49,35 @@ public class BasicSystem extends AbstractCalcSystem {
 	List<ParamSupplier> systemRelevantParameters = new ArrayList<>();
 	
 	@Override
-	public boolean onInit(HashMap<String, String> settings) {
-		NumberFactory numberFactory = new NumberFactory(DoubleNumber.class, DoubleComplexNumber.class);
-		Map<String, ParamSupplier> params = new HashMap<>();
-		int samplesDim = 2;
-		params.put("width", new StaticParamSupplier("width", (Integer)4000));
-		params.put("height", new StaticParamSupplier("height", (Integer)4000));
-		params.put("midpoint", new StaticParamSupplier("midpoint", new DoubleComplexNumber(new DoubleNumber(0.251), new DoubleNumber(0.00004849892910689283399687005))));
-		params.put("zoom", new StaticParamSupplier("zoom", numberFactory.createNumber(4./50000.)));
-		params.put("iterations", new StaticParamSupplier("iterations", (Integer)50000));
-		params.put("samples", new StaticParamSupplier("samples", (Integer)(samplesDim*samplesDim)));
-		
-		params.put("start", new StaticParamSupplier("start", new DoubleComplexNumber(new DoubleNumber(0.0), new DoubleNumber(0.0))));
-//		params.put("c", new StaticParamSupplier("c", new DoubleComplexNumber(new DoubleNumber(0.5), new DoubleNumber(0.3))));
-//		params.put("start", new CoordinateParamSupplier("start", numberFactory));
-		params.put("c", new CoordinateBasicShiftParamSupplier("c", numberFactory, samplesDim));
-		params.put("pow", new StaticParamSupplier("pow", new DoubleComplexNumber(new DoubleNumber(2), new DoubleNumber(0))));
-		params.put("limit", new StaticParamSupplier("limit", (Double)100.));
+	public boolean onInit(Map<String, ParamSupplier> params) {
+//		NumberFactory numberFactory = new NumberFactory(DoubleNumber.class, DoubleComplexNumber.class);
+//		Map<String, ParamSupplier> params = new HashMap<>();
+//		int samplesDim = 2;
+//		params.put("width", new StaticParamSupplier("width", (Integer)4000));
+//		params.put("height", new StaticParamSupplier("height", (Integer)4000));
+//		params.put("midpoint", new StaticParamSupplier("midpoint", new DoubleComplexNumber(new DoubleNumber(0.251), new DoubleNumber(0.00004849892910689283399687005))));
+//		params.put("zoom", new StaticParamSupplier("zoom", numberFactory.createNumber(4./50000.)));
+//		params.put("iterations", new StaticParamSupplier("iterations", (Integer)50000));
+//		params.put("samples", new StaticParamSupplier("samples", (Integer)(samplesDim*samplesDim)));
+//		params.put("calculator", new StaticParamSupplier("calculator", "MandelbrotCalculator"));
+//		
+//		params.put("start", new StaticParamSupplier("start", new DoubleComplexNumber(new DoubleNumber(0.0), new DoubleNumber(0.0))));
+////		params.put("c", new StaticParamSupplier("c", new DoubleComplexNumber(new DoubleNumber(0.5), new DoubleNumber(0.3))));
+////		params.put("start", new CoordinateParamSupplier("start", numberFactory));
+//		params.put("c", new CoordinateBasicShiftParamSupplier("c", numberFactory, samplesDim));
+//		params.put("pow", new StaticParamSupplier("pow", new DoubleComplexNumber(new DoubleNumber(2), new DoubleNumber(0))));
+//		params.put("limit", new StaticParamSupplier("limit", (Double)100.));
 		
 //		params.put("c", new StaticParamSupplier("c", new DoubleComplexNumber(new DoubleNumber(0.0), new DoubleNumber(0.0))));
 //		params.put("start", new CoordinateBasicShiftParamSupplier("start", numberFactory, samplesDim));
 //		//params.put("pow", new StaticParamSupplier("pow", new DoubleComplexNumber(new DoubleNumber(2), new DoubleNumber(Math.PI))));
 //		params.put("limit", new StaticParamSupplier("limit", (Double)(0.2)));
 		
-		managedThreads.add(taskManager = new BasicTaskManager(managers, this));
+		taskManager = new BasicTaskManager(managers, this);
 		taskManager.setParameters(params);
 		
-		LocalTaskProvider taskProvider = new LocalTaskProvider(taskManager);
+//		LocalTaskProvider taskProvider = new LocalTaskProvider();
 		
-		for (int i = 0 ; i < THREAD_COUNT ; i++){
-			managedThreads.add(new CalculateFractalsThread(managers, this, taskProvider));
-		}
 //		managedThreads.add(calcThread = new CalculateFractalsThread(this, taskProvider));
 //		managedThreads.add(calcThread2 = new CalculateFractalsThread(this, taskProvider));
 		//calcThread2 = new CalculateFractalsThread(this, taskProvider);
@@ -88,11 +86,8 @@ public class BasicSystem extends AbstractCalcSystem {
 
 	@Override
 	public boolean onStart() {
-		
-		for (FractalsThread thread : managedThreads)
-			thread.start();
-		
 		taskManager.startTasks();
+		managers.getThreadManager().getTaskProvider().addTaskManager(taskManager);
 		return true;
 	}
 
@@ -103,10 +98,8 @@ public class BasicSystem extends AbstractCalcSystem {
 
 	@Override
 	public boolean onStop() {
-
-		for (FractalsThread thread : managedThreads)
-			thread.stopThread();
-		
+		taskManager.stopThread();
+		managers.getThreadManager().getTaskProvider().removeTaskManager(taskManager);
 		return true;
 	}
 
@@ -118,9 +111,12 @@ public class BasicSystem extends AbstractCalcSystem {
 
 	
 	@Override
-	public void addClient(ClientConfiguration newConfiguration, Map<String, ParamSupplier> parameters) {
+	public void addClient(ClientConfiguration newConfiguration, SystemClientData systemClientData) {
 		clients.add(newConfiguration);
-		taskManager.setParameters(parameters);
+		newConfiguration.getSystemRequests().remove(systemClientData);
+		newConfiguration.getSystemClientData().put(id, systemClientData);
+		newConfiguration.getConnection().writeMessage(new SystemConnectedMessage(id, newConfiguration));
+		taskManager.setParameters(systemClientData.getClientParameters());
 	}
 
 	

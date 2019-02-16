@@ -1,19 +1,20 @@
 package de.felixperko.fractals.network.messages;
 
-import de.felixperko.fractals.network.SenderInfo;
-import de.felixperko.fractals.network.infra.Message;
+import java.util.UUID;
 
-public class JobReceivedMessage extends Message {
+import de.felixperko.fractals.network.SenderInfo;
+import de.felixperko.fractals.network.infra.ClientMessage;
+import de.felixperko.fractals.network.infra.Message;
+import de.felixperko.fractals.network.infra.SystemClientMessage;
+
+public class JobReceivedMessage extends SystemClientMessage {
 
 	private static final long serialVersionUID = -4629109684787351923L;
 
 	int[] jobIds;
-	
-	public JobReceivedMessage() {
-	}
 
-	public JobReceivedMessage(SenderInfo sender, Message lastMessage) {
-		super(sender, lastMessage);
+	public JobReceivedMessage(SenderInfo sender, Message<?, ?> lastMessage, UUID systemId) {
+		super(sender, lastMessage, systemId);
 	}
 
 	@Override

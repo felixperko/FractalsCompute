@@ -1,14 +1,15 @@
 package de.felixperko.fractals.network.messages;
 
 import de.felixperko.fractals.network.ClientConfiguration;
-import de.felixperko.fractals.network.ClientConnection;
+import de.felixperko.fractals.network.infra.ClientMessage;
 import de.felixperko.fractals.network.infra.Message;
+import de.felixperko.fractals.network.infra.connection.ClientConnection;
 
 /**
  * client -> server
  * initiates the session (client is assigned to a system, layer and view and will receive relevant chunk/state updates)
  */
-public class SessionInitRequestMessage extends Message{
+public class SessionInitRequestMessage extends ClientMessage{
 	private static final long serialVersionUID = -6879047655133190298L;
 	
 	ClientConfiguration configuration;
@@ -19,10 +20,11 @@ public class SessionInitRequestMessage extends Message{
 	
 	@Override
 	protected void process() {
-		if (!(connection instanceof ClientConnection))
-			throw new IllegalStateException("Client has recieved SessionInitRequestMessage?");
+//		if (!(connection instanceof ClientConnection))
+//			throw new IllegalStateException("Client has recieved SessionInitRequestMessage?");
 //		FractalsServerMain.dataContainer.newClient(new Client((ClientConnection)connection, configuration));
-		connection.getNetworkManager().updateClientConfiguration(getSender(), configuration);
+		configuration.setConnection(getConnection());
+		getBackConnection().getNetworkManager().updateClientConfiguration(getSender(), configuration);
 		answer(new SessionInitResponseMessage());
 	}
 	

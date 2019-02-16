@@ -3,7 +3,7 @@ package de.felixperko.fractals.system.systems.infra;
 import java.lang.reflect.InvocationTargetException;
 
 import de.felixperko.fractals.manager.Managers;
-import de.felixperko.fractals.manager.ThreadManager;
+import de.felixperko.fractals.manager.ServerManagers;
 
 public class ClassSystemFactory implements CalcSystemFactory{
 	
@@ -16,7 +16,7 @@ public class ClassSystemFactory implements CalcSystemFactory{
 	@Override
 	public CalcSystem createSystem(Managers managers) {
 		try {
-			return cls.getConstructor(ThreadManager.class).newInstance(managers);
+			return cls.getConstructor(ServerManagers.class).newInstance(managers);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
