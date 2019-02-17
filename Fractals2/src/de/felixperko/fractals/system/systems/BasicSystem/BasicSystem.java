@@ -86,6 +86,7 @@ public class BasicSystem extends AbstractCalcSystem {
 
 	@Override
 	public boolean onStart() {
+		taskManager.start();
 		taskManager.startTasks();
 		managers.getThreadManager().getTaskProvider().addTaskManager(taskManager);
 		return true;

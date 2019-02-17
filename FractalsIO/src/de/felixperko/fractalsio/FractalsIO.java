@@ -57,6 +57,7 @@ public class FractalsIO {
 		managers = new ClientManagers(messageInterface);
 //		clientNetworkManager = new ClientNetworkManager(managers, messageInterface);
 		
+//		managers.getClientNetworkManager().connectToServer("192.168.0.9", 3141);
 		managers.getClientNetworkManager().connectToServer("localhost", 3141);
 		while (managers.getClientNetworkManager().getClientInfo() == null) {
 			try {
