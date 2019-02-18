@@ -35,8 +35,11 @@ public abstract class WriteThread extends AbstractFractalsThread {
 	
 	private CategoryLogger listenLogger; //used to buffer logger for listen thread until its creation
 	
+	int writeThreadId;
+	
 	public WriteThread(Managers managers, Socket socket) {
-		super(managers);
+		super(managers, "COM_"+ID_COUNTER+"_OUT");
+		this.writeThreadId = ID_COUNTER++;
 		this.socket = socket;
 	}
 
@@ -80,6 +83,7 @@ public abstract class WriteThread extends AbstractFractalsThread {
 							break mainLoop;
 						Message msg = it.next();
 						prepareMessage(msg);
+						log.log("sending message: "+msg.getClass().getSimpleName());
 						out.writeObject(msg);
 						it.remove();
 					}

@@ -18,17 +18,20 @@ import de.felixperko.fractals.util.CategoryLogger;
 public class ListenThread extends AbstractFractalsThread {
 	
 	final static CategoryLogger LOGGER_GENERIC = new CategoryLogger("com/server/generic/in", Color.MAGENTA);
-
-	CategoryLogger log = LOGGER_GENERIC;
 	
 	static int ID_COUNTER = 0;
+
+	CategoryLogger log = LOGGER_GENERIC;
 	
 	WriteThread writeThread;
 	ObjectInputStream in;
 	boolean closeConnection = false;
+	
+	int listenThreadId;
 
 	public ListenThread(Managers managers, WriteThread writeThread, ObjectInputStream in) {
-		super(managers);
+		super(managers, "COM_"+ID_COUNTER+"_IN");
+		listenThreadId = ID_COUNTER++;
 		this.writeThread = writeThread;
 		this.in = in;
 	}

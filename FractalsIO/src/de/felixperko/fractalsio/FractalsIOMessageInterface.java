@@ -30,6 +30,8 @@ public class FractalsIOMessageInterface extends ClientMessageInterface {
 		systemInterface.addChunkCount(width*height);
 		systemInterface.setParameters(clientConfiguration.getSystemClientData(systemId).getClientParameters());
 		addSystemInterface(systemId, systemInterface);
+		
+		FractalsIO.clientConfiguration = clientConfiguration;
 	}
 
 }

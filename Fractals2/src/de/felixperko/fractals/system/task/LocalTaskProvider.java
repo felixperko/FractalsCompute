@@ -1,7 +1,9 @@
 package de.felixperko.fractals.system.task;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * basic round robin implementation
@@ -9,17 +11,17 @@ import java.util.List;
  */
 public class LocalTaskProvider implements TaskProvider {
 
-	List<TaskManager> taskManagers = new ArrayList<>();
+	List<TaskManager> taskManagers = Collections.synchronizedList(new ArrayList<>());
 	
 	int roundRobinIndex = 0;
 	
 	@Override
-	public synchronized void addTaskManager(TaskManager taskManager) {
+	public void addTaskManager(TaskManager taskManager) {
 		taskManagers.add(taskManager);
 	}
 	
 	@Override
-	public synchronized void removeTaskManager(TaskManager taskManager) {
+	public void removeTaskManager(TaskManager taskManager) {
 		taskManagers.remove(taskManager);
 	}
 	

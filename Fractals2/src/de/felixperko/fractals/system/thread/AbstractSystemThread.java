@@ -7,8 +7,8 @@ import de.felixperko.fractals.system.systems.infra.CalcSystem;
 public abstract class AbstractSystemThread extends AbstractFractalsThread {
 	protected CalcSystem system;
 
-	public AbstractSystemThread(ServerManagers managers, CalcSystem system) {
-		super(managers);
+	public AbstractSystemThread(ServerManagers managers, CalcSystem system, String name) {
+		super(managers, name);
 		this.system = system;
 	}
 	

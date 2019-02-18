@@ -47,6 +47,7 @@ public abstract class Message<CONN extends Connection, BACKCONN extends Connecti
 		this.latency = System.nanoTime()-sentTime;
 		if (connection == null)
 			throw new IllegalStateException("Back connection is null");
+		log.log("received message: "+this);
 		setBackConnection(connection);
 		setComLogger(log);
 		logIncoming();

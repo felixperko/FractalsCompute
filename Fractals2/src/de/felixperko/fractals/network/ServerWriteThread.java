@@ -18,7 +18,7 @@ public class ServerWriteThread extends WriteThread {
 	
 	ClientRemoteConnection clientConnection;
 	
-	long reachableRequestInterval = (long) (1/NumberUtil.NS_TO_S);
+	long reachableRequestInterval = (long) (5/NumberUtil.NS_TO_S);
 	long lastReachableTime;
 	
 	public ServerWriteThread(ServerManagers managers, Socket socket) {

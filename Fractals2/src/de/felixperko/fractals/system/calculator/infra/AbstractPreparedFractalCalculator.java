@@ -14,6 +14,8 @@ import de.felixperko.fractals.system.parameters.ParamSupplier;
 
 public abstract class AbstractPreparedFractalCalculator extends AbstractFractalsCalculator{
 	
+	final static double LOG_2 = Math.log(2);
+	
 	//ParamSupplier[] params;
 	
 	public AbstractPreparedFractalCalculator() {
@@ -43,11 +45,13 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 				ComplexNumber current = ((ComplexNumber) p_start.get(pixel,sample)).copy();
 				ComplexNumber c = ((ComplexNumber) p_c.get(pixel,sample)).copy();
 				ComplexNumber pow = ((ComplexNumber) p_pow.get(pixel,sample)).copy();
+				double logPow = Math.log(pow.absDouble());
 				for (int k = 0 ; k < it ; k++) {
 					executeKernel(current, pow, c);
 					double abs = current.absSqDouble();
 					if (abs > limit*limit) {
-						res = k; //abs...
+//									Math.log( Math.log(real*real+imag*imag)*0.5 / Math.log(2) ) / Math.log(pow)  )
+						res = k - Math.log(Math.log(current.absSqDouble())*0.5/LOG_2)/logPow; //abs...
 						break;
 					}
 				}

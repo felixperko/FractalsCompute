@@ -33,13 +33,14 @@ import de.felixperko.fractals.system.parameters.ParamSupplier;
 import de.felixperko.fractals.system.parameters.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
+import de.felixperko.fractals.system.task.AbstractTaskManager;
 import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.system.task.TaskManager;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.system.thread.AbstractSystemThread;
 import de.felixperko.fractals.util.NumberUtil;
 
-public class BasicTaskManager extends AbstractSystemThread implements TaskManager<BasicTask>{
+public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 	
 	static Map<String, Class<? extends FractalsCalculator>> availableCalculators = new HashMap<>();
 	

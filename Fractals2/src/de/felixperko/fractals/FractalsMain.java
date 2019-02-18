@@ -20,7 +20,7 @@ public class FractalsMain {
 	
 	static ServerManagers managers;
 	
-	public static int THREAD_COUNT = 8;
+	public static int THREAD_COUNT = 2;
 	
 	public static void main(String[] args) {
 		

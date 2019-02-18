@@ -20,7 +20,7 @@ public class ServerConnectThread extends AbstractFractalsThread{
 	CategoryLogger log = new CategoryLogger("com/server", Color.MAGENTA);
 	
 	public ServerConnectThread(ServerManagers managers) {
-		super(managers);
+		super(managers, "COM_CONN");
 	}
 	
 	@Override

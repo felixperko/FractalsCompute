@@ -9,10 +9,15 @@ import de.felixperko.fractals.system.task.TaskProvider;
 
 public class CalculateFractalsThread extends AbstractFractalsThread{
 	
+	static int ID_COUNTER = 0;
+	
 	TaskProvider taskProvider;
 	
+	int calcThreadId = 0;
+	
 	public CalculateFractalsThread(ServerManagers managers, TaskProvider taskProvider){
-		super(managers);
+		super(managers, "CALC_"+ID_COUNTER);
+		calcThreadId = ID_COUNTER++;
 		this.taskProvider = taskProvider;
 	}
 	
