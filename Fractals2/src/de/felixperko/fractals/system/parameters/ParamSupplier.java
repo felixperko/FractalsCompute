@@ -2,6 +2,8 @@ package de.felixperko.fractals.system.parameters;
 
 import java.io.Serializable;
 
+import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
+
 public interface ParamSupplier extends Serializable{
 	
 	public String getName();
@@ -17,4 +19,6 @@ public interface ParamSupplier extends Serializable{
 	public void setViewRelevant(boolean relevant);
 
 	public ParamSupplier copy();
+
+	public <C> C getGeneral(Class<C> cls);
 }

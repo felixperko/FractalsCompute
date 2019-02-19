@@ -53,5 +53,10 @@ public class BasicTask extends AbstractFractalsTask {
 	public TaskManager getTaskManager() {
 		return taskManager;
 	}
+	
+	public Chunk getChunk() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

@@ -12,6 +12,9 @@ import de.felixperko.fractals.system.task.TaskManager;
 public class BreadthFirstTask extends BasicTask {
 	
 	int layer;
+	
+	Double distance;
+	Double priority;
 
 	public BreadthFirstTask(int id, TaskManager taskManager, Chunk chunk, Map<String, ParamSupplier> taskParameters,
 			ComplexNumber chunkPos, FractalsCalculator calculator, int layer) {
@@ -19,4 +22,20 @@ public class BreadthFirstTask extends BasicTask {
 		this.layer = layer;
 	}
 
+	public void updateDistance(double chunkX, double chunkY) {
+		distance = getChunk().distance(chunkX, chunkY);
+	}
+	
+	public void updatePriorityAndDistance(double chunkX, double chunkY, double priorityMultiplier) {
+		updateDistance(chunkX, chunkY);
+		priority = distance * priorityMultiplier;
+	}
+
+	public Double getDistance() {
+		return distance;
+	}
+
+	public Double getPriority() {
+		return priority;
+	}
 }

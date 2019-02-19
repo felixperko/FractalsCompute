@@ -37,14 +37,14 @@ public class FractalsIOSystemInterface implements ClientSystemInterface {
 	@Override
 	public void chunkUpdated(Chunk chunk) {
 		int chunkSize = chunk.getChunkSize();
-		int cx = chunkSize*chunk.getChunkX();
-		int cy = chunkSize*chunk.getChunkY();
+		long cx = chunkSize*chunk.getChunkX();
+		long cy = chunkSize*chunk.getChunkY();
 		for (int i = 0 ; i < chunk.getArrayLength() ; i++) {
-			int x = i / chunkSize + cx;
-			int y = i % chunkSize + cy;
+			int x = (int) (i / chunkSize + cx);
+			int y = (int) (i % chunkSize + cy);
 			double value = chunk.getValue(i);
 			if (value > 0) {
-				float hue = (float)Math.log(value+1);
+				float hue = (float)Math.log(Math.log(value)+1);
 				int color = Color.HSBtoRGB(hue, 0.4f, 0.6f);
 				image.setRGB(x, y, color);
 			}
@@ -56,8 +56,7 @@ public class FractalsIOSystemInterface implements ClientSystemInterface {
 //				System.out.println("calculated in "+NumberUtil.getElapsedTimeInS(startTime, 2)+"s.");
 				ImageIO.write(image, "png", new File("test.png"));
 				System.out.println("done!");
-//				system.stop();
-//				System.exit(0);
+				System.exit(0);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -49,6 +49,12 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 		real *= number.value;
 		imag *= number.value;
 	}
+	
+	@Override
+	public void divNumber(DoubleNumber number) {
+		real /= number.value;
+		imag /= number.value;
+	}
 
 	@Override
 	public void pow(DoubleComplexNumber other) {
@@ -177,7 +183,19 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 	}
 
 	@Override
-	public double realImag() {
+	public double imagDouble() {
 		return imag;
 	}
+	
+	@Override
+	public DoubleNumber getReal() {
+		return new DoubleNumber(real);
+	}
+
+	@Override
+	public DoubleNumber getImag() {
+		return new DoubleNumber(imag);
+	}
+
+
 }

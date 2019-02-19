@@ -8,7 +8,7 @@ public class Chunk implements Serializable{
 	
 	private static final long serialVersionUID = -6507259803639466582L;
 
-	int chunkX, chunkY;
+	long chunkX, chunkY;
 	
 	int dimensionSize;
 	int arrayLength;
@@ -17,7 +17,7 @@ public class Chunk implements Serializable{
 	double[] values;
 	int[] failedSamples;
 	
-	public Chunk(int chunkX, int chunkY, int dimensionSize) {
+	public Chunk(long chunkX, long chunkY, int dimensionSize) {
 		this.chunkX = chunkX;
 		this.chunkY = chunkY;
 		
@@ -56,11 +56,11 @@ public class Chunk implements Serializable{
 		return dimensionSize;
 	}
 
-	public int getChunkX() {
+	public long getChunkX() {
 		return chunkX;
 	}
 	
-	public int getChunkY() {
+	public long getChunkY() {
 		return chunkY;
 	}
 	
@@ -111,5 +111,15 @@ public class Chunk implements Serializable{
 
 	public void setArrayLength(int arrayLength) {
 		this.arrayLength = arrayLength;
+	}
+	
+	public double distanceSq(double otherX, double otherY) {
+		double dx = otherX-chunkX;
+		double dy = otherY-chunkY;
+		return dx*dx + dy*dy;
+	}
+	
+	public double distance(double otherX, double otherY) {
+		return Math.sqrt(distanceSq(otherX, otherY));
 	}
 }

@@ -7,11 +7,14 @@ public interface ComplexNumber<T, N> extends Number<N>{
 	public double absDouble();
 	public double absSqDouble();
 	public void multNumber(T number);
+	public void divNumber(T number);
 	//void mult(DoubleNumber number);
 	public ComplexNumber copy();
 	public void toPositive();
 	public void div(N otherComplex);
 	public void sub(N otherComplex);
 	public double realDouble();
-	public double realImag();
+	public double imagDouble();
+	public T getReal();
+	public T getImag();
 }

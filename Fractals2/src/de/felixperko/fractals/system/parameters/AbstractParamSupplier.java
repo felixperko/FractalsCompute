@@ -42,4 +42,10 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 	public void setViewRelevant(boolean viewRelevant) {
 		this.viewRelevant = viewRelevant;
 	}
+	
+	@Override
+	public <C> C getGeneral(Class<C> cls) {
+		Object obj = get(0,0);
+		return (C) obj;
+	}
 }

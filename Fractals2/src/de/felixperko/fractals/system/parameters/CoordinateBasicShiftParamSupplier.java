@@ -56,4 +56,5 @@ public class CoordinateBasicShiftParamSupplier extends CoordinateParamSupplier {
 		pixelCoord.add(shifts[sample]);
 	}
 
+
 }

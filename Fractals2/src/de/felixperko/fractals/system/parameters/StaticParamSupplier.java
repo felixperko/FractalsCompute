@@ -18,4 +18,5 @@ public class StaticParamSupplier extends AbstractParamSupplier {
 	public ParamSupplier copy() {
 		return new StaticParamSupplier(name, obj);
 	}
+
 }

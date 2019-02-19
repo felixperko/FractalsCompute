@@ -83,7 +83,7 @@ public abstract class WriteThread extends AbstractFractalsThread {
 							break mainLoop;
 						Message msg = it.next();
 						prepareMessage(msg);
-						log.log("sending message: "+msg.getClass().getSimpleName());
+//						log.log("sending message: "+msg.getClass().getSimpleName());
 						out.writeObject(msg);
 						it.remove();
 					}
