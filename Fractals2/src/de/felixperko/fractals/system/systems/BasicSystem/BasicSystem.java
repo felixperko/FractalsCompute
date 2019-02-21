@@ -39,48 +39,15 @@ public class BasicSystem extends AbstractCalcSystem {
 	TaskFactory factory_task = new ClassTaskFactory(BasicTask.class);
 	
 	BasicTaskManager taskManager;
-	CalculateFractalsThread calcThread;
-	CalculateFractalsThread calcThread2;
-	
-	List<FractalsThread> managedThreads = new ArrayList<>();
 	
 	List<ClientConfiguration> clients = new ArrayList<>();
 	
-	List<ParamSupplier> systemRelevantParameters = new ArrayList<>();
-	
 	@Override
 	public boolean onInit(Map<String, ParamSupplier> params) {
-//		NumberFactory numberFactory = new NumberFactory(DoubleNumber.class, DoubleComplexNumber.class);
-//		Map<String, ParamSupplier> params = new HashMap<>();
-//		int samplesDim = 2;
-//		params.put("width", new StaticParamSupplier("width", (Integer)4000));
-//		params.put("height", new StaticParamSupplier("height", (Integer)4000));
-//		params.put("midpoint", new StaticParamSupplier("midpoint", new DoubleComplexNumber(new DoubleNumber(0.251), new DoubleNumber(0.00004849892910689283399687005))));
-//		params.put("zoom", new StaticParamSupplier("zoom", numberFactory.createNumber(4./50000.)));
-//		params.put("iterations", new StaticParamSupplier("iterations", (Integer)50000));
-//		params.put("samples", new StaticParamSupplier("samples", (Integer)(samplesDim*samplesDim)));
-//		params.put("calculator", new StaticParamSupplier("calculator", "MandelbrotCalculator"));
-//		
-//		params.put("start", new StaticParamSupplier("start", new DoubleComplexNumber(new DoubleNumber(0.0), new DoubleNumber(0.0))));
-////		params.put("c", new StaticParamSupplier("c", new DoubleComplexNumber(new DoubleNumber(0.5), new DoubleNumber(0.3))));
-////		params.put("start", new CoordinateParamSupplier("start", numberFactory));
-//		params.put("c", new CoordinateBasicShiftParamSupplier("c", numberFactory, samplesDim));
-//		params.put("pow", new StaticParamSupplier("pow", new DoubleComplexNumber(new DoubleNumber(2), new DoubleNumber(0))));
-//		params.put("limit", new StaticParamSupplier("limit", (Double)100.));
-		
-//		params.put("c", new StaticParamSupplier("c", new DoubleComplexNumber(new DoubleNumber(0.0), new DoubleNumber(0.0))));
-//		params.put("start", new CoordinateBasicShiftParamSupplier("start", numberFactory, samplesDim));
-//		//params.put("pow", new StaticParamSupplier("pow", new DoubleComplexNumber(new DoubleNumber(2), new DoubleNumber(Math.PI))));
-//		params.put("limit", new StaticParamSupplier("limit", (Double)(0.2)));
 		
 		taskManager = new BasicTaskManager(managers, this);
 		taskManager.setParameters(params);
 		
-//		LocalTaskProvider taskProvider = new LocalTaskProvider();
-		
-//		managedThreads.add(calcThread = new CalculateFractalsThread(this, taskProvider));
-//		managedThreads.add(calcThread2 = new CalculateFractalsThread(this, taskProvider));
-		//calcThread2 = new CalculateFractalsThread(this, taskProvider);
 		return true;
 	}
 

@@ -7,11 +7,6 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 	
 	private static final long serialVersionUID = -6625226042922366712L;
 	
-	public static void main(String[] args) {
-		DoubleComplexNumber n1 = new DoubleComplexNumber();
-		DoubleComplexNumber n2 = new DoubleComplexNumber();
-	}
-	
 	double real, imag;
 	
 	public DoubleComplexNumber() {
@@ -75,20 +70,7 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 				real = expReal * Math.cos(logImag);
 				imag = expReal * Math.sin(logImag);
 			}
-//				double modulus = Math.sqrt(real*real + imag*imag);
-//			    double arg = Math.atan2(imag,real);
-//			    double log_re = Math.log(modulus);
-//			    double log_im = arg;
-//			    double x_log_re = other.imag * log_re;
-//			    double x_log_im = other.imag * log_im;
-//			    double modulus_ans = Math.exp(x_log_re);
-//			    real = modulus_ans*Math.cos(x_log_im);
-//			    imag = modulus_ans*Math.sin(x_log_im);
 		}
-//		other = (DoubleComplexNumber) other.copy();
-//		if (other.imag == 0 && other.real == 2) {
-//			square();
-//		}
 		else { //complex power
 			//log().multiply(x).exp()
 			//log
@@ -156,10 +138,6 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 
 	@Override
 	public void div(DoubleComplexNumber otherComplex) {
-		//double den = real*real + imag*imag;
-//		double newReal = (real*otherComplex.real + imag*otherComplex.imag)/den;
-//		imag = (imag*otherComplex.real - real*otherComplex.imag)/den;
-//		real = newReal;
 		DoubleComplexNumber n = (DoubleComplexNumber) otherComplex.copy();
 		n.reciprocal();
 		mult(n);

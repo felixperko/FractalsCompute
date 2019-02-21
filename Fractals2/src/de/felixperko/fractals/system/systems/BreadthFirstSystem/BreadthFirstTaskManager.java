@@ -108,14 +108,6 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	NumberFactory numberFactory;
 	
 	Map<String, ParamSupplier> parameters;
-	
-	public void updatePredictedMidpoint() {
-		ComplexNumber delta = midpoint.copy();
-		delta.sub(viewData.anchor);
-		delta.divNumber(chunkZoom);
-		midpointChunkX = delta.realDouble();
-		midpointChunkY = delta.imagDouble();
-	}
 
 	int id_counter_tasks = 0;
 
@@ -135,17 +127,6 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		nextOpenTasks.add(rootTask);
 		
 		generateNeighbours(rootTask);
-		
-			
-			//fill queues with higher priority
-			
-//		}
-		
-//		Queue<BreadthFirstTask> firstPassOpenTasks = new LinkedList<>();
-//		openTasks.add(firstPassOpenTasks);
-//		generateNeighbours(firstTask, firstPassOpenTasks);
-		//add task at relative (0, 0)
-		//generate neighbours
 	}
 	
 	public boolean tick() {
@@ -153,12 +134,89 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		finishTasks();
 		return true;
 	}
+
+	@Override
+	public boolean setParameters(Map<String, ParamSupplier> params) {
+		this.parameters = params;
+		calculator = parameters.get("calculator").getGeneral(FractalsCalculator.class);
+		chunkSize = parameters.get("chunkSize").getGeneral(Integer.class);
+		midpoint = parameters.get("midpoint").getGeneral(ComplexNumber.class);
+		zoom = parameters.get("zoom").getGeneral(Number.class);
+		
+		numberFactory = parameters.get("numberFactory").getGeneral(NumberFactory.class);
+		
+		chunkZoom = zoom.copy();
+		chunkZoom.mult(numberFactory.createNumber(chunkSize));
+		
+		int width = parameters.get("width").getGeneral(Integer.class);
+		int height = parameters.get("width").getGeneral(Integer.class);
+		
+		Number rX = numberFactory.createNumber(width/2.);
+		rX.mult(zoom);
+		Number rY = numberFactory.createNumber(height/2.);
+		rY.mult(zoom);
+		ComplexNumber sideDist = numberFactory.createComplexNumber(rX, rY);
+		
+
+		leftLowerCorner = midpoint.copy();
+		leftLowerCorner.sub(sideDist);
+		
+		rightUpperCorner = sideDist;
+		rightUpperCorner.add(midpoint);
+		
+		ComplexNumber anchor = numberFactory.createComplexNumber(chunkZoom, chunkZoom);
+		anchor.multNumber(numberFactory.createNumber(-0.5));
+		anchor.add(midpoint);
+		
+		viewData = new BreadthFirstViewData(anchor);
+		return true;
+	}
+
+	@Override
+	public List<? extends FractalsTask> getTasks(int count) {
+		List<BreadthFirstTask> tasks = new ArrayList<>();
+		for (int i = 0 ; i < count ; i++) {
+			BreadthFirstTask task = nextBufferedTasks.poll();
+			if (task == null)
+				break;
+			tasks.add(task);
+		}
+		return tasks;
+	}
+
+	@Override
+	public void taskFinished(BreadthFirstTask task) {
+		finishedTasks.add(task);
+	}
 	
 	private void finishTasks() {
 		
 	}
 
-	List<List<BreadthFirstTask>> tempList = new ArrayList<>();
+	@Override
+	public void endTasks() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public synchronized void reset() {
+		openTasks.clear();
+		nextOpenTasks.clear();
+		nextBufferedTasks.clear();
+		finishedTasks.clear();
+		//TODO abort running tasks
+	}
+	
+	public void updatePredictedMidpoint() {
+		ComplexNumber delta = midpoint.copy();
+		delta.sub(viewData.anchor);
+		delta.divNumber(chunkZoom);
+		midpointChunkX = delta.realDouble();
+		midpointChunkY = delta.imagDouble();
+	}
+
+	List<List<BreadthFirstTask>> tempList = new ArrayList<>(); //used when refreshing sorting order
 
 	//TODO use
 	public void predictedMidpointUpdated() {
@@ -258,76 +316,6 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		ComplexNumber chunkPos = numberFactory.createComplexNumber(shiftX, shiftY);
 		chunkPos.add(viewData.anchor);
 		return chunkPos;
-	}
-
-	@Override
-	public void endTasks() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean setParameters(Map<String, ParamSupplier> params) {
-		this.parameters = params;
-		calculator = parameters.get("calculator").getGeneral(FractalsCalculator.class);
-		chunkSize = parameters.get("chunkSize").getGeneral(Integer.class);
-		midpoint = parameters.get("midpoint").getGeneral(ComplexNumber.class);
-		zoom = parameters.get("zoom").getGeneral(Number.class);
-		
-		numberFactory = parameters.get("numberFactory").getGeneral(NumberFactory.class);
-		
-		chunkZoom = zoom.copy();
-		chunkZoom.mult(numberFactory.createNumber(chunkSize));
-		
-		int width = parameters.get("width").getGeneral(Integer.class);
-		int height = parameters.get("width").getGeneral(Integer.class);
-		
-		Number rX = numberFactory.createNumber(width/2.);
-		rX.mult(zoom);
-		Number rY = numberFactory.createNumber(height/2.);
-		rY.mult(zoom);
-		ComplexNumber sideDist = numberFactory.createComplexNumber(rX, rY);
-		
-
-		leftLowerCorner = midpoint.copy();
-		leftLowerCorner.sub(sideDist);
-		
-		rightUpperCorner = sideDist;
-		rightUpperCorner.add(midpoint);
-		
-		ComplexNumber anchor = numberFactory.createComplexNumber(chunkZoom, chunkZoom);
-		anchor.multNumber(numberFactory.createNumber(-0.5));
-		anchor.add(midpoint);
-		
-		viewData = new BreadthFirstViewData(anchor);
-		return true;
-	}
-
-	@Override
-	public synchronized void reset() {
-		openTasks.clear();
-		nextOpenTasks.clear();
-		nextBufferedTasks.clear();
-		tempList.clear();
-		finishedTasks.clear();
-		//TODO abort running tasks
-	}
-
-	@Override
-	public void taskFinished(BreadthFirstTask task) {
-		finishedTasks.add(task);
-	}
-
-	@Override
-	public List<? extends FractalsTask> getTasks(int count) {
-		List<BreadthFirstTask> tasks = new ArrayList<>();
-		for (int i = 0 ; i < count ; i++) {
-			BreadthFirstTask task = nextBufferedTasks.poll();
-			if (task == null)
-				break;
-			tasks.add(task);
-		}
-		return tasks;
 	}
 
 }

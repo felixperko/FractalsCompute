@@ -14,10 +14,6 @@ import de.felixperko.fractals.system.systems.infra.ClassSystemFactory;
 
 public class FractalsMain {
 	
-//	public static final String PARAM_SYSTEM = "system";
-//	
-//	static HashMap<String,String> parameters = new HashMap<>();
-	
 	static ServerManagers managers;
 	
 	public static int THREAD_COUNT = Runtime.getRuntime().availableProcessors();
@@ -30,27 +26,6 @@ public class FractalsMain {
 		
 		managers.getThreadManager().startWorkerThreads(THREAD_COUNT);
 		managers.getServerNetworkManager().startServerConnectThread();
-		//managers.getSystemManager().initSystem(managers.getSystemManager().defaultSystem);
+		
 	}
-	
-//	public static String getParameter(String key, String defaultValue) {
-//		if (parameters.containsKey(key))
-//			return parameters.get(key);
-//		return defaultValue;
-//	}
-
-//	private static HashMap<String,String> parseParameters(String[] args) {
-//		HashMap<String,String> params = new HashMap<>();
-//		for (String arg : args) {
-//			String[] s = arg.split(":", 2);
-//			if (s.length == 2) {
-//				params.put(s[0], s[1]);
-//				System.out.println("[main] read parameter "+s[0]+" = "+s[1]);
-//			} else {
-//				System.err.println("[main] invalid parameter: '"+arg+"'");
-//				return null;
-//			}
-//		}
-//		return params;
-//	}
 }

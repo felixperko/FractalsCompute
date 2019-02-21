@@ -49,7 +49,6 @@ public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 		availableCalculators.put("BurningShipCalculator", BurningShipCalculator.class);
 		availableCalculators.put("NewtonThridPowerMinusOneCalculator", NewtonThridPowerMinusOneCalculator.class);
 		availableCalculators.put("NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator", NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator.class);
-//		availableCalculators.put("", );
 	}
 	
 	public BasicTaskManager(ServerManagers managers, CalcSystem system) {
@@ -152,8 +151,6 @@ public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 					ComplexNumber chunkPos = numberFactory.createComplexNumber(x/(double)dimX-0.5, y/(double)dimX-0.5);
 					chunkPos.multNumber(zoom);
 					chunkPos.add(midpoint);
-//					Map<String, ParamSupplier> taskParameters = new HashMap<>(currentParameters);
-//					taskParameters.putAll(currentParameters);
 					openTasks.add(new BasicTask(id, this, chunk, currentParameters, chunkPos, createCalculator()));//TODO calculator for each thread not each task
 					calculate = true;
 					id++;
@@ -203,32 +200,9 @@ public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 				for (ClientConfiguration client : ((BasicSystem)system).getClients()) {
 					((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, task.chunk);
 				}
-	//			int chunkSize = task.chunk.getChunkSize();
-	//			int cx = chunkSize*task.chunk.getChunkX();
-	//			int cy = chunkSize*task.chunk.getChunkY();
-	//			for (int i = 0 ; i < task.chunk.getArrayLength() ; i++) {
-	//				int x = i / chunkSize + cx;
-	//				int y = i % chunkSize + cy;
-	//				double value = task.chunk.getValue(i);
-	//				if (value > 0) {
-	//					float hue = (float)Math.log(Math.log(value));
-	//					int color = Color.HSBtoRGB(hue, 0.4f, 0.6f);
-	//					testImage.setRGB(x, y, color);
-	//				}
-	//			}
 				openChunks--;
 				if (openChunks == 0) { //finished
 					system.stop();
-	//				try {
-	//					long endTime = System.nanoTime();
-	//					System.out.println("calculated in "+NumberUtil.getElapsedTimeInS(startTime, 2)+"s.");
-	//					ImageIO.write(testImage, "png", new File("test.png"));
-	//					System.out.println("done!");
-	//					system.stop();
-	//					System.exit(0);
-	//				} catch (IOException e) {
-	//					e.printStackTrace();
-	//				}
 				}
 			}
 			finishedTasks.clear();
