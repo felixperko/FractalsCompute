@@ -1,10 +1,13 @@
-package de.felixperko.fractals.manager;
+package de.felixperko.fractals.manager.server;
 
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
 
 import de.felixperko.fractals.data.Chunk;
+import de.felixperko.fractals.manager.common.Manager;
+import de.felixperko.fractals.manager.common.Managers;
+import de.felixperko.fractals.manager.common.NetworkManager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.Connection;
 import de.felixperko.fractals.network.SenderInfo;
@@ -32,8 +35,11 @@ public class ServerNetworkManager extends Manager implements NetworkManager{
 	
 	Map<Integer, ClientConfiguration> clients = new HashMap<>();
 	
+	ServerManagers managers;
+	
 	public ServerNetworkManager(ServerManagers managers) {
 		super(managers);
+		this.managers = managers;
 	}
 	
 	public void startServerConnectThread() {
@@ -88,6 +94,6 @@ public class ServerNetworkManager extends Manager implements NetworkManager{
 	}
 
 	public void updateChunk(ClientConfiguration client, CalcSystem system, Chunk chunk) {
-		client.getConnection().writeMessage(new ChunkUpdateMessage(system.getId(), chunk));
+		client.getConnection().writeMessage(new ChunkUpdateMessage(system.getId(), chunk, managers.getSystemManager().getStateInfo()));
 	}
 }

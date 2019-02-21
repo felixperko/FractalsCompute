@@ -51,4 +51,10 @@ public class DoubleNumber implements Number<DoubleNumber> {
 	public String toString() {
 		return ""+value;
 	}
+
+	
+	@Override
+	public DoubleNumber copy() {
+		return new DoubleNumber(value);
+	}
 }

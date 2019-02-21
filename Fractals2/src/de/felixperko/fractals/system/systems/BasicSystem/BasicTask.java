@@ -15,22 +15,20 @@ import de.felixperko.fractals.system.calculator.NewtonEighthPowerPlusFifteenTime
 import de.felixperko.fractals.system.calculator.NewtonThridPowerMinusOneCalculator;
 import de.felixperko.fractals.system.parameters.ParamSupplier;
 import de.felixperko.fractals.system.parameters.StaticParamSupplier;
+import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.AbstractFractalsTask;
 import de.felixperko.fractals.system.task.TaskManager;
 
 public class BasicTask extends AbstractFractalsTask {
 	
-	int id;
 	Chunk chunk;
 	Map<String, ParamSupplier> parameters;
 	
-	FractalsCalculator calculator = new MandelbrotCalculator();
+	FractalsCalculator calculator;
 	
-	TaskManager taskManager;
 	
 	public BasicTask(int id, TaskManager taskManager, Chunk chunk, Map<String, ParamSupplier> taskParameters, ComplexNumber chunkPos, FractalsCalculator calculator) {
-		this.id = id;
-		this.taskManager = taskManager;
+		super(id, taskManager);
 		this.chunk = chunk;
 		this.calculator = calculator;
 		this.parameters = new HashMap<>();
@@ -48,15 +46,11 @@ public class BasicTask extends AbstractFractalsTask {
 		calculator.calculate(chunk);
 		chunk.incrementSampleCount((int)this.parameters.get("samples").get(0, 0));
 	}
-
-	@Override
-	public TaskManager getTaskManager() {
-		return taskManager;
-	}
 	
 	public Chunk getChunk() {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 
 }

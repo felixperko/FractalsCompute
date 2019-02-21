@@ -6,10 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import de.felixperko.fractals.manager.ServerManagers;
-import de.felixperko.fractals.manager.ServerThreadManager;
+import de.felixperko.fractals.manager.server.ServerManagers;
+import de.felixperko.fractals.manager.server.ServerThreadManager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.system.parameters.ParamSupplier;
+import de.felixperko.fractals.system.systems.stateinfo.SystemStateInfo;
 import de.felixperko.fractals.system.task.TaskManager;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.system.thread.FractalsThread;
@@ -24,8 +25,12 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	
 	protected ServerManagers managers;
 	
+	SystemStateInfo systemStateInfo;
+	
 	public AbstractCalcSystem(ServerManagers managers) {
 		this.managers = managers;
+		this.systemStateInfo = new SystemStateInfo();
+		managers.getSystemManager().getStateInfo().addSystemStateInfo(id, this.systemStateInfo);
 	}
 	
 	@Override
@@ -76,6 +81,10 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 		this.state = state;
 	}
 	
+	public SystemStateInfo getSystemStateInfo() {
+		return systemStateInfo;
+	}
+
 	@Override
 	public UUID getId() {
 		return id;

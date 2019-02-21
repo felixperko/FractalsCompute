@@ -15,9 +15,9 @@ import javax.imageio.ImageIO;
 
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.ChunkFactory;
-import de.felixperko.fractals.manager.ServerManagers;
-import de.felixperko.fractals.manager.ServerNetworkManager;
-import de.felixperko.fractals.manager.ServerThreadManager;
+import de.felixperko.fractals.manager.server.ServerManagers;
+import de.felixperko.fractals.manager.server.ServerNetworkManager;
+import de.felixperko.fractals.manager.server.ServerThreadManager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
 import de.felixperko.fractals.system.Numbers.DoubleNumber;
@@ -191,7 +191,7 @@ public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 	@Override
 	public synchronized void taskFinished(BasicTask task) {
 		finishedTasks.add(task);
-		System.out.println("task finished "+task.id+"/"+totalChunkCount);
+		System.out.println("task finished "+task.getId()+"/"+totalChunkCount);
 	}
 	
 	public boolean tick() {
@@ -248,4 +248,5 @@ public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 		
 	}
 
+	
 }

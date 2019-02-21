@@ -10,10 +10,11 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import de.felixperko.fractals.data.Chunk;
-import de.felixperko.fractals.manager.Managers;
-import de.felixperko.fractals.manager.ServerManagers;
+import de.felixperko.fractals.manager.common.Managers;
+import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.Number;
+import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.parameters.ParamSupplier;
 import de.felixperko.fractals.system.systems.BasicSystem.BasicTask;
@@ -88,8 +89,12 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	ComplexNumber leftLowerCorner;
 	ComplexNumber rightUpperCorner;
 	
+	Number zoom;
+	
 	FractalsCalculator calculator;
 	int chunkSize;
+	
+	List<BasicTask> finishedTasks = new ArrayList<>();
 
 	public BreadthFirstTaskManager(ServerManagers managers, CalcSystem system) {
 		super(managers, system);
@@ -99,6 +104,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	double midpointChunkY;
 	
 	Number chunkZoom;
+	
+	NumberFactory numberFactory;
 	
 	Map<String, ParamSupplier> parameters;
 	
@@ -110,19 +117,25 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		midpointChunkY = delta.imagDouble();
 	}
 
+	int id_counter_tasks = 0;
+
 	@Override
 	public void startTasks() {
+		if (layers.isEmpty())
+			layers.add(new BreadthFirstLayer(1));
+		
 		for (int i = 0 ; i < layers.size() ; i++) {
 			openTasks.add(new PriorityQueue<>(comparator_distance));
 			tempList.add(new ArrayList<>());
 		}
+
+		Chunk chunk = new Chunk(0, 0, chunkSize);
+		BreadthFirstTask rootTask = new BreadthFirstTask(id_counter_tasks++, this, chunk, parameters, midpoint.copy(), calculator, 0);
+		rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(0).priority_multiplier);
+		nextOpenTasks.add(rootTask);
 		
-		BreadthFirstTask takenTask = generateTask(0, 0, 0);
-		nextOpenTasks.add(takenTask);
+		generateNeighbours(rootTask);
 		
-		generateNeighbours(takenTask);
-		
-		fillQueues();
 			
 			//fill queues with higher priority
 			
@@ -135,6 +148,16 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		//generate neighbours
 	}
 	
+	public boolean tick() {
+		fillQueues();
+		finishTasks();
+		return true;
+	}
+	
+	private void finishTasks() {
+		
+	}
+
 	List<List<BreadthFirstTask>> tempList = new ArrayList<>();
 
 	//TODO use
@@ -209,8 +232,6 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		}
 	}
 
-	int id_counter_tasks = 0;
-
 	private boolean generateNeighbourIfNotExists(int layer, BreadthFirstTask parentTask, int dx, int dy) {
 		if (done)
 			return false;
@@ -222,12 +243,22 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			return false;
 		
 		Chunk chunk = new Chunk(chunkX, chunkY, chunkSize);
-		BreadthFirstTask task = new BreadthFirstTask(id_counter_tasks++, this, chunk, parameters, chunkPos, calculator, layer);
+		BreadthFirstTask task = new BreadthFirstTask(id_counter_tasks++, this, chunk, parameters, getChunkPos(chunkX, chunkY), calculator, layer);
 		task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(layer).priority_multiplier);
 		newQueue.add(task);
+		viewData.addChunk(chunk);
 		return true;
 	}
-	
+
+	private ComplexNumber getChunkPos(long chunkX, long chunkY) {
+		Number shiftX = numberFactory.createNumber(chunkX);
+		Number shiftY = numberFactory.createNumber(chunkY);
+		shiftX.mult(chunkZoom);
+		shiftY.mult(chunkZoom);
+		ComplexNumber chunkPos = numberFactory.createComplexNumber(shiftX, shiftY);
+		chunkPos.add(viewData.anchor);
+		return chunkPos;
+	}
 
 	@Override
 	public void endTasks() {
@@ -240,25 +271,63 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		this.parameters = params;
 		calculator = parameters.get("calculator").getGeneral(FractalsCalculator.class);
 		chunkSize = parameters.get("chunkSize").getGeneral(Integer.class);
-		return false;
+		midpoint = parameters.get("midpoint").getGeneral(ComplexNumber.class);
+		zoom = parameters.get("zoom").getGeneral(Number.class);
+		
+		numberFactory = parameters.get("numberFactory").getGeneral(NumberFactory.class);
+		
+		chunkZoom = zoom.copy();
+		chunkZoom.mult(numberFactory.createNumber(chunkSize));
+		
+		int width = parameters.get("width").getGeneral(Integer.class);
+		int height = parameters.get("width").getGeneral(Integer.class);
+		
+		Number rX = numberFactory.createNumber(width/2.);
+		rX.mult(zoom);
+		Number rY = numberFactory.createNumber(height/2.);
+		rY.mult(zoom);
+		ComplexNumber sideDist = numberFactory.createComplexNumber(rX, rY);
+		
+
+		leftLowerCorner = midpoint.copy();
+		leftLowerCorner.sub(sideDist);
+		
+		rightUpperCorner = sideDist;
+		rightUpperCorner.add(midpoint);
+		
+		ComplexNumber anchor = numberFactory.createComplexNumber(chunkZoom, chunkZoom);
+		anchor.multNumber(numberFactory.createNumber(-0.5));
+		anchor.add(midpoint);
+		
+		viewData = new BreadthFirstViewData(anchor);
+		return true;
 	}
 
 	@Override
-	public void reset() {
-		// TODO Auto-generated method stub
-		
+	public synchronized void reset() {
+		openTasks.clear();
+		nextOpenTasks.clear();
+		nextBufferedTasks.clear();
+		tempList.clear();
+		finishedTasks.clear();
+		//TODO abort running tasks
 	}
 
 	@Override
 	public void taskFinished(BreadthFirstTask task) {
-		// TODO Auto-generated method stub
-		
+		finishedTasks.add(task);
 	}
 
 	@Override
 	public List<? extends FractalsTask> getTasks(int count) {
-		// TODO Auto-generated method stub
-		return null;
+		List<BreadthFirstTask> tasks = new ArrayList<>();
+		for (int i = 0 ; i < count ; i++) {
+			BreadthFirstTask task = nextBufferedTasks.poll();
+			if (task == null)
+				break;
+			tasks.add(task);
+		}
+		return tasks;
 	}
 
 }

@@ -38,4 +38,16 @@ public class NumberFactory implements Serializable{
 			return null;
 		}
 	}
+
+	public ComplexNumber createComplexNumber(Number r, Number i) {
+		if (complexNumberClass == null)
+			throw new IllegalStateException("NumberFactory has no complexNumberClass configured");
+		try {
+			return complexNumberClass.getDeclaredConstructor(numberClass, numberClass).newInstance(r, i);
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 }

@@ -3,8 +3,8 @@ package de.felixperko.fractalsio;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.felixperko.fractals.manager.ClientManagers;
-import de.felixperko.fractals.manager.ClientNetworkManager;
+import de.felixperko.fractals.manager.client.ClientManagers;
+import de.felixperko.fractals.manager.client.ClientNetworkManager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.ClientMessageInterface;
 import de.felixperko.fractals.network.SystemClientData;
@@ -28,7 +28,7 @@ public class FractalsIO {
 		
 		NumberFactory numberFactory = new NumberFactory(DoubleNumber.class, DoubleComplexNumber.class);
 		Map<String, ParamSupplier> params = new HashMap<>();
-		int samplesDim = 2;
+		int samplesDim = 3;
 		params.put("width", new StaticParamSupplier("width", (Integer)1000));
 		params.put("height", new StaticParamSupplier("height", (Integer)1000));
 		params.put("chunkSize", new StaticParamSupplier("chunkSize", (Integer)200));

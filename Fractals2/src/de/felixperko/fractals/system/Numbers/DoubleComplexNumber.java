@@ -142,7 +142,7 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 	}
 
 	@Override
-	public ComplexNumber copy() {
+	public DoubleComplexNumber copy() {
 		return new DoubleComplexNumber(real, imag);
 	}
 	

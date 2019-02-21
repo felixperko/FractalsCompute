@@ -4,12 +4,12 @@ import java.awt.Color;
 import java.io.ObjectInputStream;
 import java.net.SocketException;
 
-import de.felixperko.fractals.manager.ClientManagers;
-import de.felixperko.fractals.manager.Managers;
-import de.felixperko.fractals.manager.NetworkManager;
-import de.felixperko.fractals.manager.ServerManagers;
-import de.felixperko.fractals.manager.ServerNetworkManager;
-import de.felixperko.fractals.manager.ServerThreadManager;
+import de.felixperko.fractals.manager.client.ClientManagers;
+import de.felixperko.fractals.manager.common.Managers;
+import de.felixperko.fractals.manager.common.NetworkManager;
+import de.felixperko.fractals.manager.server.ServerManagers;
+import de.felixperko.fractals.manager.server.ServerNetworkManager;
+import de.felixperko.fractals.manager.server.ServerThreadManager;
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;

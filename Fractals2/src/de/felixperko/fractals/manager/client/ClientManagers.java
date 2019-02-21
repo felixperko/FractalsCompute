@@ -1,5 +1,7 @@
-package de.felixperko.fractals.manager;
+package de.felixperko.fractals.manager.client;
 
+import de.felixperko.fractals.manager.common.Managers;
+import de.felixperko.fractals.manager.common.ThreadManager;
 import de.felixperko.fractals.network.ClientMessageInterface;
 
 public class ClientManagers implements Managers {

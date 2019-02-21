@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import de.felixperko.fractals.manager.ServerManagers;
-import de.felixperko.fractals.manager.ServerThreadManager;
+import de.felixperko.fractals.manager.server.ServerManagers;
+import de.felixperko.fractals.manager.server.ServerThreadManager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.Connection;
 import de.felixperko.fractals.network.SystemClientData;

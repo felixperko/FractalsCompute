@@ -1,10 +1,13 @@
-package de.felixperko.fractals.manager;
+package de.felixperko.fractals.manager.server;
+
+import de.felixperko.fractals.manager.common.Managers;
+import de.felixperko.fractals.manager.common.NetworkManager;
 
 public class ServerManagers implements Managers {
 	
 	SystemManager systemManager;
 	ServerThreadManager threadManager;
-	NetworkManager networkManager;
+	ServerNetworkManager networkManager;
 	
 	public ServerManagers() {
 		systemManager = new SystemManager(this);
@@ -22,7 +25,7 @@ public class ServerManagers implements Managers {
 	}
 	
 	@Override
-	public NetworkManager getNetworkManager() {
+	public ServerNetworkManager getNetworkManager() {
 		return networkManager;
 	}
 

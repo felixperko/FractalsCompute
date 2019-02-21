@@ -6,16 +6,19 @@ import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.network.infra.ServerMessage;
 import de.felixperko.fractals.network.infra.SystemServerMessage;
+import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
 
 public class ChunkUpdateMessage extends SystemServerMessage {
 	
 	private static final long serialVersionUID = -2349690041977280160L;
 	
 	Chunk chunk;
+	ServerStateInfo serverStateInfo;
 	
-	public ChunkUpdateMessage(UUID systemId, Chunk chunk) {
+	public ChunkUpdateMessage(UUID systemId, Chunk chunk, ServerStateInfo serverStateInfo) {
 		super(systemId);
 		this.chunk = chunk;
+		this.serverStateInfo = serverStateInfo;
 	}
 
 	@Override

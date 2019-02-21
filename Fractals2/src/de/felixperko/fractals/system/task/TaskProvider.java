@@ -5,6 +5,6 @@ public interface TaskProvider {
 
 	public void finishedTask(FractalsTask currentTask);
 	
-	public void addTaskManager(TaskManager taskManager);
-	public void removeTaskManager(TaskManager taskManager);
+//	public void addTaskManager(TaskManager taskManager);
+//	public void removeTaskManager(TaskManager taskManager);
 }

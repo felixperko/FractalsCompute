@@ -1,8 +1,10 @@
-package de.felixperko.fractals.manager;
+package de.felixperko.fractals.manager.client;
 
 import java.io.IOException;
 import java.net.Socket;
 
+import de.felixperko.fractals.manager.common.Manager;
+import de.felixperko.fractals.manager.common.NetworkManager;
 import de.felixperko.fractals.network.ClientMessageInterface;
 import de.felixperko.fractals.network.ClientWriteThread;
 import de.felixperko.fractals.network.SenderInfo;

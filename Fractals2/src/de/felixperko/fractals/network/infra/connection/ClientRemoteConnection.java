@@ -1,8 +1,8 @@
 package de.felixperko.fractals.network.infra.connection;
 
-import de.felixperko.fractals.manager.ClientNetworkManager;
-import de.felixperko.fractals.manager.Manager;
-import de.felixperko.fractals.manager.ServerNetworkManager;
+import de.felixperko.fractals.manager.client.ClientNetworkManager;
+import de.felixperko.fractals.manager.common.Manager;
+import de.felixperko.fractals.manager.server.ServerNetworkManager;
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.ServerWriteThread;
 import de.felixperko.fractals.network.infra.Message;

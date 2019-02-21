@@ -5,9 +5,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import de.felixperko.fractals.manager.Managers;
-import de.felixperko.fractals.manager.ServerManagers;
-import de.felixperko.fractals.manager.ServerThreadManager;
+import de.felixperko.fractals.manager.common.Managers;
+import de.felixperko.fractals.manager.server.ServerManagers;
+import de.felixperko.fractals.manager.server.ServerThreadManager;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.systems.infra.LifeCycleStateChange;

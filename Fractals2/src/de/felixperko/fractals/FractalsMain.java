@@ -4,9 +4,9 @@ import java.lang.reflect.GenericArrayType;
 import java.util.HashMap;
 import java.util.UUID;
 
-import de.felixperko.fractals.manager.ServerManagers;
-import de.felixperko.fractals.manager.ServerNetworkManager;
-import de.felixperko.fractals.manager.SystemManager;
+import de.felixperko.fractals.manager.server.ServerManagers;
+import de.felixperko.fractals.manager.server.ServerNetworkManager;
+import de.felixperko.fractals.manager.server.SystemManager;
 import de.felixperko.fractals.system.systems.BasicSystem.BasicSystem;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.CalcSystemFactory;

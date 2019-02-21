@@ -1,4 +1,4 @@
-package de.felixperko.fractals.manager;
+package de.felixperko.fractals.manager.common;
 
 import de.felixperko.fractals.network.Connection;
 

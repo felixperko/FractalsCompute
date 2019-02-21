@@ -6,6 +6,8 @@ import java.util.Map;
 
 import de.felixperko.fractals.system.parameters.ParamSupplier;
 import de.felixperko.fractals.system.systems.BasicSystem.BasicTask;
+import de.felixperko.fractals.system.systems.infra.CalcSystem;
+import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
 
 public interface TaskManager<T> {
 	void startTasks();
@@ -14,4 +16,5 @@ public interface TaskManager<T> {
 	void reset();
 	void taskFinished(T task);
 	List<? extends FractalsTask> getTasks(int count);
+	CalcSystem getSystem();
 }

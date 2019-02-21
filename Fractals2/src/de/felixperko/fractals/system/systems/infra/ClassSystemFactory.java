@@ -2,8 +2,8 @@ package de.felixperko.fractals.system.systems.infra;
 
 import java.lang.reflect.InvocationTargetException;
 
-import de.felixperko.fractals.manager.Managers;
-import de.felixperko.fractals.manager.ServerManagers;
+import de.felixperko.fractals.manager.common.Managers;
+import de.felixperko.fractals.manager.server.ServerManagers;
 
 public class ClassSystemFactory implements CalcSystemFactory{
 	

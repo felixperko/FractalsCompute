@@ -2,8 +2,8 @@ package de.felixperko.fractals.network.infra.connection;
 
 import java.awt.Color;
 
-import de.felixperko.fractals.manager.ClientNetworkManager;
-import de.felixperko.fractals.manager.ServerNetworkManager;
+import de.felixperko.fractals.manager.client.ClientNetworkManager;
+import de.felixperko.fractals.manager.server.ServerNetworkManager;
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;

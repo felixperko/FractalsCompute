@@ -1,4 +1,4 @@
-package de.felixperko.fractals.manager;
+package de.felixperko.fractals.manager.server;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import de.felixperko.fractals.manager.common.Manager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.SystemClientData;
 import de.felixperko.fractals.system.parameters.ParamSupplier;
@@ -14,10 +15,13 @@ import de.felixperko.fractals.system.systems.BasicSystem.BasicSystem;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.CalcSystemFactory;
 import de.felixperko.fractals.system.systems.infra.ClassSystemFactory;
+import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
 
 public class SystemManager extends Manager{
 	
 	Map<UUID, CalcSystem> activeSystems = new HashMap<>();
+	
+	ServerStateInfo stateInfo = new ServerStateInfo();
 	
 	Map<String, ClassSystemFactory> availableSystems = new HashMap<>();
 	
@@ -135,6 +139,11 @@ public class SystemManager extends Manager{
 		return system;
 	}
 
+	
+	public ServerStateInfo getStateInfo() {
+		return stateInfo;
+	}
+
 //	public CalcSystem initSystem(String systemName) {
 //		if (!availableSystems.containsKey(systemName)) {
 //			System.err.println("[main] system not available: '"+systemName+"'");
@@ -146,5 +155,7 @@ public class SystemManager extends Manager{
 //		system.start();
 //		return system;
 //	}
+	
+	
 
 }

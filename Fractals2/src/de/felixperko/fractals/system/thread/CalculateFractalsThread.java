@@ -1,7 +1,8 @@
 package de.felixperko.fractals.system.thread;
 
-import de.felixperko.fractals.manager.ServerManagers;
-import de.felixperko.fractals.manager.ServerThreadManager;
+import de.felixperko.fractals.manager.common.Managers;
+import de.felixperko.fractals.manager.server.ServerManagers;
+import de.felixperko.fractals.manager.server.ServerThreadManager;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.task.FractalsTask;
@@ -15,7 +16,7 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 	
 	int calcThreadId = 0;
 	
-	public CalculateFractalsThread(ServerManagers managers, TaskProvider taskProvider){
+	public CalculateFractalsThread(Managers managers, TaskProvider taskProvider){
 		super(managers, "CALC_"+ID_COUNTER);
 		calcThreadId = ID_COUNTER++;
 		this.taskProvider = taskProvider;
