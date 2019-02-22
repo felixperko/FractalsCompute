@@ -11,6 +11,9 @@ import javax.imageio.ImageIO;
 
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.network.ClientSystemInterface;
+import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
+import de.felixperko.fractals.system.Numbers.infra.Number;
+import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
 import de.felixperko.fractals.system.parameters.ParamSupplier;
 
 public class FractalsIOSystemInterface implements ClientSystemInterface {
@@ -32,16 +35,36 @@ public class FractalsIOSystemInterface implements ClientSystemInterface {
 			imgHeight = newImgHeight;
 			image = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_INT_RGB);
 		}
+		this.parameters = parameters;
 	}
 
 	@Override
 	public void chunkUpdated(Chunk chunk) {
+		int width = parameters.get("width").getGeneral(Integer.class);
+		double height = parameters.get("height").getGeneral(Integer.class);
+		Number zoom = parameters.get("zoom").getGeneral(Number.class);
+		ComplexNumber midpoint = parameters.get("midpoint").getGeneral(ComplexNumber.class);
+		ComplexNumber shift = chunk.chunkPos.copy();
+		shift.sub(midpoint);
+		NumberFactory nf = parameters.get("numberFactory").getGeneral(NumberFactory.class);
+		Number zoomY = zoom.copy();
+		zoomY.mult(nf.createNumber(height/width));
+		ComplexNumber internalShift = nf.createComplexNumber(zoom, zoomY);
+		internalShift.multNumber(nf.createNumber(0.5));
+		shift.add(internalShift);
+		shift.divNumber(zoom);
+		double relX = shift.getReal().toDouble();
+		double relY = shift.getImag().toDouble() * (width/height);
+		int chunkImgX = (int)Math.round(relX*width);
+		int chunkImgY = (int)Math.round(relY*width);
 		int chunkSize = chunk.getChunkSize();
-		long cx = chunkSize*chunk.getChunkX();
-		long cy = chunkSize*chunk.getChunkY();
+		boolean inside = false;
 		for (int i = 0 ; i < chunk.getArrayLength() ; i++) {
-			int x = (int) (i / chunkSize + cx);
-			int y = (int) (i % chunkSize + cy);
+			int x = (int) (i / chunkSize + chunkImgX);
+			int y = (int) (i % chunkSize + chunkImgY);
+			if (x >= image.getWidth() || x < 0 || y >= image.getHeight() || y < 0)
+				continue;
+			inside = true;
 			double value = chunk.getValue(i);
 			if (value > 0) {
 				float hue = (float)Math.log(Math.log(value+1)+1);
@@ -49,8 +72,10 @@ public class FractalsIOSystemInterface implements ClientSystemInterface {
 				image.setRGB(x, y, color);
 			}
 		}
-		chunkCount--;
+		if (inside)
+			chunkCount--;
 		if (chunkCount == 0) {
+//		if (FractalsIOMessageInterface.TEST_FINISH) {
 			try {
 //				long endTime = System.nanoTime();
 //				System.out.println("calculated in "+NumberUtil.getElapsedTimeInS(startTime, 2)+"s.");

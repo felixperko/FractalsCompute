@@ -12,6 +12,7 @@ import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.SystemClientData;
 import de.felixperko.fractals.system.parameters.ParamSupplier;
 import de.felixperko.fractals.system.systems.BasicSystem.BasicSystem;
+import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstSystem;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.CalcSystemFactory;
 import de.felixperko.fractals.system.systems.infra.ClassSystemFactory;
@@ -34,6 +35,7 @@ public class SystemManager extends Manager{
 	
 	public void insertAvailableSystems() {
 		availableSystems.put("BasicSystem", new ClassSystemFactory(BasicSystem.class));
+		availableSystems.put("BreadthFirstSystem", new ClassSystemFactory(BreadthFirstSystem.class));
 	}
 
 //	Map<UUID, SystemInstanceClientData> newSystemClientData = new HashMap<>();

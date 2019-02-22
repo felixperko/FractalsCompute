@@ -21,7 +21,7 @@ import de.felixperko.fractals.system.task.TaskManager;
 
 public class BasicTask extends AbstractFractalsTask {
 	
-	Chunk chunk;
+	public Chunk chunk;
 	Map<String, ParamSupplier> parameters;
 	
 	FractalsCalculator calculator;
@@ -36,7 +36,8 @@ public class BasicTask extends AbstractFractalsTask {
 			this.parameters.put(e.getKey(), e.getValue().copy());
 		}
 //		this.parameters = new HashMap<>(taskParameters);
-		this.parameters.put("chunkpos", new StaticParamSupplier("chunkpos", chunkPos));
+		this.parameters.put("chunkpos", new StaticParamSupplier("chunkpos", chunkPos.copy()));
+		this.chunk.chunkPos = chunkPos.copy();
 		this.parameters.put("chunksize", new StaticParamSupplier("chunksize", (Integer)chunk.getChunkSize()));
 	}
 
@@ -48,8 +49,7 @@ public class BasicTask extends AbstractFractalsTask {
 	}
 	
 	public Chunk getChunk() {
-		// TODO Auto-generated method stub
-		return null;
+		return chunk;
 	}
 
 

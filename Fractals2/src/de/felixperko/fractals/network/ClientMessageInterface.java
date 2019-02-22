@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
+
 public abstract class ClientMessageInterface {
 	
 	Map<UUID, ClientSystemInterface> systemInterfaces = new HashMap<>();
@@ -32,4 +34,7 @@ public abstract class ClientMessageInterface {
 		systemInterfaces.remove(systemId);
 		return true;
 	}
+	
+
+	public abstract void serverStateUpdated(ServerStateInfo serverStateInfo);
 }

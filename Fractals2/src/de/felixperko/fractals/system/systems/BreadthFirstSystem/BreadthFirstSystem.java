@@ -1,15 +1,26 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.SystemClientData;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
+import de.felixperko.fractals.network.messages.SystemConnectedMessage;
 import de.felixperko.fractals.system.parameters.ParamSupplier;
 import de.felixperko.fractals.system.systems.infra.AbstractCalcSystem;
+import de.felixperko.fractals.system.task.ClassTaskFactory;
+import de.felixperko.fractals.system.task.TaskFactory;
 
 public class BreadthFirstSystem extends AbstractCalcSystem {
+	
+	TaskFactory factory_task = new ClassTaskFactory(BreadthFirstTask.class);
+	
+	BreadthFirstTaskManager taskManager;
+	
+	List<ClientConfiguration> clients = new ArrayList<>();
 
 	public BreadthFirstSystem(ServerManagers managers) {
 		super(managers);
@@ -18,26 +29,38 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
-
+		taskManager.reset();
 	}
 
 	@Override
 	public void addClient(ClientConfiguration newConfiguration, SystemClientData systemClientData) {
-		// TODO Auto-generated method stub
-
+		clients.add(newConfiguration);
+		newConfiguration.getSystemRequests().remove(systemClientData);
+		newConfiguration.getSystemClientData().put(id, systemClientData);
+		newConfiguration.getConnection().writeMessage(new SystemConnectedMessage(id, newConfiguration));
+		taskManager.setParameters(systemClientData.getClientParameters());
 	}
 
 	@Override
 	public void changedClient(ClientConfiguration newConfiguration, ClientConfiguration oldConfiguration) {
-		// TODO Auto-generated method stub
-
+		
+		Map<String, ParamSupplier> newParameters = newConfiguration.getSystemClientData(getId()).getClientParameters();
+		
+		boolean applicable = isApplicable(newConfiguration.getConnection(), newParameters);
+		
+		synchronized(clients) {
+			if (oldConfiguration != null)
+				clients.remove(oldConfiguration);
+			if (applicable) {
+				clients.add(newConfiguration);
+				taskManager.setParameters(newParameters);
+			}
+		}
 	}
 
 	@Override
 	public void removeClient(ClientConfiguration oldConfiguration) {
-		// TODO Auto-generated method stub
-
+		clients.remove(oldConfiguration);
 	}
 
 	@Override
@@ -47,33 +70,60 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 	}
 
 	@Override
-	public boolean isApplicable(ClientConnection connection, Map<String, ParamSupplier> map) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean isApplicable(ClientConnection connection, Map<String, ParamSupplier> parameters) {
+		boolean hasClient = false;
+		for (ClientConfiguration conf : clients) {
+			if (conf.getConnection() == connection) {
+				hasClient = true;
+				break;
+			}
+		}
+		if (hasClient && clients.size() == 1)
+			return true;
+		for (ParamSupplier param : parameters.values()) {
+			if (param.isSystemRelevant() || param.isLayerRelevant() || param.isViewRelevant()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
 	public boolean onInit(Map<String, ParamSupplier> params) {
-		// TODO Auto-generated method stub
-		return false;
+		
+		taskManager = new BreadthFirstTaskManager(managers, this);
+		taskManager.setParameters(params);
+		
+		return true;
 	}
 
 	@Override
 	public boolean onStart() {
-		// TODO Auto-generated method stub
-		return false;
+		
+		taskManager.start();
+		taskManager.startTasks();
+		managers.getThreadManager().getTaskProvider().addTaskManager(taskManager);
+		
+		return true;
 	}
 
 	@Override
 	public boolean onPause() {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean onStop() {
-		// TODO Auto-generated method stub
-		return false;
+
+		taskManager.stopThread();
+		managers.getThreadManager().getTaskProvider().removeTaskManager(taskManager);
+		
+		return true;
+	}
+
+	public List<ClientConfiguration> getClients() {
+		return clients;
 	}
 
 }

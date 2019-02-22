@@ -10,6 +10,8 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 	boolean layerRelevant = false;
 	boolean viewRelevant = false;
 	
+	protected boolean changed = false;
+	
 	public AbstractParamSupplier(String name) {
 		this.name = name;
 	}
@@ -41,6 +43,21 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 
 	public void setViewRelevant(boolean viewRelevant) {
 		this.viewRelevant = viewRelevant;
+	}
+	
+	@Override
+	public void updateChanged(ParamSupplier old) {
+		changed = evaluateChanged(old);
+	}
+	
+	public abstract boolean evaluateChanged(ParamSupplier old);
+	
+	/**
+	 * updateChanged() has to be called first
+	 */
+	@Override
+	public boolean isChanged() {
+		return changed;
 	}
 	
 	@Override

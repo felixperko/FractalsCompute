@@ -40,7 +40,7 @@ public class BreadthFirstViewData {
 		return ans;
 	}
 
-	public boolean hasChunk(long chunkX, long chunkY) {
+	public boolean hasChunk(Long chunkX, Long chunkY) {
 		Map<Long, Chunk> map = chunks.get(chunkX);
 		if (map == null)
 			return false;

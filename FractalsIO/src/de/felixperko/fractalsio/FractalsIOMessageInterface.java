@@ -5,6 +5,9 @@ import java.util.UUID;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.ClientMessageInterface;
 import de.felixperko.fractals.network.ClientSystemInterface;
+import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
+import de.felixperko.fractals.system.systems.stateinfo.SystemStateInfo;
+import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 
 public class FractalsIOMessageInterface extends ClientMessageInterface {
 
@@ -27,11 +30,23 @@ public class FractalsIOMessageInterface extends ClientMessageInterface {
 			height += chunkSize;
 		width /= chunkSize;
 		height /= chunkSize;
-		systemInterface.addChunkCount(width*height);
+		systemInterface.addChunkCount((width)*(height));
 		systemInterface.setParameters(clientConfiguration.getSystemClientData(systemId).getClientParameters());
 		addSystemInterface(systemId, systemInterface);
 		
 		FractalsIO.clientConfiguration = clientConfiguration;
+	}
+	
+	public static boolean TEST_FINISH = false;
+
+	@Override
+	public void serverStateUpdated(ServerStateInfo serverStateInfo) {
+		for (SystemStateInfo ssi : serverStateInfo.getSystemStates()) {
+			if (ssi.getTaskListForState(TaskState.ASSIGNED).size() == 0 && ssi.getTaskListForState(TaskState.OPEN).size() == 0)
+				TEST_FINISH = true;
+			for (TaskState state : TaskState.values())
+				System.out.println(state.name()+": "+ssi.getTaskListForState(state).size());
+		}
 	}
 
 }

@@ -9,6 +9,7 @@ import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.network.messages.task.TaskFinishedMessage;
 import de.felixperko.fractals.network.messages.task.TaskRequestMessage;
 import de.felixperko.fractals.network.messages.task.TaskStateChangedMessage;
+import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 
 public class RemoteTaskProvider implements TaskProvider {
 	

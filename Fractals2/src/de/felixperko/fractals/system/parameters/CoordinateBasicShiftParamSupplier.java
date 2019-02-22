@@ -9,11 +9,11 @@ public class CoordinateBasicShiftParamSupplier extends CoordinateParamSupplier {
 	private static final long serialVersionUID = 2317887367642326504L;
 	
 	ComplexNumber[] shifts;
-	int dim = 0;
+//	int dim = 0;
 	
 	public CoordinateBasicShiftParamSupplier(String name, NumberFactory numberFactory, int dim) {
 		super(name, numberFactory);
-		this.dim = dim;
+//		this.dim = dim;
 		shifts = new ComplexNumber[dim*dim];
 		for (float x = 0 ; x < dim ; x++){
 			for (float y = 0 ; y < dim ; y++){
@@ -24,7 +24,7 @@ public class CoordinateBasicShiftParamSupplier extends CoordinateParamSupplier {
 	
 	private CoordinateBasicShiftParamSupplier(String name, NumberFactory numberFactory, ComplexNumber[] shifts) {
 		super(name, numberFactory);
-		this.dim = Math.round((float)Math.sqrt(shifts.length));
+//		this.dim = Math.round((float)Math.sqrt(shifts.length));
 		this.shifts = shifts;
 	}
 	
@@ -54,6 +54,29 @@ public class CoordinateBasicShiftParamSupplier extends CoordinateParamSupplier {
 	@Override
 	public void applyRelativeSampleShift(ComplexNumber pixelCoord, int sample) {
 		pixelCoord.add(shifts[sample]);
+	}
+
+	
+	@Override
+	public boolean evaluateChanged(ParamSupplier old) {
+		if (old == null) {
+			return false;
+		} else if (!(old instanceof CoordinateBasicShiftParamSupplier)) {
+			return true;
+		} else {
+			CoordinateBasicShiftParamSupplier o = (CoordinateBasicShiftParamSupplier) old;
+			
+//			if (p_pixelzoom.evaluateChanged(o.p_pixelzoom) || p_chunkpos.evaluateChanged(o.p_chunkpos) || p_chunksize.evaluateChanged(o.p_chunksize)
+//					|| shifts.length != o.shifts.length)
+			if (shifts.length != o.shifts.length)
+				return true;
+			
+			for (int i = 0 ; i < shifts.length ; i++)
+				if (!shifts[i].equals(o.shifts[i]))
+					return true;
+			
+			return false;
+		}
 	}
 
 

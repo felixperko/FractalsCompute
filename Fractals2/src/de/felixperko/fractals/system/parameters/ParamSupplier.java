@@ -17,8 +17,13 @@ public interface ParamSupplier extends Serializable{
 	public void setSystemRelevant(boolean relevant);
 	public void setLayerRelevant(boolean relevant);
 	public void setViewRelevant(boolean relevant);
+	
+	public boolean isChanged();
 
 	public ParamSupplier copy();
 
 	public <C> C getGeneral(Class<C> cls);
+
+	public void updateChanged(ParamSupplier old);
+	public boolean evaluateChanged(ParamSupplier old);
 }

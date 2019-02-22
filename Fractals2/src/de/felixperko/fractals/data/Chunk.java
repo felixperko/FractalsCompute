@@ -17,6 +17,8 @@ public class Chunk implements Serializable{
 	double[] values;
 	int[] failedSamples;
 	
+	public ComplexNumber chunkPos;
+	
 	public Chunk(long chunkX, long chunkY, int dimensionSize) {
 		this.chunkX = chunkX;
 		this.chunkY = chunkY;

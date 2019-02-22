@@ -19,4 +19,16 @@ public class StaticParamSupplier extends AbstractParamSupplier {
 		return new StaticParamSupplier(name, obj);
 	}
 
+	
+	@Override
+	public boolean evaluateChanged(ParamSupplier old) {
+		if (old == null) {
+			return false;
+		} else if (!(old instanceof StaticParamSupplier)) {
+			return true;
+		} else {
+			return !((StaticParamSupplier)old).obj.equals(obj);
+		}
+	}
+
 }

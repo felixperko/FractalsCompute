@@ -17,6 +17,7 @@ public class FractalsMain {
 	static ServerManagers managers;
 	
 	public static int THREAD_COUNT = Runtime.getRuntime().availableProcessors();
+//	public static int THREAD_COUNT = 2;
 	
 	public static void main(String[] args) {
 		

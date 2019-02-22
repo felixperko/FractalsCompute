@@ -20,6 +20,6 @@ public interface CalcSystem extends LifeCycleComponent{
 	public void changedClient(ClientConfiguration newConfiguration, ClientConfiguration oldConfiguration);
 	public void removeClient(ClientConfiguration oldConfiguration);
 	public void changeClientMaxThreadCount(int newGranted, int oldGranted);
-	public boolean isApplicable(ClientConnection connection, Map<String, ParamSupplier> map);
+	public boolean isApplicable(ClientConnection connection, Map<String, ParamSupplier> parameters);
 	public SystemStateInfo getSystemStateInfo();
 }
