@@ -13,8 +13,11 @@ import de.felixperko.fractals.system.parameters.ParamSupplier;
 import de.felixperko.fractals.system.systems.infra.AbstractCalcSystem;
 import de.felixperko.fractals.system.task.ClassTaskFactory;
 import de.felixperko.fractals.system.task.TaskFactory;
+import de.felixperko.fractals.util.CategoryLogger;
 
 public class BreadthFirstSystem extends AbstractCalcSystem {
+	
+	CategoryLogger log;
 	
 	TaskFactory factory_task = new ClassTaskFactory(BreadthFirstTask.class);
 	
@@ -24,7 +27,7 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 
 	public BreadthFirstSystem(ServerManagers managers) {
 		super(managers);
-		// TODO Auto-generated constructor stub
+		log = managers.getSystemManager().getLogger().createSubLogger(getNumber()+"_BF");
 	}
 
 	@Override
@@ -91,6 +94,7 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 	@Override
 	public boolean onInit(Map<String, ParamSupplier> params) {
 		
+		log.log("initializing");
 		taskManager = new BreadthFirstTaskManager(managers, this);
 		taskManager.setParameters(params);
 		
@@ -99,7 +103,8 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 
 	@Override
 	public boolean onStart() {
-		
+
+		log.log("starting");
 		taskManager.start();
 		taskManager.startTasks();
 		managers.getThreadManager().getTaskProvider().addTaskManager(taskManager);
@@ -118,12 +123,17 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 
 		taskManager.stopThread();
 		managers.getThreadManager().getTaskProvider().removeTaskManager(taskManager);
+		log.log("stopped");
 		
 		return true;
 	}
 
 	public List<ClientConfiguration> getClients() {
 		return clients;
+	}
+	
+	public CategoryLogger getLogger(){
+		return log;
 	}
 
 }

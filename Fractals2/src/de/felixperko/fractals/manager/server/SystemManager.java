@@ -1,5 +1,6 @@
 package de.felixperko.fractals.manager.server;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,8 +18,11 @@ import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.CalcSystemFactory;
 import de.felixperko.fractals.system.systems.infra.ClassSystemFactory;
 import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
+import de.felixperko.fractals.util.CategoryLogger;
 
 public class SystemManager extends Manager{
+	
+	CategoryLogger log = new CategoryLogger("systems", Color.YELLOW);
 	
 	Map<UUID, CalcSystem> activeSystems = new HashMap<>();
 	
@@ -138,12 +142,17 @@ public class SystemManager extends Manager{
 		}
 		
 		CalcSystem system = availableSystems.get(systemName).createSystem(managers);
+		log.log("initiating system "+systemName);
 		return system;
 	}
 
 	
 	public ServerStateInfo getStateInfo() {
 		return stateInfo;
+	}
+	
+	public CategoryLogger getLogger(){
+		return log;
 	}
 
 //	public CalcSystem initSystem(String systemName) {

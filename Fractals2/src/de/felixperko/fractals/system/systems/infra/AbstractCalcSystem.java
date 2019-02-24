@@ -17,7 +17,11 @@ import de.felixperko.fractals.system.thread.FractalsThread;
 
 public abstract class AbstractCalcSystem implements CalcSystem {
 	
+	static int CALC_SYSTEM_COUNTER = 0;
+	
 	protected UUID id = UUID.randomUUID();
+	
+	int number = 0;
 	
 	LifeCycleState state = LifeCycleState.NOT_INITIALIZED;
 	
@@ -29,6 +33,7 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	
 	public AbstractCalcSystem(ServerManagers managers) {
 		this.managers = managers;
+		this.number = CALC_SYSTEM_COUNTER++;
 		this.systemStateInfo = new SystemStateInfo();
 		managers.getSystemManager().getStateInfo().addSystemStateInfo(id, this.systemStateInfo);
 	}
@@ -88,5 +93,9 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	@Override
 	public UUID getId() {
 		return id;
+	}
+	
+	public int getNumber(){
+		return number;
 	}
 }

@@ -2,6 +2,7 @@ package de.felixperko.fractalsio;
 
 import java.util.UUID;
 
+import de.felixperko.fractals.manager.client.ClientManagers;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.ClientMessageInterface;
 import de.felixperko.fractals.network.ClientSystemInterface;
@@ -10,16 +11,29 @@ import de.felixperko.fractals.system.systems.stateinfo.SystemStateInfo;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 
 public class FractalsIOMessageInterface extends ClientMessageInterface {
+	
+	ClientManagers managers;
+	
+	public FractalsIOMessageInterface() {
+	}
+	
+	public void setManagers(ClientManagers managers){
+		this.managers = managers;
+	}
 
 	@Override
 	protected ClientSystemInterface createSystemInterface(ClientConfiguration clientConfiguration) {
-		FractalsIOSystemInterface systemInterface = new FractalsIOSystemInterface();
+		if (managers == null)
+			throw new IllegalStateException();
+		FractalsIOSystemInterface systemInterface = new FractalsIOSystemInterface(managers);
 		return systemInterface;
 	}
 	
 	@Override
 	public void createdSystem(UUID systemId, ClientConfiguration clientConfiguration) {
-		FractalsIOSystemInterface systemInterface = new FractalsIOSystemInterface();
+		if (managers == null)
+			throw new IllegalStateException();
+		FractalsIOSystemInterface systemInterface = new FractalsIOSystemInterface(managers);
 		
 		int chunkSize = clientConfiguration.getParameterGeneralValue(systemId, "chunkSize", Integer.class);
 		int width = clientConfiguration.getParameterGeneralValue(systemId, "width", Integer.class);
@@ -41,8 +55,10 @@ public class FractalsIOMessageInterface extends ClientMessageInterface {
 
 	@Override
 	public void serverStateUpdated(ServerStateInfo serverStateInfo) {
-		for (SystemStateInfo ssi : serverStateInfo.getSystemStates()) {
-			if (ssi.getTaskListForState(TaskState.ASSIGNED).size() == 0 && ssi.getTaskListForState(TaskState.OPEN).size() == 0)
+		for (UUID systemId : getRegisteredSystems()) {
+			SystemStateInfo ssi = serverStateInfo.getSystemState(systemId);
+			System.out.println(ssi.getUpdateTime());
+			if (ssi.getTaskListForState(TaskState.OPEN).size() == 0 && ssi.getTaskListForState(TaskState.ASSIGNED).size() == 0 && ssi.getTaskListForState(TaskState.FINISHED).size() > 0)
 				TEST_FINISH = true;
 			for (TaskState state : TaskState.values())
 				System.out.println(state.name()+": "+ssi.getTaskListForState(state).size());

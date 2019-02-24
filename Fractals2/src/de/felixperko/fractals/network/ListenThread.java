@@ -51,7 +51,7 @@ public class ListenThread extends AbstractFractalsThread {
 			
 			try {
 				setLifeCycleState(LifeCycleState.IDLE);
-				Message msg = (Message) in.readObject();
+				Message msg = (Message) in.readUnshared();
 				setLifeCycleState(LifeCycleState.RUNNING);
 				NetworkManager net = managers.getNetworkManager();
 				msg.received(writeThread.getConnection(), log);

@@ -84,11 +84,11 @@ public abstract class WriteThread extends AbstractFractalsThread {
 						Message msg = it.next();
 						prepareMessage(msg);
 //						log.log("sending message: "+msg.getClass().getSimpleName());
-						out.writeObject(msg);
+						out.writeUnshared(msg);
 						it.remove();
+						out.reset();
 					}
 				}
-				out.flush();
 			}
 			
 			in.close();

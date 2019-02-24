@@ -1,7 +1,9 @@
 package de.felixperko.fractals.network;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
@@ -11,6 +13,10 @@ public abstract class ClientMessageInterface {
 	Map<UUID, ClientSystemInterface> systemInterfaces = new HashMap<>();
 	
 	protected abstract ClientSystemInterface createSystemInterface(ClientConfiguration clientConfiguration);
+	
+	public Set<UUID> getRegisteredSystems(){
+		return systemInterfaces.keySet();
+	}
 	
 	public ClientSystemInterface getSystemInterface(UUID systemId) {
 		return systemInterfaces.get(systemId);

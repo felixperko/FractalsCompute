@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class SystemStateInfo implements Serializable{
 	
@@ -12,9 +14,9 @@ public class SystemStateInfo implements Serializable{
 	
 //	int stageCount;
 //	int currentWorkerThreads;
-	Map<Integer, TaskStateInfo> taskStates = new HashMap<>();
+	Map<Integer, TaskStateInfo> taskStates = new ConcurrentHashMap<>();
 	
-	Map<TaskState, List<TaskStateInfo>> tasksPerState = new HashMap<>();
+	Map<TaskState, List<TaskStateInfo>> tasksPerState = new ConcurrentHashMap<>();
 	
 	ServerStateInfo serverStateInfo;
 	
@@ -23,12 +25,13 @@ public class SystemStateInfo implements Serializable{
 		taskStates.put((Integer)taskStateInfo.getTaskId(), taskStateInfo);
 		
 		getTaskListForState(taskStateInfo.getState()).add(taskStateInfo);
+		updateTime();
 	}
 	
 	public List<TaskStateInfo> getTaskListForState(TaskState state){
 		List<TaskStateInfo> stateList = tasksPerState.get(state);
 		if (stateList == null) {
-			stateList = new ArrayList<>();
+			stateList = new CopyOnWriteArrayList<>();
 			tasksPerState.put(state, stateList);
 		}
 		return stateList;
@@ -48,5 +51,13 @@ public class SystemStateInfo implements Serializable{
 	
 	public Map<TaskState, List<TaskStateInfo>> getTasksPerState(){
 		return tasksPerState;
+	}
+	
+	protected void updateTime(){
+		serverStateInfo.updateTime();
+	}
+	
+	public long getUpdateTime(){
+		return serverStateInfo.getUpdateTime();
 	}
 }

@@ -33,6 +33,7 @@ import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.AbstractTaskManager;
 import de.felixperko.fractals.system.task.FractalsTask;
+import de.felixperko.fractals.util.CategoryLogger;
 
 //first chunk at relative 0, 0
 //generate neighbours -> add to open queue
@@ -112,9 +113,12 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	int chunkSize;
 	
 	List<BreadthFirstTask> finishedTasks = new ArrayList<>();
+	
+	CategoryLogger log;
 
 	public BreadthFirstTaskManager(ServerManagers managers, CalcSystem system) {
 		super(managers, system);
+		log = ((BreadthFirstSystem)system).getLogger().createSubLogger("tm");
 	}
 	
 	double midpointChunkX;
@@ -262,7 +266,12 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	public List<? extends FractalsTask> getTasks(int count) {
 		List<BreadthFirstTask> tasks = new ArrayList<>();
 		for (int i = 0 ; i < count ; i++) {
-			BreadthFirstTask task = nextBufferedTasks.poll();
+			BreadthFirstTask task = null;
+			for (int try1 = 0 ; try1 < 3 ; try1++){
+				task = nextBufferedTasks.poll();
+				if (task != null)
+					break;
+			}
 			if (task == null)
 				break;
 			tasks.add(task);
@@ -285,12 +294,22 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		setLifeCycleState(LifeCycleState.RUNNING);
 		synchronized (this) {
 			for (BreadthFirstTask task : finishedTasks) {
-				for (ClientConfiguration client : ((BreadthFirstSystem)system).getClients()) {
+//				log.log("task finished "+task.getId());
+//				for (TaskState state : TaskState.values())
+//					log.log(state.name()+": "+system.getSystemStateInfo().getTaskListForState(state).size());
+				List<ClientConfiguration> clients = ((BreadthFirstSystem)system).getClients();
+				log.log("update chunk for "+clients.size()+" clients");
+				for (ClientConfiguration client : clients) {
 					((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, task.chunk);
 				}
 				if (task.layer >= layers.size()-1) {
 					openChunks--;
 					if (openChunks == 0) { //finished
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 						system.stop();
 					}
 				} else {
@@ -409,9 +428,9 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	}
 
 	private void generateNeighbours(BreadthFirstTask polledTask) {
-		int highestDistance = width >= height ? width : height;
-		highestDistance /= 2;
-		highestDistance += chunkSize;
+		double highestDistance = width >= height ? width : height;
+		highestDistance *= 0.5 * Math.sqrt(2);
+//		highestDistance += chunkSize;
 		if (polledTask.getChunk().distance(midpointChunkX, midpointChunkY) > highestDistance/chunkSize)
 			return; //TODO generate tasks later when shift brings task into view
 		generateNeighbourIfNotExists(0, polledTask, 1, 0);

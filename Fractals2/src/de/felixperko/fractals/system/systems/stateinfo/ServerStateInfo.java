@@ -16,6 +16,8 @@ public class ServerStateInfo implements Serializable{
 	List<Integer> remoteWorkerThreads = new ArrayList<>();
 	Map<UUID, SystemStateInfo> systemStates = new HashMap<>();
 	
+	long updateTime = 0;
+	
 	public void addSystemStateInfo(UUID systemId, SystemStateInfo systemStateInfo) {
 		systemStateInfo.setServerStateInfo(this);
 		systemStates.put(systemId, systemStateInfo);
@@ -27,5 +29,17 @@ public class ServerStateInfo implements Serializable{
 	
 	public Collection<TaskStateInfo> getTaskStates(UUID systemId){
 		return systemStates.get(systemId).taskStates.values();
+	}
+
+	public SystemStateInfo getSystemState(UUID systemId) {
+		return systemStates.get(systemId);
+	}
+	
+	protected void updateTime(){
+		updateTime = System.nanoTime();
+	}
+
+	public long getUpdateTime() {
+		return updateTime;
 	}
 }

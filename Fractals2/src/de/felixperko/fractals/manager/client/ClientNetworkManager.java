@@ -54,4 +54,8 @@ public class ClientNetworkManager extends Manager implements NetworkManager{
 	public ClientMessageInterface getMessageInterface() {
 		return clientMessageInterface;
 	}
+
+	public void closeServerConnection() {
+		serverConnection.getWriteToServer().closeConnection();
+	}
 }
