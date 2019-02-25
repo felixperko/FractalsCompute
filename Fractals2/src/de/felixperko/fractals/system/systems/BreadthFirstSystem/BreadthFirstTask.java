@@ -22,6 +22,7 @@ public class BreadthFirstTask extends BasicTask {
 	public BreadthFirstTask(int id, TaskManager taskManager, Chunk chunk, Map<String, ParamSupplier> taskParameters,
 			ComplexNumber chunkPos, FractalsCalculator calculator, int layer) {
 		super(id, taskManager, chunk, taskParameters, chunkPos, calculator);
+		chunk.setCurrentTask(this);
 		this.layer = layer;
 		getStateInfo().setState(TaskState.OPEN);
 	}

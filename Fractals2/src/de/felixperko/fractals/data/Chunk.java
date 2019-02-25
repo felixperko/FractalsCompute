@@ -3,6 +3,7 @@ package de.felixperko.fractals.data;
 import java.io.Serializable;
 
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
+import de.felixperko.fractals.system.task.FractalsTask;
 
 public class Chunk implements Serializable{
 	
@@ -18,6 +19,8 @@ public class Chunk implements Serializable{
 	int[] failedSamples;
 	
 	public ComplexNumber chunkPos;
+	
+	FractalsTask currentTask;
 	
 	public Chunk(long chunkX, long chunkY, int dimensionSize) {
 		this.chunkX = chunkX;
@@ -123,5 +126,14 @@ public class Chunk implements Serializable{
 	
 	public double distance(double otherX, double otherY) {
 		return Math.sqrt(distanceSq(otherX, otherY));
+	}
+
+	
+	public FractalsTask getCurrentTask() {
+		return currentTask;
+	}
+	
+	public void setCurrentTask(FractalsTask currentTask) {
+		this.currentTask = currentTask;
 	}
 }

@@ -5,6 +5,7 @@ import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.manager.server.ServerThreadManager;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
+import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.system.task.TaskProvider;
 
@@ -71,6 +72,7 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 			
 			//got task, execute
 			setLifeCycleState(LifeCycleState.RUNNING);
+			currentTask.getStateInfo().setState(TaskState.STARTED);
 			currentTask.run();
 			taskProvider.finishedTask(currentTask);
 			currentTask = null;

@@ -5,8 +5,10 @@ import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
 
 public abstract class AbstractFractalsTask implements FractalsTask{
 	
+	private static final long serialVersionUID = -3755610537350804691L;
+	
 	Integer id;
-	TaskManager taskManager;
+	transient TaskManager taskManager;
 	TaskStateInfo stateInfo;
 	
 	public AbstractFractalsTask(Integer id, TaskManager taskManager) {

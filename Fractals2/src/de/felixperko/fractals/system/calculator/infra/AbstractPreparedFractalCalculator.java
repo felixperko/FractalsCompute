@@ -14,6 +14,8 @@ import de.felixperko.fractals.system.parameters.ParamSupplier;
 
 public abstract class AbstractPreparedFractalCalculator extends AbstractFractalsCalculator{
 	
+	private static final long serialVersionUID = 8917363332981274755L;
+	
 	final static double LOG_2 = Math.log(2);
 	
 	//ParamSupplier[] params;
@@ -36,8 +38,11 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 		int samples = (Integer) p_samples.get(0,0);
 //		if (chunk.getChunkX() == 5 && chunk.getChunkY() == 10)
 //			System.out.println("test chunk");
+		
+		int pixelCount = chunk.getArrayLength();
+		
 		loop : 
-		for (int pixel = 0 ; pixel < chunk.getArrayLength() ; pixel++) {
+		for (int pixel = 0 ; pixel < pixelCount ; pixel++) {
 			for (int sample = 0 ; sample < samples ; sample++){
 				if (cancelled)
 					break loop;
@@ -57,6 +62,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 				}
 				chunk.addSample(pixel, res);
 			}
+			chunk.getCurrentTask().getStateInfo().setProgress((pixel+1.)/pixelCount);
 		}
 	}
 	

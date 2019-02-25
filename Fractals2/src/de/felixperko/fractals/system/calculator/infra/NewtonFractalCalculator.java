@@ -7,6 +7,8 @@ import de.felixperko.fractals.system.parameters.ParamSupplier;
 
 public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator{
 
+	private static final long serialVersionUID = -6099194301035200237L;
+	
 	ParamSupplier p_iterations;
 	ParamSupplier p_samples;
 	ParamSupplier p_start;

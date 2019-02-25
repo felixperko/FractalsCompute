@@ -7,6 +7,8 @@ import de.felixperko.fractals.system.calculator.infra.NewtonFractalCalculator;
 
 public class NewtonThridPowerMinusOneCalculator extends NewtonFractalCalculator {
 
+	private static final long serialVersionUID = -2057843694568405589L;
+
 	@Override
 	public void setRoots() {
 		roots = new DoubleComplexNumber[3];

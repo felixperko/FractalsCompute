@@ -47,25 +47,29 @@ public class FractalsIOSystemInterface implements ClientSystemInterface {
 
 	@Override
 	public void chunkUpdated(Chunk chunk) {
-		System.out.println(chunk.getChunkX()+"/ "+chunk.getChunkY());
+		int chunkSize = chunk.getChunkSize();
 		int width = parameters.get("width").getGeneral(Integer.class);
 		double height = parameters.get("height").getGeneral(Integer.class);
 		Number zoom = parameters.get("zoom").getGeneral(Number.class);
 		ComplexNumber midpoint = parameters.get("midpoint").getGeneral(ComplexNumber.class);
+		NumberFactory nf = parameters.get("numberFactory").getGeneral(NumberFactory.class);
+		
 		ComplexNumber shift = chunk.chunkPos.copy();
 		shift.sub(midpoint);
-		NumberFactory nf = parameters.get("numberFactory").getGeneral(NumberFactory.class);
 		Number zoomY = zoom.copy();
 //		zoomY.mult(nf.createNumber(height/width));
 		ComplexNumber internalShift = nf.createComplexNumber(zoom, zoomY);
 		internalShift.multNumber(nf.createNumber(0.5));
 		shift.add(internalShift);
 		shift.divNumber(zoom);
-		double relX = shift.getReal().toDouble();
-		double relY = shift.getImag().toDouble() * (width/height);
-		int chunkImgX = (int)Math.round(relX*width);
-		int chunkImgY = (int)Math.round(relY*height);
-		int chunkSize = chunk.getChunkSize();
+		double shiftX = (((width/(double)height)-1)*0.5);
+		double relX = (shift.getReal().toDouble() + shiftX) * (height/width);
+		double relY = shift.getImag().toDouble();
+		double testShrinkForHeightGreaterThanWidth = (height/width) > 1 ? (height/width) : 1;
+		int chunkImgX = (int)Math.round(relX*width/testShrinkForHeightGreaterThanWidth);
+		int chunkImgY = (int)Math.round(relY*height/testShrinkForHeightGreaterThanWidth);
+		
+		System.out.println(chunk.getChunkX()+" / "+chunk.getChunkY()+" -> "+chunkImgX+" / "+chunkImgY);
 		boolean inside = false;
 		for (int i = 0 ; i < chunk.getArrayLength() ; i++) {
 			int x = (int) (i / chunkSize + chunkImgX);
@@ -79,6 +83,8 @@ public class FractalsIOSystemInterface implements ClientSystemInterface {
 				float hue = (float)Math.log(value+1);
 				int color = Color.HSBtoRGB(hue, 1f, 1f);
 				image.setRGB(x, y, color);
+//				if (y == 501)
+//					System.out.println(x+", "+y+": "+value);
 			}
 		}
 		if (inside)

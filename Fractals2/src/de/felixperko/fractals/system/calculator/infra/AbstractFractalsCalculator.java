@@ -10,7 +10,9 @@ import de.felixperko.fractals.system.parameters.ParamSupplier;
 
 public abstract class AbstractFractalsCalculator implements FractalsCalculator {
 
-	Map<String, Field> fields = null;
+	private static final long serialVersionUID = 448587812207550305L;
+
+	transient Map<String, Field> fields = null;
 	
 	Class<? extends AbstractFractalsCalculator> fieldClass;
 	

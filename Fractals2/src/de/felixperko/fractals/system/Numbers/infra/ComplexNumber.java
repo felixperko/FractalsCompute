@@ -7,6 +7,7 @@ public interface ComplexNumber<T extends Number, N extends ComplexNumber> extend
 	public double absDouble();
 	public double absSqDouble();
 	public void multNumber(T number);
+	public void multValues(N otherComplex);
 	public void divNumber(T number);
 	//void mult(DoubleNumber number);
 	public N copy();

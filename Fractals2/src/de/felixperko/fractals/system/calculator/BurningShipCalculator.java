@@ -5,6 +5,8 @@ import de.felixperko.fractals.system.calculator.infra.AbstractPreparedFractalCal
 
 public class BurningShipCalculator extends AbstractPreparedFractalCalculator {
 	
+	private static final long serialVersionUID = 8448302722452695680L;
+
 	@Override
 	public void executeKernel(ComplexNumber current, ComplexNumber exp, ComplexNumber c) {
 		current.toPositive();

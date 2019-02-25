@@ -46,6 +46,12 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 	}
 	
 	@Override
+	public void multValues(DoubleComplexNumber otherComplex) {
+		real *= otherComplex.real;
+		imag *= otherComplex.imag;
+	}
+	
+	@Override
 	public void divNumber(DoubleNumber number) {
 		real /= number.value;
 		imag /= number.value;

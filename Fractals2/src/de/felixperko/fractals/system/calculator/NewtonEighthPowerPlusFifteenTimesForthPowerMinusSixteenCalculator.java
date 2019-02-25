@@ -8,6 +8,8 @@ import de.felixperko.fractals.system.calculator.infra.NewtonFractalCalculator;
 
 public class NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator extends NewtonFractalCalculator{
 
+	private static final long serialVersionUID = 7374253894015410365L;
+
 	public NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator() {
 	}
 	
