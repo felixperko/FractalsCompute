@@ -29,11 +29,12 @@ public class FractalsIO {
 		NumberFactory numberFactory = new NumberFactory(DoubleNumber.class, DoubleComplexNumber.class);
 		Map<String, ParamSupplier> params = new HashMap<>();
 		int samplesDim = 4;
-		params.put("width", new StaticParamSupplier("width", (Integer)750));
-		params.put("height", new StaticParamSupplier("height", (Integer)1000));
-		params.put("chunkSize", new StaticParamSupplier("chunkSize", (Integer)100));
-		params.put("midpoint", new StaticParamSupplier("midpoint", new DoubleComplexNumber(new DoubleNumber(0.251), new DoubleNumber(0.00004849892910689283399687005))));
-		params.put("zoom", new StaticParamSupplier("zoom", numberFactory.createNumber(4./200000.)));
+		params.put("width", new StaticParamSupplier("width", (Integer)3840));
+		params.put("height", new StaticParamSupplier("height", (Integer)2060));
+		params.put("chunkSize", new StaticParamSupplier("chunkSize", (Integer)200));
+//		params.put("midpoint", new StaticParamSupplier("midpoint", new DoubleComplexNumber(new DoubleNumber(0.251), new DoubleNumber(0.00004849892910689283399687005))));
+		params.put("midpoint", new StaticParamSupplier("midpoint", new DoubleComplexNumber(new DoubleNumber(0.251), new DoubleNumber(0.000055))));
+		params.put("zoom", new StaticParamSupplier("zoom", numberFactory.createNumber(5./200000.)));
 		params.put("iterations", new StaticParamSupplier("iterations", (Integer)15000));
 		params.put("samples", new StaticParamSupplier("samples", (Integer)(samplesDim*samplesDim)));
 		

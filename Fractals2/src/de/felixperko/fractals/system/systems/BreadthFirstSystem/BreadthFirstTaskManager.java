@@ -84,6 +84,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	Comparator<BreadthFirstTask> comparator_priority = new Comparator<BreadthFirstTask>() {
 		@Override
 		public int compare(BreadthFirstTask arg0, BreadthFirstTask arg1) {
+			if (arg0 == null || arg1 == null)
+				return 1;
 			return arg0.getPriority().compareTo(arg1.getPriority());
 		}
 	};
