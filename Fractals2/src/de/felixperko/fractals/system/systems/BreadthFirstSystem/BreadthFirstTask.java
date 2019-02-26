@@ -8,22 +8,21 @@ import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.parameters.ParamSupplier;
 import de.felixperko.fractals.system.systems.BasicSystem.BasicTask;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
+import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskManager;
 
 public class BreadthFirstTask extends BasicTask {
 	
 	private static final long serialVersionUID = 428442040367400862L;
 
-	int layer;
 	
 	Double distance;
 	Double priority;
 
 	public BreadthFirstTask(int id, TaskManager taskManager, Chunk chunk, Map<String, ParamSupplier> taskParameters,
-			ComplexNumber chunkPos, FractalsCalculator calculator, int layer) {
-		super(id, taskManager, chunk, taskParameters, chunkPos, calculator);
+			ComplexNumber chunkPos, FractalsCalculator calculator, Layer layer) {
+		super(id, taskManager, chunk, taskParameters, chunkPos, calculator, layer);
 		chunk.setCurrentTask(this);
-		this.layer = layer;
 		getStateInfo().setState(TaskState.OPEN);
 	}
 
@@ -31,9 +30,9 @@ public class BreadthFirstTask extends BasicTask {
 		distance = getChunk().distance(chunkX, chunkY);
 	}
 	
-	public void updatePriorityAndDistance(double chunkX, double chunkY, double priorityMultiplier) {
+	public void updatePriorityAndDistance(double chunkX, double chunkY, Layer layer) {
 		updateDistance(chunkX, chunkY);
-		priority = distance * priorityMultiplier;
+		priority = distance * layer.getPriorityMultiplier() + layer.getPriorityShift();
 	}
 
 	public Double getDistance() {

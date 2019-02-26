@@ -11,10 +11,10 @@ public abstract class AbstractFractalsTask implements FractalsTask{
 	transient TaskManager taskManager;
 	TaskStateInfo stateInfo;
 	
-	public AbstractFractalsTask(Integer id, TaskManager taskManager) {
+	public AbstractFractalsTask(Integer id, TaskManager taskManager, Layer layer) {
 		this.id = id;
 		this.taskManager = taskManager;
-		this.stateInfo = new TaskStateInfo(id);
+		this.stateInfo = new TaskStateInfo(id, layer);
 		taskManager.getSystem().getSystemStateInfo().addTaskStateInfo(stateInfo);
 	}
 

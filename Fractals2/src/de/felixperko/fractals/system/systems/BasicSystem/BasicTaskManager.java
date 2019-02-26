@@ -31,10 +31,12 @@ import de.felixperko.fractals.system.calculator.NewtonThridPowerMinusOneCalculat
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.parameters.ParamSupplier;
 import de.felixperko.fractals.system.parameters.StaticParamSupplier;
+import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstLayer;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.task.AbstractTaskManager;
 import de.felixperko.fractals.system.task.FractalsTask;
+import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskManager;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.system.thread.AbstractSystemThread;
@@ -143,6 +145,7 @@ public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 		startTime = System.nanoTime();
 		int id = 0;
 		FractalsCalculator calculator = createCalculator();
+		Layer layer = new BreadthFirstLayer(0);
 		for (int x = 0 ; x < dimX ; x++) {
 			for (int y = 0 ; y < dimY ; y++) {
 				Chunk chunk = chunkFactory.createChunk(x, y);
@@ -151,7 +154,7 @@ public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 					ComplexNumber chunkPos = numberFactory.createComplexNumber(x/(double)dimX-0.5, y/(double)dimX-0.5);
 					chunkPos.multNumber(zoom);
 					chunkPos.add(midpoint);
-					openTasks.add(new BasicTask(id, this, chunk, currentParameters, chunkPos, createCalculator()));//TODO calculator for each thread not each task
+					openTasks.add(new BasicTask(id, this, chunk, currentParameters, chunkPos, createCalculator(), layer));//TODO calculator for each thread not each task
 					calculate = true;
 					id++;
 				}

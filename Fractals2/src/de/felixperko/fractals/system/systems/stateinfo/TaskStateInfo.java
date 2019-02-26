@@ -2,6 +2,8 @@ package de.felixperko.fractals.system.systems.stateinfo;
 
 import java.io.Serializable;
 
+import de.felixperko.fractals.system.task.Layer;
+
 public class TaskStateInfo implements Serializable{
 	
 	private static final long serialVersionUID = -5333555292596681679L;
@@ -9,21 +11,21 @@ public class TaskStateInfo implements Serializable{
 	int taskId;
 	TaskState state;
 	double progress;
-	int stage;
 	SystemStateInfo systemStateInfo;
+	Layer layer;
 	
-	public TaskStateInfo(int taskId) {
+	public TaskStateInfo(int taskId, Layer layer) {
 		this.taskId = taskId;
 		this.state = TaskState.PLANNED;
 		this.progress = 0;
-		this.stage = 0;
+		this.layer = layer;
 	}
 	
 	public TaskStateInfo() {
 		this.taskId = -1;
 		this.state = TaskState.PLANNED;
 		this.progress = 0;
-		this.stage = 0;
+		this.layer = null;
 	}
 
 	public TaskState getState() {
@@ -49,14 +51,6 @@ public class TaskStateInfo implements Serializable{
 		this.progress = progress;
 	}
 
-	public int getStage() {
-		return stage;
-	}
-
-	public void setStage(int stage) {
-		this.stage = stage;
-	}
-
 	public int getTaskId() {
 		return taskId;
 	}
@@ -72,4 +66,15 @@ public class TaskStateInfo implements Serializable{
 	protected void setSystemStateInfo(SystemStateInfo systemStateInfo) {
 		this.systemStateInfo = systemStateInfo;
 	}
+
+	
+	public Layer getLayer() {
+		return layer;
+	}
+	
+
+	public void setLayer(Layer layer) {
+		this.layer = layer;
+	}
+
 }

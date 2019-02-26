@@ -11,6 +11,7 @@ import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.calculator.infra.AbstractFractalsCalculator;
 import de.felixperko.fractals.system.parameters.MappedParamSupplier;
 import de.felixperko.fractals.system.parameters.ParamSupplier;
+import de.felixperko.fractals.system.task.Layer;
 
 public abstract class AbstractPreparedFractalCalculator extends AbstractFractalsCalculator{
 	
@@ -36,6 +37,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 		Double limit = (Double) p_limit.get(0,0);
 		Integer it = (Integer) p_iterations.get(0,0);
 		int samples = (Integer) p_samples.get(0,0);
+		Layer layer = chunk.getCurrentTask().getStateInfo().getLayer();
 //		if (chunk.getChunkX() == 5 && chunk.getChunkY() == 10)
 //			System.out.println("test chunk");
 		
@@ -43,7 +45,9 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 		
 		loop : 
 		for (int pixel = 0 ; pixel < pixelCount ; pixel++) {
-			for (int sample = 0 ; sample < samples ; sample++){
+			if (!layer.isActive(pixel))
+				continue;
+			for (int sample = chunk.getSampleCount(pixel) ; sample < samples ; sample++){
 				if (cancelled)
 					break loop;
 				double res = -1;

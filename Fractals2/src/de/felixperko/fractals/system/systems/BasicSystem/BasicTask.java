@@ -17,6 +17,7 @@ import de.felixperko.fractals.system.parameters.ParamSupplier;
 import de.felixperko.fractals.system.parameters.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.AbstractFractalsTask;
+import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskManager;
 
 public class BasicTask extends AbstractFractalsTask {
@@ -27,8 +28,9 @@ public class BasicTask extends AbstractFractalsTask {
 	FractalsCalculator calculator;
 	
 	
-	public BasicTask(int id, TaskManager taskManager, Chunk chunk, Map<String, ParamSupplier> taskParameters, ComplexNumber chunkPos, FractalsCalculator calculator) {
-		super(id, taskManager);
+	public BasicTask(int id, TaskManager taskManager, Chunk chunk, Map<String, ParamSupplier> taskParameters,
+			ComplexNumber chunkPos, FractalsCalculator calculator, Layer layer) {
+		super(id, taskManager, layer);
 		this.chunk = chunk;
 		this.calculator = calculator;
 		this.parameters = new HashMap<>();
@@ -45,7 +47,6 @@ public class BasicTask extends AbstractFractalsTask {
 	public void run() {
 		calculator.setParams(parameters);
 		calculator.calculate(chunk);
-		chunk.incrementSampleCount((int)this.parameters.get("samples").get(0, 0));
 	}
 	
 	public Chunk getChunk() {

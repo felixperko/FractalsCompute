@@ -23,10 +23,20 @@ public class DoubleNumber implements Number<DoubleNumber> {
 	public void add(DoubleNumber other) {
 		value += other.value;
 	}
-
+	
+	@Override
+	public void sub(DoubleNumber other) {
+		value -= other.value;
+	}
+	
 	@Override
 	public void mult(DoubleNumber other) {
 		value *= other.value;
+	}
+	
+	@Override
+	public void div(DoubleNumber other) {
+		value /= other.value;
 	}
 
 	@Override
@@ -57,4 +67,6 @@ public class DoubleNumber implements Number<DoubleNumber> {
 	public DoubleNumber copy() {
 		return new DoubleNumber(value);
 	}
+
+
 }

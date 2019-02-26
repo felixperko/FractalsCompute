@@ -13,9 +13,9 @@ public class Chunk implements Serializable{
 	
 	int dimensionSize;
 	int arrayLength;
-	int sampleCount;
 	
 	double[] values;
+	int[] samples;
 	int[] failedSamples;
 	
 	public ComplexNumber chunkPos;
@@ -27,10 +27,9 @@ public class Chunk implements Serializable{
 		this.chunkY = chunkY;
 		
 		this.dimensionSize = dimensionSize;
-		this.arrayLength = dimensionSize*dimensionSize;
-		this.sampleCount = 0;
-		
+		this.arrayLength = dimensionSize*dimensionSize;		
 		this.values = new double[arrayLength];
+		this.samples = new int[arrayLength];
 		this.failedSamples = new int[arrayLength];
 	}
 	
@@ -39,7 +38,32 @@ public class Chunk implements Serializable{
 	}
 	
 	public double getValue(int i) {
-		return values[i] / (sampleCount-failedSamples[i]);
+		return getValue(i, false);
+	}
+	
+	public double getValue(int i, boolean strict) {
+		int count = samples[i];
+		if (count == 0) {
+			if (strict)
+				return 0;
+			int x = i/dimensionSize;
+			int y = i%dimensionSize;
+			int upstep = 1;
+			while (count == 0) {
+				upstep *= 2;
+				if (upstep >= dimensionSize)
+					return 0;
+				x -= x%upstep;
+				y -= y%upstep;
+				i = (x + upstep-1)*dimensionSize + (y + upstep-1);
+				count = samples[i];
+				if (count != 0)
+					break;
+			}
+			if (count == 0)
+				return 0;
+		}
+		return values[i] / (samples[i]-failedSamples[i]);
 	}
 	
 	public void addSample(int i, double value) {
@@ -47,6 +71,7 @@ public class Chunk implements Serializable{
 			failedSamples[i]++;
 		else
 			values[i] += value;
+		samples[i]++;
 	}
 	
 	public int getIndex(int chunkX, int chunkY) {
@@ -68,11 +93,6 @@ public class Chunk implements Serializable{
 	public Long getChunkY() {
 		return chunkY;
 	}
-	
-
-	public void incrementSampleCount(int i) {
-		sampleCount += i;
-	}
 
 	public int getDimensionSize() {
 		return dimensionSize;
@@ -82,12 +102,8 @@ public class Chunk implements Serializable{
 		this.dimensionSize = dimensionSize;
 	}
 
-	public int getSampleCount() {
-		return sampleCount;
-	}
-
-	public void setSampleCount(int sampleCount) {
-		this.sampleCount = sampleCount;
+	public int getSampleCount(int i) {
+		return samples[i];
 	}
 
 	public double[] getValues() {
