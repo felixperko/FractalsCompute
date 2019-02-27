@@ -250,9 +250,9 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		chunkZoom = pixelzoom.copy();
 		chunkZoom.mult(numberFactory.createNumber(chunkSize));
 		
-		Number rX = numberFactory.createNumber(width/2.);
+		Number rX = numberFactory.createNumber(1/2.);
 		rX.mult(zoom);
-		Number rY = numberFactory.createNumber(height/2.);
+		Number rY = numberFactory.createNumber(1/2.);
 		rY.mult(zoom);
 		ComplexNumber sideDist = numberFactory.createComplexNumber(rX, rY);
 
@@ -268,6 +268,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		leftLowerCorner.sub(sideDist);
 		leftLowerCornerChunkX = getChunkX(leftLowerCorner);
 		leftLowerCornerChunkY = getChunkY(leftLowerCorner);
+		System.out.println(leftLowerCorner.toString()+" -> "+leftLowerCornerChunkX+", "+leftLowerCornerChunkY);
 		
 		rightUpperCorner = sideDist;
 		rightUpperCorner.add(midpoint);
@@ -445,7 +446,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		
 	}
 	
-	private void fillQueues() {
+	private synchronized void fillQueues() {
 		while (nextBufferedTasks.size() < buffer) {
 			//fill nextOpenTasks with next values from openTasks
 			if (nextOpenTasks.isEmpty()) {
@@ -529,15 +530,15 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	private double getChunkX(ComplexNumber pos) {
 		Number value = pos.getReal();
 		value.sub(viewData.anchor.getReal());
-		value.div(zoom);
-		return value.toDouble()/chunkSize;
+		value.div(chunkZoom);
+		return value.toDouble();
 	}
 	
 	private double getChunkY(ComplexNumber pos) {
 		Number value = pos.getImag();
 		value.sub(viewData.anchor.getImag());
-		value.div(zoom);
-		return value.toDouble()/chunkSize;
+		value.div(chunkZoom);
+		return value.toDouble();
 	}
 	
 	public double getScreenDistance(long chunkX, long chunkY) {

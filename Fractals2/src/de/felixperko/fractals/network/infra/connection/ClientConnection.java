@@ -9,6 +9,5 @@ import de.felixperko.fractals.system.systems.infra.CalcSystem;
 public interface ClientConnection extends Connection<ServerNetworkManager> {
 	public CalcSystem getCurrentSystem();
 	public void setCurrentSystem(CalcSystem system);
-	@Override
-	ServerNetworkManager getNetworkManager();
+	public ServerNetworkManager getNetworkManager();
 }

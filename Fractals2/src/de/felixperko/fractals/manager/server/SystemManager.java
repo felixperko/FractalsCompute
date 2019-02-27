@@ -142,6 +142,7 @@ public class SystemManager extends Manager{
 		}
 		
 		CalcSystem system = availableSystems.get(systemName).createSystem(managers);
+		activeSystems.put(system.getId(), system);
 		log.log("initiating system "+systemName);
 		return system;
 	}
