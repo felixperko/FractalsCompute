@@ -55,9 +55,13 @@ public class ListenThread extends AbstractFractalsThread {
 				setLifeCycleState(LifeCycleState.RUNNING);
 				NetworkManager net = managers.getNetworkManager();
 				msg.received(writeThread.getConnection(), log);
+				if (writeThread instanceof ServerWriteThread)
+					((ServerWriteThread)writeThread).resetLastReachableTime();
 			} catch (SocketException e) {
 				log.log("lost connection");
 				setCloseConnection(true);
+				if (managers instanceof ServerManagers)
+					((ServerManagers)managers).getServerNetworkManager().removeClient(writeThread.getConnection());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

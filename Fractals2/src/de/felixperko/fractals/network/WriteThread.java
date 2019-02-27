@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -84,16 +85,32 @@ public abstract class WriteThread extends AbstractFractalsThread {
 						Message msg = it.next();
 						prepareMessage(msg);
 //						log.log("sending message: "+msg.getClass().getSimpleName());
-						out.writeUnshared(msg);
+						try {
+							out.writeUnshared(msg);
+							out.reset();
+						} catch (SocketException e) {
+							try {
+								Thread.sleep(1);
+							} catch (InterruptedException e1) {
+								e1.printStackTrace();
+							}
+							if (!closeConnection)
+								throw e;
+						}
 						it.remove();
-						out.reset();
 					}
 				}
 			}
 			
-			in.close();
-			out.close();
-			socket.close();
+			try {
+				in.close();
+			} catch (SocketException e) {if (!closeConnection) throw e;}
+			try {
+				out.close();
+			} catch (SocketException e) {if (!closeConnection) throw e;}
+			try {
+				socket.close();
+			} catch (SocketException e) {if (!closeConnection) throw e;}
 			
 		} catch (IOException e) {
 			e.printStackTrace();

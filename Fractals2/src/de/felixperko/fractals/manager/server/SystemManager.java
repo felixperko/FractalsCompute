@@ -147,13 +147,20 @@ public class SystemManager extends Manager{
 		return system;
 	}
 
-	
 	public ServerStateInfo getStateInfo() {
 		return stateInfo;
 	}
 	
 	public CategoryLogger getLogger(){
 		return log;
+	}
+
+
+	public void clientRemoved(ClientConfiguration conf) {
+		for (UUID systemId : conf.getSystemClientData().keySet()) {
+			CalcSystem system = activeSystems.get(systemId);
+			system.removeClient(conf);
+		}
 	}
 
 //	public CalcSystem initSystem(String systemName) {

@@ -64,6 +64,8 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 	@Override
 	public void removeClient(ClientConfiguration oldConfiguration) {
 		clients.remove(oldConfiguration);
+		if (clients.isEmpty())
+			stop();
 	}
 
 	@Override
@@ -105,6 +107,7 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 	public boolean onStart() {
 
 		log.log("starting");
+		addThread(taskManager);
 		taskManager.start();
 		taskManager.startTasks();
 		managers.getThreadManager().getTaskProvider().addTaskManager(taskManager);
@@ -120,8 +123,9 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 
 	@Override
 	public boolean onStop() {
-
+		
 		taskManager.stopThread();
+		taskManager.endTasks();
 		managers.getThreadManager().getTaskProvider().removeTaskManager(taskManager);
 		log.log("stopped");
 		

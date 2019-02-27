@@ -96,4 +96,10 @@ public class ServerNetworkManager extends Manager implements NetworkManager{
 	public void updateChunk(ClientConfiguration client, CalcSystem system, Chunk chunk) {
 		client.getConnection().writeMessage(new ChunkUpdateMessage(system.getId(), chunk, managers.getSystemManager().getStateInfo()));
 	}
+
+	
+	public void removeClient(Connection connection) {
+		ClientConfiguration conf = clients.remove((Integer)connection.getSenderInfo().getClientId());
+		managers.getSystemManager().clientRemoved(conf);
+	}
 }

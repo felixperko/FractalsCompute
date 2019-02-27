@@ -80,7 +80,7 @@ public class FractalsIOSystemInterface implements ClientSystemInterface {
 			double value = chunk.getValue(i);
 			if (value > 0) {
 //				float hue = (float)Math.log(Math.log(value+1)+1);
-				float hue = (float)Math.log(value+1);
+				float hue = (float)Math.log(value+1)/10;
 				int color = Color.HSBtoRGB(hue, 1f, 1f);
 				image.setRGB(x, y, color);
 //				if (y == 501)

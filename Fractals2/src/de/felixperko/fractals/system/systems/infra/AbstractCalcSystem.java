@@ -60,10 +60,13 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 
 	@Override
 	public void stop() {
+		LifeCycleState oldState = state;
+		state = LifeCycleState.STOPPED;
 		if (onStop()) {
-			state = LifeCycleState.STOPPED;
 			for (FractalsThread thread : threads)
 				thread.stopThread();
+		} else {
+			state = oldState;
 		}
 	}
 	

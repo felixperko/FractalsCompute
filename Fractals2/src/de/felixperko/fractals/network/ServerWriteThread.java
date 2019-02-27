@@ -58,4 +58,8 @@ public class ServerWriteThread extends WriteThread {
 	public ClientRemoteConnection getConnection() {
 		return clientConnection;
 	}
+	
+	public void resetLastReachableTime() {
+		this.lastReachableTime = System.nanoTime();
+	}
 }

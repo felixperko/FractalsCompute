@@ -46,4 +46,9 @@ public class BreadthFirstViewData {
 			return false;
 		return map.get(chunkY) != null;
 	}
+
+	
+	public void dispose() {
+		chunks.clear();
+	}
 }

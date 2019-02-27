@@ -36,8 +36,8 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 	public void calculate(Chunk chunk) {
 		Double limit = (Double) p_limit.get(0,0);
 		Integer it = (Integer) p_iterations.get(0,0);
-		int samples = (Integer) p_samples.get(0,0);
 		Layer layer = chunk.getCurrentTask().getStateInfo().getLayer();
+		int samples = layer.getSampleCount();
 //		if (chunk.getChunkX() == 5 && chunk.getChunkY() == 10)
 //			System.out.println("test chunk");
 		
