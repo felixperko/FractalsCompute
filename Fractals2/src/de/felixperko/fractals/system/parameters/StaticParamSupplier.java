@@ -30,5 +30,19 @@ public class StaticParamSupplier extends AbstractParamSupplier {
 			return !((StaticParamSupplier)old).obj.equals(obj);
 		}
 	}
+	
+	@Override
+	public boolean equals(Object arg0) {
+		if (arg0 == null)
+			return false;
+		if (!(arg0 instanceof StaticParamSupplier))
+			return false;
+		StaticParamSupplier other = (StaticParamSupplier)arg0;
+		if (this.obj == null)
+			return other.obj == null;
+		if (other.obj == null) //this.obj can't be null
+			return false;
+		return this.obj.equals(other.obj);
+	}
 
 }

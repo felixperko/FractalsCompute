@@ -28,6 +28,23 @@ public class CoordinateBasicShiftParamSupplier extends CoordinateParamSupplier {
 		this.shifts = shifts;
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		if (!(obj instanceof CoordinateBasicShiftParamSupplier))
+			return false;
+		CoordinateBasicShiftParamSupplier other = (CoordinateBasicShiftParamSupplier) obj;
+		
+		if (this.shifts.length != other.shifts.length)
+			return false;
+		for (int i = 0 ; i < shifts.length ; i++)
+			if (!this.shifts[i].equals(other.shifts[i]))
+				return false;
+		
+		return true;
+	}
+	
 	ParamSupplier p_pixelzoom;
 	ParamSupplier p_chunkpos;
 	ParamSupplier p_chunksize;
@@ -59,24 +76,9 @@ public class CoordinateBasicShiftParamSupplier extends CoordinateParamSupplier {
 	
 	@Override
 	public boolean evaluateChanged(ParamSupplier old) {
-		if (old == null) {
-			return false;
-		} else if (!(old instanceof CoordinateBasicShiftParamSupplier)) {
+		if (old == null)
 			return true;
-		} else {
-			CoordinateBasicShiftParamSupplier o = (CoordinateBasicShiftParamSupplier) old;
-			
-//			if (p_pixelzoom.evaluateChanged(o.p_pixelzoom) || p_chunkpos.evaluateChanged(o.p_chunkpos) || p_chunksize.evaluateChanged(o.p_chunksize)
-//					|| shifts.length != o.shifts.length)
-			if (shifts.length != o.shifts.length)
-				return true;
-			
-			for (int i = 0 ; i < shifts.length ; i++)
-				if (!shifts[i].equals(o.shifts[i]))
-					return true;
-			
-			return false;
-		}
+		return !this.equals(old);
 	}
 
 

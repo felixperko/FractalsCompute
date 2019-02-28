@@ -27,7 +27,6 @@ public class BasicTask extends AbstractFractalsTask {
 	
 	FractalsCalculator calculator;
 	
-	
 	public BasicTask(int id, TaskManager taskManager, Chunk chunk, Map<String, ParamSupplier> taskParameters,
 			ComplexNumber chunkPos, FractalsCalculator calculator, Layer layer) {
 		super(id, taskManager, layer);

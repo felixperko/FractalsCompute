@@ -151,9 +151,6 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			//layers.add(new BreadthFirstLayer(1).with_priority_shift(5).with_priority_multiplier(2));
 			//layers.add(new BreadthFirstLayer(2).with_priority_shift(10).with_priority_multiplier(3).with_samples(4));
 //		}
-		
-		openTasks.clear();
-		tempList.clear();
 		for (int i = 0 ; i < layers.size() ; i++) {
 			openTasks.add(new PriorityQueue<>(comparator_distance));
 			tempList.add(new ArrayList<>());
@@ -259,6 +256,9 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				if (!(obj instanceof BreadthFirstLayer))
 					throw new IllegalStateException("content in layers isn't compartible with BreadthFirstLayer");
 				layers.add((BreadthFirstLayer)obj);
+				
+				openTasks.add(new PriorityQueue<>(comparator_distance));
+				tempList.add(new ArrayList<>());
 			}
 			if (layers.isEmpty())
 				throw new IllegalStateException("no layers configured");
@@ -279,10 +279,11 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		chunkZoom = pixelzoom.copy();
 		chunkZoom.mult(numberFactory.createNumber(chunkSize));
 		
-		Number rX = numberFactory.createNumber(0.5);
-		rX.mult(zoom);
-		Number rY = numberFactory.createNumber(0.5 * ((width > height) ? width/(double)height : 1));
-		rY.mult(zoom);
+		Number rX = numberFactory.createNumber(0.5*(width+chunkSize));
+		rX.mult(pixelzoom);
+//		Number rY = numberFactory.createNumber(0.5 * ((width > height) ? width/(double)height : 1));
+		Number rY = numberFactory.createNumber(0.5*(height+chunkSize));
+		rY.mult(pixelzoom);
 		ComplexNumber sideDist = numberFactory.createComplexNumber(rX, rY);
 
 		
@@ -356,7 +357,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 //				for (TaskState state : TaskState.values())
 //					log.log(state.name()+": "+system.getSystemStateInfo().getTaskListForState(state).size());
 				List<ClientConfiguration> clients = ((BreadthFirstSystem)system).getClients();
-//				log.log("update chunk for "+clients.size()+" clients");
+				log.log("update chunk for "+clients.size()+" clients");
 				for (ClientConfiguration client : clients) {
 					((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, task.chunk);
 				}
@@ -395,6 +396,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	@Override
 	public synchronized void reset() {
 		openTasks.clear();
+		tempList.clear();
 		nextOpenTasks.clear();
 		nextBufferedTasks.clear();
 		finishedTasks.clear();
