@@ -248,21 +248,6 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		width = parameters.get("width").getGeneral(Integer.class);
 		height = parameters.get("height").getGeneral(Integer.class);
 		
-		ParamSupplier layersParam = parameters.get("layers");
-		List<?> layers2 = layersParam.getGeneral(List.class);
-		if (layers.isEmpty() || layersParam.isChanged()) {
-			layers.clear();
-			for (Object obj : layers2) {
-				if (!(obj instanceof BreadthFirstLayer))
-					throw new IllegalStateException("content in layers isn't compartible with BreadthFirstLayer");
-				layers.add((BreadthFirstLayer)obj);
-				
-				openTasks.add(new PriorityQueue<>(comparator_distance));
-				tempList.add(new ArrayList<>());
-			}
-			if (layers.isEmpty())
-				throw new IllegalStateException("no layers configured");
-		}
 		border_generation = parameters.get("border_generation").getGeneral(Double.class);
 		border_dispose = parameters.get("border_dispose").getGeneral(Double.class);
 		buffer = parameters.get("task_buffer").getGeneral(Integer.class);
@@ -294,6 +279,22 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		if (reset)
 			reset();
 		
+		ParamSupplier layersParam = parameters.get("layers");
+		List<?> layers2 = layersParam.getGeneral(List.class);
+		if (layers.isEmpty() || layersParam.isChanged()) {
+			layers.clear();
+			for (Object obj : layers2) {
+				if (!(obj instanceof BreadthFirstLayer))
+					throw new IllegalStateException("content in layers isn't compartible with BreadthFirstLayer");
+				layers.add((BreadthFirstLayer)obj);
+				
+				openTasks.add(new PriorityQueue<>(comparator_distance));
+				tempList.add(new ArrayList<>());
+			}
+			if (layers.isEmpty())
+				throw new IllegalStateException("no layers configured");
+		}
+		
 		if (viewData == null)
 			viewData = new BreadthFirstViewData(anchor);
 
@@ -313,6 +314,9 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			if (!reset)
 				predictedMidpointUpdated();
 		}
+		
+		if (reset)
+			generateRootTask();
 		
 		return true;
 	}

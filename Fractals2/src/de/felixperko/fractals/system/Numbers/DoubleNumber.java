@@ -68,5 +68,12 @@ public class DoubleNumber implements Number<DoubleNumber> {
 		return new DoubleNumber(value);
 	}
 
-
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		if (!(obj instanceof Number))
+			return false;
+		return ((Number)obj).toDouble() == value;
+	}
 }

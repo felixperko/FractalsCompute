@@ -17,6 +17,7 @@ import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstSyst
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.CalcSystemFactory;
 import de.felixperko.fractals.system.systems.infra.ClassSystemFactory;
+import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
 import de.felixperko.fractals.util.CategoryLogger;
 
@@ -114,7 +115,8 @@ public class SystemManager extends Manager{
 		for (SystemClientData data : requests) {
 			//search systems if applicable
 			for (CalcSystem system : activeSystems.values()) {
-				if (system.isApplicable(newConfiguration.getConnection(), data.getClientParameters())) {
+				if ((system.getLifeCycleState() == LifeCycleState.IDLE || system.getLifeCycleState() == LifeCycleState.RUNNING)
+					&& system.isApplicable(newConfiguration.getConnection(), data.getClientParameters())) {
 					system.addClient(newConfiguration, data);
 					continue requestLoop;
 				}
