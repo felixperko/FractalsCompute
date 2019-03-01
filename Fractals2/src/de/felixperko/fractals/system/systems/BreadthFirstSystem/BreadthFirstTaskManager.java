@@ -38,6 +38,7 @@ import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.AbstractTaskManager;
 import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.system.task.Layer;
+import de.felixperko.fractals.system.thread.CalculateThreadReference;
 import de.felixperko.fractals.util.CategoryLogger;
 
 //first chunk at relative 0, 0
@@ -143,11 +144,15 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	ComplexNumber relativeStartShift;
 	
 	Map<String, ParamSupplier> parameters;
+	
+	Map<Integer, CalculateThreadReference> calculateThreadReferences = new HashMap<>();
 
 	int id_counter_tasks = 0;
 	
 	int width, height;
 	int chunksWidth, chunksHeight;
+	
+	int taskId = 0;
 
 	@Override
 	public void startTasks() {
@@ -172,7 +177,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 //		ComplexNumber pos = numberFactory.createComplexNumber(chunkZoom, chunkZoom);
 //		pos.multValues(relativeStartShift);
 //		pos.add(midpoint);
-		BreadthFirstTask rootTask = new BreadthFirstTask(id_counter_tasks++, this, chunk, parameters, getChunkPos(0, 0), createCalculator(), layers.get(0));
+		BreadthFirstTask rootTask = new BreadthFirstTask(id_counter_tasks++, this, chunk, parameters, getChunkPos(0, 0), createCalculator(), layers.get(0), taskId);
 		rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(0));
 		viewData.addChunk(chunk);
 		openTasks.get(0).add(rootTask);
@@ -412,6 +417,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		finishedTasks.clear();
 		borderTasks.clear();
 		newQueue.clear();
+		taskId++;
 		if (viewData != null) {
 			viewData.dispose();
 			viewData = null;
@@ -480,7 +486,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			if (!viewData.hasChunk(midpointChunkXFloor, midpointChunkYFloor)){
 				AbstractArrayChunk chunk = chunkFactory.createChunk(midpointChunkXFloor, midpointChunkYFloor);
 				BreadthFirstTask rootTask = new BreadthFirstTask(id_counter_tasks++, this,
-						chunk, parameters, getChunkPos(midpointChunkXFloor, midpointChunkYFloor), createCalculator(), layers.get(0));
+						chunk, parameters, getChunkPos(midpointChunkXFloor, midpointChunkYFloor), createCalculator(), layers.get(0), taskId);
 				rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(0));
 				viewData.addChunk(chunk);
 				openTasks.get(0).add(rootTask);
@@ -562,7 +568,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			return false;
 		
 		AbstractArrayChunk chunk = chunkFactory.createChunk(chunkX, chunkY);
-		BreadthFirstTask task = new BreadthFirstTask(id_counter_tasks++, this, chunk, parameters, getChunkPos(chunkX, chunkY), createCalculator(), layers.get(0));
+		BreadthFirstTask task = new BreadthFirstTask(id_counter_tasks++, this, chunk, parameters, getChunkPos(chunkX, chunkY), createCalculator(), layers.get(0), taskId);
 		task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(0));
 		openChunks++;
 		newQueue.add(task);

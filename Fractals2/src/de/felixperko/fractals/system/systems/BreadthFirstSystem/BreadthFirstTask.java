@@ -18,12 +18,14 @@ public class BreadthFirstTask extends BasicTask {
 	
 	Double distance;
 	Double priority;
+	int taskId;
 
 	public BreadthFirstTask(int id, TaskManager taskManager, AbstractArrayChunk chunk, Map<String, ParamSupplier> taskParameters,
-			ComplexNumber chunkPos, FractalsCalculator calculator, Layer layer) {
+			ComplexNumber chunkPos, FractalsCalculator calculator, Layer layer, int taskId) {
 		super(id, taskManager, chunk, taskParameters, chunkPos, calculator, layer);
 		chunk.setCurrentTask(this);
 		getStateInfo().setState(TaskState.OPEN);
+		this.taskId = taskId;
 	}
 
 	public void updateDistance(double chunkX, double chunkY) {
@@ -41,5 +43,9 @@ public class BreadthFirstTask extends BasicTask {
 
 	public Double getPriority() {
 		return priority;
+	}
+	
+	public int getTaskId() {
+		return taskId;
 	}
 }

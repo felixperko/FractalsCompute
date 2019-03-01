@@ -17,6 +17,9 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 	
 	int calcThreadId = 0;
 	
+	FractalsTask currentTask;
+	int abortedTaskId = -1;
+	
 	public CalculateFractalsThread(Managers managers, TaskProvider taskProvider){
 		super(managers, "CALC_"+ID_COUNTER);
 		calcThreadId = ID_COUNTER++;
@@ -56,7 +59,7 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 			}
 			
 			//get task, idle if none available
-			FractalsTask currentTask = null;
+			currentTask = null;
 			while (currentTask == null) {
 				currentTask = getTask();
 				if (currentTask == null) {
@@ -73,8 +76,13 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 			//got task, execute
 			setLifeCycleState(LifeCycleState.RUNNING);
 			currentTask.getStateInfo().setState(TaskState.STARTED);
-			currentTask.run();
-			taskProvider.finishedTask(currentTask);
+			try {
+				currentTask.run();
+				taskProvider.finishedTask(currentTask);
+			} catch (InterruptedException e) {
+				if (currentTask.getId() != abortedTaskId)
+					e.printStackTrace();
+			}
 			currentTask = null;
 		}
 	}
@@ -83,5 +91,14 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 		if (taskProvider == null)
 			return null;
 		return taskProvider.getTask();
+	}
+
+	public void abortTask(int taskId) {
+		if (currentTask != null && currentTask.getId() == taskId)
+			this.interrupt();
+	}
+
+	public int getCalcThreadId() {
+		return calcThreadId;
 	}
 }

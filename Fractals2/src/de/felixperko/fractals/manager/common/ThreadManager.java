@@ -1,8 +1,10 @@
 package de.felixperko.fractals.manager.common;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 import de.felixperko.fractals.system.thread.FractalsThread;
 
 public abstract class ThreadManager extends Manager {
@@ -19,6 +21,19 @@ public abstract class ThreadManager extends Manager {
 
 	public void removeThread(FractalsThread thread) {
 		threads.remove(thread);
+	}
+
+	
+	public CalculateFractalsThread getCalculateFractalsThread(int calcThreadId) {
+		for (FractalsThread thread : threads) {
+			if (thread instanceof CalculateFractalsThread) {
+				CalculateFractalsThread t = (CalculateFractalsThread) thread;
+				if (t.getCalcThreadId() == calcThreadId) {
+					return t;
+				}
+			}
+		}
+		return null;
 	}
 
 }
