@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.felixperko.fractals.data.ArrayChunkFactory;
+import de.felixperko.fractals.data.ReducedNaiveChunk;
 import de.felixperko.fractals.manager.client.ClientManagers;
 import de.felixperko.fractals.manager.client.ClientNetworkManager;
 import de.felixperko.fractals.network.ClientConfiguration;
@@ -50,7 +52,7 @@ public class FractalsIO {
 		params.put("samples", new StaticParamSupplier("samples", (Integer)(samplesDim*samplesDim)));
 		
 		List<BreadthFirstLayer> layers = new ArrayList<>();
-		layers.add(new BreadthFirstLayer(0).with_samples(4));
+		layers.add(new BreadthFirstLayer(0));
 //		layers.add(new BreadthFirstUpsampleLayer(0, 8, chunkSize));
 		params.put("layers", new StaticParamSupplier("layers", layers));
 		params.put("border_generation", new StaticParamSupplier("border_generation", (Double) 0.));
@@ -64,6 +66,7 @@ public class FractalsIO {
 		params.put("calculator", new StaticParamSupplier("calculator", "MandelbrotCalculator"));
 		params.put("systemName", new StaticParamSupplier("systemName", "BreadthFirstSystem"));
 		params.put("numberFactory", new StaticParamSupplier("numberFactory", numberFactory));
+		params.put("chunkFactory", new StaticParamSupplier("chunkFactory", new ArrayChunkFactory(ReducedNaiveChunk.class, chunkSize)));
 		
 		params.put("start", new StaticParamSupplier("start", new DoubleComplexNumber(new DoubleNumber(0.0), new DoubleNumber(0.0))));
 		params.put("c", new CoordinateBasicShiftParamSupplier("c", numberFactory, 2));

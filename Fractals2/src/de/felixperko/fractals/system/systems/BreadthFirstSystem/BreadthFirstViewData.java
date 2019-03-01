@@ -5,13 +5,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.felixperko.fractals.data.Chunk;
+import de.felixperko.fractals.data.NaiveChunk;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.util.CategoryLogger;
 
 public class BreadthFirstViewData {
 	CategoryLogger log = CategoryLogger.WARNING.createSubLogger("calc/taskmanager/bf_data");
 	
-	Map<Long, Map<Long, Chunk>> chunks = new HashMap<>();
+	Map<Integer, Map<Integer, Chunk>> chunks = new HashMap<>();
 	
 	ComplexNumber anchor;
 	
@@ -20,28 +21,28 @@ public class BreadthFirstViewData {
 	}
 	
 	public void addChunk(Chunk chunk) {
-		Map<Long, Chunk> xMap = getXMap(chunk.getChunkX());
+		Map<Integer, Chunk> xMap = getXMap(chunk.getChunkX());
 		if (xMap.containsKey(chunk.getChunkY()))
 			log.log("overwriting existing chunk");
 		xMap.put(chunk.getChunkY(), chunk);
 	}
 	
-	public Chunk getChunk(Long chunkX, Long chunkY) {
+	public Chunk getChunk(Integer chunkX, Integer chunkY) {
 		Chunk c = getXMap(chunkX).get(chunkY);
 		return c;
 	}
 	
-	private Map<Long, Chunk> getXMap(Long chunkX){
-		Map<Long, Chunk> ans = chunks.get(chunkX);
+	private Map<Integer, Chunk> getXMap(Integer chunkX){
+		Map<Integer, Chunk> ans = chunks.get(chunkX);
 		if (ans == null) {
-			ans = new HashMap<Long, Chunk>();
+			ans = new HashMap<Integer, Chunk>();
 			chunks.put(chunkX, ans);
 		}
 		return ans;
 	}
 
-	public boolean hasChunk(Long chunkX, Long chunkY) {
-		Map<Long, Chunk> map = chunks.get(chunkX);
+	public boolean hasChunk(Integer chunkX, Integer chunkY) {
+		Map<Integer, Chunk> map = chunks.get(chunkX);
 		if (map == null)
 			return false;
 		return map.get(chunkY) != null;

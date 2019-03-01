@@ -9,7 +9,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import de.felixperko.fractals.data.Chunk;
+import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.manager.client.ClientManagers;
 import de.felixperko.fractals.network.ClientSystemInterface;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
@@ -46,8 +46,8 @@ public class FractalsIOSystemInterface implements ClientSystemInterface {
 	}
 
 	@Override
-	public void chunkUpdated(Chunk chunk) {
-		int chunkSize = chunk.getChunkSize();
+	public void chunkUpdated(AbstractArrayChunk chunk) {
+		int chunkSize = chunk.getChunkDimensions();
 		int width = parameters.get("width").getGeneral(Integer.class);
 		double height = parameters.get("height").getGeneral(Integer.class);
 		Number zoom = parameters.get("zoom").getGeneral(Number.class);

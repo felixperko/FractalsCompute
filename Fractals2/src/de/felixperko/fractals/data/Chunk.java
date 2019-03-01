@@ -2,154 +2,44 @@ package de.felixperko.fractals.data;
 
 import java.io.Serializable;
 
-import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.task.FractalsTask;
 
-public class Chunk implements Serializable{
-	
-	private static final long serialVersionUID = -6507259803639466582L;
+public interface Chunk extends Serializable{
 
-	Long chunkX, chunkY;
-	
-	int dimensionSize;
-	int arrayLength;
-	
-	double[] values;
-	int[] samples;
-	int[] failedSamples;
-	
-	public ComplexNumber chunkPos;
-	
-	FractalsTask currentTask;
-	
-	public Chunk(long chunkX, long chunkY, int dimensionSize) {
-		this.chunkX = chunkX;
-		this.chunkY = chunkY;
-		
-		this.dimensionSize = dimensionSize;
-		this.arrayLength = dimensionSize*dimensionSize;		
-		this.values = new double[arrayLength];
-		this.samples = new int[arrayLength];
-		this.failedSamples = new int[arrayLength];
-	}
-	
-	public Chunk() {
-		
-	}
-	
-	public double getValue(int i) {
-		return getValue(i, false);
-	}
-	
-	public double getValue(int i, boolean strict) {
-		int count = samples[i];
-		if (count == 0) {
-			if (strict)
-				return 0;
-			int x = i/dimensionSize;
-			int y = i%dimensionSize;
-			int upstep = 1;
-			while (count == 0) {
-				upstep *= 2;
-				if (upstep >= dimensionSize)
-					return 0;
-				x -= x%upstep;
-				y -= y%upstep;
-				i = (x + upstep-1)*dimensionSize + (y + upstep-1);
-				count = samples[i];
-				if (count != 0)
-					break;
-			}
-			if (count == 0)
-				return 0;
-		}
-		return values[i] / (samples[i]-failedSamples[i]);
-	}
-	
-	public void addSample(int i, double value) {
-		if (value < 0)
-			failedSamples[i]++;
-		else
-			values[i] += value;
-		samples[i]++;
-	}
-	
-	public int getIndex(int chunkX, int chunkY) {
-		return chunkX*dimensionSize + chunkY;
-	}
-	
-	public int getArrayLength() {
-		return arrayLength;
-	}
-	
-	public int getChunkSize() {
-		return dimensionSize;
-	}
+	double getValue(int i);
 
-	public Long getChunkX() {
-		return chunkX;
-	}
-	
-	public Long getChunkY() {
-		return chunkY;
-	}
+	double getValue(int i, boolean strict);
 
-	public int getDimensionSize() {
-		return dimensionSize;
-	}
+	void addSample(int i, double value);
 
-	public void setDimensionSize(int dimensionSize) {
-		this.dimensionSize = dimensionSize;
-	}
+	int getIndex(int chunkX, int chunkY);
 
-	public int getSampleCount(int i) {
-		return samples[i];
-	}
+//	int getArrayLength();
 
-	public double[] getValues() {
-		return values;
-	}
+//	int getChunkSize();
 
-	public void setValues(double[] values) {
-		this.values = values;
-	}
+	Integer getChunkX();
 
-	public int[] getFailedSamples() {
-		return failedSamples;
-	}
+	Integer getChunkY();
 
-	public void setFailedSamples(int[] failedSamples) {
-		this.failedSamples = failedSamples;
-	}
+//	int getDimensionSize();
+//
+//	void setDimensionSize(int dimensionSize);
 
-	public void setChunkX(Long chunkX) {
-		this.chunkX = chunkX;
-	}
+	int getSampleCount(int i);
 
-	public void setChunkY(Long chunkY) {
-		this.chunkY = chunkY;
-	}
+	void setChunkX(Integer chunkX);
 
-	public void setArrayLength(int arrayLength) {
-		this.arrayLength = arrayLength;
-	}
-	
-	public double distanceSq(double otherX, double otherY) {
-		double dx = otherX-chunkX;
-		double dy = otherY-chunkY;
-		return dx*dx + dy*dy;
-	}
-	
-	public double distance(double otherX, double otherY) {
-		return Math.sqrt(distanceSq(otherX, otherY));
-	}
+	void setChunkY(Integer chunkY);
 
-	
-	public FractalsTask getCurrentTask() {
-		return currentTask;
-	}
-	
-	public void setCurrentTask(FractalsTask currentTask) {
-		this.currentTask = currentTask;
-	}
+//	void setArrayLength(int arrayLength);
+
+	double distanceSq(double otherX, double otherY);
+
+	double distance(double otherX, double otherY);
+
+	FractalsTask getCurrentTask();
+
+	void setCurrentTask(FractalsTask currentTask);
+
 }

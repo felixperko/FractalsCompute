@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.calculator.infra.AbstractFractalsCalculator;
@@ -22,12 +23,12 @@ import de.felixperko.fractals.system.task.TaskManager;
 
 public class BasicTask extends AbstractFractalsTask {
 	
-	public Chunk chunk;
+	public AbstractArrayChunk chunk;
 	Map<String, ParamSupplier> parameters;
 	
 	FractalsCalculator calculator;
 	
-	public BasicTask(int id, TaskManager taskManager, Chunk chunk, Map<String, ParamSupplier> taskParameters,
+	public BasicTask(int id, TaskManager taskManager, AbstractArrayChunk chunk, Map<String, ParamSupplier> taskParameters,
 			ComplexNumber chunkPos, FractalsCalculator calculator, Layer layer) {
 		super(id, taskManager, layer);
 		this.chunk = chunk;
@@ -39,7 +40,7 @@ public class BasicTask extends AbstractFractalsTask {
 //		this.parameters = new HashMap<>(taskParameters);
 		this.parameters.put("chunkpos", new StaticParamSupplier("chunkpos", chunkPos.copy()));
 		this.chunk.chunkPos = chunkPos.copy();
-		this.parameters.put("chunksize", new StaticParamSupplier("chunksize", (Integer)chunk.getChunkSize()));
+		this.parameters.put("chunksize", new StaticParamSupplier("chunksize", (Integer)chunk.getChunkDimensions()));
 	}
 
 	@Override

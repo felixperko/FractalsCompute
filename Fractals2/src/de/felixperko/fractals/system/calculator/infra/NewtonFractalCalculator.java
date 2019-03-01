@@ -1,5 +1,6 @@
 package de.felixperko.fractals.system.calculator.infra;
 
+import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
@@ -22,7 +23,7 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 	}
 
 	@Override
-	public void calculate(Chunk chunk) {
+	public void calculate(AbstractArrayChunk chunk) {
 		setRoots();
 		double limit = (Double) p_limit.get(0,0); //TODO arbitrary precision
 		int it = (Integer) p_iterations.get(0,0);

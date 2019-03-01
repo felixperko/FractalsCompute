@@ -2,7 +2,7 @@ package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
 import java.util.Map;
 
-import de.felixperko.fractals.data.Chunk;
+import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.parameters.ParamSupplier;
@@ -19,7 +19,7 @@ public class BreadthFirstTask extends BasicTask {
 	Double distance;
 	Double priority;
 
-	public BreadthFirstTask(int id, TaskManager taskManager, Chunk chunk, Map<String, ParamSupplier> taskParameters,
+	public BreadthFirstTask(int id, TaskManager taskManager, AbstractArrayChunk chunk, Map<String, ParamSupplier> taskParameters,
 			ComplexNumber chunkPos, FractalsCalculator calculator, Layer layer) {
 		super(id, taskManager, chunk, taskParameters, chunkPos, calculator, layer);
 		chunk.setCurrentTask(this);

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.calculator.infra.AbstractFractalsCalculator;
@@ -33,7 +34,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 	ParamSupplier p_samples;
 	
 	@Override
-	public void calculate(Chunk chunk) {
+	public void calculate(AbstractArrayChunk chunk) {
 		Double limit = (Double) p_limit.get(0,0);
 		Integer it = (Integer) p_iterations.get(0,0);
 		Layer layer = chunk.getCurrentTask().getStateInfo().getLayer();

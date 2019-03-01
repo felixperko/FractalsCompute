@@ -13,8 +13,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.imageio.ImageIO;
 
+import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.Chunk;
-import de.felixperko.fractals.data.ChunkFactory;
+import de.felixperko.fractals.data.NaiveChunk;
+import de.felixperko.fractals.data.ArrayChunkFactory;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.manager.server.ServerNetworkManager;
 import de.felixperko.fractals.manager.server.ServerThreadManager;
@@ -59,7 +61,7 @@ public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 
 	BufferedImage testImage;
 
-	ChunkFactory chunkFactory;
+	ArrayChunkFactory chunkFactory;
 	NumberFactory numberFactory = new NumberFactory(DoubleNumber.class, DoubleComplexNumber.class);
 	
 	Chunk[][] chunks;
@@ -117,7 +119,7 @@ public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 			calculatorClass = availableCalculators.get(((String)params.get("calculator").get(0, 0)));
 			if (calculatorClass == null)
 				throw new IllegalStateException("Couldn't find calculator for name: "+params.get("calculator").get(0, 0).toString());
-			chunkFactory = new ChunkFactory((int)params.get("chunkSize").get(0, 0));
+			chunkFactory = new ArrayChunkFactory(NaiveChunk.class, (int)params.get("chunkSize").get(0, 0));
 			
 			Number pixelzoom = numberFactory.createNumber(1./width);
 			pixelzoom.mult(zoom);
@@ -148,7 +150,7 @@ public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 		Layer layer = new BreadthFirstLayer(0);
 		for (int x = 0 ; x < dimX ; x++) {
 			for (int y = 0 ; y < dimY ; y++) {
-				Chunk chunk = chunkFactory.createChunk(x, y);
+				AbstractArrayChunk chunk = chunkFactory.createChunk(x, y);
 				chunks[x][y] = chunk;
 				synchronized(this) {
 					ComplexNumber chunkPos = numberFactory.createComplexNumber(x/(double)dimX-0.5, y/(double)dimX-0.5);

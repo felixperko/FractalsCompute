@@ -2,6 +2,7 @@ package de.felixperko.fractals.network.messages;
 
 import java.util.UUID;
 
+import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.network.infra.ServerMessage;
@@ -12,10 +13,10 @@ public class ChunkUpdateMessage extends SystemServerMessage {
 	
 	private static final long serialVersionUID = -2349690041977280160L;
 	
-	Chunk chunk;
+	AbstractArrayChunk chunk;
 	ServerStateInfo serverStateInfo;
 	
-	public ChunkUpdateMessage(UUID systemId, Chunk chunk, ServerStateInfo serverStateInfo) {
+	public ChunkUpdateMessage(UUID systemId, AbstractArrayChunk chunk, ServerStateInfo serverStateInfo) {
 		super(systemId);
 		this.chunk = chunk;
 		this.serverStateInfo = serverStateInfo;
@@ -37,7 +38,7 @@ public class ChunkUpdateMessage extends SystemServerMessage {
 		return chunk;
 	}
 
-	public void setChunk(Chunk chunk) {
+	public void setChunk(AbstractArrayChunk chunk) {
 		this.chunk = chunk;
 	}
 }

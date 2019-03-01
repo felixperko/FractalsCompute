@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.felixperko.fractals.data.Chunk;
+import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.manager.common.Manager;
 import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.manager.common.NetworkManager;
@@ -93,7 +93,7 @@ public class ServerNetworkManager extends Manager implements NetworkManager{
 		return getClientConnection(senderInfo.getClientId());
 	}
 
-	public void updateChunk(ClientConfiguration client, CalcSystem system, Chunk chunk) {
+	public void updateChunk(ClientConfiguration client, CalcSystem system, AbstractArrayChunk chunk) {
 		client.getConnection().writeMessage(new ChunkUpdateMessage(system.getId(), chunk, managers.getSystemManager().getStateInfo()));
 	}
 
