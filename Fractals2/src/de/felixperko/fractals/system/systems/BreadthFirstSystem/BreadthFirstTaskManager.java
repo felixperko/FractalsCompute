@@ -19,6 +19,7 @@ import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.manager.server.ServerNetworkManager;
 import de.felixperko.fractals.network.ClientConfiguration;
+import de.felixperko.fractals.network.messages.ChunkUpdateMessage;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.Number;
 import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
@@ -119,6 +120,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	int chunkSize;
 	
 	List<BreadthFirstTask> finishedTasks = new ArrayList<>();
+	
+	Map<Integer, List<ChunkUpdateMessage>> pendingUpdateMessages = new HashMap<>();
 	
 	CategoryLogger log;
 
@@ -373,8 +376,21 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 //					log.log(state.name()+": "+system.getSystemStateInfo().getTaskListForState(state).size());
 				List<ClientConfiguration> clients = ((BreadthFirstSystem)system).getClients();
 				log.log("update chunk for "+clients.size()+" clients");
+				List<ChunkUpdateMessage> pendingList = new ArrayList<>();
+				pendingUpdateMessages.put(task.getId(), pendingList);
 				for (ClientConfiguration client : clients) {
-					((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, task.chunk);
+					ChunkUpdateMessage message = ((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, task.chunk);
+					synchronized (pendingList) {
+						pendingList.add(message);	
+					}
+					message.addSentCallback(new Runnable() {
+						@Override
+						public void run() {
+							synchronized (pendingList) {
+								pendingList.remove(message);
+							}
+						}
+					});
 				}
 				Layer currentLayer = task.getStateInfo().getLayer();
 				int currentLayerId = currentLayer.getId();
@@ -410,6 +426,11 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 
 	@Override
 	public synchronized void reset() {
+		for (List<ChunkUpdateMessage> list : pendingUpdateMessages.values()) {
+			for (ChunkUpdateMessage msg : list)
+				msg.setCancelled(true);
+		}
+		pendingUpdateMessages.clear();
 		openTasks.clear();
 		tempList.clear();
 		nextOpenTasks.clear();

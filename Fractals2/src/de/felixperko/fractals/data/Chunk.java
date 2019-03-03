@@ -41,5 +41,7 @@ public interface Chunk extends Serializable{
 	FractalsTask getCurrentTask();
 
 	void setCurrentTask(FractalsTask currentTask);
+	
+	int getJobId();
 
 }

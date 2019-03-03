@@ -1,6 +1,8 @@
 package de.felixperko.fractals.network.infra;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.felixperko.fractals.network.Connection;
 import de.felixperko.fractals.network.SenderInfo;
@@ -20,7 +22,11 @@ public abstract class Message<CONN extends Connection, BACKCONN extends Connecti
 	long creationTime;
 	long lastMessageTime;
 	
+	transient boolean cancelled = false;
+	
 	protected transient CategoryLogger log;
+	
+	protected transient List<Runnable> sentCallbacks = null;
 	
 	public Message() {
 		
@@ -98,5 +104,20 @@ public abstract class Message<CONN extends Connection, BACKCONN extends Connecti
 	
 	protected void answer(Message message) {
 		getBackConnection().writeMessage(message);
+	}
+	
+	public boolean isCancelled() {
+		return cancelled;
+	}
+	
+	public void setCancelled(boolean cancelled) {
+		this.cancelled = cancelled;
+	}
+	
+	public void addSentCallback(Runnable run) {
+		if (sentCallbacks == null) {
+			sentCallbacks = new ArrayList<>();
+		}
+		sentCallbacks.add(run);
 	}
 }

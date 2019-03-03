@@ -86,6 +86,8 @@ public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 	
 	Class<? extends FractalsCalculator> calculatorClass = null;
 	
+	int jobId = 0;
+	
 	@Override
 	public void run() {
 		mainLoop : while (getLifeCycleState() != LifeCycleState.STOPPED) {
@@ -156,7 +158,7 @@ public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 					ComplexNumber chunkPos = numberFactory.createComplexNumber(x/(double)dimX-0.5, y/(double)dimX-0.5);
 					chunkPos.multNumber(zoom);
 					chunkPos.add(midpoint);
-					openTasks.add(new BasicTask(id, this, chunk, currentParameters, chunkPos, createCalculator(), layer));//TODO calculator for each thread not each task
+					openTasks.add(new BasicTask(id, this, chunk, currentParameters, chunkPos, createCalculator(), layer, jobId));//TODO calculator for each thread not each task
 					calculate = true;
 					id++;
 				}

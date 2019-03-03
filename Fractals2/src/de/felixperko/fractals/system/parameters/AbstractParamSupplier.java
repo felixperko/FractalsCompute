@@ -25,24 +25,27 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 		return systemRelevant;
 	}
 
-	public void setSystemRelevant(boolean systemRelevant) {
+	public AbstractParamSupplier setSystemRelevant(boolean systemRelevant) {
 		this.systemRelevant = systemRelevant;
+		return this;
 	}
 
 	public boolean isLayerRelevant() {
 		return layerRelevant;
 	}
 
-	public void setLayerRelevant(boolean layerRelevant) {
+	public AbstractParamSupplier setLayerRelevant(boolean layerRelevant) {
 		this.layerRelevant = layerRelevant;
+		return this;
 	}
 
 	public boolean isViewRelevant() {
 		return viewRelevant;
 	}
 
-	public void setViewRelevant(boolean viewRelevant) {
+	public AbstractParamSupplier setViewRelevant(boolean viewRelevant) {
 		this.viewRelevant = viewRelevant;
+		return this;
 	}
 	
 	@Override

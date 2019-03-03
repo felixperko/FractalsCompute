@@ -13,6 +13,7 @@ public abstract class AbstractChunk implements Chunk {
 	
 	transient FractalsTask currentTask;
 	
+	int jobId;
 	
 	public AbstractChunk(int chunkX, int chunkY) {
 
@@ -60,5 +61,11 @@ public abstract class AbstractChunk implements Chunk {
 	@Override
 	public void setCurrentTask(FractalsTask currentTask) {
 		this.currentTask = currentTask;
+		this.jobId = currentTask.getJobId();
+	}
+	
+	@Override
+	public int getJobId() {
+		return jobId;
 	}
 }

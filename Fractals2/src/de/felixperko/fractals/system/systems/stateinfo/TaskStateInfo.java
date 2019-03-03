@@ -40,7 +40,8 @@ public class TaskStateInfo implements Serializable{
 		
 		this.state = state;
 		
-		systemStateInfo.getTaskListForState(state).add(this);
+		if (state != TaskState.REMOVED)
+			systemStateInfo.getTaskListForState(state).add(this);
 	}
 
 	public double getProgress() {

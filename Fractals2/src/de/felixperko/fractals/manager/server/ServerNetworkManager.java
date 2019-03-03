@@ -93,10 +93,11 @@ public class ServerNetworkManager extends Manager implements NetworkManager{
 		return getClientConnection(senderInfo.getClientId());
 	}
 
-	public void updateChunk(ClientConfiguration client, CalcSystem system, AbstractArrayChunk chunk) {
-		client.getConnection().writeMessage(new ChunkUpdateMessage(system.getId(), chunk, managers.getSystemManager().getStateInfo()));
+	public ChunkUpdateMessage updateChunk(ClientConfiguration client, CalcSystem system, AbstractArrayChunk chunk) {
+		ChunkUpdateMessage message = new ChunkUpdateMessage(system.getId(), chunk, managers.getSystemManager().getStateInfo());
+		client.getConnection().writeMessage(message);
+		return message;
 	}
-
 	
 	public void removeClient(Connection connection) {
 		ClientConfiguration conf = clients.remove((Integer)connection.getSenderInfo().getClientId());

@@ -10,6 +10,8 @@ public interface FractalsTask extends Serializable{
 	TaskManager getTaskManager();
 
 	Integer getId();
+	
+	Integer getJobId();
 
 	TaskStateInfo getStateInfo();
 	TaskState getState();

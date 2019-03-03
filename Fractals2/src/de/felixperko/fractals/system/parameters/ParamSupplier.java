@@ -14,9 +14,9 @@ public interface ParamSupplier extends Serializable{
 	public boolean isLayerRelevant();
 	public boolean isViewRelevant();
 	
-	public void setSystemRelevant(boolean relevant);
-	public void setLayerRelevant(boolean relevant);
-	public void setViewRelevant(boolean relevant);
+	public AbstractParamSupplier setSystemRelevant(boolean relevant);
+	public AbstractParamSupplier setLayerRelevant(boolean relevant);
+	public AbstractParamSupplier setViewRelevant(boolean relevant);
 	
 	public boolean isChanged();
 

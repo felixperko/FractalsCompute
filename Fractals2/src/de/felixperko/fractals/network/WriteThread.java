@@ -28,6 +28,7 @@ public abstract class WriteThread extends AbstractFractalsThread {
 	boolean closeConnection = false;
 	
 	Queue<Message> pendingMessages = new LinkedList<>();
+	Queue<Message> newMessages = new LinkedList<>();
 	private ObjectInputStream in;
 	private ObjectOutputStream out;
 	protected Socket socket;
@@ -65,7 +66,7 @@ public abstract class WriteThread extends AbstractFractalsThread {
 					}
 				}
 				
-				while (pendingMessages.isEmpty()) {
+				while (newMessages.isEmpty()) {
 					tick();
 					setLifeCycleState(LifeCycleState.IDLE);
 					try {
@@ -77,14 +78,23 @@ public abstract class WriteThread extends AbstractFractalsThread {
 				}
 				
 				setLifeCycleState(LifeCycleState.RUNNING);
-				synchronized(this) {
-					Iterator<Message> it = pendingMessages.iterator();
-					while (it.hasNext()) {
-						if (closeConnection)
-							break mainLoop;
+				
+				synchronized(newMessages) {
+					pendingMessages.addAll(newMessages);
+					newMessages.clear();
+				}
+				
+				Iterator<Message> it = pendingMessages.iterator();
+				while (it.hasNext()) {
+					if (closeConnection)
+						break mainLoop;
+					synchronized (pendingMessages) {
 						Message msg = it.next();
+						it.remove();
+						if (msg.isCancelled())
+							continue;
 						prepareMessage(msg);
-//						log.log("sending message: "+msg.getClass().getSimpleName());
+	//						log.log("sending message: "+msg.getClass().getSimpleName());
 						try {
 							out.writeUnshared(msg);
 							out.reset();
@@ -97,7 +107,6 @@ public abstract class WriteThread extends AbstractFractalsThread {
 							if (!closeConnection)
 								throw e;
 						}
-						it.remove();
 					}
 				}
 			}
@@ -124,9 +133,27 @@ public abstract class WriteThread extends AbstractFractalsThread {
 	protected void tick() {
 	}
 
-	public synchronized void writeMessage(Message msg) {
-		pendingMessages.add(msg);
+	public void writeMessage(Message msg) {
+		synchronized (newMessages) {
+			newMessages.add(msg);
+		}
 	}
+	
+//	public boolean cancelMessage(Message msg) {
+//		synchronized (newMessages) {
+//			if (newMessages.contains(msg)) {
+//				newMessages.remove(msg);
+//				return true;
+//			}
+//		}
+//		synchronized (pendingMessages) {
+//			if (pendingMessages.contains(msg)) {
+//				pendingMessages.remove(msg);
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
 	
 	public void closeConnection() {
 		closeConnection = true;

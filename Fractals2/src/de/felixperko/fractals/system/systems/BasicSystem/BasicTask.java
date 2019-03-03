@@ -29,8 +29,8 @@ public class BasicTask extends AbstractFractalsTask {
 	FractalsCalculator calculator;
 	
 	public BasicTask(int id, TaskManager taskManager, AbstractArrayChunk chunk, Map<String, ParamSupplier> taskParameters,
-			ComplexNumber chunkPos, FractalsCalculator calculator, Layer layer) {
-		super(id, taskManager, layer);
+			ComplexNumber chunkPos, FractalsCalculator calculator, Layer layer, int jobId) {
+		super(id, taskManager, layer, jobId);
 		this.chunk = chunk;
 		this.calculator = calculator;
 		this.parameters = new HashMap<>();
