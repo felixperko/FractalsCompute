@@ -40,20 +40,20 @@ public class FractalsIO {
 		numberFactory = new NumberFactory(DoubleNumber.class, DoubleComplexNumber.class);
 		Map<String, ParamSupplier> params = new HashMap<>();
 		int samplesDim = 1;
-		params.put("width", new StaticParamSupplier("width", (Integer)400));
-		params.put("height", new StaticParamSupplier("height", (Integer)400));
+		params.put("width", new StaticParamSupplier("width", (Integer)1000));
+		params.put("height", new StaticParamSupplier("height", (Integer)1000));
 		Integer chunkSize = 200;
 		params.put("chunkSize", new StaticParamSupplier("chunkSize", chunkSize));
 //		params.put("midpoint", new StaticParamSupplier("midpoint", new DoubleComplexNumber(new DoubleNumber(0.251), new DoubleNumber(0.00004849892910689283399687005))));
 		params.put("midpoint", new StaticParamSupplier("midpoint", new DoubleComplexNumber(new DoubleNumber(0.251), new DoubleNumber(0.000055))));
 		zoom = numberFactory.createNumber(5./200000.);
 		params.put("zoom", new StaticParamSupplier("zoom", zoom));
-		params.put("iterations", new StaticParamSupplier("iterations", (Integer)15000));
+		params.put("iterations", new StaticParamSupplier("iterations", (Integer)1500));
 		params.put("samples", new StaticParamSupplier("samples", (Integer)(samplesDim*samplesDim)));
 		
 		List<BreadthFirstLayer> layers = new ArrayList<>();
-		layers.add(new BreadthFirstLayer(0));
-//		layers.add(new BreadthFirstUpsampleLayer(0, 8, chunkSize));
+		layers.add(new BreadthFirstUpsampleLayer(0, 8, chunkSize));
+		layers.add(new BreadthFirstLayer(1).with_priority_shift(3));
 		params.put("layers", new StaticParamSupplier("layers", layers));
 		params.put("border_generation", new StaticParamSupplier("border_generation", (Double) 0.));
 		params.put("border_dispose", new StaticParamSupplier("border_dispose", (Double) 5.));

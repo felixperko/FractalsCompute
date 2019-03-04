@@ -97,7 +97,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		}
 	};
 	
-	int buffer = 5;
+	int buffer = 10;
 	double border_generation = 0;
 	double border_dispose = 5;
 	
@@ -375,7 +375,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 //				for (TaskState state : TaskState.values())
 //					log.log(state.name()+": "+system.getSystemStateInfo().getTaskListForState(state).size());
 				List<ClientConfiguration> clients = ((BreadthFirstSystem)system).getClients();
-				log.log("update chunk for "+clients.size()+" clients");
+//				log.log("update chunk for "+clients.size()+" clients");
 				List<ChunkUpdateMessage> pendingList = new ArrayList<>();
 				pendingUpdateMessages.put(task.getId(), pendingList);
 				for (ClientConfiguration client : clients) {
@@ -520,23 +520,56 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		
 	}
 	
+	
 	private synchronized boolean fillQueues() {
 		boolean changed = false;
 		while (nextBufferedTasks.size() < buffer) {
+			boolean[] layerInNextTasks = new boolean[layers.size()];
+			int notFilled = layers.size();
 			//fill nextOpenTasks with next values from openTasks
-			if (nextOpenTasks.isEmpty()) {
-				for (int i = 0 ; i < openTasks.size() ; i++) {
-					BreadthFirstTask task = openTasks.get(i).poll();
-					if (task != null) {
-						changed = true;
-						nextOpenTasks.add(task);
-						if (task.getStateInfo().getLayer().getId() == 0)
-							generateNeighbours(task);
-					}
+			for (BreadthFirstTask nextOpenTask : nextOpenTasks) {
+				layerInNextTasks[nextOpenTask.getStateInfo().getLayer().getId()] = true;
+				notFilled--;
+			}
+			if (notFilled > 0) {
+				for (int l = 0 ; l < layers.size() ; l++) {
+					if  (layerInNextTasks[l])
+						continue;
+					BreadthFirstTask task = openTasks.get(l).poll();
+					if (task == null)
+						continue;
+					changed = true;
+					nextOpenTasks.add(task);
+					if (task.getStateInfo().getLayer().getId() == 0)
+						generateNeighbours(task);
 				}
 			}
+//			if (nextOpenTasks.isEmpty()) {
+//				for (int i = 0 ; i < openTasks.size() ; i++) {
+//					BreadthFirstTask task = openTasks.get(i).poll();
+//					if (task != null) {
+//						changed = true;
+//						nextOpenTasks.add(task);
+//						if (task.getStateInfo().getLayer().getId() == 0)
+//							generateNeighbours(task);
+//					}
+//					else
+//						log.log("no open tasks on layer "+i);
+//				}
+//			}
 			//cascade further if not empty
 			if (!nextOpenTasks.isEmpty()) {
+//				log.log("nextOpenTasks: ");
+//				for (BreadthFirstTask task : nextOpenTasks)
+//					log.log(" - "+task.getStateInfo().getLayer().getId()+": "+task.getChunk().getChunkX()+"/"+task.getChunk().getChunkY()
+//							+" prio="+task.getPriority()+" dist="+task.getDistance());
+//				int i = 0;
+//				for (Queue<BreadthFirstTask> list : openTasks) {
+//					log.log("open layer: "+(i++));
+//					for (BreadthFirstTask task : list)
+//					log.log(" - "+task.getStateInfo().getLayer().getId()+": "+task.getChunk().getChunkX()+"/"+task.getChunk().getChunkY()
+//							+" prio="+task.getPriority()+" dist="+task.getDistance());
+//				}
 				BreadthFirstTask polled = nextOpenTasks.poll();
 				nextBufferedTasks.add(polled);
 				changed = true;
