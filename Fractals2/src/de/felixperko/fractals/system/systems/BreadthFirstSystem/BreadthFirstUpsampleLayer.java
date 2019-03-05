@@ -34,4 +34,14 @@ public class BreadthFirstUpsampleLayer extends BreadthFirstLayer{
 			return new GlobalPixel(0, -1, x, chunkSize+y);
 		return new GlobalPixel(0, 0, x, y);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if (other == null)
+			return false;
+		if (!(other instanceof BreadthFirstUpsampleLayer))
+			return false;
+		BreadthFirstUpsampleLayer o = (BreadthFirstUpsampleLayer) other;
+		return (o.id == id && o.upsample == upsample);
+	}
 }

@@ -120,4 +120,10 @@ public abstract class Message<CONN extends Connection, BACKCONN extends Connecti
 		}
 		sentCallbacks.add(run);
 	}
+
+	public void executeSentCallbacks() {
+		if (sentCallbacks != null)
+			for (Runnable run : sentCallbacks)
+				run.run();
+	}
 }

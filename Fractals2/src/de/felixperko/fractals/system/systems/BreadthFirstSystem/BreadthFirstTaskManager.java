@@ -377,6 +377,11 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				List<ClientConfiguration> clients = ((BreadthFirstSystem)system).getClients();
 //				log.log("update chunk for "+clients.size()+" clients");
 				List<ChunkUpdateMessage> pendingList = new ArrayList<>();
+				List<ChunkUpdateMessage> oldMessages = pendingUpdateMessages.get(task.getId());
+				if (oldMessages != null) {
+					for (ChunkUpdateMessage oldMessage : oldMessages)
+						oldMessage.setCancelled(true);
+				}
 				pendingUpdateMessages.put(task.getId(), pendingList);
 				for (ClientConfiguration client : clients) {
 					ChunkUpdateMessage message = ((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, task.chunk);

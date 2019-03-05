@@ -85,4 +85,14 @@ public class BreadthFirstLayer implements Layer {
 	public int getSampleCount() {
 		return samples;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if (other == null)
+			return false;
+		if (!(other instanceof BreadthFirstLayer))
+			return false;
+		BreadthFirstLayer o = (BreadthFirstLayer) other;
+		return (o.id == id && o.samples == samples && ((enabledPixels == null && o.enabledPixels == null) || o.enabledPixels.equals(enabledPixels)));
+	}
 }
