@@ -14,7 +14,7 @@ public class ServerStateInfo implements Serializable{
 	
 	int localWorkerThreads;
 	List<Integer> remoteWorkerThreads = new ArrayList<>();
-	transient Map<UUID, SystemStateInfo> systemStates = new HashMap<>();
+	Map<UUID, SystemStateInfo> systemStates = new HashMap<>();
 	
 	long updateTime = 0;
 	

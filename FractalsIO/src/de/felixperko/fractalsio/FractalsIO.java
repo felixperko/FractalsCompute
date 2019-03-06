@@ -46,7 +46,7 @@ public class FractalsIO {
 		params.put("chunkSize", new StaticParamSupplier("chunkSize", chunkSize));
 //		params.put("midpoint", new StaticParamSupplier("midpoint", new DoubleComplexNumber(new DoubleNumber(0.251), new DoubleNumber(0.00004849892910689283399687005))));
 		params.put("midpoint", new StaticParamSupplier("midpoint", new DoubleComplexNumber(new DoubleNumber(0.251), new DoubleNumber(0.000055))));
-		zoom = numberFactory.createNumber(5./200000.);
+		zoom = numberFactory.createNumber(5./100000.);
 		params.put("zoom", new StaticParamSupplier("zoom", zoom));
 		params.put("iterations", new StaticParamSupplier("iterations", (Integer)1500));
 		params.put("samples", new StaticParamSupplier("samples", (Integer)(samplesDim*samplesDim)));

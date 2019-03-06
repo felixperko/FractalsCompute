@@ -28,6 +28,8 @@ public abstract class Message<CONN extends Connection, BACKCONN extends Connecti
 	
 	protected transient List<Runnable> sentCallbacks = null;
 	
+	boolean sent = false;
+	
 	public Message() {
 		
 	}
@@ -125,5 +127,13 @@ public abstract class Message<CONN extends Connection, BACKCONN extends Connecti
 		if (sentCallbacks != null)
 			for (Runnable run : sentCallbacks)
 				run.run();
+	}
+
+	public boolean isSent() {
+		return sent;
+	}
+
+	public void setSent(boolean sent) {
+		this.sent = sent;
 	}
 }

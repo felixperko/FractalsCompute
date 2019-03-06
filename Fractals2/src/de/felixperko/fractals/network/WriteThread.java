@@ -92,6 +92,7 @@ public abstract class WriteThread extends AbstractFractalsThread {
 						Message msg = it.next();
 						it.remove();
 						msg.executeSentCallbacks();
+						msg.setSent(true);
 						if (msg.isCancelled())
 							continue;
 						prepareMessage(msg);

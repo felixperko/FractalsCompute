@@ -4,10 +4,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
@@ -53,7 +55,7 @@ import de.felixperko.fractals.util.CategoryLogger;
  */
 
 //choose next neigbour with lowest euclidian distance
-//neigbour extracted -> generate neighbours that don't exist
+//neighbour extracted -> generate neighbours that don't exist
 
 /* N N C N N
  * N C 1 C N
@@ -121,7 +123,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	
 	List<BreadthFirstTask> finishedTasks = new ArrayList<>();
 	
-	Map<Integer, List<ChunkUpdateMessage>> pendingUpdateMessages = new HashMap<>();
+	Map<Integer, Map<ClientConfiguration, ChunkUpdateMessage>> pendingUpdateMessages = new HashMap<>(); //TODO replace second map with Set/List of clients?
 	
 	CategoryLogger log;
 
@@ -370,33 +372,46 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			return false;
 		setLifeCycleState(LifeCycleState.RUNNING);
 		synchronized (this) {
+			HashSet<ClientConfiguration> skipClients = new HashSet<>();
 			for (BreadthFirstTask task : finishedTasks) {
-//				log.log("task finished "+task.getId());
-//				for (TaskState state : TaskState.values())
-//					log.log(state.name()+": "+system.getSystemStateInfo().getTaskListForState(state).size());
+				
+				final Integer taskId = task.getId();
 				List<ClientConfiguration> clients = ((BreadthFirstSystem)system).getClients();
-//				log.log("update chunk for "+clients.size()+" clients");
-				List<ChunkUpdateMessage> pendingList = new ArrayList<>();
-				List<ChunkUpdateMessage> oldMessages = pendingUpdateMessages.get(task.getId());
+				
+				//skip clients if message already exists
+				Map<ClientConfiguration, ChunkUpdateMessage> oldMessages = pendingUpdateMessages.get(taskId);
 				if (oldMessages != null) {
-					for (ChunkUpdateMessage oldMessage : oldMessages)
-						oldMessage.setCancelled(true);
-				}
-				pendingUpdateMessages.put(task.getId(), pendingList);
-				for (ClientConfiguration client : clients) {
-					ChunkUpdateMessage message = ((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, task.chunk);
-					synchronized (pendingList) {
-						pendingList.add(message);	
+					for (Entry<ClientConfiguration, ChunkUpdateMessage> e : oldMessages.entrySet()) {
+						skipClients.add(e.getKey());
 					}
+				} else {
+					oldMessages = new HashMap<>();
+					pendingUpdateMessages.put(taskId, oldMessages);
+				}
+				
+				//send update messages
+				for (ClientConfiguration client : clients) {
+					if (skipClients.contains(client))
+						continue;
+					ChunkUpdateMessage message = ((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, task.chunk);
+					synchronized (oldMessages) {
+						oldMessages.put(client, message);	
+					}
+					final Map<ClientConfiguration, ChunkUpdateMessage> oldMessagesFinal = oldMessages;
 					message.addSentCallback(new Runnable() {
 						@Override
 						public void run() {
-							synchronized (pendingList) {
-								pendingList.remove(message);
+							synchronized (oldMessagesFinal) {
+								oldMessagesFinal.remove(client);
+								if (oldMessagesFinal.isEmpty())
+									pendingUpdateMessages.remove(taskId);
 							}
 						}
 					});
 				}
+				skipClients.clear();
+				
+				//update layer and re-add or dispose
 				Layer currentLayer = task.getStateInfo().getLayer();
 				int currentLayerId = currentLayer.getId();
 				if (currentLayer.getId() >= layers.size()-1) {
@@ -431,8 +446,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 
 	@Override
 	public synchronized void reset() {
-		for (List<ChunkUpdateMessage> list : pendingUpdateMessages.values()) {
-			for (ChunkUpdateMessage msg : list)
+		for (Map<ClientConfiguration, ChunkUpdateMessage> map : pendingUpdateMessages.values()) {
+			for (ChunkUpdateMessage msg : map.values())
 				msg.setCancelled(true);
 		}
 		pendingUpdateMessages.clear();
