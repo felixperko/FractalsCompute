@@ -24,6 +24,7 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 		super(managers, "CALC_"+ID_COUNTER);
 		calcThreadId = ID_COUNTER++;
 		this.taskProvider = taskProvider;
+		setPriority(1);
 	}
 	
 	public void setTaskProvider(TaskProvider taskProvider) {
