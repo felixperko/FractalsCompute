@@ -436,8 +436,10 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				msg.setCancelled(true);
 		}
 		pendingUpdateMessages.clear();
-		openTasks.clear();
-		tempList.clear();
+		for (Queue<BreadthFirstTask> openQueue : openTasks)
+			openQueue.clear();
+		for (List<BreadthFirstTask> temp : tempList)
+			temp.clear();
 		nextOpenTasks.clear();
 		nextBufferedTasks.clear();
 		finishedTasks.clear();
