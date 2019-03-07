@@ -45,23 +45,23 @@ public class BreadthFirstLayer implements Layer {
 		return this;
 	}
 	
-	public GlobalPixel getNeighbour(int pixel, int chunkSize, int shiftX, int shiftY) {
-		//TODO or share border data either way?
-		if (enabledPixels == null) {
-			int x = pixel / chunkSize + shiftX;
-			int y = pixel % chunkSize + shiftY;
-			if (x < 0) {
-				if (y < 0)
-					return new GlobalPixel(-1, -1, chunkSize+x, chunkSize+y);
-				return new GlobalPixel(-1, 0, chunkSize+x, y);
-			}
-			if (y < 0)
-				return new GlobalPixel(0, -1, x, chunkSize+y);
-			return new GlobalPixel(0, 0, x, y);
-		} else {
-			throw new IllegalStateException("no implemented neighbour bahavior");
-		}
-	}
+//	public GlobalPixel getNeighbour(int pixel, int chunkSize, int shiftX, int shiftY) {
+//		//TODO or share border data either way?
+//		if (enabledPixels == null) {
+//			int x = pixel / chunkSize + shiftX;
+//			int y = pixel % chunkSize + shiftY;
+//			if (x < 0) {
+//				if (y < 0)
+//					return new GlobalPixel(-1, -1, chunkSize+x, chunkSize+y);
+//				return new GlobalPixel(-1, 0, chunkSize+x, y);
+//			}
+//			if (y < 0)
+//				return new GlobalPixel(0, -1, x, chunkSize+y);
+//			return new GlobalPixel(0, 0, x, y);
+//		} else {
+//			throw new IllegalStateException("no implemented neighbour bahavior");
+//		}
+//	}
 	
 	public int getId() {
 		return id;

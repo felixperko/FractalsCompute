@@ -1,6 +1,7 @@
 package de.felixperko.fractals.data;
 
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
+import de.felixperko.fractals.system.systems.BreadthFirstSystem.ViewData;
 import de.felixperko.fractals.system.task.FractalsTask;
 
 public abstract class AbstractChunk implements Chunk {
@@ -12,11 +13,12 @@ public abstract class AbstractChunk implements Chunk {
 	public ComplexNumber chunkPos;
 	
 	transient FractalsTask currentTask;
+	transient ViewData viewData;
 	
 	int jobId;
 	
-	public AbstractChunk(int chunkX, int chunkY) {
-
+	public AbstractChunk(ViewData viewData, int chunkX, int chunkY) {
+		this.viewData = viewData;
 		this.chunkX = chunkX;
 		this.chunkY = chunkY;
 	}

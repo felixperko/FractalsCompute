@@ -311,8 +311,10 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				throw new IllegalStateException("no layers configured");
 		}
 		
-		if (viewData == null)
+		if (viewData == null) {
 			viewData = new BreadthFirstViewData(anchor);
+		}
+		chunkFactory.setViewData(viewData);
 
 		leftLowerCorner = midpoint.copy();
 		leftLowerCorner.sub(sideDist);

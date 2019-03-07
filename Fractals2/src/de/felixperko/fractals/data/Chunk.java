@@ -10,7 +10,7 @@ public interface Chunk extends Serializable{
 
 	double getValue(int i, boolean strict);
 
-	void addSample(int i, double value);
+	void addSample(int i, double value, int upsample);
 
 	int getIndex(int chunkX, int chunkY);
 

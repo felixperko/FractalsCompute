@@ -1,16 +1,30 @@
 package de.felixperko.fractals.data;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import de.felixperko.fractals.system.systems.BreadthFirstSystem.ViewData;
+
+import static de.felixperko.fractals.data.BorderAlignment.*;
+
 public abstract class AbstractArrayChunk extends AbstractChunk {
 	
 	private static final long serialVersionUID = -338312489401474113L;
+	
 	int dimensionSize;
 	int arrayLength;
 	
-	public AbstractArrayChunk(int chunkX, int chunkY, int dimensionSize) {
-		super(chunkX, chunkY);
+	transient Map<BorderAlignment, ChunkBorderData> selfBorderData = new HashMap<>();
+	
+	public AbstractArrayChunk(ViewData viewData, int chunkX, int chunkY, int dimensionSize) {
+		super(viewData, chunkX, chunkY);
 		
 		this.dimensionSize = dimensionSize;
-		this.arrayLength = dimensionSize*dimensionSize;		
+		this.arrayLength = dimensionSize*dimensionSize;
+		
+		for (BorderAlignment alignment : BorderAlignment.values()) {
+			selfBorderData.put(alignment, new ChunkBorderDataImpl(this, alignment));
+		}
 	}
 
 	public int getArrayLength() {
@@ -33,5 +47,81 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 	public int getIndex(int chunkX, int chunkY) {
 		return chunkX*dimensionSize + chunkY;
 	}
+	
+	private static ChunkBorderData[] emptyBorderData = new ChunkBorderData[]{};
+	
+	public ChunkBorderData[] getIndexBorderData(int x, int y, int upsample) {
+		
+		int lowestX = x-upsample-1;
+		int highestX = x+upsample;
+		int lowestY = y-upsample-1;
+		int highestY = y+upsample;
+		final int higherBorder = dimensionSize-1;
+		
+		//most cases -> check first
+		if (lowestX > 0 && highestX < higherBorder && lowestY > 0 && highestY < higherBorder)
+			return emptyBorderData;
+		
+		if (lowestX <= 0) {
+			if (highestX >= higherBorder) {
+				if (lowestY <= 0) {
+					if (highestY >= higherBorder)
+						return getBorderDataForAlignments(LEFT, RIGHT, UP, DOWN);
+					else
+						return getBorderDataForAlignments(LEFT, RIGHT, UP);
+				} else {
+					if (highestY >= higherBorder)
+						return getBorderDataForAlignments(LEFT, RIGHT, DOWN);
+					else
+						return getBorderDataForAlignments(LEFT, RIGHT);
+				}
+			} else {
+				if (lowestY <= 0) {
+					if (highestY >= higherBorder)
+						return getBorderDataForAlignments(LEFT, UP, DOWN);
+					else
+						return getBorderDataForAlignments(LEFT, UP);
+				} else {
+					if (highestY >= higherBorder)
+						return getBorderDataForAlignments(LEFT, DOWN);
+					else
+						return getBorderDataForAlignments(LEFT);
+				}
+			}
+		} else {
+			if (highestX >= higherBorder) {
+				if (lowestY <= 0) {
+					if (highestY >= higherBorder)
+						return getBorderDataForAlignments(RIGHT, UP, DOWN);
+					else
+						return getBorderDataForAlignments(RIGHT, UP);
+				} else {
+					if (highestY >= higherBorder)
+						return getBorderDataForAlignments(RIGHT, DOWN);
+					else
+						return getBorderDataForAlignments(RIGHT);
+				}
+			} else {
+				if (lowestY <= 0) {
+					if (highestY >= higherBorder)
+						return getBorderDataForAlignments(UP, DOWN);
+					else
+						return getBorderDataForAlignments(UP);
+				} else {
+					if (highestY >= higherBorder)
+						return getBorderDataForAlignments(DOWN);
+					else
+						throw new IllegalStateException("unexpected branch in AbstractArrayChunk.getIndexBorderData()");
+				}
+			}
+		}
+	}
 
+	private ChunkBorderData[] getBorderDataForAlignments(BorderAlignment... alignments) {
+		ChunkBorderData[] res = new ChunkBorderData[alignments.length];
+		for (int i = 0 ; i < alignments.length ; i++) {
+			res[i] = selfBorderData.get(alignments[i]);
+		}
+		return res;
+	}
 }

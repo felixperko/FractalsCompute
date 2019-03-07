@@ -1,5 +1,8 @@
 package de.felixperko.fractals.data;
 
+import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstViewData;
+import de.felixperko.fractals.system.systems.BreadthFirstSystem.ViewData;
+
 public class ReducedNaiveChunk extends AbstractArrayChunk {
 	
 	private static final long serialVersionUID = -8824365910389869969L;
@@ -9,8 +12,8 @@ public class ReducedNaiveChunk extends AbstractArrayChunk {
 	byte[] failedSamples;
 	// 32 bit + 2 * 8 bit -> 6 byte per pixel
 
-	ReducedNaiveChunk(int chunkX, int chunkY, int dimensionSize) {
-		super(chunkX, chunkY, dimensionSize);
+	ReducedNaiveChunk(ViewData viewData, int chunkX, int chunkY, int dimensionSize) {
+		super(viewData, chunkX, chunkY, dimensionSize);
 		this.values = new float[arrayLength];
 		this.samples = new byte[arrayLength];
 		this.failedSamples = new byte[arrayLength];
@@ -50,12 +53,37 @@ public class ReducedNaiveChunk extends AbstractArrayChunk {
 	}
 	
 	@Override
-	public void addSample(int i, double value) {
+	public void addSample(int i, double value, int upsample) {
+		boolean hadValidValue = samples[i] > failedSamples[i];
+		boolean hasValidValue = hadValidValue;
 		if (value < 0)
 			failedSamples[i]++;
-		else
+		else {
 			values[i] += value;
+			hasValidValue = true;
+		}
 		samples[i]++;
+		
+		if (!hadValidValue && hasValidValue) {
+			int x = i%dimensionSize;
+			int y = i/dimensionSize;
+			for (ChunkBorderData data : getIndexBorderData(x, y, upsample)) {
+				BorderAlignment alignment = data.getAlignment();
+				if (alignment.isHorizontal()) {
+					data.set(hasValidValue, clampIndex(x-upsample-1), clampIndex(x+upsample));
+				} else {
+					data.set(hasValidValue, clampIndex(y-upsample-1), clampIndex(y+upsample));
+				}
+			}
+		}
+	}
+	
+	private int clampIndex(int val) {
+		return clamp(val, 0, dimensionSize);
+	}
+	
+	private int clamp(int val, int min, int max) {
+		return val < min ? min : (val > max ? max : val);
 	}
 
 	@Override

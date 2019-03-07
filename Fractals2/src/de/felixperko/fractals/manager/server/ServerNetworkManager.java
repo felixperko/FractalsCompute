@@ -103,4 +103,8 @@ public class ServerNetworkManager extends Manager implements NetworkManager{
 		ClientConfiguration conf = clients.remove((Integer)connection.getSenderInfo().getClientId());
 		managers.getSystemManager().clientRemoved(conf);
 	}
+	
+	public Map<Integer, ClientConfiguration> getClients(){
+		return clients;
+	}
 }

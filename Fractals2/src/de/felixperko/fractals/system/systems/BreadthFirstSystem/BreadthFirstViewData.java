@@ -9,7 +9,7 @@ import de.felixperko.fractals.data.NaiveChunk;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.util.CategoryLogger;
 
-public class BreadthFirstViewData {
+public class BreadthFirstViewData implements ViewData {
 	CategoryLogger log = CategoryLogger.WARNING.createSubLogger("calc/taskmanager/bf_data");
 	
 	Map<Integer, Map<Integer, Chunk>> chunks = new HashMap<>();
@@ -20,6 +20,7 @@ public class BreadthFirstViewData {
 		this.anchor = anchor;
 	}
 	
+	@Override
 	public void addChunk(Chunk chunk) {
 		Map<Integer, Chunk> xMap = getXMap(chunk.getChunkX());
 		if (xMap.containsKey(chunk.getChunkY()))
@@ -27,6 +28,7 @@ public class BreadthFirstViewData {
 		xMap.put(chunk.getChunkY(), chunk);
 	}
 	
+	@Override
 	public Chunk getChunk(Integer chunkX, Integer chunkY) {
 		Chunk c = getXMap(chunkX).get(chunkY);
 		return c;
@@ -41,6 +43,7 @@ public class BreadthFirstViewData {
 		return ans;
 	}
 
+	@Override
 	public boolean hasChunk(Integer chunkX, Integer chunkY) {
 		Map<Integer, Chunk> map = chunks.get(chunkX);
 		if (map == null)
@@ -48,7 +51,7 @@ public class BreadthFirstViewData {
 		return map.get(chunkY) != null;
 	}
 
-	
+	@Override
 	public void dispose() {
 		chunks.clear();
 	}

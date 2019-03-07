@@ -3,6 +3,7 @@ package de.felixperko.fractals.data;
 import java.io.Serializable;
 
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
+import de.felixperko.fractals.system.systems.BreadthFirstSystem.ViewData;
 import de.felixperko.fractals.system.task.FractalsTask;
 
 public class NaiveChunk extends AbstractArrayChunk{
@@ -14,8 +15,8 @@ public class NaiveChunk extends AbstractArrayChunk{
 	int[] failedSamples;
 	// 64 bit + 2 * 32 bit -> 16 byte per pixel
 	
-	NaiveChunk(int chunkX, int chunkY, int dimensionSize) {
-		super(chunkX, chunkY, dimensionSize);
+	NaiveChunk(ViewData viewData, int chunkX, int chunkY, int dimensionSize) {
+		super(viewData, chunkX, chunkY, dimensionSize);
 		this.values = new double[arrayLength];
 		this.samples = new int[arrayLength];
 		this.failedSamples = new int[arrayLength];
@@ -53,12 +54,13 @@ public class NaiveChunk extends AbstractArrayChunk{
 	}
 	
 	@Override
-	public void addSample(int i, double value) {
-		if (value < 0)
-			failedSamples[i]++;
-		else
-			values[i] += value;
-		samples[i]++;
+	public void addSample(int i, double value, int upsample) {
+		throw new IllegalStateException("Method NaiveChunk.addSample() not up to date");
+//		if (value < 0)
+//			failedSamples[i]++;
+//		else
+//			values[i] += value;
+//		samples[i]++;
 	}
 
 	@Override

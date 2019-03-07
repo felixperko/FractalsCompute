@@ -5,6 +5,8 @@ import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.parameters.ParamSupplier;
+import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
+import de.felixperko.fractals.system.task.Layer;
 
 public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator{
 
@@ -27,9 +29,13 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 		setRoots();
 		double limit = (Double) p_limit.get(0,0); //TODO arbitrary precision
 		int it = (Integer) p_iterations.get(0,0);
-		int samples = (Integer) p_samples.get(0, 0);
+		Layer layer = chunk.getCurrentTask().getStateInfo().getLayer();
+		int samples = layer.getSampleCount();
+		int upsample = (layer instanceof BreadthFirstUpsampleLayer) ? ((BreadthFirstUpsampleLayer)layer).getUpsample()/2 : 0;
 		loop : 
 		for (int pixel = 0 ; pixel < chunk.getArrayLength() ; pixel++) {
+			if (!layer.isActive(pixel))
+				continue;
 			for (int sample = 0 ; sample < samples ; sample++){
 				if (cancelled)
 					break loop;
@@ -52,7 +58,7 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 					for (int i = 0 ; i < roots.length ; i++) {
 						DoubleComplexNumber root = roots[i];
 						if (Math.abs(current.realDouble()-root.realDouble()) < limit && Math.abs(current.imagDouble()-root.imagDouble()) < limit) {
-							chunk.addSample(pixel, getRootValue(i));
+							chunk.addSample(pixel, getRootValue(i), upsample);
 							break;
 						}
 					}
