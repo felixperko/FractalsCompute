@@ -7,6 +7,8 @@ public class BreadthFirstUpsampleLayer extends BreadthFirstLayer{
 	private static final long serialVersionUID = -6818101684225388444L;
 	
 	int upsample;
+	
+	boolean culling;
 
 	public BreadthFirstUpsampleLayer(int id, int upsample, int chunkSize) {
 		super(id);
@@ -19,6 +21,15 @@ public class BreadthFirstUpsampleLayer extends BreadthFirstLayer{
 			}
 		}
 		with_enabled_pixels(bitSet);
+	}
+	
+	public BreadthFirstUpsampleLayer with_culling(boolean culling) {
+		this.culling = culling;
+		return this;
+	}
+	
+	public boolean cullingEnabled() {
+		return culling;
 	}
 	
 //	@Override
@@ -47,5 +58,9 @@ public class BreadthFirstUpsampleLayer extends BreadthFirstLayer{
 
 	public int getUpsample() {
 		return upsample;
+	}
+
+	public BitSet getEnabledPixels() {
+		return enabledPixels;
 	}
 }

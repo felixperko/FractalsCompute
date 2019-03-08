@@ -59,7 +59,10 @@ public class ReducedNaiveChunk extends AbstractArrayChunk {
 		if (value < 0)
 			failedSamples[i]++;
 		else {
-			values[i] += value;
+			if (samples[i] == 0) //override flags
+				values[i] = (float) value;
+			else
+				values[i] += value;
 			hasValidValue = true;
 		}
 		samples[i]++;

@@ -3,6 +3,8 @@ package de.felixperko.fractals.data;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.border.Border;
+
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.ViewData;
 
 import static de.felixperko.fractals.data.BorderAlignment.*;
@@ -14,7 +16,8 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 	int dimensionSize;
 	int arrayLength;
 	
-	transient Map<BorderAlignment, ChunkBorderData> selfBorderData = new HashMap<>();
+	Map<BorderAlignment, ChunkBorderData> selfBorderData = new HashMap<>();
+	Map<BorderAlignment, ChunkBorderData> neighbourBorderData = null;
 	
 	public AbstractArrayChunk(ViewData viewData, int chunkX, int chunkY, int dimensionSize) {
 		super(viewData, chunkX, chunkY);
@@ -41,6 +44,10 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 
 	public void setArrayLength(int arrayLength) {
 		this.arrayLength = arrayLength;
+	}
+	
+	public ChunkBorderData getBorderData(BorderAlignment alignment) {
+		return selfBorderData.get(alignment);
 	}
 	
 	@Override
@@ -123,5 +130,13 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 			res[i] = selfBorderData.get(alignments[i]);
 		}
 		return res;
+	}
+	
+	public void setNeighbourBorderData(Map<BorderAlignment, ChunkBorderData> neighbourBorderData) {
+		this.neighbourBorderData = neighbourBorderData;
+	}
+	
+	public ChunkBorderData getNeighbourBorderData(BorderAlignment alignment) {
+		return neighbourBorderData.get(alignment);
 	}
 }

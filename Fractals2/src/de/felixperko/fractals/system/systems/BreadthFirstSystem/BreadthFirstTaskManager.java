@@ -15,7 +15,9 @@ import java.util.Queue;
 
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.ArrayChunkFactory;
+import de.felixperko.fractals.data.BorderAlignment;
 import de.felixperko.fractals.data.Chunk;
+import de.felixperko.fractals.data.ChunkBorderData;
 import de.felixperko.fractals.data.NaiveChunk;
 import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.manager.server.ServerManagers;
@@ -355,6 +357,23 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			}
 			if (task == null)
 				break;
+			
+			Map<BorderAlignment, ChunkBorderData> neighbourBorderData = new HashMap<>();
+			AbstractArrayChunk chunk = ((AbstractArrayChunk)task.getChunk());
+			int x = chunk.getChunkX();
+			int y = chunk.getChunkX();
+			for (BorderAlignment alignment : BorderAlignment.values()) {
+				Chunk c = viewData.getChunk(alignment.getNeighbourX(x), alignment.getNeighbourY(y));
+				BorderAlignment relative = alignment.getAlignmentForNeighbour();
+				if (c == null) {
+					neighbourBorderData.put(relative, null);
+				} else {
+					AbstractArrayChunk neighbour = (AbstractArrayChunk) c;
+					neighbourBorderData.put(relative, neighbour.getBorderData(alignment));
+				}
+			}
+			chunk.setNeighbourBorderData(neighbourBorderData);
+			
 			tasks.add(task);
 			task.getStateInfo().setState(TaskState.ASSIGNED);
 		}

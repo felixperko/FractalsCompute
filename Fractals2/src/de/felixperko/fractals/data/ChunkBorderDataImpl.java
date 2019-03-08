@@ -8,7 +8,7 @@ public class ChunkBorderDataImpl implements ChunkBorderData {
 	
 	private static final long serialVersionUID = 3137928899767222203L;
 
-	AbstractArrayChunk chunk;
+	transient AbstractArrayChunk chunk;
 	
 	BitSet bits;
 	

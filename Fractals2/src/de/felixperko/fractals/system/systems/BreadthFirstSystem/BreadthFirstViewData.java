@@ -50,7 +50,7 @@ public class BreadthFirstViewData implements ViewData {
 			return false;
 		return map.get(chunkY) != null;
 	}
-
+	
 	@Override
 	public void dispose() {
 		chunks.clear();
