@@ -37,19 +37,19 @@ public class BreadthFirstTask extends BasicTask {
 	}
 
 	private void preprocess() {
-		if (previousLayer == null || !(previousLayer instanceof BreadthFirstUpsampleLayer))
-			return;
-		BreadthFirstUpsampleLayer prev = (BreadthFirstUpsampleLayer) previousLayer;
-		if (!prev.cullingEnabled())
-			return;
-		BitSet activePixels = prev.getEnabledPixels();
-		for (int i = activePixels.nextSetBit(0) ; i != -1 ; i = activePixels.nextSetBit(i+1)) { //loop active pixels
-			if (prev.getNeighbourCulling(chunk, i)) {
-				for (int i2 : prev.getManagedIndices(i)) {
-					prev.setCullingFlag(i2);
-				}
-			}
-		}
+//		if (previousLayer == null || !(previousLayer instanceof BreadthFirstUpsampleLayer))
+//			return;
+//		BreadthFirstUpsampleLayer prev = (BreadthFirstUpsampleLayer) previousLayer;
+//		if (!prev.cullingEnabled())
+//			return;
+//		BitSet activePixels = prev.getEnabledPixels();
+//		for (int i = activePixels.nextSetBit(0) ; i != -1 ; i = activePixels.nextSetBit(i+1)) { //loop active pixels
+//			if (prev.getNeighbourCulling(chunk, i)) {
+//				for (int i2 : prev.getManagedIndices(i)) {
+//					prev.setCullingFlag(i2);
+//				}
+//			}
+//		}
 	}
 
 	public void updateDistance(double chunkX, double chunkY) {

@@ -21,6 +21,11 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 		this.imag = imag.value;
 	}
 	
+	public DoubleComplexNumber(String real, String imag) {
+		this.real = Double.parseDouble(real);
+		this.imag = Double.parseDouble(imag);
+	}
+	
 	public DoubleComplexNumber(double real, double imag) {
 		this.real = real;
 		this.imag = imag;
@@ -181,5 +186,17 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 		return new DoubleNumber(imag);
 	}
 
-
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		if (!(obj instanceof DoubleComplexNumber)) {
+			if (obj instanceof ComplexNumber)
+				return getReal().equals(((ComplexNumber) obj).getReal()) && getImag().equals(((ComplexNumber) obj).getImag());
+			return false;
+		}
+		
+		DoubleComplexNumber other = (DoubleComplexNumber)obj;
+		return real == other.real && imag == other.imag;
+	}
 }

@@ -159,7 +159,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	int width, height;
 	int chunksWidth, chunksHeight;
 	
-	int taskId = 0;
+	int jobId = 0;
 
 	@Override
 	public void startTasks() {
@@ -184,7 +184,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 //		ComplexNumber pos = numberFactory.createComplexNumber(chunkZoom, chunkZoom);
 //		pos.multValues(relativeStartShift);
 //		pos.add(midpoint);
-		BreadthFirstTask rootTask = new BreadthFirstTask(id_counter_tasks++, this, chunk, parameters, getChunkPos(0, 0), createCalculator(), layers.get(0), taskId);
+		BreadthFirstTask rootTask = new BreadthFirstTask(id_counter_tasks++, this, chunk, parameters, getChunkPos(0, 0), createCalculator(), layers.get(0), jobId);
 		rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(0));
 		viewData.addChunk(chunk);
 		openTasks.get(0).add(rootTask);
@@ -227,10 +227,10 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	public boolean tick() {
 		boolean changed = false;
 		try {
-		if (fillQueues())
-			changed = true;
-		if (finishTasks())
-			changed = true;
+			if (fillQueues())
+				changed = true;
+			if (finishTasks())
+				changed = true;
 		} catch (Exception e) {
 			if (system.getLifeCycleState() != LifeCycleState.STOPPED)
 				throw e;
@@ -240,6 +240,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 
 	@Override
 	public boolean setParameters(Map<String, ParamSupplier> params) {
+		setLifeCycleState(LifeCycleState.PAUSED);
+		System.out.println("setting params... "+System.currentTimeMillis());
 		boolean reset = false;
 		if (this.parameters != null) {
 			for (ParamSupplier supplier : params.values()) {
@@ -322,7 +324,6 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		leftLowerCorner.sub(sideDist);
 		leftLowerCornerChunkX = getChunkX(leftLowerCorner);
 		leftLowerCornerChunkY = getChunkY(leftLowerCorner);
-		System.out.println(leftLowerCorner.toString()+" -> "+leftLowerCornerChunkX+", "+leftLowerCornerChunkY);
 		
 		rightUpperCorner = sideDist;
 		rightUpperCorner.add(midpoint);
@@ -338,6 +339,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		if (reset)
 			generateRootTask();
 		
+		setLifeCycleState(LifeCycleState.RUNNING);
+		System.out.println("params set "+System.currentTimeMillis());
 		return true;
 	}
 
@@ -411,26 +414,28 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				}
 				
 				//send update messages
-				for (ClientConfiguration client : clients) {
-					if (skipClients.contains(client))
-						continue;
-					ChunkUpdateMessage message = ((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, task.chunk);
-					synchronized (oldMessages) {
-						oldMessages.put(client, message);	
-					}
-					final Map<ClientConfiguration, ChunkUpdateMessage> oldMessagesFinal = oldMessages;
-					message.addSentCallback(new Runnable() {
-						@Override
-						public void run() {
-							synchronized (oldMessagesFinal) {
-								oldMessagesFinal.remove(client);
-								if (oldMessagesFinal.isEmpty())
-									pendingUpdateMessages.remove(taskId);
-							}
+//				synchronized (clients) {
+					for (ClientConfiguration client : clients) {
+						if (skipClients.contains(client))
+							continue;
+						ChunkUpdateMessage message = ((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, task.chunk);
+						synchronized (oldMessages) {
+							oldMessages.put(client, message);	
 						}
-					});
-				}
-				skipClients.clear();
+						final Map<ClientConfiguration, ChunkUpdateMessage> oldMessagesFinal = oldMessages;
+						message.addSentCallback(new Runnable() {
+							@Override
+							public void run() {
+								synchronized (oldMessagesFinal) {
+									oldMessagesFinal.remove(client);
+									if (oldMessagesFinal.isEmpty())
+										pendingUpdateMessages.remove(taskId);
+								}
+							}
+						});
+					}
+					skipClients.clear();
+//				}
 				
 				//update layer and re-add or dispose
 				Layer currentLayer = task.getStateInfo().getLayer();
@@ -481,7 +486,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		finishedTasks.clear();
 		borderTasks.clear();
 		newQueue.clear();
-		taskId++;
+		jobId++;
 		if (viewData != null) {
 			viewData.dispose();
 			viewData = null;
@@ -550,7 +555,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			if (!viewData.hasChunk(midpointChunkXFloor, midpointChunkYFloor)){
 				AbstractArrayChunk chunk = chunkFactory.createChunk(midpointChunkXFloor, midpointChunkYFloor);
 				BreadthFirstTask rootTask = new BreadthFirstTask(id_counter_tasks++, this,
-						chunk, parameters, getChunkPos(midpointChunkXFloor, midpointChunkYFloor), createCalculator(), layers.get(0), taskId);
+						chunk, parameters, getChunkPos(midpointChunkXFloor, midpointChunkYFloor), createCalculator(), layers.get(0), jobId);
 				rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(0));
 				viewData.addChunk(chunk);
 				openTasks.get(0).add(rootTask);
@@ -664,8 +669,24 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		if (viewData.hasChunk(chunkX, chunkY)) //already exists
 			return false;
 		
-		AbstractArrayChunk chunk = chunkFactory.createChunk(chunkX, chunkY);
-		BreadthFirstTask task = new BreadthFirstTask(id_counter_tasks++, this, chunk, parameters, getChunkPos(chunkX, chunkY), createCalculator(), layers.get(0), taskId);
+		AbstractArrayChunk chunk = null;
+		chunkFactory.setViewData(viewData);
+		for (int try1 = 0 ; try1 < 10 ; try1++) {//TODO remove
+			try {
+				chunk = chunkFactory.createChunk(chunkX, chunkY);
+				break;
+			} catch (Exception e) {
+				if (try1 == 9 && parentTask.getJobId() == jobId)
+					throw e;
+				else
+					try {
+						Thread.sleep(1);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+			}
+		}
+		BreadthFirstTask task = new BreadthFirstTask(id_counter_tasks++, this, chunk, parameters, getChunkPos(chunkX, chunkY), createCalculator(), layers.get(0), jobId);
 		task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(0));
 		openChunks++;
 		newQueue.add(task);

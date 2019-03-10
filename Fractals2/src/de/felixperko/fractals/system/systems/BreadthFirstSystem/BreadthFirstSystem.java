@@ -37,11 +37,13 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 
 	@Override
 	public void addClient(ClientConfiguration newConfiguration, SystemClientData systemClientData) {
-		clients.add(newConfiguration);
-		newConfiguration.getSystemRequests().remove(systemClientData);
-		newConfiguration.getSystemClientData().put(id, systemClientData);
-		newConfiguration.getConnection().writeMessage(new SystemConnectedMessage(id, newConfiguration));
-		taskManager.setParameters(systemClientData.getClientParameters());
+		synchronized (clients) {
+			clients.add(newConfiguration);
+			newConfiguration.getSystemRequests().remove(systemClientData);
+			newConfiguration.getSystemClientData().put(id, systemClientData);
+			newConfiguration.getConnection().writeMessage(new SystemConnectedMessage(id, newConfiguration));
+			taskManager.setParameters(systemClientData.getClientParameters());
+		}
 	}
 
 	@Override
@@ -63,9 +65,11 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 
 	@Override
 	public void removeClient(ClientConfiguration oldConfiguration) {
-		clients.remove(oldConfiguration);
-		if (clients.isEmpty())
-			stop();
+		synchronized(clients) {
+			clients.remove(oldConfiguration);
+			if (clients.isEmpty())
+				stop();
+		}
 	}
 
 	@Override
