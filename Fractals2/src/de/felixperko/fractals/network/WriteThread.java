@@ -10,6 +10,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.xerial.snappy.SnappyInputStream;
+import org.xerial.snappy.SnappyOutputStream;
+
 import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.manager.server.ServerThreadManager;
@@ -29,8 +32,10 @@ public abstract class WriteThread extends AbstractFractalsThread {
 	
 	Queue<Message> pendingMessages = new LinkedList<>();
 	Queue<Message> newMessages = new LinkedList<>();
-	private ObjectInputStream in;
+//	private ObjectInputStream in;
+	private SnappyInputStream inComp;
 	private ObjectOutputStream out;
+	private SnappyOutputStream outComp;
 	protected Socket socket;
 	
 //	Connection connection;
@@ -48,9 +53,9 @@ public abstract class WriteThread extends AbstractFractalsThread {
 	public void run() {
 		try {
 			InputStream inStream = socket.getInputStream();
-			out = new ObjectOutputStream(socket.getOutputStream());
-			in = new ObjectInputStream(inStream);
-			listenThread = new ListenThread(managers, this, in);
+			outComp = new SnappyOutputStream(socket.getOutputStream());
+			out = new ObjectOutputStream(outComp);
+			listenThread = new ListenThread(managers, this, inStream);
 			if (listenLogger != null)
 				listenThread.setLogger(listenLogger);
 			listenThread.start();
@@ -100,6 +105,7 @@ public abstract class WriteThread extends AbstractFractalsThread {
 						try {
 							out.writeUnshared(msg);
 							out.reset();
+							outComp.flush();
 						} catch (SocketException e) {
 							try {
 								Thread.sleep(1);
@@ -113,9 +119,9 @@ public abstract class WriteThread extends AbstractFractalsThread {
 				}
 			}
 			
-			try {
-				in.close();
-			} catch (SocketException e) {if (!closeConnection) throw e;}
+//			try {
+//				inComp.close();
+//			} catch (SocketException e) {if (!closeConnection) throw e;}
 			try {
 				out.close();
 			} catch (SocketException e) {if (!closeConnection) throw e;}

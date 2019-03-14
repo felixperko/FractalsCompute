@@ -1,8 +1,12 @@
 package de.felixperko.fractals.network;
 
 import java.awt.Color;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.SocketException;
+
+import org.xerial.snappy.SnappyInputStream;
 
 import de.felixperko.fractals.manager.client.ClientManagers;
 import de.felixperko.fractals.manager.common.Managers;
@@ -24,18 +28,20 @@ public class ListenThread extends AbstractFractalsThread {
 	CategoryLogger log = LOGGER_GENERIC;
 	
 	WriteThread writeThread;
-	ObjectInputStream in;
+	InputStream in;
+	InputStream inComp = null;
+	ObjectInputStream inObj = null;
 	boolean closeConnection = false;
 	
 	int listenThreadId;
 
-	public ListenThread(Managers managers, WriteThread writeThread, ObjectInputStream in) {
+	public ListenThread(Managers managers, WriteThread writeThread, InputStream in) {
 		super(managers, "COM_"+ID_COUNTER+"_IN");
 		listenThreadId = ID_COUNTER++;
 		this.writeThread = writeThread;
 		this.in = in;
 	}
-	
+
 	@Override
 	public void run() {
 		
@@ -49,9 +55,18 @@ public class ListenThread extends AbstractFractalsThread {
 				}
 			}
 			
+			if (inComp == null) {
+				try {
+					inComp = new SnappyInputStream(in);
+					inObj = new ObjectInputStream(inComp);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			
 			try {
 				setLifeCycleState(LifeCycleState.IDLE);
-				Message msg = (Message) in.readUnshared();
+				Message msg = (Message) inObj.readUnshared();
 				setLifeCycleState(LifeCycleState.RUNNING);
 				NetworkManager net = managers.getNetworkManager();
 				msg.received(writeThread.getConnection(), log);
@@ -63,6 +78,21 @@ public class ListenThread extends AbstractFractalsThread {
 				if (managers instanceof ServerManagers)
 					((ServerManagers)managers).getServerNetworkManager().removeClient(writeThread.getConnection());
 			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		if (inComp != null) {
+			try {
+				inComp.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		if (inObj != null) {
+			try {
+				inObj.close();
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
