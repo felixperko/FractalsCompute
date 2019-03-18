@@ -8,14 +8,13 @@ public class BreadthFirstLayer implements Layer {
 	
 	private static final long serialVersionUID = -2680536406773328635L;
 	
-	int id;
+	int id = -1;
 	double priority_multiplier = 1;
 	double priority_shift = 0;
 	BitSet enabledPixels = null;
 	int samples = 1;
 	
-	public BreadthFirstLayer(int id) {
-		this.id = id;
+	public BreadthFirstLayer() {
 	}
 	
 	@Override

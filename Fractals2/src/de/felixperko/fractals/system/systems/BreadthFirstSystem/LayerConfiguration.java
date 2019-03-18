@@ -4,44 +4,95 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 
+import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
+import de.felixperko.fractals.system.Numbers.DoubleNumber;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
+import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 
-public class LayerConfiguration {
-	
-	static boolean debug = false;
-	
-	ComplexNumber[][] offsets;
-	
-	Color[] layerColors = new Color[] {new Color(1f, 0, 0), new Color(0f, 1f, 0f), new Color(0f,0f,1f)};
+/**
+ * Manages layers for a system.
+ * Tries to generate and distribute offsets for even sampling (might be a bit buggy atm).
+ * prepare() has to be called before getOffsets()
+ */
+
+public class LayerConfiguration implements Serializable{
 	
 	public static void main(String[] args) {
-		debug = true;
 		List<BreadthFirstLayer> list = new ArrayList<>();
 		
-		list.add(new BreadthFirstLayer(0).with_samples(1));
-		list.add(new BreadthFirstLayer(1).with_samples(4));
-		list.add(new BreadthFirstLayer(2).with_samples(64));
+		list.add(new BreadthFirstLayer().with_samples(1));
+		list.add(new BreadthFirstLayer().with_samples(2));
+		list.add(new BreadthFirstLayer().with_samples(7));
+//		list.add(new BreadthFirstLayer().with_samples(40));
 		
-		new LayerConfiguration(list, null, 0.01, 100);
+		LayerConfiguration layerConfiguration = new LayerConfiguration(list, 0.05, 20, 42);
+		layerConfiguration.setDebug(true);
+		layerConfiguration.prepare(new NumberFactory(DoubleNumber.class, DoubleComplexNumber.class));
 	}
 	
-	public LayerConfiguration(List<BreadthFirstLayer> layers, NumberFactory numberFactory, double simStep, int simCount) {
+	private static final long serialVersionUID = -5299508995009860459L;
+
+	boolean debug = false;
+	
+	transient ComplexNumber[][] offsets;
+	transient NumberFactory numberFactory;
+	transient boolean prepared = false;
+	
+	
+	Color[] layerColors = new Color[] {new Color(1f, 0, 0), new Color(0f, 1f, 0f), new Color(0.0f,1f,1f), new Color(1f, 0f, 1f)};
+	
+	List<BreadthFirstLayer> layers;
+	double simStep;
+	int simCount;
+	long seed;
+
+	public LayerConfiguration(List<BreadthFirstLayer> layers, double simStep, int simCount, long seed) {
+		this.layers = layers;
+		this.simStep = simStep;
+		this.simCount = simCount;
+		this.seed = seed;
+	}
+	
+	public synchronized ComplexNumber[] getOffsets(int layerId) {
+		if (!prepared)
+			throw new IllegalStateException("LayerConfiguration has to be prepared first (prepare()).");
+		return offsets[layerId];
+	}
+	
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+	}
+	
+	public synchronized void prepare(NumberFactory numberFactory) {
+		this.numberFactory = numberFactory;
+		for (int i = 0; i < layers.size() ; i++) {
+			layers.get(i).setId(i);
+		}
 		offsets = new ComplexNumber[layers.size()][];
 		double[][] temp = new double[layers.size()][];
 		
 		int totalSamples = 0;
-		for (BreadthFirstLayer layer : layers)
-			totalSamples += layer.getSampleCount();
+		for (BreadthFirstLayer layer : layers) {
+			if (layer.getSampleCount() > totalSamples)
+				totalSamples = layer.getSampleCount();
+		}
 		
-		generatePoints(layers, temp);
+		for (int l = 0 ; l < layers.size() ; l++) {
+			generatePoints(layers, temp, l);
 		
-		distributePoints(layers, simStep, simCount, temp, totalSamples);
+			int lower = l-1;
+			if (l > 0)
+				distributePoints(layers, simStep, simCount, temp, totalSamples, lower, l);
+		}
 		
 		convertToComplex(layers, numberFactory, temp);
 	}
@@ -51,16 +102,19 @@ public class LayerConfiguration {
 			double[] points = temp[l];
 			ComplexNumber[] compPoints = new ComplexNumber[points.length/2];
 			for (int i = 0 ; i < points.length ; i+=2)
-				compPoints[i] = numberFactory.createComplexNumber(points[i], points[i+1]);
+				compPoints[i/2] = numberFactory.createComplexNumber(points[i], points[i+1]);
 		}
 	}
 
 	private void distributePoints(List<BreadthFirstLayer> layers, double simStep, int simCount, double[][] temp,
-			int totalSamples) {
+			int totalSamples, int minLayer, int maxLayer) {
+		int activeSamples = 0;
+		for (int l = 0 ; l <= maxLayer ; l++)
+			activeSamples += layers.get(0).getSampleCount();
 		for (int step = 0 ; step < simCount ; step++) {
 			double lowestDist = 1;
 			double totalDist = 0;
-			for (int l = 0 ; l < layers.size() ; l++) {
+			for (int l = 0 ; l <= maxLayer ; l++) {
 				double[] points = temp[l];
 				for (int i = 0 ; i < points.length ; i += 2) {
 					double x = points[i];
@@ -68,7 +122,7 @@ public class LayerConfiguration {
 					
 					double moveX = 0;
 					double moveY = 0;
-					for (int l2 = 0 ; l2 < layers.size() ; l2++) {
+					for (int l2 = 0 ; l2 <= maxLayer ; l2++) {
 						for (int j = 0 ; j < temp[l2].length ; j += 2) {
 							double x2 = temp[l2][j];
 							double y2 = temp[l2][j+1];
@@ -104,13 +158,15 @@ public class LayerConfiguration {
 								lowestDist = dist;
 							if (dist < 0.01)
 								dist = 0.01;
-							double mult = l2 == l ? 2 : 1;
-							mult *= 1-(temp[l].length*0.5/totalSamples);
+							double mult = l2 <= l ? 1 : 0.1;
+							mult *= 1-(activeSamples/((double)totalSamples));
 							mult *= 1-(step/(double)simCount);
 							moveX += (signX*simStep)*mult/dist;
 							moveY += (signY*simStep)*mult/dist;
 						}
 					}
+					moveX = clamp(moveX, -0.05, 0.05);
+					moveY = clamp(moveY, -0.05, 0.05);
 					double newX = (x + moveX)%1;
 					double newY = (y + moveY)%1;
 //					double newY = (y + moveY + (Math.random()*0.05-0.025))%1;
@@ -127,35 +183,40 @@ public class LayerConfiguration {
 			}
 			
 			if (debug)
-				testDraw(temp, step);
+				testDraw(temp, maxLayer, step);
 		}
 	}
 
-	private void generatePoints(List<BreadthFirstLayer> layers, double[][] temp) {
-		for (int l = 0 ; l < temp.length ; l++) {
-			BreadthFirstLayer layer = layers.get(l);
-			int sampleCount = layer.getSampleCount();
-			int len = sampleCount*2;
-			
-			//generate random points
-			double[] points = new double[len];
-			if (l == 0) {
-				points[0] = 0.5;
-				points[1] = 0.5;
-				for (int i = 2 ; i < len ; i++) {
-					points[i] = Math.random();
-				}
-			} else {
-				for (int i = 0 ; i < len ; i++) {
-					points[i] = Math.random();
-				}
+	private void generatePoints(List<BreadthFirstLayer> layers, double[][] temp, int layerId) {
+		BreadthFirstLayer layer = layers.get(layerId);
+		int sampleCount = layer.getSampleCount();
+		int accu = 0;
+		for (int l2 = 0 ; l2 < layerId ; l2++) {
+			int diff = layers.get(l2).getSampleCount() - accu;
+			accu += diff;
+			sampleCount -= diff;
+		}
+		int len = sampleCount*2;
+		
+		Random random = new Random(seed);
+		
+		//generate random points
+		double[] points = new double[len];
+		if (layerId == 0) {
+			points[0] = 0.5;
+			points[1] = 0.5;
+			for (int i = 2 ; i < len ; i++) {
+				points[i] = random.nextDouble();
 			}
-			temp[l] = points;
-			
+		} else {
+			for (int i = 0 ; i < len ; i++) {
+				points[i] = random.nextDouble();
+			}
 		}
+		temp[layerId] = points;
 	}
 
-	private void testDraw(double[][] temp, int step) {
+	private void testDraw(double[][] temp, int layer, int step) {
 		//draw test picture
 		int width = 200;
 		int height = 200;
@@ -188,7 +249,7 @@ public class LayerConfiguration {
 			}
 		}
 		try {
-			ImageIO.write(image, "png", new File(step+".png"));
+			ImageIO.write(image, "png", new File(layer+"-"+step+".png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -196,5 +257,21 @@ public class LayerConfiguration {
 	
 	private double clamp(double value, double min, double max) {
 		return value < min ? min : (value > max ? max : value);
+	}
+
+	public List<BreadthFirstLayer> getLayers() {
+		return layers;
+	}
+
+	public void setLayers(List<BreadthFirstLayer> layers, boolean prepare) {
+		this.prepared = false;
+		this.layers = layers;
+		this.offsets = null;
+		if (prepare)
+			prepare(numberFactory);
+	}
+
+	public boolean isPrepared() {
+		return prepared;
 	}
 }

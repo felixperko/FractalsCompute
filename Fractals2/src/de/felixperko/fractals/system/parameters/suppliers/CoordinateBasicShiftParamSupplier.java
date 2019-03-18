@@ -1,25 +1,38 @@
-package de.felixperko.fractals.system.parameters;
+package de.felixperko.fractals.system.parameters.suppliers;
+
+import java.util.Map;
 
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.Number;
 import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
+import de.felixperko.fractals.system.systems.BreadthFirstSystem.LayerConfiguration;
 
 public class CoordinateBasicShiftParamSupplier extends CoordinateParamSupplier {
 	
 	private static final long serialVersionUID = 2317887367642326504L;
 	
 	ComplexNumber[] shifts;
+	LayerConfiguration layerConfiguration;
 //	int dim = 0;
 	
-	public CoordinateBasicShiftParamSupplier(String name, NumberFactory numberFactory, int dim) {
-		super(name, numberFactory);
-//		this.dim = dim;
-		shifts = new ComplexNumber[dim*dim];
-		for (float x = 0 ; x < dim ; x++){
-			for (float y = 0 ; y < dim ; y++){
-				shifts[Math.round(x*dim+y)] = numberFactory.createComplexNumber(x/dim, y/dim);
-			}
-		}
+	public CoordinateBasicShiftParamSupplier(String name) {
+		super(name);
+	}
+	
+//	public CoordinateBasicShiftParamSupplier(String name, NumberFactory numberFactory, int dim) {
+//		super(name, numberFactory);
+////		this.dim = dim;
+//		shifts = new ComplexNumber[dim*dim];
+//		for (float x = 0 ; x < dim ; x++){
+//			for (float y = 0 ; y < dim ; y++){
+//				shifts[Math.round(x*dim+y)] = numberFactory.createComplexNumber(x/dim, y/dim);
+//			}
+//		}
+//	}
+	
+	public CoordinateBasicShiftParamSupplier(String name, LayerConfiguration layerConfiguration) {
+		super(name);
+		this.layerConfiguration = layerConfiguration;
 	}
 	
 	private CoordinateBasicShiftParamSupplier(String name, NumberFactory numberFactory, ComplexNumber[] shifts) {
@@ -48,6 +61,13 @@ public class CoordinateBasicShiftParamSupplier extends CoordinateParamSupplier {
 	ParamSupplier p_pixelzoom;
 	ParamSupplier p_chunkpos;
 	ParamSupplier p_chunksize;
+	ParamSupplier p_layer;
+	
+	@Override
+	public void bindParameters(Map<String, ParamSupplier> parameters) {
+		super.bindParameters(parameters);
+		this.shifts = layerConfiguration.getOffsets(p_layer.getGeneral(Integer.class));
+	}
 	
 	@Override
 	public Object get(int pixel, int sample) {

@@ -1,4 +1,4 @@
-package de.felixperko.fractals.system.parameters;
+package de.felixperko.fractals.system.parameters.suppliers;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

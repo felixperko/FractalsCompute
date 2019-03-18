@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import de.felixperko.fractals.system.parameters.ParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 
 public class SystemClientData implements Serializable{

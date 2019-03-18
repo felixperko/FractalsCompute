@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
-import de.felixperko.fractals.system.parameters.ParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 
 public class ClientConfiguration implements Serializable{
 	

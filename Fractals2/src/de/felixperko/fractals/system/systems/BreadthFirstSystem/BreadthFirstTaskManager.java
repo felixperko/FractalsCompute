@@ -32,8 +32,8 @@ import de.felixperko.fractals.system.calculator.MandelbrotCalculator;
 import de.felixperko.fractals.system.calculator.NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator;
 import de.felixperko.fractals.system.calculator.NewtonThridPowerMinusOneCalculator;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
-import de.felixperko.fractals.system.parameters.ParamSupplier;
-import de.felixperko.fractals.system.parameters.StaticParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.BasicSystem.BasicSystem;
 import de.felixperko.fractals.system.systems.BasicSystem.BasicTask;
 import de.felixperko.fractals.system.systems.BasicSystem.BasicTaskManager;
@@ -113,7 +113,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 
 	List<BreadthFirstTask> borderTasks = new ArrayList<>();
 	
-	List<BreadthFirstLayer> layers = new ArrayList<>(); //TODO fill from parameters
+	LayerConfiguration layerConfig;
+	//List<BreadthFirstLayer> layers = new ArrayList<>();
 	
 	boolean done = false;
 	
@@ -168,7 +169,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			//layers.add(new BreadthFirstLayer(1).with_priority_shift(5).with_priority_multiplier(2));
 			//layers.add(new BreadthFirstLayer(2).with_priority_shift(10).with_priority_multiplier(3).with_samples(4));
 //		}
-		for (int i = 0 ; i < layers.size() ; i++) {
+		for (int i = 0 ; i < layerConfig.getLayers().size() ; i++) {
 			openTasks.add(new PriorityQueue<>(comparator_distance));
 			tempList.add(new ArrayList<>());
 		}
@@ -184,8 +185,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 //		ComplexNumber pos = numberFactory.createComplexNumber(chunkZoom, chunkZoom);
 //		pos.multValues(relativeStartShift);
 //		pos.add(midpoint);
-		BreadthFirstTask rootTask = new BreadthFirstTask(id_counter_tasks++, this, chunk, parameters, getChunkPos(0, 0), createCalculator(), layers.get(0), jobId);
-		rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(0));
+		BreadthFirstTask rootTask = new BreadthFirstTask(id_counter_tasks++, this, chunk, parameters, getChunkPos(0, 0), createCalculator(), layerConfig.getLayers().get(0), jobId);
+		rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layerConfig.getLayers().get(0));
 		viewData.addChunk(chunk);
 		openTasks.get(0).add(rootTask);
 		openChunks++;
@@ -299,21 +300,25 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		if (reset)
 			reset();
 		
-		ParamSupplier layersParam = parameters.get("layers");
-		List<?> layers2 = layersParam.getGeneral(List.class);
-		if (layers.isEmpty() || layersParam.isChanged()) {
-			layers.clear();
-			for (Object obj : layers2) {
-				if (!(obj instanceof BreadthFirstLayer))
-					throw new IllegalStateException("content in layers isn't compartible with BreadthFirstLayer");
-				layers.add((BreadthFirstLayer)obj);
-				
-				openTasks.add(new PriorityQueue<>(comparator_distance));
-				tempList.add(new ArrayList<>());
-			}
-			if (layers.isEmpty())
-				throw new IllegalStateException("no layers configured");
-		}
+		layerConfig = parameters.get("layerConfiguration").getGeneral(LayerConfiguration.class);
+		if (!layerConfig.isPrepared())
+			layerConfig.prepare(numberFactory);
+		
+//		ParamSupplier layersParam = parameters.get("layers");
+//		List<?> layers2 = layersParam.getGeneral(List.class);
+//		if (layers.isEmpty() || layersParam.isChanged()) {
+//			layers.clear();
+//			for (Object obj : layers2) {
+//				if (!(obj instanceof BreadthFirstLayer))
+//					throw new IllegalStateException("content in layers isn't compartible with BreadthFirstLayer");
+//				layers.add((BreadthFirstLayer)obj);
+//				
+//				openTasks.add(new PriorityQueue<>(comparator_distance));
+//				tempList.add(new ArrayList<>());
+//			}
+//			if (layers.isEmpty())
+//				throw new IllegalStateException("no layers configured");
+//		}
 		
 		if (viewData == null) {
 			viewData = new BreadthFirstViewData(anchor);
@@ -440,7 +445,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				//update layer and re-add or dispose
 				Layer currentLayer = task.getStateInfo().getLayer();
 				int currentLayerId = currentLayer.getId();
-				if (currentLayer.getId() >= layers.size()-1) {
+				if (currentLayer.getId() >= layerConfig.getLayers().size()-1) {
 					openChunks--;
 					if (openChunks == 0) { //finished
 						try {
@@ -453,7 +458,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 					task.getStateInfo().setState(TaskState.DONE);
 				} else {
 					currentLayerId++;
-					Layer layer = layers.get(currentLayerId);
+					Layer layer = layerConfig.getLayers().get(currentLayerId);
 					task.getStateInfo().setLayer(layer);
 					task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layer);
 					openTasks.get(currentLayerId).add(task);
@@ -509,6 +514,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		//TODO synchronization
 		//clear queues to update sorting
 		synchronized (this) {
+			List<BreadthFirstLayer> layers = layerConfig.getLayers();
 			for (int l = 0 ; l < layers.size() ; l++) {
 				tempList.get(l).addAll(openTasks.get(l));
 				openTasks.get(l).clear();
@@ -571,6 +577,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	
 	private synchronized boolean fillQueues() {
 		boolean changed = false;
+		List<BreadthFirstLayer> layers = layerConfig.getLayers();
 		while (nextBufferedTasks.size() < buffer) {
 			boolean[] layerInNextTasks = new boolean[layers.size()];
 			int notFilled = layers.size();
@@ -686,8 +693,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 					}
 			}
 		}
-		BreadthFirstTask task = new BreadthFirstTask(id_counter_tasks++, this, chunk, parameters, getChunkPos(chunkX, chunkY), createCalculator(), layers.get(0), jobId);
-		task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(0));
+		BreadthFirstTask task = new BreadthFirstTask(id_counter_tasks++, this, chunk, parameters, getChunkPos(chunkX, chunkY), createCalculator(), layerConfig.getLayers().get(0), jobId);
+		task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layerConfig.getLayers().get(0));
 		openChunks++;
 		newQueue.add(task);
 		viewData.addChunk(chunk);

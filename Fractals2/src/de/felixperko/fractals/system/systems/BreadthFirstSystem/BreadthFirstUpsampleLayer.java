@@ -10,9 +10,8 @@ public class BreadthFirstUpsampleLayer extends BreadthFirstLayer{
 	
 	boolean culling;
 
-	public BreadthFirstUpsampleLayer(int id, int upsample, int chunkSize) {
-		super(id);
-		this.id = id;
+	public BreadthFirstUpsampleLayer(int upsample, int chunkSize) {
+		super();
 		this.upsample = upsample;
 		BitSet bitSet = new BitSet();
 		for (int x = upsample-1 ; x < chunkSize ; x += upsample) {

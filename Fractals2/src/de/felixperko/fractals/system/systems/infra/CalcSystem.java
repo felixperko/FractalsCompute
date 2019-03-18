@@ -6,7 +6,7 @@ import java.util.UUID;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.SystemClientData;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
-import de.felixperko.fractals.system.parameters.ParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.systems.stateinfo.SystemStateInfo;
 
 public interface CalcSystem extends LifeCycleComponent{

@@ -1,4 +1,4 @@
-package de.felixperko.fractals.system.parameters;
+package de.felixperko.fractals.system.parameters.suppliers;
 
 import java.util.Random;
 
@@ -15,6 +15,10 @@ public abstract class CoordinateParamSupplier extends MappedParamSupplier {
 	public CoordinateParamSupplier(String name, NumberFactory numberFactory) {
 		super(name);
 		this.numberFactory = numberFactory;
+	}
+	
+	public CoordinateParamSupplier(String name) {
+		super(name);
 	}
 	
 	ParamSupplier p_pixelzoom;

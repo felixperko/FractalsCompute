@@ -10,12 +10,12 @@ import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.calculator.infra.AbstractFractalsCalculator;
 import de.felixperko.fractals.system.calculator.infra.AbstractPreparedFractalCalculator;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
+import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.calculator.BurningShipCalculator;
 import de.felixperko.fractals.system.calculator.MandelbrotCalculator;
 import de.felixperko.fractals.system.calculator.NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator;
 import de.felixperko.fractals.system.calculator.NewtonThridPowerMinusOneCalculator;
-import de.felixperko.fractals.system.parameters.ParamSupplier;
-import de.felixperko.fractals.system.parameters.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.AbstractFractalsTask;
 import de.felixperko.fractals.system.task.Layer;
@@ -45,6 +45,7 @@ public class BasicTask extends AbstractFractalsTask {
 
 	@Override
 	public void run() {
+		parameters.put("layer", new StaticParamSupplier("layer", (Integer)getStateInfo().getLayer().getId()));
 		calculator.setParams(parameters);
 		calculator.calculate(chunk);
 	}

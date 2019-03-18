@@ -18,9 +18,9 @@ import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
 import de.felixperko.fractals.system.Numbers.DoubleNumber;
 import de.felixperko.fractals.system.Numbers.infra.Number;
 import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
-import de.felixperko.fractals.system.parameters.CoordinateBasicShiftParamSupplier;
-import de.felixperko.fractals.system.parameters.ParamSupplier;
-import de.felixperko.fractals.system.parameters.StaticParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.CoordinateBasicShiftParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstLayer;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
 

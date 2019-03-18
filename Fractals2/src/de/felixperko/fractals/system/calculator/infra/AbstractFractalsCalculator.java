@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.felixperko.fractals.system.parameters.MappedParamSupplier;
-import de.felixperko.fractals.system.parameters.ParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.MappedParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 
 public abstract class AbstractFractalsCalculator implements FractalsCalculator {
 

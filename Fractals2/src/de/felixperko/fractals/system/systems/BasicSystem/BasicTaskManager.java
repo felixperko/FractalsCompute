@@ -31,8 +31,8 @@ import de.felixperko.fractals.system.calculator.MandelbrotCalculator;
 import de.felixperko.fractals.system.calculator.NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator;
 import de.felixperko.fractals.system.calculator.NewtonThridPowerMinusOneCalculator;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
-import de.felixperko.fractals.system.parameters.ParamSupplier;
-import de.felixperko.fractals.system.parameters.StaticParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstLayer;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
@@ -149,7 +149,7 @@ public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 		startTime = System.nanoTime();
 		int id = 0;
 		FractalsCalculator calculator = createCalculator();
-		Layer layer = new BreadthFirstLayer(0);
+		Layer layer = new BreadthFirstLayer();
 		for (int x = 0 ; x < dimX ; x++) {
 			for (int y = 0 ; y < dimY ; y++) {
 				AbstractArrayChunk chunk = chunkFactory.createChunk(x, y);

@@ -2,7 +2,7 @@ package de.felixperko.fractals.system.calculator;
 
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.calculator.infra.AbstractPreparedFractalCalculator;
-import de.felixperko.fractals.system.parameters.ParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 
 public class MandelbrotCalculator extends AbstractPreparedFractalCalculator {
 	

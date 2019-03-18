@@ -9,7 +9,7 @@ import java.util.UUID;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.manager.server.ServerThreadManager;
 import de.felixperko.fractals.network.ClientConfiguration;
-import de.felixperko.fractals.system.parameters.ParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.systems.stateinfo.SystemStateInfo;
 import de.felixperko.fractals.system.task.TaskManager;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.Chunk;
-import de.felixperko.fractals.system.parameters.ParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 
 public interface FractalsCalculator extends Serializable{
 	public void calculate(AbstractArrayChunk chunk);

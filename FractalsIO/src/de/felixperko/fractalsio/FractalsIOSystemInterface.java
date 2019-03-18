@@ -15,7 +15,7 @@ import de.felixperko.fractals.network.ClientSystemInterface;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.Number;
 import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
-import de.felixperko.fractals.system.parameters.ParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 
 public class FractalsIOSystemInterface implements ClientSystemInterface {
 	
