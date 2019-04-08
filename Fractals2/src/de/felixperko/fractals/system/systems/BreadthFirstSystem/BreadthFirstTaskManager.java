@@ -18,6 +18,8 @@ import de.felixperko.fractals.data.ArrayChunkFactory;
 import de.felixperko.fractals.data.BorderAlignment;
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.ChunkBorderData;
+import de.felixperko.fractals.data.ChunkBorderDataImpl;
+import de.felixperko.fractals.data.ChunkBorderDataImplNull;
 import de.felixperko.fractals.data.NaiveChunk;
 import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.manager.server.ServerManagers;
@@ -301,12 +303,16 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		if (reset)
 			reset();
 		
-		LayerConfiguration oldLayerConfig = oldParams.get("layerConfiguration").getGeneral(LayerConfiguration.class);
+		LayerConfiguration oldLayerConfig = null;
+		if (oldParams != null)
+			oldLayerConfig = oldParams.get("layerConfiguration").getGeneral(LayerConfiguration.class);
 		ParamSupplier newLayerConfigSupplier = params.get("layerConfiguration");
 		LayerConfiguration newLayerConfig = newLayerConfigSupplier.getGeneral(LayerConfiguration.class);
 		if (oldLayerConfig == null || newLayerConfigSupplier.isChanged()) {
 			layerConfig = newLayerConfig;
 			layerConfig.prepare(numberFactory);
+		} else {
+			parameters.put("layerConfiguration", oldParams.get("layerConfiguration"));
 		}
 		
 //		ParamSupplier layersParam = parameters.get("layers");
@@ -380,7 +386,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 					Chunk c = viewData.getChunk(alignment.getNeighbourX(x), alignment.getNeighbourY(y));
 					BorderAlignment relative = alignment.getAlignmentForNeighbour();
 					if (c == null) {
-						neighbourBorderData.put(relative, null);
+						neighbourBorderData.put(relative, new ChunkBorderDataImplNull());
 					} else {
 						AbstractArrayChunk neighbour = (AbstractArrayChunk) c;
 						neighbourBorderData.put(relative, neighbour.getBorderData(alignment));

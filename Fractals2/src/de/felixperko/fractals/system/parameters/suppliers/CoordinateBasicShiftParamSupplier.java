@@ -1,5 +1,8 @@
 package de.felixperko.fractals.system.parameters.suppliers;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
@@ -15,10 +18,6 @@ public class CoordinateBasicShiftParamSupplier extends CoordinateParamSupplier {
 	LayerConfiguration layerConfiguration;
 //	int dim = 0;
 	
-	public CoordinateBasicShiftParamSupplier(String name) {
-		super(name);
-	}
-	
 //	public CoordinateBasicShiftParamSupplier(String name, NumberFactory numberFactory, int dim) {
 //		super(name, numberFactory);
 ////		this.dim = dim;
@@ -30,16 +29,28 @@ public class CoordinateBasicShiftParamSupplier extends CoordinateParamSupplier {
 //		}
 //	}
 	
+	public CoordinateBasicShiftParamSupplier(String name) {
+		super(name);
+	}
+	
 	public CoordinateBasicShiftParamSupplier(String name, LayerConfiguration layerConfiguration) {
 		super(name);
 		this.layerConfiguration = layerConfiguration;
+		if (this.layerConfiguration != null) {
+			List<ComplexNumber> shifts = new ArrayList<>();
+			for (int i = 0 ; i < layerConfiguration.getLayers().size() ; i++) {
+				for (ComplexNumber n : layerConfiguration.getOffsets(i))
+					shifts.add(n);
+			}
+			this.shifts = shifts.toArray(new ComplexNumber[shifts.size()]);
+		}
 	}
 	
-	private CoordinateBasicShiftParamSupplier(String name, NumberFactory numberFactory, ComplexNumber[] shifts) {
-		super(name, numberFactory);
-//		this.dim = Math.round((float)Math.sqrt(shifts.length));
-		this.shifts = shifts;
-	}
+//	private CoordinateBasicShiftParamSupplier(String name, NumberFactory numberFactory, ComplexNumber[] shifts) {
+//		super(name, numberFactory);
+////		this.dim = Math.round((float)Math.sqrt(shifts.length));
+//		this.shifts = shifts;
+//	}
 	
 	@Override
 	public boolean equals(Object obj) {
@@ -47,13 +58,7 @@ public class CoordinateBasicShiftParamSupplier extends CoordinateParamSupplier {
 			return false;
 		if (!(obj instanceof CoordinateBasicShiftParamSupplier))
 			return false;
-		CoordinateBasicShiftParamSupplier other = (CoordinateBasicShiftParamSupplier) obj;
 		
-		if (this.shifts.length != other.shifts.length)
-			return false;
-		for (int i = 0 ; i < shifts.length ; i++)
-			if (!this.shifts[i].equals(other.shifts[i]))
-				return false;
 		
 		return true;
 	}
@@ -66,7 +71,15 @@ public class CoordinateBasicShiftParamSupplier extends CoordinateParamSupplier {
 	@Override
 	public void bindParameters(Map<String, ParamSupplier> parameters) {
 		super.bindParameters(parameters);
-		this.shifts = layerConfiguration.getOffsets(p_layer.getGeneral(Integer.class));
+		if (layerConfiguration == null) {
+			this.layerConfiguration = parameters.get("layerConfiguration").getGeneral(LayerConfiguration.class);
+			List<ComplexNumber> shifts = new ArrayList<>();
+			for (int i = 0 ; i < layerConfiguration.getLayers().size() ; i++) {
+				for (ComplexNumber n : layerConfiguration.getOffsets(i))
+					shifts.add(n);
+			}
+			this.shifts = shifts.toArray(new ComplexNumber[shifts.size()]);
+		}
 	}
 	
 	@Override
@@ -76,7 +89,7 @@ public class CoordinateBasicShiftParamSupplier extends CoordinateParamSupplier {
 		int y = pixel%chunkSize;
 		ComplexNumber chunkPos = (ComplexNumber)p_chunkpos.get(0, 0);
 		Number pixelzoom = (Number)p_pixelzoom.get(0, 0);
-		ComplexNumber n = numberFactory.createComplexNumber(x, y);
+		ComplexNumber n = layerConfiguration.getNumberFactory().createComplexNumber(x, y);
 		applyRelativeSampleShift(n, sample);
 		n.multNumber(pixelzoom);
 		n.add(chunkPos);
@@ -85,7 +98,8 @@ public class CoordinateBasicShiftParamSupplier extends CoordinateParamSupplier {
 
 	@Override
 	public ParamSupplier copy() {
-		return new CoordinateBasicShiftParamSupplier(name, numberFactory, shifts);
+		//TODO remove recopy at copy!
+		return new CoordinateBasicShiftParamSupplier(name, layerConfiguration);
 	}
 
 	@Override

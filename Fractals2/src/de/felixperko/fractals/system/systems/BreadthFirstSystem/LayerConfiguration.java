@@ -95,6 +95,7 @@ public class LayerConfiguration implements Serializable{
 		}
 		
 		convertToComplex(layers, numberFactory, temp);
+		prepared = true;
 	}
 
 	private void convertToComplex(List<BreadthFirstLayer> layers, NumberFactory numberFactory, double[][] temp) {
@@ -103,6 +104,7 @@ public class LayerConfiguration implements Serializable{
 			ComplexNumber[] compPoints = new ComplexNumber[points.length/2];
 			for (int i = 0 ; i < points.length ; i+=2)
 				compPoints[i/2] = numberFactory.createComplexNumber(points[i], points[i+1]);
+			offsets[l] = compPoints;
 		}
 	}
 
@@ -287,5 +289,9 @@ public class LayerConfiguration implements Serializable{
 				return false;
 		}
 		return true;
+	}
+
+	public NumberFactory getNumberFactory() {
+		return numberFactory;
 	}
 }

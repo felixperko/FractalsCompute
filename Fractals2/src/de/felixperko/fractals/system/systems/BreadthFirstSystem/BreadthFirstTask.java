@@ -79,7 +79,7 @@ public class BreadthFirstTask extends BasicTask {
 								}
 							} else
 								throw new IllegalStateException("unexpected branch");
-						} else if (neighbourUpsampleIndex > chunk.getArrayLength()) {
+						} else if (neighbourUpsampleIndex >= chunk.getArrayLength()) {
 							if (dx == 1) {
 								if (chunk.getNeighbourBorderData(BorderAlignment.RIGHT).isSet(y)) {
 									cull = false;

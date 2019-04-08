@@ -19,6 +19,8 @@ public class ClientLocalConnection implements ClientConnection {
 	
 	CalcSystem currentSystem;
 	
+	boolean closed;
+	
 	public ClientLocalConnection(ServerNetworkManager networkManager, SenderInfo localSenderInfo) {
 		this.networkManager = networkManager;
 		this.senderInfo = localSenderInfo;
@@ -53,6 +55,16 @@ public class ClientLocalConnection implements ClientConnection {
 	@Override
 	public void setCurrentSystem(CalcSystem system) {
 		this.currentSystem = system;
+	}
+
+	@Override
+	public boolean isClosed() {
+		return closed;
+	}
+
+	@Override
+	public void setClosed() {
+		this.closed = true;
 	}
 
 }
