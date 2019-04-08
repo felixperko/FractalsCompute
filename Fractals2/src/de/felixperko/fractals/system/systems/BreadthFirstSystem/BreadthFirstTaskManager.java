@@ -253,6 +253,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				}
 			}
 		}
+		Map<String, ParamSupplier> oldParams = this.parameters;
 		this.parameters = params;
 		
 		calculatorClass = availableCalculators.get(((String)params.get("calculator").get(0, 0)));
@@ -300,9 +301,13 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		if (reset)
 			reset();
 		
-		layerConfig = parameters.get("layerConfiguration").getGeneral(LayerConfiguration.class);
-		if (!layerConfig.isPrepared())
+		LayerConfiguration oldLayerConfig = oldParams.get("layerConfiguration").getGeneral(LayerConfiguration.class);
+		ParamSupplier newLayerConfigSupplier = params.get("layerConfiguration");
+		LayerConfiguration newLayerConfig = newLayerConfigSupplier.getGeneral(LayerConfiguration.class);
+		if (oldLayerConfig == null || newLayerConfigSupplier.isChanged()) {
+			layerConfig = newLayerConfig;
 			layerConfig.prepare(numberFactory);
+		}
 		
 //		ParamSupplier layersParam = parameters.get("layers");
 //		List<?> layers2 = layersParam.getGeneral(List.class);
@@ -366,22 +371,24 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			if (task == null)
 				break;
 			
-			Map<BorderAlignment, ChunkBorderData> neighbourBorderData = new HashMap<>();
-			AbstractArrayChunk chunk = ((AbstractArrayChunk)task.getChunk());
-			int x = chunk.getChunkX();
-			int y = chunk.getChunkX();
-			for (BorderAlignment alignment : BorderAlignment.values()) {
-				Chunk c = viewData.getChunk(alignment.getNeighbourX(x), alignment.getNeighbourY(y));
-				BorderAlignment relative = alignment.getAlignmentForNeighbour();
-				if (c == null) {
-					neighbourBorderData.put(relative, null);
-				} else {
-					AbstractArrayChunk neighbour = (AbstractArrayChunk) c;
-					neighbourBorderData.put(relative, neighbour.getBorderData(alignment));
+			if (task.getPreviousLayer() != null && task.getPreviousLayer().cullingEnabled()) {
+				Map<BorderAlignment, ChunkBorderData> neighbourBorderData = new HashMap<>();
+				AbstractArrayChunk chunk = ((AbstractArrayChunk)task.getChunk());
+				int x = chunk.getChunkX();
+				int y = chunk.getChunkX();
+				for (BorderAlignment alignment : BorderAlignment.values()) {
+					Chunk c = viewData.getChunk(alignment.getNeighbourX(x), alignment.getNeighbourY(y));
+					BorderAlignment relative = alignment.getAlignmentForNeighbour();
+					if (c == null) {
+						neighbourBorderData.put(relative, null);
+					} else {
+						AbstractArrayChunk neighbour = (AbstractArrayChunk) c;
+						neighbourBorderData.put(relative, neighbour.getBorderData(alignment));
+					}
 				}
+				chunk.setNeighbourBorderData(neighbourBorderData);
 			}
-			chunk.setNeighbourBorderData(neighbourBorderData);
-			
+				
 			tasks.add(task);
 			task.getStateInfo().setState(TaskState.ASSIGNED);
 		}

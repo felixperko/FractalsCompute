@@ -8,7 +8,9 @@ import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.SystemClientData;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.network.messages.SystemConnectedMessage;
+import de.felixperko.fractals.system.parameters.ParameterConfiguration;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
+import de.felixperko.fractals.system.systems.BreadthFirstSystem.LayerConfiguration;
 import de.felixperko.fractals.system.systems.infra.AbstractCalcSystem;
 import de.felixperko.fractals.system.task.ClassTaskFactory;
 import de.felixperko.fractals.system.task.TaskFactory;
@@ -24,6 +26,7 @@ public class BasicSystem extends AbstractCalcSystem {
 	BasicTaskManager taskManager;
 	
 	List<ClientConfiguration> clients = new ArrayList<>();
+	ParameterConfiguration parameterConfiguration = null;
 	
 	@Override
 	public boolean onInit(Map<String, ParamSupplier> params) {
@@ -64,7 +67,7 @@ public class BasicSystem extends AbstractCalcSystem {
 		clients.add(newConfiguration);
 		newConfiguration.getSystemRequests().remove(systemClientData);
 		newConfiguration.getSystemClientData().put(id, systemClientData);
-		newConfiguration.getConnection().writeMessage(new SystemConnectedMessage(id, newConfiguration));
+		newConfiguration.getConnection().writeMessage(new SystemConnectedMessage(id, newConfiguration, parameterConfiguration));
 		taskManager.setParameters(systemClientData.getClientParameters());
 	}
 	

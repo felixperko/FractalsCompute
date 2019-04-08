@@ -13,8 +13,6 @@ import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.Inflater;
 
-import org.xerial.snappy.Snappy;
-
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstViewData;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.ViewData;
 
@@ -43,6 +41,10 @@ public class ReducedNaiveChunk extends AbstractArrayChunk {
 	
 	@Override
 	public double getValue(int i, boolean strict) {
+		float currValues = values[i];
+		if (currValues == FLAG_CULL)
+			return FLAG_CULL;
+		
 		int count = samples[i];
 		if (count == 0) {
 			if (strict)
@@ -72,16 +74,21 @@ public class ReducedNaiveChunk extends AbstractArrayChunk {
 		boolean hadValidValue = samples[i] > failedSamples[i];
 		boolean hasValidValue = hadValidValue;
 		synchronized (this) {
-			if (value < 0)
-				failedSamples[i]++;
-			else {
-				if (samples[i] == 0) //override flags
-					values[i] = (float) value;
-				else
-					values[i] += value;
-				hasValidValue = true;
+			if (value == FLAG_CULL) {
+				if (samples[i] == 0)
+					values[i] = -2;
+			} else {
+				if (value < 0)
+					failedSamples[i]++;
+				else {
+					if (samples[i] == 0) //override flags
+						values[i] = (float) value;
+					else
+						values[i] += value;
+					hasValidValue = true;
+				}
+				samples[i]++;
 			}
-			samples[i]++;
 		}
 		
 		if (!hadValidValue && hasValidValue) {
@@ -109,6 +116,13 @@ public class ReducedNaiveChunk extends AbstractArrayChunk {
 	@Override
 	public int getSampleCount(int i) {
 		return samples[i];
+	}
+
+	
+	@Override
+	protected void removeFlag(int i) {
+		if (samples[i] == 0)
+			values[i] = 0;
 	}
 	
 //	static Deflater deflater = new Deflater(0);

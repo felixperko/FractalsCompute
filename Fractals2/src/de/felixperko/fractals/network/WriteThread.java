@@ -165,6 +165,7 @@ public abstract class WriteThread extends AbstractFractalsThread {
 	
 	public void closeConnection() {
 		closeConnection = true;
+		getConnection().setClosed();
 		if (getLifeCycleState() == LifeCycleState.PAUSED)
 			continueThread();
 	}

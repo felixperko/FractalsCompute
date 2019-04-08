@@ -4,6 +4,7 @@ import java.util.BitSet;
 import java.util.Map;
 
 import de.felixperko.fractals.data.AbstractArrayChunk;
+import de.felixperko.fractals.data.BorderAlignment;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
@@ -16,7 +17,6 @@ public class BreadthFirstTask extends BasicTask {
 	
 	private static final long serialVersionUID = 428442040367400862L;
 
-	
 	Double distance;
 	Double priority;
 	
@@ -37,19 +37,73 @@ public class BreadthFirstTask extends BasicTask {
 	}
 
 	private void preprocess() {
-//		if (previousLayer == null || !(previousLayer instanceof BreadthFirstUpsampleLayer))
-//			return;
-//		BreadthFirstUpsampleLayer prev = (BreadthFirstUpsampleLayer) previousLayer;
-//		if (!prev.cullingEnabled())
-//			return;
-//		BitSet activePixels = prev.getEnabledPixels();
-//		for (int i = activePixels.nextSetBit(0) ; i != -1 ; i = activePixels.nextSetBit(i+1)) { //loop active pixels
-//			if (prev.getNeighbourCulling(chunk, i)) {
-//				for (int i2 : prev.getManagedIndices(i)) {
-//					prev.setCullingFlag(i2);
-//				}
-//			}
-//		}
+		if (previousLayer == null || !(previousLayer instanceof BreadthFirstLayer))
+			return;
+		BreadthFirstLayer prev = (BreadthFirstLayer) previousLayer;
+		
+		if (prev.cullingEnabled()){
+			preprocess_culling(prev);
+		}
+	}
+
+	private void preprocess_culling(BreadthFirstLayer prev) {
+		if (prev instanceof BreadthFirstUpsampleLayer) {
+			BreadthFirstUpsampleLayer prevUpsampled = (BreadthFirstUpsampleLayer) prev;
+			BitSet activePixels = prevUpsampled.getEnabledPixels();
+			int upsample = prevUpsampled.upsample;
+			int chunkSize = chunk.getChunkDimensions();
+			
+			for (int i = 0 ; i < chunk.getArrayLength() ; i++) {
+			}
+			
+			activePixelLoop:
+			for (int i = activePixels.nextSetBit(0) ; i != -1 ; i = activePixels.nextSetBit(i+1)) { //loop active pixels
+				int x = i / chunkSize;
+				int y = i % chunkSize;
+				boolean cull = true;
+				
+				evalCullingLoop:
+				for (int dx = -1 ; dx <= 1 ; dx++) {
+					for (int dy = -1 ; dy <= 1 ; dy++) {
+						int neighbourUpsampleIndex = i + dx*chunkSize + dy;
+						if (neighbourUpsampleIndex < 0){
+							if (dx == -1) {
+								if (chunk.getNeighbourBorderData(BorderAlignment.LEFT).isSet(y)) {
+									cull = false;
+									break evalCullingLoop;
+								}
+							} else if (dy == -1){
+								if (chunk.getNeighbourBorderData(BorderAlignment.UP).isSet(x)) {
+									cull = false;
+									break evalCullingLoop;
+								}
+							} else
+								throw new IllegalStateException("unexpected branch");
+						} else if (neighbourUpsampleIndex > chunk.getArrayLength()) {
+							if (dx == 1) {
+								if (chunk.getNeighbourBorderData(BorderAlignment.RIGHT).isSet(y)) {
+									cull = false;
+									break evalCullingLoop;
+								}
+							} else if (dy == 1){
+								if (chunk.getNeighbourBorderData(BorderAlignment.DOWN).isSet(x)) {
+									cull = false;
+									break evalCullingLoop;
+								}
+							} else
+								throw new IllegalStateException("unexpected branch");
+						} else {
+							if (chunk.getValue(neighbourUpsampleIndex, true) > 0) {
+								cull = false;
+								break evalCullingLoop;
+							}
+						}
+					}
+				}
+				
+				chunk.setCullFlags(i, upsample, cull);
+			}
+		}
 	}
 
 	public void updateDistance(double chunkX, double chunkY) {
@@ -67,5 +121,9 @@ public class BreadthFirstTask extends BasicTask {
 
 	public Double getPriority() {
 		return priority;
+	}
+	
+	public Layer getPreviousLayer() {
+		return previousLayer;
 	}
 }

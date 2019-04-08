@@ -6,21 +6,24 @@ import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.network.infra.SystemServerMessage;
+import de.felixperko.fractals.system.parameters.ParameterConfiguration;
 
 public class SystemConnectedMessage extends SystemServerMessage {
 
 	private static final long serialVersionUID = 1578093945175083508L;
 	
 	ClientConfiguration clientConfiguration;
+	ParameterConfiguration parameterConfiguration;
 	
-	public SystemConnectedMessage(UUID systemId, ClientConfiguration clientConfiguration) {
+	public SystemConnectedMessage(UUID systemId, ClientConfiguration clientConfiguration, ParameterConfiguration parameterConfiguration) {
 		super(systemId);
 		this.clientConfiguration = clientConfiguration;
+		this.parameterConfiguration = parameterConfiguration;
 	}
 
 	@Override
 	protected void process() {
-		getClientMessageInterface().createdSystem(systemId, clientConfiguration);
+		getClientMessageInterface().createdSystem(systemId, clientConfiguration, parameterConfiguration);
 	}
 
 }

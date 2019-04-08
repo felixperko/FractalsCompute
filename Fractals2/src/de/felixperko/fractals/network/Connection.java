@@ -12,4 +12,7 @@ public interface Connection<N extends NetworkManager> {
 	public N getNetworkManager();
 
 	public void setSenderInfo(SenderInfo clientInfo);
+	
+	public boolean isClosed();
+	public void setClosed();
 }

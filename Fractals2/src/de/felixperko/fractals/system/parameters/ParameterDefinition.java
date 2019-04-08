@@ -14,6 +14,7 @@ public class ParameterDefinition implements Serializable{
 	ParameterConfiguration configuration;
 	
 	String name;
+	String description;
 	
 	List<Class<? extends ParamSupplier>> possibleClasses;
 	List<ParamValueType> possibleValueTypes;
@@ -58,6 +59,15 @@ public class ParameterDefinition implements Serializable{
 
 	public String getName() {
 		return name;
+	}
+	
+	public String getDescription() {
+		return description;
+	}
+	
+	public ParameterDefinition withDescription(String description) {
+		this.description = description;
+		return this;
 	}
 
 	public Object getDefaultValue() {

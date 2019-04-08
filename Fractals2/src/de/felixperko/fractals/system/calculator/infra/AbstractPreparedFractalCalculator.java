@@ -48,7 +48,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 		
 		loop : 
 		for (int pixel = 0 ; pixel < pixelCount ; pixel++) {
-			if (!layer.isActive(pixel))
+			if (!layer.isActive(pixel) || chunk.getValue(pixel) == AbstractArrayChunk.FLAG_CULL)
 				continue;
 			for (int sample = chunk.getSampleCount(pixel) ; sample < samples ; sample++){
 				if (cancelled)

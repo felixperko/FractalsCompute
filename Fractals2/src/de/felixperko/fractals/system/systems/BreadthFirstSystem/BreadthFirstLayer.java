@@ -14,7 +14,19 @@ public class BreadthFirstLayer implements Layer {
 	BitSet enabledPixels = null;
 	int samples = 1;
 	
+	boolean culling;
+	
 	public BreadthFirstLayer() {
+	}
+	
+	public BreadthFirstLayer with_culling(boolean culling) {
+		this.culling = culling;
+		return this;
+	}
+	
+	@Override
+	public boolean cullingEnabled() {
+		return culling;
 	}
 	
 	@Override
@@ -92,6 +104,7 @@ public class BreadthFirstLayer implements Layer {
 		if (!(other instanceof BreadthFirstLayer))
 			return false;
 		BreadthFirstLayer o = (BreadthFirstLayer) other;
-		return (o.id == id && o.samples == samples && ((enabledPixels == null && o.enabledPixels == null) || o.enabledPixels.equals(enabledPixels)));
+		return (o.id == id && o.samples == samples && ((enabledPixels == null && o.enabledPixels == null) || 
+				(enabledPixels != null && enabledPixels.equals(o.enabledPixels))));
 	}
 }

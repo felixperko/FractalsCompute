@@ -3,14 +3,13 @@ package de.felixperko.fractals.data;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.border.Border;
-
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.ViewData;
 
 import static de.felixperko.fractals.data.BorderAlignment.*;
 
 public abstract class AbstractArrayChunk extends AbstractChunk {
 	
+	public static float FLAG_CULL = -2;
 	private static final long serialVersionUID = -338312489401474113L;
 	
 	int dimensionSize;
@@ -139,4 +138,31 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 	public ChunkBorderData getNeighbourBorderData(BorderAlignment alignment) {
 		return neighbourBorderData.get(alignment);
 	}
+
+	
+	public void setCullFlags(int upsampleIndex, int upsample, boolean cull) {
+		int startX = (upsampleIndex / dimensionSize);
+		int startY = (upsampleIndex % dimensionSize);
+		startX -= startX%upsample;
+		startY -= startY%upsample;
+		int offX = 0;
+		for (int x = startX ; x < upsample ; x++) {
+			for (int y = startY ; y < upsample ; y++) {
+				int i = offX + y;
+				setCullFlag(i, cull, upsample);
+			}
+			offX += dimensionSize;
+		}
+	}
+
+	private void setCullFlag(int i, boolean cull, int upsample) {
+		if (cull)
+			addSample(i, FLAG_CULL, upsample);
+		else {
+			if (getValue(i, true) == FLAG_CULL)
+				removeFlag(i);
+		}
+	}
+
+	protected abstract void removeFlag(int i);
 }

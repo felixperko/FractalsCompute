@@ -274,4 +274,18 @@ public class LayerConfiguration implements Serializable{
 	public boolean isPrepared() {
 		return prepared;
 	}
+	
+	@Override
+	public boolean equals(Object arg0) {
+		if (arg0 == null || !(arg0 instanceof LayerConfiguration))
+			return false;
+		LayerConfiguration other = (LayerConfiguration) arg0;
+		if (layers.size() != other.layers.size())
+			return false;
+		for (int i = 0 ; i < layers.size() ; i++) {
+			if (!layers.get(0).equals(other.layers.get(0)))
+				return false;
+		}
+		return true;
+	}
 }

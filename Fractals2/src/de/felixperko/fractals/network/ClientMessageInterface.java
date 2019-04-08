@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import de.felixperko.fractals.system.parameters.ParameterConfiguration;
 import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
 
 public abstract class ClientMessageInterface {
@@ -22,8 +23,9 @@ public abstract class ClientMessageInterface {
 		return systemInterfaces.get(systemId);
 	}
 	
-	public void createdSystem(UUID systemId, ClientConfiguration clientConfiguration) {
+	public void createdSystem(UUID systemId, ClientConfiguration clientConfiguration, ParameterConfiguration parameterConfiguration) {
 		addSystemInterface(systemId, createSystemInterface(clientConfiguration));
+		recievedParameterConfiguration(parameterConfiguration);
 	}
 	
 	public void removedSystem(UUID systemId) {
@@ -41,6 +43,6 @@ public abstract class ClientMessageInterface {
 		return true;
 	}
 	
-
+	public abstract void recievedParameterConfiguration(ParameterConfiguration parameterConfiguration);
 	public abstract void serverStateUpdated(ServerStateInfo serverStateInfo);
 }

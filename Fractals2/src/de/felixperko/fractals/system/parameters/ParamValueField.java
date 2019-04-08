@@ -7,6 +7,8 @@ public class ParamValueField implements Serializable{
 	private static final long serialVersionUID = -3757757582361274134L;
 	
 	String name;
+	String description;
+	
 	ParamValueType type;
 	Object defaultValue;
 	ParamValueType subType = null;
@@ -24,6 +26,15 @@ public class ParamValueField implements Serializable{
 
 	public String getName() {
 		return name;
+	}
+	
+	public String getDescription() {
+		return description;
+	}
+	
+	public ParamValueField withDescription(String description) {
+		this.description = description;
+		return this;
 	}
 
 	public ParamValueType getType() {

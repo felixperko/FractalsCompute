@@ -9,5 +9,6 @@ public interface Layer extends Serializable{
 	double getPriorityMultiplier();
 	double getPriorityShift();
 	int getSampleCount();
+	boolean cullingEnabled();
 
 }

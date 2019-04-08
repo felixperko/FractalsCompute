@@ -43,8 +43,8 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 
 	public BreadthFirstSystem(ServerManagers managers) {
 		super(managers);
-		createParameterConfiguration();
 		log = managers.getSystemManager().getLogger().createSubLogger(getNumber()+"_BF");
+		createParameterConfiguration();
 	}
 
 	private void createParameterConfiguration() {
@@ -159,7 +159,7 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 			clients.add(newConfiguration);
 			newConfiguration.getSystemRequests().remove(systemClientData);
 			newConfiguration.getSystemClientData().put(id, systemClientData);
-			newConfiguration.getConnection().writeMessage(new SystemConnectedMessage(id, newConfiguration));
+			newConfiguration.getConnection().writeMessage(new SystemConnectedMessage(id, newConfiguration, getParameterConfiguration()));
 			taskManager.setParameters(systemClientData.getClientParameters());
 		}
 	}

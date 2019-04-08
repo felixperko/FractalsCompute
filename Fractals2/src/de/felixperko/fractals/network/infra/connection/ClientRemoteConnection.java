@@ -14,6 +14,7 @@ public class ClientRemoteConnection implements ClientConnection{
 	ServerWriteThread writeThread;
 	ServerNetworkManager networkManager;
 	CalcSystem currentSystem;
+	boolean closed;
 	
 	public ClientRemoteConnection(ServerNetworkManager networkManager, SenderInfo info, ServerWriteThread writeThread) {
 		this.networkManager = networkManager;
@@ -35,23 +36,28 @@ public class ClientRemoteConnection implements ClientConnection{
 		return networkManager;
 	}
 
-	
 	@Override
 	public void setSenderInfo(SenderInfo clientInfo) {
 		this.info = clientInfo;
 	}
 	
-
 	@Override
 	public CalcSystem getCurrentSystem() {
 		return currentSystem;
 	}
 	
-
 	@Override
 	public void setCurrentSystem(CalcSystem system) {
 		this.currentSystem = system;
 	}
+	
+	@Override
+	public boolean isClosed() {
+		return closed;
+	}
 
-
+	@Override
+	public void setClosed() {
+		closed = true;
+	}
 }

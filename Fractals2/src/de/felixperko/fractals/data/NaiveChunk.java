@@ -67,4 +67,11 @@ public class NaiveChunk extends AbstractArrayChunk{
 	public int getSampleCount(int i) {
 		return samples[i];
 	}
+
+	
+	@Override
+	protected void removeFlag(int i) {
+		if (samples[i] == 0)
+			values[i] = 0;
+	}
 }

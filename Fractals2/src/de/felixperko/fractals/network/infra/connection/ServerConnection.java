@@ -17,6 +17,8 @@ public class ServerConnection implements Connection<ClientNetworkManager>{
 	
 	ClientNetworkManager networkManager;
 	
+	boolean closed = false;
+	
 	public ServerConnection(ClientNetworkManager networkManager){
 		this.networkManager = networkManager;
 	}
@@ -50,5 +52,17 @@ public class ServerConnection implements Connection<ClientNetworkManager>{
 	@Override
 	public ClientNetworkManager getNetworkManager() {
 		return networkManager;
+	}
+
+	
+	@Override
+	public boolean isClosed() {
+		return closed;
+	}
+	
+
+	@Override
+	public void setClosed() {
+		closed = true;
 	}
 }
