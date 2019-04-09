@@ -12,8 +12,8 @@ public class BreadthFirstUpsampleLayer extends BreadthFirstLayer{
 		super();
 		this.upsample = upsample;
 		BitSet bitSet = new BitSet();
-		for (int x = upsample-1 ; x < chunkSize ; x += upsample) {
-			for (int y = upsample-1 ; y < chunkSize ; y += upsample) {
+		for (int x = upsample/2 ; x < chunkSize ; x += upsample) {
+			for (int y = upsample/2 ; y < chunkSize ; y += upsample) {
 				bitSet.set(x*chunkSize + y);
 			}
 		}

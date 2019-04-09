@@ -145,9 +145,9 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 		int startY = (upsampleIndex % dimensionSize);
 		startX -= startX%upsample;
 		startY -= startY%upsample;
-		int offX = 0;
-		for (int x = startX ; x < upsample ; x++) {
-			for (int y = startY ; y < upsample ; y++) {
+		int offX = startX*dimensionSize;
+		for (int x = startX ; x < upsample+startX ; x++) {
+			for (int y = startY ; y < upsample+startY ; y++) {
 				int i = offX + y;
 				setCullFlag(i, cull, upsample);
 			}

@@ -33,6 +33,8 @@ public class ListenThread extends AbstractFractalsThread {
 	ObjectInputStream inObj = null;
 	boolean closeConnection = false;
 	
+	boolean compressed_in;
+	
 	int listenThreadId;
 
 	public ListenThread(Managers managers, WriteThread writeThread, InputStream in) {
@@ -45,6 +47,7 @@ public class ListenThread extends AbstractFractalsThread {
 	@Override
 	public void run() {
 		
+		mainLoop:
 		while (!closeConnection && getLifeCycleState() != LifeCycleState.STOPPED) {
 			
 			while (getLifeCycleState() == LifeCycleState.PAUSED) {
@@ -60,6 +63,8 @@ public class ListenThread extends AbstractFractalsThread {
 					inComp = new SnappyInputStream(in);
 					inObj = new ObjectInputStream(inComp);
 				} catch (IOException e) {
+					if (closeConnection)
+						break mainLoop;
 					e.printStackTrace();
 				}
 			}
@@ -111,5 +116,6 @@ public class ListenThread extends AbstractFractalsThread {
 
 	public void setLogger(CategoryLogger log) {
 		this.log = log;
+		Thread.dumpStack();
 	}
 }

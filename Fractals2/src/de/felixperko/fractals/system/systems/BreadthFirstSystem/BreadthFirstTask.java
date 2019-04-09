@@ -65,33 +65,31 @@ public class BreadthFirstTask extends BasicTask {
 				evalCullingLoop:
 				for (int dx = -1 ; dx <= 1 ; dx++) {
 					for (int dy = -1 ; dy <= 1 ; dy++) {
-						int neighbourUpsampleIndex = i + dx*chunkSize + dy;
+						int neighbourUpsampleIndex = i + dx*upsample*chunkSize + dy*upsample;
 						if (neighbourUpsampleIndex < 0){
 							if (dx == -1) {
 								if (chunk.getNeighbourBorderData(BorderAlignment.LEFT).isSet(y)) {
 									cull = false;
 									break evalCullingLoop;
 								}
-							} else if (dy == -1){
+							} if (dy == -1){
 								if (chunk.getNeighbourBorderData(BorderAlignment.UP).isSet(x)) {
 									cull = false;
 									break evalCullingLoop;
 								}
-							} else
-								throw new IllegalStateException("unexpected branch");
+							}
 						} else if (neighbourUpsampleIndex >= chunk.getArrayLength()) {
 							if (dx == 1) {
 								if (chunk.getNeighbourBorderData(BorderAlignment.RIGHT).isSet(y)) {
 									cull = false;
 									break evalCullingLoop;
 								}
-							} else if (dy == 1){
+							} if (dy == 1){
 								if (chunk.getNeighbourBorderData(BorderAlignment.DOWN).isSet(x)) {
 									cull = false;
 									break evalCullingLoop;
 								}
-							} else
-								throw new IllegalStateException("unexpected branch");
+							}
 						} else {
 							if (chunk.getValue(neighbourUpsampleIndex, true) > 0) {
 								cull = false;

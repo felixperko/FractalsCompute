@@ -175,9 +175,8 @@ public abstract class WriteThread extends AbstractFractalsThread {
 	};
 	
 	public void setListenLogger(CategoryLogger log) {
-		if (listenThread == null)
-			listenLogger = log;
-		else
+		listenLogger = log;
+		if (listenThread != null)
 			listenThread.setLogger(listenLogger);
 	}
 
