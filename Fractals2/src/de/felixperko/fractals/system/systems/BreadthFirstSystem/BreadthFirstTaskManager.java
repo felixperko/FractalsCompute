@@ -490,7 +490,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 
 	@Override
 	public synchronized void reset() {
-		for (Map<ClientConfiguration, ChunkUpdateMessage> map : pendingUpdateMessages.values()) {
+		for (Map<ClientConfiguration, ChunkUpdateMessage> map : new HashMap<>(pendingUpdateMessages).values()) {
 			for (ChunkUpdateMessage msg : map.values())
 				msg.setCancelled(true);
 		}
