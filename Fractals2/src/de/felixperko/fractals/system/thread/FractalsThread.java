@@ -8,5 +8,8 @@ public interface FractalsThread extends LifeCycleComponent{
 	void continueThread();
 	void pauseThread();
 	void stopThread();
+	
+	public boolean isNotified();
+	public void resetNotified();
 
 }

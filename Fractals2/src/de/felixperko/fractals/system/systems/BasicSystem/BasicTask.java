@@ -20,6 +20,7 @@ import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.AbstractFractalsTask;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskManager;
+import de.felixperko.fractals.system.thread.FractalsThread;
 
 public class BasicTask extends AbstractFractalsTask {
 	
@@ -27,6 +28,7 @@ public class BasicTask extends AbstractFractalsTask {
 	Map<String, ParamSupplier> parameters;
 	
 	FractalsCalculator calculator;
+	FractalsThread thread;
 	
 	public BasicTask(int id, TaskManager taskManager, AbstractArrayChunk chunk, Map<String, ParamSupplier> taskParameters,
 			ComplexNumber chunkPos, FractalsCalculator calculator, Layer layer, int jobId) {
@@ -52,6 +54,11 @@ public class BasicTask extends AbstractFractalsTask {
 	
 	public Chunk getChunk() {
 		return chunk;
+	}
+
+	@Override
+	public void setThread(FractalsThread thread) {
+		this.thread = thread;
 	}
 
 

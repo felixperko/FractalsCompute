@@ -17,6 +17,8 @@ public abstract class AbstractFractalsThread extends Thread implements FractalsT
 	LifeCycleState state;
 	protected Managers managers;
 	
+	boolean notified = false;
+	
 	static boolean LOG_LIFECYCLE_STATE = true;
 	
 	List<LifeCycleStateChange> lifeCycleHistory = new ArrayList<>();
@@ -73,5 +75,15 @@ public abstract class AbstractFractalsThread extends Thread implements FractalsT
 			}
 			return res;
 		}
+	}
+	
+	@Override
+	public boolean isNotified() {
+		return notified;
+	}
+	
+	@Override
+	public void resetNotified() {
+		this.notified = false;
 	}
 }

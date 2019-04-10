@@ -23,6 +23,7 @@ import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstLayer;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
+import de.felixperko.fractals.system.systems.BreadthFirstSystem.LayerConfiguration;
 
 public class FractalsIO {
 	
@@ -52,9 +53,10 @@ public class FractalsIO {
 		params.put("samples", new StaticParamSupplier("samples", (Integer)(samplesDim*samplesDim)));
 		
 		List<BreadthFirstLayer> layers = new ArrayList<>();
-		layers.add(new BreadthFirstUpsampleLayer(0, 8, chunkSize));
-		layers.add(new BreadthFirstLayer(1).with_priority_shift(3));
-		params.put("layers", new StaticParamSupplier("layers", layers));
+		layers.add(new BreadthFirstUpsampleLayer(8, chunkSize));
+		layers.add(new BreadthFirstLayer().with_priority_shift(3));
+		LayerConfiguration layerConfig = new LayerConfiguration(layers, 0.05, 20, 42);
+		params.put("layerConfiguration", new StaticParamSupplier("layerConfiguration", layerConfig));
 		params.put("border_generation", new StaticParamSupplier("border_generation", (Double) 0.));
 		params.put("border_dispose", new StaticParamSupplier("border_dispose", (Double) 5.));
 		params.put("task_buffer", new StaticParamSupplier("task_buffer", (Integer) 5));
@@ -69,7 +71,7 @@ public class FractalsIO {
 		params.put("chunkFactory", new StaticParamSupplier("chunkFactory", new ArrayChunkFactory(ReducedNaiveChunk.class, chunkSize)));
 		
 		params.put("start", new StaticParamSupplier("start", new DoubleComplexNumber(new DoubleNumber(0.0), new DoubleNumber(0.0))));
-		params.put("c", new CoordinateBasicShiftParamSupplier("c", numberFactory, 2));
+		params.put("c", new CoordinateBasicShiftParamSupplier("c"));
 		params.put("pow", new StaticParamSupplier("pow", new DoubleComplexNumber(new DoubleNumber(2), new DoubleNumber(0))));
 		params.put("limit", new StaticParamSupplier("limit", (Double)100.));
 		

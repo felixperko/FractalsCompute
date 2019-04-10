@@ -29,12 +29,15 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 	
 	public void setTaskProvider(TaskProvider taskProvider) {
 		this.taskProvider = taskProvider;
+		taskProvider.addLocalCalculateThread(this);
 	}
 	
 	@Override
 	public void run() {
 		//do main loop while not stopped
 		mainLoop : while (state != LifeCycleState.STOPPED) {
+			
+			notified = false;
 			
 			//paused
 			while (state == LifeCycleState.PAUSED) {
@@ -76,6 +79,7 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 			
 			//got task, execute
 			setLifeCycleState(LifeCycleState.RUNNING);
+			currentTask.setThread(this);
 			currentTask.getStateInfo().setState(TaskState.STARTED);
 			try {
 				currentTask.run();
@@ -84,6 +88,7 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 				if (currentTask.getId() != abortedTaskId)
 					e.printStackTrace();
 			}
+			currentTask.setThread(null);
 			currentTask = null;
 		}
 	}
@@ -101,5 +106,15 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 
 	public int getCalcThreadId() {
 		return calcThreadId;
+	}
+	
+	public void dispose() {
+		if (taskProvider != null)
+			taskProvider.removeLocalCalculateThread(this);
+	}
+
+	public void taskAvailable() {
+		notified = true;
+		interrupt();
 	}
 }

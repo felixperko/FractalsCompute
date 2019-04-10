@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import de.felixperko.fractals.system.systems.infra.LifeCycleState;
+import de.felixperko.fractals.system.thread.CalculateFractalsThread;
+
 /**
  * basic round robin implementation
  *
@@ -17,6 +20,8 @@ public class LocalTaskProvider implements TaskProvider {
 	List<TaskManager> taskManagers = Collections.synchronizedList(new ArrayList<>());
 	
 	int roundRobinIndex = 0;
+	
+	List<CalculateFractalsThread> localThreads = new ArrayList<>();
 	
 //	Map<TaskManager, Long> threadTimeTaken = new HashMap<>();
 	
@@ -28,6 +33,16 @@ public class LocalTaskProvider implements TaskProvider {
 	public void removeTaskManager(TaskManager taskManager) {
 		taskManagers.remove(taskManager);
 //		threadTimeTaken.clear();
+	}
+	
+	@Override
+	public void addLocalCalculateThread(CalculateFractalsThread calculateFractalsThread) {
+		localThreads.add(calculateFractalsThread);
+	}
+	
+	@Override
+	public void removeLocalCalculateThread(CalculateFractalsThread calculateFractalsThread) {
+		localThreads.remove(calculateFractalsThread);
 	}
 	
 	@Override
@@ -47,7 +62,7 @@ public class LocalTaskProvider implements TaskProvider {
 			if (roundRobinIndex >= taskManagers.size())
 				roundRobinIndex = 0;
 			TaskManager manager = taskManagers.get(roundRobinIndex++);
-			List<FractalsTask> tasks = manager.getTasks(1);
+			List<? extends FractalsTask> tasks = manager.getTasks(1);
 			if (tasks != null && tasks.size() == 1)
 				return tasks.get(0);
 		}
@@ -62,6 +77,17 @@ public class LocalTaskProvider implements TaskProvider {
 //		if (oldTime == null)
 //			oldTime = 0L;
 //		threadTimeTaken.put(tm, (long)(oldTime+task.getLastExecutionTime()));
+	}
+
+	@Override
+	public void taskAvailable() {
+		
+		for (CalculateFractalsThread thread : localThreads) {
+			if (thread.getLifeCycleState().equals(LifeCycleState.IDLE)) {
+				thread.taskAvailable();
+				return;
+			}
+		}
 	}
 
 }

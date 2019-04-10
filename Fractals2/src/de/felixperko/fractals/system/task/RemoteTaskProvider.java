@@ -1,5 +1,6 @@
 package de.felixperko.fractals.system.task;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -10,6 +11,7 @@ import de.felixperko.fractals.network.messages.task.TaskFinishedMessage;
 import de.felixperko.fractals.network.messages.task.TaskRequestMessage;
 import de.felixperko.fractals.network.messages.task.TaskStateChangedMessage;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
+import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 
 public class RemoteTaskProvider implements TaskProvider {
 	
@@ -17,6 +19,8 @@ public class RemoteTaskProvider implements TaskProvider {
 	
 	Queue<FractalsTask> bufferedTasks = new LinkedList<>();
 	ClientManagers managers;
+	
+	List<CalculateFractalsThread> localThreads = new ArrayList();
 	
 	public RemoteTaskProvider(ClientManagers managers, int bufferSize) {
 		this.managers = managers;
@@ -41,12 +45,28 @@ public class RemoteTaskProvider implements TaskProvider {
 	}
 	
 	public void taskStateChanged(FractalsTask task) {
-		getServerConnection().writeMessage(new TaskStateChangedMessage(task.getId(), task.getState()));
+		getServerConnection().writeMessage(new TaskStateChangedMessage(task.getSystemId(), task.getId(), task.getState()));
 	}
 
 	@Override
 	public void finishedTask(FractalsTask task) {
 		getServerConnection().writeMessage(new TaskFinishedMessage(task));
+	}
+
+	@Override
+	public void taskAvailable() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addLocalCalculateThread(CalculateFractalsThread calculateFractalsThread) {
+		localThreads.add(calculateFractalsThread);
+	}
+
+	@Override
+	public void removeLocalCalculateThread(CalculateFractalsThread calculateFractalsThread) {
+		localThreads.remove(calculateFractalsThread);
 	}
 
 }
