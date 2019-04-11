@@ -14,7 +14,9 @@ public class BreadthFirstLayer implements Layer {
 	BitSet enabledPixels = null;
 	int samples = 1;
 	
-	boolean culling;
+	boolean culling = false;
+	
+	boolean rendering = true;
 	
 	public BreadthFirstLayer() {
 	}
@@ -27,6 +29,10 @@ public class BreadthFirstLayer implements Layer {
 	@Override
 	public boolean cullingEnabled() {
 		return culling;
+	}
+	
+	public boolean renderingEnabled() {
+		return rendering;
 	}
 	
 	@Override
@@ -53,6 +59,11 @@ public class BreadthFirstLayer implements Layer {
 	
 	public BreadthFirstLayer with_samples(int sampleCount) {
 		this.samples = sampleCount;
+		return this;
+	}
+	
+	public BreadthFirstLayer with_rendering(boolean rendering) {
+		this.rendering = rendering;
 		return this;
 	}
 	

@@ -418,21 +418,21 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			for (BreadthFirstTask task : finishedTasks) {
 				
 				final Integer taskId = task.getId();
-				List<ClientConfiguration> clients = ((BreadthFirstSystem)system).getClients();
 				
-				//skip clients if message already exists
-				Map<ClientConfiguration, ChunkUpdateMessage> oldMessages = pendingUpdateMessages.get(taskId);
-				if (oldMessages != null) {
-					for (Entry<ClientConfiguration, ChunkUpdateMessage> e : oldMessages.entrySet()) {
-						skipClients.add(e.getKey());
+				if (task.getStateInfo().getLayer().renderingEnabled()) {
+					//skip clients if message already exists
+					List<ClientConfiguration> clients = ((BreadthFirstSystem)system).getClients();
+					Map<ClientConfiguration, ChunkUpdateMessage> oldMessages = pendingUpdateMessages.get(taskId);
+					if (oldMessages != null) {
+						for (Entry<ClientConfiguration, ChunkUpdateMessage> e : oldMessages.entrySet()) {
+							skipClients.add(e.getKey());
+						}
+					} else {
+						oldMessages = new HashMap<>();
+						pendingUpdateMessages.put(taskId, oldMessages);
 					}
-				} else {
-					oldMessages = new HashMap<>();
-					pendingUpdateMessages.put(taskId, oldMessages);
-				}
 				
-				//send update messages
-//				synchronized (clients) {
+					//send update messages
 					for (ClientConfiguration client : clients) {
 						if (skipClients.contains(client))
 							continue;
@@ -453,7 +453,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 						});
 					}
 					skipClients.clear();
-//				}
+				}
 				
 				//update layer and re-add or dispose
 				Layer currentLayer = task.getStateInfo().getLayer();

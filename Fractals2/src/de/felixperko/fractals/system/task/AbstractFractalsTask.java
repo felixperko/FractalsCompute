@@ -4,6 +4,8 @@ import java.util.UUID;
 
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
+import de.felixperko.fractals.system.task.statistics.TaskStats;
+import de.felixperko.fractals.system.task.statistics.TaskStatsEmpty;
 
 public abstract class AbstractFractalsTask implements FractalsTask{
 	
@@ -14,6 +16,8 @@ public abstract class AbstractFractalsTask implements FractalsTask{
 	TaskStateInfo stateInfo;
 	int jobId;
 	UUID systemId;
+	
+	TaskStats taskStats = new TaskStatsEmpty();
 	
 	public AbstractFractalsTask(Integer id, TaskManager taskManager, Layer layer, int jobId) {
 		this.id = id;
@@ -50,5 +54,13 @@ public abstract class AbstractFractalsTask implements FractalsTask{
 	@Override
 	public UUID getSystemId() {
 		return systemId;
+	}
+
+	public TaskStats getTaskStats() {
+		return taskStats;
+	}
+
+	public void setTaskStats(TaskStats taskStats) {
+		this.taskStats = taskStats;
 	}
 }

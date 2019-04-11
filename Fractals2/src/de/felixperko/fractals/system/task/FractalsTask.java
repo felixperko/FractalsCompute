@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
+import de.felixperko.fractals.system.task.statistics.TaskStats;
 import de.felixperko.fractals.system.thread.FractalsThread;
 
 public interface FractalsTask extends Serializable{
@@ -23,5 +24,8 @@ public interface FractalsTask extends Serializable{
 	public void run() throws InterruptedException;
 
 	UUID getSystemId();
+	
+	public TaskStats getTaskStats();
+	public void setTaskStats(TaskStats taskStats);
 	
 }

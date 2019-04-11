@@ -10,5 +10,6 @@ public interface Layer extends Serializable{
 	double getPriorityShift();
 	int getSampleCount();
 	boolean cullingEnabled();
+	boolean renderingEnabled();
 
 }
