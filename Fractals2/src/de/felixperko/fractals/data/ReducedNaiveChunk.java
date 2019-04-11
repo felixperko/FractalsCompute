@@ -58,7 +58,7 @@ public class ReducedNaiveChunk extends AbstractArrayChunk {
 					return 0;
 				x -= x%upstep;
 				y -= y%upstep;
-				i = (x + upstep-1)*dimensionSize + (y + upstep-1);
+				i = (x + upstep/2)*dimensionSize + (y + upstep/2);
 				count = samples[i];
 				if (count != 0)
 					break;
