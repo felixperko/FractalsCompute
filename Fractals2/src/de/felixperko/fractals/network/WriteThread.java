@@ -38,6 +38,8 @@ public abstract class WriteThread extends AbstractFractalsThread {
 	private SnappyOutputStream outComp;
 	protected Socket socket;
 	
+	boolean compression = true;
+	
 //	Connection connection;
 	
 	private CategoryLogger listenLogger; //used to buffer logger for listen thread until its creation
@@ -53,8 +55,11 @@ public abstract class WriteThread extends AbstractFractalsThread {
 	public void run() {
 		try {
 			InputStream inStream = socket.getInputStream();
-			outComp = new SnappyOutputStream(socket.getOutputStream());
-			out = new ObjectOutputStream(outComp);
+			if (compression) {
+				outComp = new SnappyOutputStream(socket.getOutputStream());
+				out = new ObjectOutputStream(outComp);
+			} else
+				out = new ObjectOutputStream(socket.getOutputStream());
 			listenThread = new ListenThread(managers, this, inStream);
 			if (listenLogger != null)
 				listenThread.setLogger(listenLogger);
@@ -181,6 +186,31 @@ public abstract class WriteThread extends AbstractFractalsThread {
 	}
 
 	public abstract Connection getConnection();
+	
+	public void setCompression(boolean compression) {
+		if (this.compression != compression) {
+			try {
+				if (compression) {
+					if (out != null)
+						out.close();
+					
+					outComp = new SnappyOutputStream(socket.getOutputStream());
+					out = new ObjectOutputStream(outComp);
+				} else {
+					if (outComp != null)
+						outComp.close();
+					if (out != null)
+						out.close();
+					
+					out = new ObjectOutputStream(socket.getOutputStream());
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			this.compression = compression;
+		}
+	}
 	
 //	public void setConnection(Connection connection) {
 //		this.connection = connection;

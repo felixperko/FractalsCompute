@@ -33,7 +33,7 @@ public class ListenThread extends AbstractFractalsThread {
 	ObjectInputStream inObj = null;
 	boolean closeConnection = false;
 	
-	boolean compressed_in;
+	boolean compressed = true;
 	
 	int listenThreadId;
 
@@ -58,10 +58,14 @@ public class ListenThread extends AbstractFractalsThread {
 				}
 			}
 			
-			if (inComp == null) {
+			if (inObj == null) {
 				try {
-					inComp = new SnappyInputStream(in);
-					inObj = new ObjectInputStream(inComp);
+					if (compressed) {
+						inComp = new SnappyInputStream(in);
+						inObj = new ObjectInputStream(inComp);
+					} else {
+						inObj = new ObjectInputStream(in);
+					}
 				} catch (IOException e) {
 					if (closeConnection)
 						break mainLoop;
@@ -117,5 +121,9 @@ public class ListenThread extends AbstractFractalsThread {
 	public void setLogger(CategoryLogger log) {
 		this.log = log;
 		Thread.dumpStack();
+	}
+	
+	public void setCompressed(boolean compressed) {
+		this.compressed = compressed;
 	}
 }
