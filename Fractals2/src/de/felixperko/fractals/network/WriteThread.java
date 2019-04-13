@@ -38,7 +38,7 @@ public abstract class WriteThread extends AbstractFractalsThread {
 	private SnappyOutputStream outComp;
 	protected Socket socket;
 	
-	boolean compression = true;
+	boolean compression = false;
 	
 //	Connection connection;
 	
@@ -110,7 +110,8 @@ public abstract class WriteThread extends AbstractFractalsThread {
 						try {
 							out.writeUnshared(msg);
 							out.reset();
-							outComp.flush();
+							if (outComp != null)
+								outComp.flush();
 						} catch (SocketException e) {
 							try {
 								Thread.sleep(1);

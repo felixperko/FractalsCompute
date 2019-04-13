@@ -33,7 +33,7 @@ public class ListenThread extends AbstractFractalsThread {
 	ObjectInputStream inObj = null;
 	boolean closeConnection = false;
 	
-	boolean compressed = true;
+	boolean compressed = false;
 	
 	int listenThreadId;
 
