@@ -36,8 +36,35 @@ public class SystemClientData implements Serializable{
 		return grantThreads;
 	}
 
-	
 	public Map<String, ParamSupplier> getClientParameters() {
 		return clientParameters;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((clientParameters == null) ? 0 : clientParameters.hashCode());
+		result = prime * result + grantThreads;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SystemClientData other = (SystemClientData) obj;
+		if (clientParameters == null) {
+			if (other.clientParameters != null)
+				return false;
+		} else if (!clientParameters.equals(other.clientParameters))
+			return false;
+		if (grantThreads != other.grantThreads)
+			return false;
+		return true;
 	}
 }

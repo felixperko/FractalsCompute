@@ -290,7 +290,7 @@ public class LayerConfiguration implements Serializable{
 		}
 		return true;
 	}
-
+	
 	public NumberFactory getNumberFactory() {
 		return numberFactory;
 	}

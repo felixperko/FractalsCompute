@@ -34,44 +34,69 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 	ParamSupplier p_limit;
 	ParamSupplier p_samples;
 	
+	int iterations;
+	double limit;
+	int upsample;
+	Chunk chunk;
+	
 	@Override
 	public void calculate(AbstractArrayChunk chunk) {
-		Double limit = (Double) p_limit.get(0,0);
-		Integer it = (Integer) p_iterations.get(0,0);
+		this.chunk = chunk;
+		limit = (Double) p_limit.get(0,0);
+		iterations = (Integer) p_iterations.get(0,0);
 		Layer layer = chunk.getCurrentTask().getStateInfo().getLayer();
-		int upsample = (layer instanceof BreadthFirstUpsampleLayer) ? ((BreadthFirstUpsampleLayer)layer).getUpsample()/2 : 0;
+		upsample = (layer instanceof BreadthFirstUpsampleLayer) ? ((BreadthFirstUpsampleLayer)layer).getUpsample()/2 : 0;
 		int samples = layer.getSampleCount();
 //		if (chunk.getChunkX() == 5 && chunk.getChunkY() == 10)
 //			System.out.println("test chunk");
 		
 		int pixelCount = chunk.getArrayLength();
+		int chunkSize = chunk.getChunkDimensions();
 		
 		loop : 
 		for (int pixel = 0 ; pixel < pixelCount ; pixel++) {
-			if (!layer.isActive(pixel) || chunk.getValue(pixel) == AbstractArrayChunk.FLAG_CULL)
+			if (!layer.isActive(pixel))
 				continue;
+			if (chunk.getValue(pixel) == AbstractArrayChunk.FLAG_CULL) {
+//				int x = pixel / chunkSize;
+//				int y = pixel % chunkSize;
+//				for (int x2 = x-1 ; x2 <= x+1 ; x++) {
+//					for (int y2 = y-1 ; y2 <= y+1 ; y++) {
+//						if (x < 0) {
+//							
+//						} else if (x >= chunkSize) {
+//							
+//						}
+//					}
+//				}
+				continue;
+			}
 			for (int sample = chunk.getSampleCount(pixel) ; sample < samples ; sample++){
-				if (cancelled)
+				if (isCancelled())
 					break loop;
-				double res = -1;
-				ComplexNumber current = ((ComplexNumber) p_start.get(pixel,sample)).copy();
-				ComplexNumber c = ((ComplexNumber) p_c.get(pixel,sample)).copy();
-				ComplexNumber pow = ((ComplexNumber) p_pow.get(pixel,sample)).copy();
-				double logPow = Math.log(pow.absDouble());
-				for (int k = 0 ; k < it ; k++) {
-					executeKernel(current, pow, c);
-					double abs = current.absSqDouble();
-					if (abs > limit*limit) {
-//									Math.log( Math.log(real*real+imag*imag)*0.5 / Math.log(2) ) / Math.log(pow)  )
-						res = k - Math.log(Math.log(current.absSqDouble())*0.5/LOG_2)/logPow; //abs...
-						break;
-					}
-				}
-				chunk.addSample(pixel, res, upsample);
+				calculateSample(pixel, sample);
 			}
 			chunk.getCurrentTask().getStateInfo().setProgress((pixel+1.)/pixelCount);
 		}
 	}
 	
+	private void calculateSample(int pixel, int sample) {
+		double res = -1;
+		ComplexNumber current = ((ComplexNumber) p_start.get(pixel,sample)).copy();
+		ComplexNumber c = ((ComplexNumber) p_c.get(pixel,sample)).copy();
+		ComplexNumber pow = ((ComplexNumber) p_pow.get(pixel,sample)).copy();
+		double logPow = Math.log(pow.absDouble());
+		for (int k = 0 ; k < iterations ; k++) {
+			executeKernel(current, pow, c);
+			double abs = current.absSqDouble();
+			if (abs > limit*limit) {
+//							Math.log( Math.log(real*real+imag*imag)*0.5 / Math.log(2) ) / Math.log(pow)  )
+				res = k - Math.log(Math.log(current.absSqDouble())*0.5/LOG_2)/logPow; //abs...
+				break;
+			}
+		}
+		chunk.addSample(pixel, res, upsample);
+	}
+
 	public abstract void executeKernel(ComplexNumber current, ComplexNumber exp, ComplexNumber c);
 }

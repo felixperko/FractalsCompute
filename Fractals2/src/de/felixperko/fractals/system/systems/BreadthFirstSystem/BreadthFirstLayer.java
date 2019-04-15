@@ -107,15 +107,53 @@ public class BreadthFirstLayer implements Layer {
 	public int getSampleCount() {
 		return samples;
 	}
+
 	
 	@Override
-	public boolean equals(Object other) {
-		if (other == null)
-			return false;
-		if (!(other instanceof BreadthFirstLayer))
-			return false;
-		BreadthFirstLayer o = (BreadthFirstLayer) other;
-		return (o.id == id && o.samples == samples && ((enabledPixels == null && o.enabledPixels == null) || 
-				(enabledPixels != null && enabledPixels.equals(o.enabledPixels))));
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (culling ? 1231 : 1237);
+		result = prime * result + ((enabledPixels == null) ? 0 : enabledPixels.hashCode());
+		result = prime * result + id;
+		long temp;
+		temp = Double.doubleToLongBits(priority_multiplier);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(priority_shift);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + (rendering ? 1231 : 1237);
+		result = prime * result + samples;
+		return result;
 	}
+
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BreadthFirstLayer other = (BreadthFirstLayer) obj;
+		if (culling != other.culling)
+			return false;
+		if (enabledPixels == null) {
+			if (other.enabledPixels != null)
+				return false;
+		} else if (!enabledPixels.equals(other.enabledPixels))
+			return false;
+		if (id != other.id)
+			return false;
+		if (Double.doubleToLongBits(priority_multiplier) != Double.doubleToLongBits(other.priority_multiplier))
+			return false;
+		if (Double.doubleToLongBits(priority_shift) != Double.doubleToLongBits(other.priority_shift))
+			return false;
+		if (rendering != other.rendering)
+			return false;
+		if (samples != other.samples)
+			return false;
+		return true;
+	}
+	
 }

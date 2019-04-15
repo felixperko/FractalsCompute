@@ -170,7 +170,7 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		Map<String, ParamSupplier> newParameters = newConfiguration.getSystemClientData(getId()).getClientParameters();
 		
 		boolean applicable = isApplicable(newConfiguration.getConnection(), newParameters);
-		
+		System.out.println("is Applicable()? "+applicable);
 		synchronized(clients) {
 			if (oldConfiguration != null)
 				clients.remove(oldConfiguration);

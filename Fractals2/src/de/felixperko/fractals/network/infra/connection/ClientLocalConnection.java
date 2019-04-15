@@ -17,8 +17,6 @@ public class ClientLocalConnection implements ClientConnection {
 	
 	ServerNetworkManager networkManager;
 	
-	CalcSystem currentSystem;
-	
 	boolean closed;
 	
 	public ClientLocalConnection(ServerNetworkManager networkManager, SenderInfo localSenderInfo) {
@@ -45,16 +43,6 @@ public class ClientLocalConnection implements ClientConnection {
 	@Override
 	public ServerNetworkManager getNetworkManager() {
 		return networkManager;
-	}
-
-	@Override
-	public CalcSystem getCurrentSystem() {
-		return currentSystem;
-	}
-
-	@Override
-	public void setCurrentSystem(CalcSystem system) {
-		this.currentSystem = system;
 	}
 
 	@Override

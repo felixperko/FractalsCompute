@@ -34,15 +34,15 @@ public class BreadthFirstUpsampleLayer extends BreadthFirstLayer{
 //		return new GlobalPixel(0, 0, x, y);
 //	}
 	
-	@Override
-	public boolean equals(Object other) {
-		if (other == null)
-			return false;
-		if (!(other instanceof BreadthFirstUpsampleLayer))
-			return false;
-		BreadthFirstUpsampleLayer o = (BreadthFirstUpsampleLayer) other;
-		return (o.id == id && o.upsample == upsample);
-	}
+//	@Override
+//	public boolean equals(Object other) {
+//		if (other == null)
+//			return false;
+//		if (!(other instanceof BreadthFirstUpsampleLayer))
+//			return false;
+//		BreadthFirstUpsampleLayer o = (BreadthFirstUpsampleLayer) other;
+//		return (o.id == id && o.upsample == upsample);
+//	}
 
 	public int getUpsample() {
 		return upsample;
@@ -52,10 +52,31 @@ public class BreadthFirstUpsampleLayer extends BreadthFirstLayer{
 		return enabledPixels;
 	}
 
-	
 	public int getUpsampledIndex(int i, int chunkSize) {
 		int x = ((i/chunkSize)/upsample)*upsample;
 		int y = ((i%chunkSize)/upsample)*upsample;
 		return x*chunkSize + y;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + upsample;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BreadthFirstUpsampleLayer other = (BreadthFirstUpsampleLayer) obj;
+		if (upsample != other.upsample)
+			return false;
+		return true;
 	}
 }

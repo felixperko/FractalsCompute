@@ -41,15 +41,15 @@ public class FractalsIO {
 		numberFactory = new NumberFactory(DoubleNumber.class, DoubleComplexNumber.class);
 		Map<String, ParamSupplier> params = new HashMap<>();
 		int samplesDim = 1;
-		params.put("width", new StaticParamSupplier("width", (Integer)1000));
-		params.put("height", new StaticParamSupplier("height", (Integer)1000));
-		Integer chunkSize = 200;
+		params.put("width", new StaticParamSupplier("width", (Integer)1024));
+		params.put("height", new StaticParamSupplier("height", (Integer)1024));
+		Integer chunkSize = 256;
 		params.put("chunkSize", new StaticParamSupplier("chunkSize", chunkSize));
 //		params.put("midpoint", new StaticParamSupplier("midpoint", new DoubleComplexNumber(new DoubleNumber(0.251), new DoubleNumber(0.00004849892910689283399687005))));
 		params.put("midpoint", new StaticParamSupplier("midpoint", new DoubleComplexNumber(new DoubleNumber(0.251), new DoubleNumber(0.000055))));
 		zoom = numberFactory.createNumber(5./100000.);
 		params.put("zoom", new StaticParamSupplier("zoom", zoom));
-		params.put("iterations", new StaticParamSupplier("iterations", (Integer)1500));
+		params.put("iterations", new StaticParamSupplier("iterations", (Integer)5000));
 		params.put("samples", new StaticParamSupplier("samples", (Integer)(samplesDim*samplesDim)));
 		
 		List<BreadthFirstLayer> layers = new ArrayList<>();

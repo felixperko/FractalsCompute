@@ -32,6 +32,13 @@ public class ReducedNaiveChunk extends AbstractArrayChunk {
 		this.failedSamples = new byte[arrayLength];
 	}
 	
+	protected ReducedNaiveChunk(int chunkX, int chunkY, int dimensionSize, float[] values, byte[] samples, byte[] failedSamples) {
+		super(null, chunkX, chunkY, dimensionSize);
+		this.values = values;
+		this.samples = samples;
+		this.failedSamples = failedSamples;
+	}
+	
 	// 64 bit + 2 * 32 bit -> 16 byte per pixel
 	
 	@Override

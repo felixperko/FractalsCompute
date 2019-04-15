@@ -415,13 +415,13 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		setLifeCycleState(LifeCycleState.RUNNING);
 		synchronized (this) {
 			HashSet<ClientConfiguration> skipClients = new HashSet<>();
+			List<ClientConfiguration> clients = new ArrayList<>(((BreadthFirstSystem)system).getClients());
 			for (BreadthFirstTask task : finishedTasks) {
 				
 				final Integer taskId = task.getId();
 				
-//				if (task.getStateInfo().getLayer().renderingEnabled()) {
+				if (task.getStateInfo().getLayer().renderingEnabled()) {
 					//skip clients if message already exists
-					List<ClientConfiguration> clients = ((BreadthFirstSystem)system).getClients();
 					Map<ClientConfiguration, ChunkUpdateMessage> oldMessages = pendingUpdateMessages.get(taskId);
 					if (oldMessages != null) {
 						for (Entry<ClientConfiguration, ChunkUpdateMessage> e : oldMessages.entrySet()) {
@@ -453,7 +453,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 						});
 					}
 					skipClients.clear();
-//				}
+				}
 				
 				//update layer and re-add or dispose
 				Layer currentLayer = task.getStateInfo().getLayer();

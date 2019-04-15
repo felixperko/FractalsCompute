@@ -1,19 +1,15 @@
 package de.felixperko.fractals.network.infra.connection;
 
-import de.felixperko.fractals.manager.client.ClientNetworkManager;
-import de.felixperko.fractals.manager.common.Manager;
 import de.felixperko.fractals.manager.server.ServerNetworkManager;
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.ServerWriteThread;
 import de.felixperko.fractals.network.infra.Message;
-import de.felixperko.fractals.system.systems.infra.CalcSystem;
 
 public class ClientRemoteConnection implements ClientConnection{
 	
 	SenderInfo info;
 	ServerWriteThread writeThread;
 	ServerNetworkManager networkManager;
-	CalcSystem currentSystem;
 	boolean closed;
 	
 	public ClientRemoteConnection(ServerNetworkManager networkManager, SenderInfo info, ServerWriteThread writeThread) {
@@ -42,16 +38,6 @@ public class ClientRemoteConnection implements ClientConnection{
 	}
 	
 	@Override
-	public CalcSystem getCurrentSystem() {
-		return currentSystem;
-	}
-	
-	@Override
-	public void setCurrentSystem(CalcSystem system) {
-		this.currentSystem = system;
-	}
-	
-	@Override
 	public boolean isClosed() {
 		return closed;
 	}
@@ -60,4 +46,30 @@ public class ClientRemoteConnection implements ClientConnection{
 	public void setClosed() {
 		closed = true;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((info == null) ? 0 : info.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ClientRemoteConnection other = (ClientRemoteConnection) obj;
+		if (info == null) {
+			if (other.info != null)
+				return false;
+		} else if (!info.equals(other.info))
+			return false;
+		return true;
+	}
+	
 }

@@ -53,4 +53,43 @@ public class ClientConfiguration implements Serializable{
 	public void addRequest(SystemClientData systemClientData) {
 		systemRequests.add(systemClientData);
 	}
+
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((connectionToClient == null) ? 0 : connectionToClient.hashCode());
+		result = prime * result + ((instances == null) ? 0 : instances.hashCode());
+		result = prime * result + ((systemRequests == null) ? 0 : systemRequests.hashCode());
+		return result;
+	}
+	
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ClientConfiguration other = (ClientConfiguration) obj;
+		if (connectionToClient == null) {
+			if (other.connectionToClient != null)
+				return false;
+		} else if (!connectionToClient.equals(other.connectionToClient))
+			return false;
+		if (instances == null) {
+			if (other.instances != null)
+				return false;
+		} else if (!instances.equals(other.instances))
+			return false;
+		if (systemRequests == null) {
+			if (other.systemRequests != null)
+				return false;
+		} else if (!systemRequests.equals(other.systemRequests))
+			return false;
+		return true;
+	}
 }

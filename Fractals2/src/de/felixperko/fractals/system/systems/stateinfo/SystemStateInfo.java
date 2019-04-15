@@ -14,9 +14,9 @@ public class SystemStateInfo implements Serializable{
 	
 //	int stageCount;
 //	int currentWorkerThreads;
-	transient Map<Integer, TaskStateInfo> taskStates = new ConcurrentHashMap<>();
+	Map<Integer, TaskStateInfo> taskStates = new ConcurrentHashMap<>();
 	
-	transient Map<TaskState, List<TaskStateInfo>> tasksPerState = new ConcurrentHashMap<>();
+	Map<TaskState, List<TaskStateInfo>> tasksPerState = new ConcurrentHashMap<>();
 	
 	ServerStateInfo serverStateInfo;
 	
