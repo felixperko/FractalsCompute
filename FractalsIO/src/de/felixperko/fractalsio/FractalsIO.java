@@ -43,7 +43,7 @@ public class FractalsIO {
 		int samplesDim = 1;
 		params.put("width", new StaticParamSupplier("width", (Integer)1024));
 		params.put("height", new StaticParamSupplier("height", (Integer)1024));
-		Integer chunkSize = 256;
+		Integer chunkSize = 512;
 		params.put("chunkSize", new StaticParamSupplier("chunkSize", chunkSize));
 //		params.put("midpoint", new StaticParamSupplier("midpoint", new DoubleComplexNumber(new DoubleNumber(0.251), new DoubleNumber(0.00004849892910689283399687005))));
 		params.put("midpoint", new StaticParamSupplier("midpoint", new DoubleComplexNumber(new DoubleNumber(0.251), new DoubleNumber(0.000055))));
@@ -53,7 +53,8 @@ public class FractalsIO {
 		params.put("samples", new StaticParamSupplier("samples", (Integer)(samplesDim*samplesDim)));
 		
 		List<BreadthFirstLayer> layers = new ArrayList<>();
-		layers.add(new BreadthFirstUpsampleLayer(8, chunkSize));
+		layers.add(new BreadthFirstUpsampleLayer(16, chunkSize));
+		layers.add(new BreadthFirstUpsampleLayer(4, chunkSize));
 		layers.add(new BreadthFirstLayer().with_priority_shift(3));
 		LayerConfiguration layerConfig = new LayerConfiguration(layers, 0.05, 20, 42);
 		params.put("layerConfiguration", new StaticParamSupplier("layerConfiguration", layerConfig));
