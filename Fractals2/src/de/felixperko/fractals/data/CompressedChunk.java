@@ -10,6 +10,7 @@ public class CompressedChunk implements Serializable{
 	private static final long serialVersionUID = 2576995300129069335L;
 
 	int upsample;
+	int jobId;
 	
 	byte[] values_compressed;
 	byte[] samples_compressed;
@@ -19,8 +20,9 @@ public class CompressedChunk implements Serializable{
 	int chunkY;
 	int dimensionSize;
 	
-	public CompressedChunk(ReducedNaiveChunk chunk, int upsample) {
+	public CompressedChunk(ReducedNaiveChunk chunk, int upsample, int jobId) {
 		this.upsample = upsample;
+		this.jobId = jobId;
 		this.chunkX = chunk.chunkX;
 		this.chunkY = chunk.chunkY;
 		this.dimensionSize = chunk.dimensionSize;
@@ -38,30 +40,92 @@ public class CompressedChunk implements Serializable{
 			float[] values = Snappy.uncompressFloatArray(values_compressed);
 			byte[] samples = Snappy.uncompress(samples_compressed);
 			byte[] failedSamples = Snappy.uncompress(failedSamples_compressed);
-			return new ReducedNaiveChunk(chunkX, chunkY, dimensionSize, values, samples, failedSamples);
+			ReducedNaiveChunk chunk = new ReducedNaiveChunk(chunkX, chunkY, dimensionSize, getFullFloatArray(values), getFullByteArray(samples), getFullByteArray(failedSamples));
+			chunk.setJobId(jobId);
+			return chunk;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
+	private float[] getFullFloatArray(float[] arr) {
+		float[] ans = new float[arr.length*upsample];
+		int dim = (int)Math.sqrt(arr.length);
+		int start = (upsample/2)*dim + upsample/2;
+		int rowCounter = dim;
+		for (int i = 0 ; i < arr.length ; i++) {
+			ans[start] = arr[i];
+			rowCounter--;
+			if (rowCounter == 0) {
+				start += dim*(upsample-1);
+				rowCounter = dim;
+			}
+			start += upsample;
+			if (start >= ans.length)
+				break;
+		}
+		return ans;
+	}
+
+	private byte[] getFullByteArray(byte[] arr) {
+		byte[] ans = new byte[arr.length*upsample];
+		int dim = (int)Math.sqrt(arr.length);
+		int start = (upsample/2)*dim + upsample/2;
+		int rowCounter = dim;
+		for (int i = 0 ; i < arr.length ; i++) {
+			ans[start] = arr[i];
+			rowCounter--;
+			if (rowCounter == 0) {
+				start += dim*(upsample-1);
+				rowCounter = dim;
+			}
+			start += upsample;
+			if (start >= ans.length)
+				break;
+		}
+		return ans;
+	}
+
 	private float[] getUpsampledFloatArray(float[] arr) {
 		float[] ans = new float[arr.length/upsample];
-		int start = (upsample/2)*arr.length + upsample/2;
+		int dim = (int)Math.sqrt(arr.length);
+		int start = (upsample/2)*dim + upsample/2;
+		int rowCounter = dim;
 		for (int i = 0 ; i < ans.length ; i++) {
 			ans[i] = arr[start];
-			start += upsample*upsample;
+			rowCounter--;
+			if (rowCounter == 0) {
+				start += dim*(upsample-1);
+				rowCounter = dim;
+			}
+			start += upsample;
+			if (start >= arr.length)
+				break;
 		}
 		return ans;
 	}
 
 	private byte[] getUpsampledByteArray(byte[] arr) {
 		byte[] ans = new byte[arr.length/upsample];
-		int start = (upsample/2)*arr.length + upsample/2;
+		int dim = (int)Math.sqrt(arr.length);
+		int start = (upsample/2)*dim + upsample/2;
+		int rowCounter = dim;
 		for (int i = 0 ; i < ans.length ; i++) {
 			ans[i] = arr[start];
-			start += upsample*upsample;
+			rowCounter--;
+			if (rowCounter == 0) {
+				start += dim*(upsample-1);
+				rowCounter = dim;
+			}
+			start += upsample;
+			if (start >= arr.length)
+				break;
 		}
 		return ans;
+	}
+
+	public int getJobId() {
+		return jobId;
 	}
 }

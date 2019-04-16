@@ -70,4 +70,9 @@ public abstract class AbstractChunk implements Chunk {
 	public int getJobId() {
 		return jobId;
 	}
+	
+	@Override
+	public void setJobId(int jobId) {
+		this.jobId = jobId;
+	}
 }

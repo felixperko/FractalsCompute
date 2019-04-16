@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.felixperko.fractals.data.AbstractArrayChunk;
+import de.felixperko.fractals.data.CompressedChunk;
+import de.felixperko.fractals.data.ReducedNaiveChunk;
 import de.felixperko.fractals.manager.common.Manager;
 import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.manager.common.NetworkManager;
@@ -17,7 +19,9 @@ import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.network.infra.connection.ClientLocalConnection;
 import de.felixperko.fractals.network.infra.connection.ClientRemoteConnection;
 import de.felixperko.fractals.network.messages.ChunkUpdateMessage;
+import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
+import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.util.CategoryLogger;
 
 /**
@@ -94,7 +98,11 @@ public class ServerNetworkManager extends Manager implements NetworkManager{
 	}
 
 	public ChunkUpdateMessage updateChunk(ClientConfiguration client, CalcSystem system, AbstractArrayChunk chunk) {
-		ChunkUpdateMessage message = new ChunkUpdateMessage(system.getId(), chunk, managers.getSystemManager().getStateInfo());
+		Layer layer = chunk.getCurrentTask().getStateInfo().getLayer();
+		int upsample = 1;
+		if (layer instanceof BreadthFirstUpsampleLayer)
+			upsample = ((BreadthFirstUpsampleLayer)layer).getUpsample();
+		ChunkUpdateMessage message = new ChunkUpdateMessage(system.getId(), new CompressedChunk((ReducedNaiveChunk) chunk, upsample, chunk.getJobId()), managers.getSystemManager().getStateInfo());
 		client.getConnection().writeMessage(message);
 		return message;
 	}
