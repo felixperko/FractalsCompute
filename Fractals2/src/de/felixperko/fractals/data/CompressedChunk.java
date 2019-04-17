@@ -67,20 +67,33 @@ public class CompressedChunk implements Serializable{
 	private float[] getFullFloatArray(float[] arr) {
 		if (upsample == 1)
 			return arr;
-		float[] ans = new float[arr.length*upsample];
-		int dim = (int)Math.sqrt(arr.length);
+		float[] ans = new float[arr.length*upsample*upsample];
+		int upsampleDim = (int)Math.sqrt(arr.length);
+		int dim = (int)Math.sqrt(ans.length);
 		int start = (upsample/2)*dim + upsample/2;
 		int rowCounter = dim/upsample;
 		for (int i = 0 ; i < arr.length ; i++) {
-			ans[start] = arr[i];
-			rowCounter--;
-			if (rowCounter == 0) {
-				start += dim*(upsample-1);
-				rowCounter = dim/upsample;
+			int x = (i / upsampleDim)*upsample;
+			int y = (i % upsampleDim)*upsample;
+			int startX = x;
+			int startY = y;
+			float value = arr[i];
+			System.out.println("up: "+upsample+" "+startX+"/"+startY+" "+value);
+			for (int x2 = startX ; x2 < startX+upsample ; x2++) {
+				for (int y2 = startY ; y2 < startY+upsample ; y2++) {
+					int index = x2*dim + y2;
+					ans[index] = value;
+				}
 			}
-			start += upsample;
-			if (start >= ans.length)
-				break;
+//			ans[start] = arr[i];
+//			rowCounter--;
+//			if (rowCounter == 0) {
+//				start += dim*(upsample-1);
+//				rowCounter = dim/upsample;
+//			}
+//			start += upsample;
+//			if (start >= ans.length)
+//				break;
 		}
 		return ans;
 	}
@@ -88,20 +101,32 @@ public class CompressedChunk implements Serializable{
 	private byte[] getFullByteArray(byte[] arr) {
 		if (upsample == 1)
 			return arr;
-		byte[] ans = new byte[arr.length*upsample];
-		int dim = (int)Math.sqrt(arr.length);
+		byte[] ans = new byte[arr.length*upsample*upsample];
+		int upsampleDim = (int)Math.sqrt(arr.length);
+		int dim = (int)Math.sqrt(ans.length);
 		int start = (upsample/2)*dim + upsample/2;
 		int rowCounter = dim/upsample;
 		for (int i = 0 ; i < arr.length ; i++) {
-			ans[start] = arr[i];
-			rowCounter--;
-			if (rowCounter == 0) {
-				start += dim*(upsample-1);
-				rowCounter = dim/upsample;
+			int x = (i / upsampleDim)*upsample;
+			int y = (i % upsampleDim)*upsample;
+			int startX = x;
+			int startY = y;
+			byte value = arr[i];
+			for (int x2 = startX ; x2 < startX+upsample ; x2++) {
+				for (int y2 = startY ; y2 < startY+upsample ; y2++) {
+					int index = x2*dim + y2;
+					ans[index] = value;
+				}
 			}
-			start += upsample;
-			if (start >= ans.length)
-				break;
+//			ans[start] = arr[i];
+//			rowCounter--;
+//			if (rowCounter == 0) {
+//				start += dim*(upsample-1);
+//				rowCounter = dim/upsample;
+//			}
+//			start += upsample;
+//			if (start >= ans.length)
+//				break;
 		}
 		return ans;
 	}
