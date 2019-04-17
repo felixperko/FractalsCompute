@@ -5,7 +5,7 @@ import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.ServerWriteThread;
 import de.felixperko.fractals.network.infra.Message;
 
-public class ClientRemoteConnection implements ClientConnection{
+public class ClientRemoteConnection extends AbstractConnection<ServerNetworkManager> implements ClientConnection{
 	
 	SenderInfo info;
 	ServerWriteThread writeThread;

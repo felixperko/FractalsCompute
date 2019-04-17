@@ -11,7 +11,7 @@ import de.felixperko.fractals.network.infra.Message;
 /**
  * connection to the server
  */
-public class ServerConnection implements Connection<ClientNetworkManager>{
+public class ServerConnection extends AbstractConnection<ClientNetworkManager>{
 	
 	ClientWriteThread writeToServer;
 	

@@ -1,4 +1,4 @@
-package de.felixperko.fractals.data;
+package de.felixperko.fractals.data.shareddata;
 
 import java.io.Serializable;
 import java.util.List;

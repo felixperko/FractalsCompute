@@ -9,7 +9,7 @@ import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.util.CategoryLogger;
 
-public class ClientLocalConnection implements ClientConnection {
+public class ClientLocalConnection extends AbstractConnection<ServerNetworkManager> implements ClientConnection{
 	
 	SenderInfo senderInfo;
 	

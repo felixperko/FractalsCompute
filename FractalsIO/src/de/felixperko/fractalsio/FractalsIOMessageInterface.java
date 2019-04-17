@@ -59,7 +59,6 @@ public class FractalsIOMessageInterface extends ClientMessageInterface {
 	public void serverStateUpdated(ServerStateInfo serverStateInfo) {
 		for (UUID systemId : getRegisteredSystems()) {
 			SystemStateInfo ssi = serverStateInfo.getSystemState(systemId);
-			System.out.println(ssi.getUpdateTime());
 			if (ssi.getTaskListForState(TaskState.OPEN).size() == 0 && ssi.getTaskListForState(TaskState.ASSIGNED).size() == 0 && ssi.getTaskListForState(TaskState.STARTED).size() == 0 && ssi.getTaskListForState(TaskState.PLANNED).size() == 0 && ssi.getTaskListForState(TaskState.DONE).size() > 0)
 				TEST_FINISH = true;
 			for (TaskState state : TaskState.values())

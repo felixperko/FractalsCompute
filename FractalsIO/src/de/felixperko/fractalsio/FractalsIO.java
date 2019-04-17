@@ -49,13 +49,14 @@ public class FractalsIO {
 		params.put("midpoint", new StaticParamSupplier("midpoint", new DoubleComplexNumber(new DoubleNumber(0.251), new DoubleNumber(0.000055))));
 		zoom = numberFactory.createNumber(5./100000.);
 		params.put("zoom", new StaticParamSupplier("zoom", zoom));
-		params.put("iterations", new StaticParamSupplier("iterations", (Integer)5000));
+		params.put("iterations", new StaticParamSupplier("iterations", (Integer)50000));
 		params.put("samples", new StaticParamSupplier("samples", (Integer)(samplesDim*samplesDim)));
 		
 		List<BreadthFirstLayer> layers = new ArrayList<>();
-		layers.add(new BreadthFirstUpsampleLayer(16, chunkSize));
-		layers.add(new BreadthFirstUpsampleLayer(4, chunkSize));
-		layers.add(new BreadthFirstLayer().with_priority_shift(3));
+		layers.add(new BreadthFirstUpsampleLayer(16, chunkSize).with_culling(true));
+		layers.add(new BreadthFirstUpsampleLayer(4, chunkSize).with_culling(true).with_priority_shift(10));
+		layers.add(new BreadthFirstLayer().with_priority_shift(20));
+		layers.add(new BreadthFirstLayer().with_priority_shift(30).with_samples(8));
 		LayerConfiguration layerConfig = new LayerConfiguration(layers, 0.05, 20, 42);
 		params.put("layerConfiguration", new StaticParamSupplier("layerConfiguration", layerConfig));
 		params.put("border_generation", new StaticParamSupplier("border_generation", (Double) 0.));

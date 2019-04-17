@@ -6,6 +6,7 @@ import java.io.Serializable;
 import org.xerial.snappy.BitShuffle;
 import org.xerial.snappy.Snappy;
 
+import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.util.NumberUtil;
 
 public class CompressedChunk implements Serializable{
@@ -23,6 +24,8 @@ public class CompressedChunk implements Serializable{
 	int chunkY;
 	int dimensionSize;
 	
+	ComplexNumber chunkPos;
+	
 	transient ReducedNaiveChunk chunk;//TODO debug remove
 	
 	public CompressedChunk(ReducedNaiveChunk chunk, int upsample, int jobId) {
@@ -32,6 +35,7 @@ public class CompressedChunk implements Serializable{
 		this.chunkX = chunk.chunkX;
 		this.chunkY = chunk.chunkY;
 		this.dimensionSize = chunk.dimensionSize;
+		this.chunkPos = chunk.chunkPos;
 		try {
 			long t1 = System.nanoTime();
 			values_compressed = Snappy.compress(BitShuffle.shuffle(getUpsampledFloatArray(chunk.values)));
@@ -57,6 +61,7 @@ public class CompressedChunk implements Serializable{
 			byte[] failedSamples = Snappy.uncompress(failedSamples_compressed);
 			ReducedNaiveChunk chunk = new ReducedNaiveChunk(chunkX, chunkY, dimensionSize, getFullFloatArray(values), getFullByteArray(samples), getFullByteArray(failedSamples));
 			chunk.setJobId(jobId);
+			chunk.chunkPos = chunkPos;
 			return chunk;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -75,10 +80,11 @@ public class CompressedChunk implements Serializable{
 		for (int i = 0 ; i < arr.length ; i++) {
 			int x = (i / upsampleDim)*upsample;
 			int y = (i % upsampleDim)*upsample;
+//			System.out.println(x+"/"+y);
 			int startX = x;
 			int startY = y;
 			float value = arr[i];
-			System.out.println("up: "+upsample+" "+startX+"/"+startY+" "+value);
+//			System.out.println("up: "+upsample+" "+startX+"/"+startY+" "+value);
 			for (int x2 = startX ; x2 < startX+upsample ; x2++) {
 				for (int y2 = startY ; y2 < startY+upsample ; y2++) {
 					int index = x2*dim + y2;
@@ -134,7 +140,7 @@ public class CompressedChunk implements Serializable{
 	private float[] getUpsampledFloatArray(float[] arr) {
 		if (upsample == 1)
 			return arr;
-		float[] ans = new float[arr.length/upsample];
+		float[] ans = new float[arr.length/(upsample*upsample)];
 		int dim = (int)Math.sqrt(arr.length);
 		int start = (upsample/2)*dim + upsample/2;
 		int rowCounter = dim/upsample;
@@ -163,7 +169,7 @@ public class CompressedChunk implements Serializable{
 	private byte[] getUpsampledByteArray(byte[] arr) {
 		if (upsample == 1)
 			return arr;
-		byte[] ans = new byte[arr.length/upsample];
+		byte[] ans = new byte[arr.length/(upsample*upsample)];
 		int dim = (int)Math.sqrt(arr.length);
 		int start = (upsample/2)*dim + upsample/2;
 		int rowCounter = dim/upsample;

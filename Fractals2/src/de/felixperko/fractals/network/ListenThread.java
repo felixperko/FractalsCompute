@@ -120,7 +120,6 @@ public class ListenThread extends AbstractFractalsThread {
 
 	public void setLogger(CategoryLogger log) {
 		this.log = log;
-		Thread.dumpStack();
 	}
 	
 	public void setCompressed(boolean compressed) {
