@@ -24,7 +24,7 @@ public class ParameterDefinition implements Serializable{
 	public ParameterDefinition(String name, Class<? extends ParamSupplier> cls, ParamValueType... possibleValueTypes) {
 		this.name = name;
 		this.possibleClasses = new ArrayList<>();
-		this.possibleValueTypes = new ArrayList<>();
+		this.possibleValueTypes = Arrays.asList(possibleValueTypes);
 		this.possibleClasses.add(cls);
 	}
 	
