@@ -28,7 +28,7 @@ public class CalculateThreadReference {
 			throw new IllegalStateException("remote tasks can't be aborted yet"); //TODO abort remote tasks implementation
 		} else {
 			CalculateFractalsThread thread = managers.getThreadManager().getCalculateFractalsThread(threadId);
-			thread.abortTask(taskId);
+			thread.abortTask();
 		}
 	}
 }

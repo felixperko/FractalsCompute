@@ -40,6 +40,7 @@ import de.felixperko.fractals.system.task.AbstractTaskManager;
 import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskManager;
+import de.felixperko.fractals.system.task.TaskProviderAdapter;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.system.thread.AbstractSystemThread;
 import de.felixperko.fractals.util.NumberUtil;
@@ -225,6 +226,18 @@ public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 
 	@Override
 	public void reset() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addTaskProviderAdapter(TaskProviderAdapter taskProviderAdapter) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void removeTaskProviderAdapter(TaskProviderAdapter taskProviderAdapter) {
 		// TODO Auto-generated method stub
 		
 	}

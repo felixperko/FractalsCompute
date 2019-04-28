@@ -45,6 +45,7 @@ import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.AbstractTaskManager;
 import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.system.task.Layer;
+import de.felixperko.fractals.system.task.TaskProviderAdapter;
 import de.felixperko.fractals.system.thread.CalculateThreadReference;
 import de.felixperko.fractals.util.CategoryLogger;
 
@@ -163,6 +164,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	int chunksWidth, chunksHeight;
 	
 	int jobId = 0;
+
+	List<TaskProviderAdapter> taskProviders = new ArrayList<>();
 
 	@Override
 	public void startTasks() {
@@ -510,7 +513,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			viewData.dispose();
 			viewData = null;
 		}
-		//TODO abort running tasks
+		for (TaskProviderAdapter adapter : taskProviders)
+			adapter.cancelTasks();
 	}
 	
 	public void updatePredictedMidpoint() {
@@ -755,5 +759,13 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 
 	private double getScreenDistance(Chunk chunk) {
 		return getScreenDistance(chunk.getChunkX(), chunk.getChunkY());
+	}
+	
+	public void addTaskProviderAdapter(TaskProviderAdapter taskProviderAdapter) {
+		taskProviders.add(taskProviderAdapter);
+	}
+	
+	public void removeTaskProviderAdapter(TaskProviderAdapter taskProviderAdapter) {
+		taskProviders.remove(taskProviderAdapter);
 	}
 }

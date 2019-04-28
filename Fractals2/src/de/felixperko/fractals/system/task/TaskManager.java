@@ -17,4 +17,7 @@ public interface TaskManager<T> {
 	void taskFinished(T task);
 	List<? extends FractalsTask> getTasks(int count);
 	CalcSystem getSystem();
+	
+	public void addTaskProviderAdapter(TaskProviderAdapter taskProviderAdapter);
+	public void removeTaskProviderAdapter(TaskProviderAdapter taskProviderAdapter);
 }

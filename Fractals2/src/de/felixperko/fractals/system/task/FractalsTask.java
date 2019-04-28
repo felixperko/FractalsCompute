@@ -3,6 +3,7 @@ package de.felixperko.fractals.system.task;
 import java.io.Serializable;
 import java.util.UUID;
 
+import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
 import de.felixperko.fractals.system.task.statistics.TaskStats;
@@ -20,6 +21,8 @@ public interface FractalsTask extends Serializable{
 	TaskState getState();
 	
 	public void setThread(FractalsThread thread);
+	
+	public FractalsCalculator getCalculator();
 	
 	public void run() throws InterruptedException;
 
