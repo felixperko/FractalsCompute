@@ -440,21 +440,23 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 //						if (skipClients.contains(client))
 //							continue;
 						ChunkUpdateMessage message = ((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, task.chunk);
-						synchronized (oldMessages) {
-							oldMessages.put(client, message);	
-						}
-						final BreadthFirstTaskManager thisObj = this;
-						final Map<ClientConfiguration, ChunkUpdateMessage> oldMessagesFinal = oldMessages;
-						message.addSentCallback(new Runnable() {
-							@Override
-							public void run() {
-								synchronized (thisObj) {
-									oldMessagesFinal.remove(client);
-									if (oldMessagesFinal.isEmpty())
-										pendingUpdateMessages.remove(taskId);
-								}
+						if (message != null){
+							synchronized (oldMessages) {
+								oldMessages.put(client, message);	
 							}
-						});
+							final BreadthFirstTaskManager thisObj = this;
+							final Map<ClientConfiguration, ChunkUpdateMessage> oldMessagesFinal = oldMessages;
+							message.addSentCallback(new Runnable() {
+								@Override
+								public void run() {
+									synchronized (thisObj) {
+										oldMessagesFinal.remove(client);
+										if (oldMessagesFinal.isEmpty())
+											pendingUpdateMessages.remove(taskId);
+									}
+								}
+							});
+						}
 					}
 					skipClients.clear();
 				}
