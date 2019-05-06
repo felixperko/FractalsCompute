@@ -15,17 +15,17 @@ public class ChunkUpdateMessage extends SystemServerMessage {
 	private static final long serialVersionUID = -2349690041977280160L;
 	
 	CompressedChunk chunk;
-	ServerStateInfo serverStateInfo;
+	//ServerStateInfo serverStateInfo;
 	
 	public ChunkUpdateMessage(UUID systemId, CompressedChunk chunk, ServerStateInfo serverStateInfo) {
 		super(systemId);
 		this.chunk = chunk;
-		this.serverStateInfo = serverStateInfo;
+		//this.serverStateInfo = serverStateInfo;
  	}
 
 	@Override
 	protected void process() {
-		getClientMessageInterface().serverStateUpdated(serverStateInfo);
+		//getClientMessageInterface().serverStateUpdated(serverStateInfo);
 		getClientSystemInterface().chunkUpdated(chunk.decompress());
 //		FractalsMain.threadManager.getCalcPixelThread(FractalsMain.mainWindow.getMainRenderer()).addChunk(chunk);
 	}

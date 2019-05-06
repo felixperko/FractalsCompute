@@ -1,5 +1,8 @@
 package de.felixperko.fractals.system.thread;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.manager.server.ServerThreadManager;
@@ -8,6 +11,7 @@ import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.system.task.TaskProvider;
+import de.felixperko.fractals.system.task.TaskProviderAdapter;
 
 public class CalculateFractalsThread extends AbstractFractalsThread{
 	
@@ -19,6 +23,8 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 	
 	FractalsTask currentTask;
 	int abortedTaskId = -1;
+	
+	boolean taskCancelled = false;
 	
 	public CalculateFractalsThread(Managers managers, TaskProvider taskProvider){
 		super(managers, "CALC_"+ID_COUNTER);
@@ -99,9 +105,11 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 		return taskProvider.getTask();
 	}
 
-	public void abortTask(int taskId) {
-		if (currentTask != null && currentTask.getId() == taskId)
+	public void abortTask() {
+		if (currentTask != null) {
+			setTaskCancelled();
 			this.interrupt();
+		}
 	}
 
 	public int getCalcThreadId() {
@@ -116,5 +124,19 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 	public void taskAvailable() {
 		notified = true;
 		interrupt();
+	}
+	
+	public void setTaskCancelled() {
+		if (currentTask != null) {
+			taskCancelled = true;
+			currentTask.getCalculator().setCancelled();
+		}
+	}
+	
+	public boolean isTaskCancelled(boolean reset) {
+		boolean curr = taskCancelled;
+		if (reset)
+			curr = false;
+		return curr;
 	}
 }

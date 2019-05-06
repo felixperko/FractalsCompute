@@ -69,4 +69,10 @@ public class RemoteTaskProvider implements TaskProvider {
 		localThreads.remove(calculateFractalsThread);
 	}
 
+	@Override
+	public void cancelTasks() {
+		for (CalculateFractalsThread t : localThreads)
+			t.abortTask();
+	}
+
 }

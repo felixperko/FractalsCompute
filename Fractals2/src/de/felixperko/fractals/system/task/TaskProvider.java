@@ -12,6 +12,8 @@ public interface TaskProvider {
 	public void addLocalCalculateThread(CalculateFractalsThread calculateFractalsThread);
 	public void removeLocalCalculateThread(CalculateFractalsThread calculateFractalsThread);
 	
+	public void cancelTasks();
+	
 //	public void addTaskManager(TaskManager taskManager);
 //	public void removeTaskManager(TaskManager taskManager);
 }

@@ -23,15 +23,19 @@ public class LocalTaskProvider implements TaskProvider {
 	
 	List<CalculateFractalsThread> localThreads = new ArrayList<>();
 	
+	LocalTaskProviderAdapter adapter = new LocalTaskProviderAdapter(this);
+	
 //	Map<TaskManager, Long> threadTimeTaken = new HashMap<>();
 	
 	public void addTaskManager(TaskManager taskManager) {
 		taskManagers.add(taskManager);
+		taskManager.addTaskProviderAdapter(adapter);
 //		threadTimeTaken.clear();
 	}
 	
 	public void removeTaskManager(TaskManager taskManager) {
 		taskManagers.remove(taskManager);
+		taskManager.removeTaskProviderAdapter(adapter);
 //		threadTimeTaken.clear();
 	}
 	
@@ -88,6 +92,12 @@ public class LocalTaskProvider implements TaskProvider {
 				return;
 			}
 		}
+	}
+
+	@Override
+	public void cancelTasks() {
+		for (CalculateFractalsThread t : localThreads)
+			t.abortTask();
 	}
 
 }

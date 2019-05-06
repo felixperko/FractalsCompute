@@ -61,5 +61,10 @@ public class BasicTask extends AbstractFractalsTask {
 		this.thread = thread;
 	}
 
+	@Override
+	public FractalsCalculator getCalculator() {
+		return calculator;
+	}
+
 
 }
