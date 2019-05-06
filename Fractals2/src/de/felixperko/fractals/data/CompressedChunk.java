@@ -82,12 +82,12 @@ public class CompressedChunk implements Serializable{
 		return null;
 	}
 	
-	public ReducedNaivePackedChunk decompressPacked() {
+	public AbstractArrayChunk decompressPacked() {
 		try {
 			float[] values = BitShuffle.unshuffleFloatArray(Snappy.uncompress((values_compressed)));
 			byte[] samples = Snappy.uncompress(samples_compressed);
 			byte[] failedSamples = Snappy.uncompress(failedSamples_compressed);
-			ReducedNaivePackedChunk chunk = new ReducedNaivePackedChunk(chunkX, chunkY, dimensionSize, values, samples, failedSamples);
+			AbstractArrayChunk chunk = new ReducedNaivePackedChunk(chunkX, chunkY, dimensionSize, values, samples, failedSamples, upsample);
 			chunk.setJobId(jobId);
 			chunk.chunkPos = chunkPos;
 			if (selfBorderData != null)

@@ -176,4 +176,10 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 	}
 
 	protected abstract void removeFlag(int i);
+
+	public abstract int getStartIndex();
+
+	public abstract int getDownsampleIncrement();
+
+	public abstract int getDownsample();
 }

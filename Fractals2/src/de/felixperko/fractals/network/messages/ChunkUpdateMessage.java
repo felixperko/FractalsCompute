@@ -26,7 +26,7 @@ public class ChunkUpdateMessage extends SystemServerMessage {
 	@Override
 	protected void process() {
 		//getClientMessageInterface().serverStateUpdated(serverStateInfo);
-		getClientSystemInterface().chunkUpdated(chunk.decompress());
+		getClientSystemInterface().chunkUpdated(chunk.decompressPacked());
 //		FractalsMain.threadManager.getCalcPixelThread(FractalsMain.mainWindow.getMainRenderer()).addChunk(chunk);
 	}
 	
