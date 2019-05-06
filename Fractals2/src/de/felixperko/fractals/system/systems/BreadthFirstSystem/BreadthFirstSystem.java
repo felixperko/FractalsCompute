@@ -138,12 +138,12 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		
 		parameterConfiguration.addParameterDefinitions(defs);
 		
-		Selection<Class<? extends FractalsCalculator>> calculatorSelection = new Selection<>("calculators");
+		Selection<Class<? extends FractalsCalculator>> calculatorSelection = new Selection<>("calculator");
 		calculatorSelection.addOption("Mandelbrot", MandelbrotCalculator.class);
 		calculatorSelection.addOption("BurningShip", BurningShipCalculator.class);
 		parameterConfiguration.addSelection(calculatorSelection);
 		
-		Selection<String> systemNameSelection = new Selection<>("systemNames");
+		Selection<String> systemNameSelection = new Selection<>("systemName");
 		systemNameSelection.addOption("BreadthFirstSystem", "BreadthFirstSystem");
 		parameterConfiguration.addSelection(systemNameSelection);
 	}

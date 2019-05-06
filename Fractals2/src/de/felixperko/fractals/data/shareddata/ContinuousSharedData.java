@@ -14,7 +14,7 @@ import de.felixperko.fractals.network.infra.connection.ConnectionListener;
 /**
  * Continuous data that needs to be synced for clients through update messages.
  */
-public abstract class ContinuousSharedData implements ConnectionListener{
+public abstract class ContinuousSharedData extends SharedData<SharedDataUpdate>{
 	int versionCounter = 0;
 	int disposedCounter = 0;
 	
@@ -22,13 +22,11 @@ public abstract class ContinuousSharedData implements ConnectionListener{
 	
 	Map<Integer, List<SharedDataUpdate>> updates = new HashMap<>();
 	
-	Map<Connection<?>, Integer> connections = new HashMap<>();
-	
-	public ContinuousSharedData() {
-		
+	public ContinuousSharedData(boolean disposeDistributed) {
+		this.disposeDistributed = disposeDistributed;
 	}
 	
-	public SharedDataContainer getUpdates(Connection<?> connection){
+	public DataContainer getUpdates(Connection<?> connection){
 		
 		//prepare state
 		if (!connections.containsKey(connection))
@@ -44,28 +42,16 @@ public abstract class ContinuousSharedData implements ConnectionListener{
 		}
 		
 		//add current version updates and increment version
-		SharedDataContainer ans;
+		DataContainer ans;
 		synchronized (updates) {
 			list.addAll(updates.get(versionCounter));
-			ans = new SharedDataContainer(versionCounter, list);
+			ans = new ContinuousDataContainer(versionCounter, list);
 			connections.put(connection, (Integer)versionCounter);
 			if (!list.isEmpty())
 				versionCounter++;
 			
-			//dispose data that is already distributed to all registered clients
 			if (disposeDistributed) {
-				int lowestDistributedVersion = versionCounter;
-				for (Entry<Connection<?>, Integer> e : connections.entrySet()) {
-					int version = e.getValue();
-					if (version < lowestDistributedVersion)
-						lowestDistributedVersion = version;
-				}
-				
-				for (int i = disposedCounter ; i <= lowestDistributedVersion ; i++) {
-					updates.remove((Integer)i);
-				}
-				
-				disposedCounter = lowestDistributedVersion;
+				disposeDistributed();
 			}
 			
 		}
@@ -80,6 +66,26 @@ public abstract class ContinuousSharedData implements ConnectionListener{
 		}
 	}
 
+	/**
+	 * dispose data that is already distributed to all registered clients
+	 */
+	private void disposeDistributed() {
+		if (!disposeDistributed)
+			return;
+		int lowestDistributedVersion = versionCounter;
+		for (Entry<Connection<?>, Integer> e : connections.entrySet()) {
+			int version = e.getValue();
+			if (version < lowestDistributedVersion)
+				lowestDistributedVersion = version;
+		}
+		
+		for (int i = disposedCounter ; i <= lowestDistributedVersion ; i++) {
+			updates.remove((Integer)i);
+		}
+		
+		disposedCounter = lowestDistributedVersion;
+	}
+
 	public boolean isDisposeDistributed() {
 		return disposeDistributed;
 	}
@@ -90,8 +96,9 @@ public abstract class ContinuousSharedData implements ConnectionListener{
 	
 	@Override
 	public void connectionClosed(Connection<?> connection) {
-		synchronized(updates) {
-			connections.remove(connection);
+		synchronized (updates) {
+			super.connectionClosed(connection);
+			disposeDistributed();
 		}
 	}
 }

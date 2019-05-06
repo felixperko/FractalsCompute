@@ -138,8 +138,19 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 	public ChunkBorderData getNeighbourBorderData(BorderAlignment alignment) {
 		return neighbourBorderData.get(alignment);
 	}
-
 	
+	public Map<BorderAlignment, ChunkBorderData> getNeighbourBorderData() {
+		return neighbourBorderData;
+	}
+	
+	public Map<BorderAlignment, ChunkBorderData> getSelfBorderData() {
+		return selfBorderData;
+	}
+
+	public void setSelfBorderData(Map<BorderAlignment, ChunkBorderData> selfBorderData) {
+		this.selfBorderData = selfBorderData;
+	}
+
 	public void setCullFlags(int upsampleIndex, int upsample, boolean cull) {
 		int startX = (upsampleIndex / dimensionSize);
 		int startY = (upsampleIndex % dimensionSize);

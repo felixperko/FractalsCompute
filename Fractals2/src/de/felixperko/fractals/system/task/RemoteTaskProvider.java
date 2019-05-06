@@ -20,7 +20,7 @@ public class RemoteTaskProvider implements TaskProvider {
 	Queue<FractalsTask> bufferedTasks = new LinkedList<>();
 	ClientManagers managers;
 	
-	List<CalculateFractalsThread> localThreads = new ArrayList();
+	List<CalculateFractalsThread> localThreads = new ArrayList<>();
 	
 	public RemoteTaskProvider(ClientManagers managers, int bufferSize) {
 		this.managers = managers;

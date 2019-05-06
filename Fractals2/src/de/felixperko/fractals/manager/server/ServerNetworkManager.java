@@ -102,7 +102,7 @@ public class ServerNetworkManager extends Manager implements NetworkManager{
 		int upsample = 1;
 		if (layer instanceof BreadthFirstUpsampleLayer)
 			upsample = ((BreadthFirstUpsampleLayer)layer).getUpsample();
-		ChunkUpdateMessage message = new ChunkUpdateMessage(system.getId(), new CompressedChunk((ReducedNaiveChunk) chunk, upsample, chunk.getJobId()), managers.getSystemManager().getStateInfo());
+		ChunkUpdateMessage message = new ChunkUpdateMessage(system.getId(), new CompressedChunk((ReducedNaiveChunk) chunk, upsample, chunk.getJobId(), false), managers.getSystemManager().getStateInfo());
 		client.getConnection().writeMessage(message);
 		return message;
 	}

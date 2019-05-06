@@ -2,12 +2,14 @@ package de.felixperko.fractals.network;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import de.felixperko.fractals.system.parameters.ParameterConfiguration;
 import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
+import de.felixperko.fractals.system.task.FractalsTask;
 
 public abstract class ClientMessageInterface {
 	
@@ -24,8 +26,9 @@ public abstract class ClientMessageInterface {
 	}
 	
 	public void createdSystem(UUID systemId, ClientConfiguration clientConfiguration, ParameterConfiguration parameterConfiguration) {
-		addSystemInterface(systemId, createSystemInterface(clientConfiguration));
-		recievedParameterConfiguration(parameterConfiguration);
+		ClientSystemInterface systemInterface = createSystemInterface(clientConfiguration);
+		addSystemInterface(systemId, systemInterface);
+		systemInterface.updateParameterConfiguration(clientConfiguration, parameterConfiguration);
 	}
 	
 	public void removedSystem(UUID systemId) {
@@ -43,6 +46,7 @@ public abstract class ClientMessageInterface {
 		return true;
 	}
 	
-	public abstract void recievedParameterConfiguration(ParameterConfiguration parameterConfiguration);
 	public abstract void serverStateUpdated(ServerStateInfo serverStateInfo);
+	
+	public abstract void assignedTasks(List<FractalsTask> tasks);
 }

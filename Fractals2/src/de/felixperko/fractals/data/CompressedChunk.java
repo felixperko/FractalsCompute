@@ -2,6 +2,8 @@ package de.felixperko.fractals.data;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.xerial.snappy.BitShuffle;
 import org.xerial.snappy.Snappy;
@@ -26,9 +28,12 @@ public class CompressedChunk implements Serializable{
 	
 	ComplexNumber chunkPos;
 	
+	Map<BorderAlignment, ChunkBorderData> selfBorderData;
+	Map<BorderAlignment, ChunkBorderData> neighbourBorderData;
+	
 	transient ReducedNaiveChunk chunk;//TODO debug remove
 	
-	public CompressedChunk(ReducedNaiveChunk chunk, int upsample, int jobId) {
+	public CompressedChunk(ReducedNaiveChunk chunk, int upsample, int jobId, boolean includeBorderData) {
 		this.upsample = upsample;
 		this.jobId = jobId;
 		this.chunk = chunk;
@@ -52,6 +57,10 @@ public class CompressedChunk implements Serializable{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		if (includeBorderData) {
+			this.selfBorderData = chunk.getSelfBorderData();
+			this.neighbourBorderData = chunk.getNeighbourBorderData();
+		}
 	}
 	
 	public ReducedNaiveChunk decompress() {
@@ -62,6 +71,29 @@ public class CompressedChunk implements Serializable{
 			ReducedNaiveChunk chunk = new ReducedNaiveChunk(chunkX, chunkY, dimensionSize, getFullFloatArray(values), getFullByteArray(samples), getFullByteArray(failedSamples));
 			chunk.setJobId(jobId);
 			chunk.chunkPos = chunkPos;
+			if (selfBorderData != null)
+				chunk.setSelfBorderData(selfBorderData);
+			if (neighbourBorderData != null)
+				chunk.setNeighbourBorderData(neighbourBorderData);
+			return chunk;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public ReducedNaivePackedChunk decompressPacked() {
+		try {
+			float[] values = BitShuffle.unshuffleFloatArray(Snappy.uncompress((values_compressed)));
+			byte[] samples = Snappy.uncompress(samples_compressed);
+			byte[] failedSamples = Snappy.uncompress(failedSamples_compressed);
+			ReducedNaivePackedChunk chunk = new ReducedNaivePackedChunk(chunkX, chunkY, dimensionSize, values, samples, failedSamples);
+			chunk.setJobId(jobId);
+			chunk.chunkPos = chunkPos;
+			if (selfBorderData != null)
+				chunk.setSelfBorderData(selfBorderData);
+			if (neighbourBorderData != null)
+				chunk.setNeighbourBorderData(neighbourBorderData);
 			return chunk;
 		} catch (IOException e) {
 			e.printStackTrace();
