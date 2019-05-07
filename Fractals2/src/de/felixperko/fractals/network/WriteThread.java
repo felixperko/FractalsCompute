@@ -13,6 +13,7 @@ import java.util.Queue;
 import org.xerial.snappy.SnappyInputStream;
 import org.xerial.snappy.SnappyOutputStream;
 
+import de.felixperko.fractals.data.shareddata.SharedDataController;
 import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.manager.server.ServerThreadManager;
@@ -45,6 +46,8 @@ public abstract class WriteThread extends AbstractFractalsThread {
 	private CategoryLogger listenLogger; //used to buffer logger for listen thread until its creation
 	
 	int writeThreadId;
+	
+	SharedDataController sharedDataController = new SharedDataController();
 	
 	public WriteThread(Managers managers, Socket socket) {
 		super(managers, "COM_"+ID_COUNTER+"_OUT");
@@ -145,6 +148,7 @@ public abstract class WriteThread extends AbstractFractalsThread {
 	}
 
 	protected void tick() {
+		sharedDataController.sendMessageIfUpdatesAvailable(getConnection());
 	}
 
 	public void writeMessage(Message msg) {

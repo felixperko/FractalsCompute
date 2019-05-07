@@ -10,11 +10,30 @@ public abstract class SharedData<U extends SharedDataUpdate> implements Connecti
 	
 	Map<Connection<?>, Integer> connections = new HashMap<>();
 	
+	final String dataIdentifier;
+	
+	public SharedData(String dataIdentifier) {
+		this.dataIdentifier = dataIdentifier;
+	}
+	
 	public abstract DataContainer getUpdates(Connection<?> connection);
 	public abstract void update(U update);
+	public abstract int getVersion();
+	public abstract boolean isEmpty();
+	
+	public boolean hasUpdate(Connection<?> connection) {
+		if (isEmpty())
+			return false;
+		Integer version = connections.get(connection);
+		return version == null || version < getVersion();
+	}
 	
 	@Override
 	public void connectionClosed(Connection<?> connection) {
 		connections.remove(connection);
+	}
+	
+	public String getDataIdentifier() {
+		return dataIdentifier;
 	}
 }
