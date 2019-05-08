@@ -111,10 +111,11 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	List<Queue<BreadthFirstTask>> openTasks = new ArrayList<>();
 	Queue<BreadthFirstTask> nextOpenTasks = new PriorityQueue<>(comparator_priority);//one entry for each pass -> 
 	Queue<BreadthFirstTask> nextBufferedTasks = new PriorityQueue<>(comparator_priority);//buffer for highest priority tasks
-	
+	List<List<BreadthFirstTask>> tempList = new ArrayList<>(); //used when refreshing sorting order
+	List<BreadthFirstTask> borderTasks = new ArrayList<>();
 	Queue<BreadthFirstTask> newQueue = new LinkedList<>(); //for generation
 
-	List<BreadthFirstTask> borderTasks = new ArrayList<>();
+	
 	
 	LayerConfiguration layerConfig;
 	//List<BreadthFirstLayer> layers = new ArrayList<>();
@@ -174,6 +175,9 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			//layers.add(new BreadthFirstLayer(1).with_priority_shift(5).with_priority_multiplier(2));
 			//layers.add(new BreadthFirstLayer(2).with_priority_shift(10).with_priority_multiplier(3).with_samples(4));
 //		}
+		
+		
+		//TODO readd when layerConfig changes?!
 		for (int i = 0 ; i < layerConfig.getLayers().size() ; i++) {
 			openTasks.add(new PriorityQueue<>(comparator_distance));
 			tempList.add(new ArrayList<>());
@@ -197,7 +201,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		openChunks++;
 	}
 	
-	private FractalsCalculator createCalculator() {
+	public FractalsCalculator createCalculator() {
 		try {
 			return calculatorClass.getDeclaredConstructor().newInstance();
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
@@ -477,7 +481,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 					task.getStateInfo().setState(TaskState.DONE);
 				} else {
 					currentLayerId++;
-					Layer layer = layerConfig.getLayers().get(currentLayerId);
+					BreadthFirstLayer layer = layerConfig.getLayers().get(currentLayerId);
 					task.getStateInfo().setLayer(layer);
 					task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layer);
 					openTasks.get(currentLayerId).add(task);
@@ -527,11 +531,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		midpointChunkY = delta.imagDouble();
 	}
 
-	List<List<BreadthFirstTask>> tempList = new ArrayList<>(); //used when refreshing sorting order
-
-	//TODO use
 	public void predictedMidpointUpdated() {
-		//TODO synchronization
 		//clear queues to update sorting
 		synchronized (this) {
 			List<BreadthFirstLayer> layers = layerConfig.getLayers();
@@ -598,15 +598,17 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	private synchronized boolean fillQueues() {
 		boolean changed = false;
 		List<BreadthFirstLayer> layers = layerConfig.getLayers();
+		
+		//buffer not filled -> fill if pending tasks are available
 		while (nextBufferedTasks.size() < buffer) {
-			boolean[] layerInNextTasks = new boolean[layers.size()];
+			boolean[] layerInNextTasks = new boolean[layers.size()]; //nextOpenTasks contains nearest chunk of each layer, track missing
 			int notFilled = layers.size();
 			//fill nextOpenTasks with next values from openTasks
 			for (BreadthFirstTask nextOpenTask : nextOpenTasks) {
 				layerInNextTasks[nextOpenTask.getStateInfo().getLayer().getId()] = true;
 				notFilled--;
 			}
-			if (notFilled > 0) {
+			if (notFilled > 0) { //nextOpenTasks is missing next task for at least one layer. refill if available.
 				for (int l = 0 ; l < layers.size() ; l++) {
 					if  (layerInNextTasks[l])
 						continue;
@@ -619,32 +621,9 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 						generateNeighbours(task);
 				}
 			}
-//			if (nextOpenTasks.isEmpty()) {
-//				for (int i = 0 ; i < openTasks.size() ; i++) {
-//					BreadthFirstTask task = openTasks.get(i).poll();
-//					if (task != null) {
-//						changed = true;
-//						nextOpenTasks.add(task);
-//						if (task.getStateInfo().getLayer().getId() == 0)
-//							generateNeighbours(task);
-//					}
-//					else
-//						log.log("no open tasks on layer "+i);
-//				}
-//			}
+			
 			//cascade further if not empty
 			if (!nextOpenTasks.isEmpty()) {
-//				log.log("nextOpenTasks: ");
-//				for (BreadthFirstTask task : nextOpenTasks)
-//					log.log(" - "+task.getStateInfo().getLayer().getId()+": "+task.getChunk().getChunkX()+"/"+task.getChunk().getChunkY()
-//							+" prio="+task.getPriority()+" dist="+task.getDistance());
-//				int i = 0;
-//				for (Queue<BreadthFirstTask> list : openTasks) {
-//					log.log("open layer: "+(i++));
-//					for (BreadthFirstTask task : list)
-//					log.log(" - "+task.getStateInfo().getLayer().getId()+": "+task.getChunk().getChunkX()+"/"+task.getChunk().getChunkY()
-//							+" prio="+task.getPriority()+" dist="+task.getDistance());
-//				}
 				BreadthFirstTask polled = nextOpenTasks.poll();
 				nextBufferedTasks.add(polled);
 				changed = true;
@@ -652,7 +631,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				if (!queue.isEmpty()) {
 					BreadthFirstTask polledTask = queue.poll();
 					nextBufferedTasks.add(polledTask);
-					//new chunk at layer 0 taken -> generate neighbours -> fill queues
+					//new chunk at layer 0 taken -> generate neighbours, fill queues
 					if (polled.getStateInfo().getLayer().getId() == 0)
 						generateNeighbours(polledTask);
 				}
@@ -686,7 +665,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		newQueue.clear();
 	}
 
-	private boolean generateNeighbourIfNotExists(BreadthFirstTask parentTask, int dx, int dy) {
+	protected boolean generateNeighbourIfNotExists(BreadthFirstTask parentTask, int dx, int dy) {
 		if (done)
 			return false;
 		
@@ -721,7 +700,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		return true;
 	}
 
-	private ComplexNumber getChunkPos(long chunkX, long chunkY) {
+	public ComplexNumber getChunkPos(long chunkX, long chunkY) {
 		ComplexNumber chunkPos = numberFactory.createComplexNumber(chunkX, chunkY);
 		chunkPos.add(relativeStartShift);
 		chunkPos.multNumber(chunkZoom);
@@ -729,14 +708,14 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		return chunkPos;
 	}
 	
-	private double getChunkX(ComplexNumber pos) {
+	public double getChunkX(ComplexNumber pos) {
 		Number value = pos.getReal();
 		value.sub(viewData.anchor.getReal());
 		value.div(chunkZoom);
 		return value.toDouble();
 	}
 	
-	private double getChunkY(ComplexNumber pos) {
+	public double getChunkY(ComplexNumber pos) {
 		Number value = pos.getImag();
 		value.sub(viewData.anchor.getImag());
 		value.div(chunkZoom);
@@ -759,7 +738,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		return Math.sqrt(dx*dx + dy*dy);
 	}
 
-	private double getScreenDistance(Chunk chunk) {
+	public double getScreenDistance(Chunk chunk) {
 		return getScreenDistance(chunk.getChunkX(), chunk.getChunkY());
 	}
 	

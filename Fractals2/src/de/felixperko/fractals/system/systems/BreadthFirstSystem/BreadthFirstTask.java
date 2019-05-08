@@ -15,7 +15,7 @@ import de.felixperko.fractals.system.task.TaskManager;
 import de.felixperko.fractals.system.task.statistics.TaskStats;
 import de.felixperko.fractals.system.task.statistics.TaskStatsEmpty;
 
-public class BreadthFirstTask extends BasicTask {
+public class BreadthFirstTask extends BasicTask implements BreadthFirstQueueEntry {
 	
 	private static final long serialVersionUID = 428442040367400862L;
 
@@ -109,11 +109,6 @@ public class BreadthFirstTask extends BasicTask {
 	public void updateDistance(double chunkX, double chunkY) {
 		distance = getChunk().distance(chunkX, chunkY);
 	}
-	
-	public void updatePriorityAndDistance(double chunkX, double chunkY, Layer layer) {
-		updateDistance(chunkX, chunkY);
-		priority = distance * layer.getPriorityMultiplier() + layer.getPriorityShift();
-	}
 
 	public Double getDistance() {
 		return distance;
@@ -125,5 +120,18 @@ public class BreadthFirstTask extends BasicTask {
 	
 	public Layer getPreviousLayer() {
 		return previousLayer;
+	}
+
+	
+	@Override
+	public int getLayerId() {
+		return getStateInfo().getLayer().getId();
+	}
+
+	
+	@Override
+	public void updatePriorityAndDistance(double midpointChunkX, double midpointChunkY, BreadthFirstLayer layer) {
+		updateDistance(midpointChunkX, midpointChunkX);
+		priority = distance * layer.getPriorityMultiplier() + layer.getPriorityShift();
 	}
 }

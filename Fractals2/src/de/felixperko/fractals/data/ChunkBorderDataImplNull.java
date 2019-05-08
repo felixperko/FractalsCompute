@@ -4,6 +4,8 @@ import java.util.List;
 
 public class ChunkBorderDataImplNull implements ChunkBorderData {
 
+	private static final long serialVersionUID = 3220272617615167154L;
+
 	@Override
 	public AbstractArrayChunk getChunk() {
 		return null;
@@ -21,19 +23,15 @@ public class ChunkBorderDataImplNull implements ChunkBorderData {
 
 	@Override
 	public List<Integer> getChangedIndices() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void updateDone() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public BorderAlignment getAlignment() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

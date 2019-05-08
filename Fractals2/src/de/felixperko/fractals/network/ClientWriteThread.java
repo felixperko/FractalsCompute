@@ -20,7 +20,6 @@ public class ClientWriteThread extends WriteThread{
 	
 	public ClientWriteThread(ClientManagers managers, Socket socket) throws UnknownHostException, IOException {
 		super(managers, socket);
-		//TODO managers und clients
 		log = superLogger.createSubLogger("out");
 		setListenLogger(new CategoryLogger("com/client/in", Color.MAGENTA));
 //		setConnection(managers.getClientNetworkManager().getServerConnection());

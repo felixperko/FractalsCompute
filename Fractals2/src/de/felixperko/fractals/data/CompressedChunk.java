@@ -31,12 +31,9 @@ public class CompressedChunk implements Serializable{
 	Map<BorderAlignment, ChunkBorderData> selfBorderData;
 	Map<BorderAlignment, ChunkBorderData> neighbourBorderData;
 	
-	transient ReducedNaiveChunk chunk;//TODO debug remove
-	
 	public CompressedChunk(ReducedNaiveChunk chunk, int upsample, int jobId, boolean includeBorderData) {
 		this.upsample = upsample;
 		this.jobId = jobId;
-		this.chunk = chunk;
 		this.chunkX = chunk.chunkX;
 		this.chunkY = chunk.chunkY;
 		this.dimensionSize = chunk.dimensionSize;
