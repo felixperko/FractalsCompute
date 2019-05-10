@@ -7,9 +7,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.felixperko.fractals.network.Connection;
-import de.felixperko.fractals.network.infra.connection.AbstractConnection;
-import de.felixperko.fractals.network.infra.connection.ClientConnection;
-import de.felixperko.fractals.network.infra.connection.ConnectionListener;
 
 /**
  * Continuous data that needs to be synced for clients through update messages.
@@ -22,7 +19,8 @@ public abstract class ContinuousSharedData extends SharedData<SharedDataUpdate>{
 	
 	Map<Integer, List<SharedDataUpdate>> updates = new HashMap<>();
 	
-	public ContinuousSharedData(boolean disposeDistributed) {
+	public ContinuousSharedData(String dataIdentifier, boolean disposeDistributed) {
+		super(dataIdentifier);
 		this.disposeDistributed = disposeDistributed;
 	}
 	
@@ -45,7 +43,7 @@ public abstract class ContinuousSharedData extends SharedData<SharedDataUpdate>{
 		DataContainer ans;
 		synchronized (updates) {
 			list.addAll(updates.get(versionCounter));
-			ans = new ContinuousDataContainer(versionCounter, list);
+			ans = new ContinuousDataContainer(dataIdentifier, versionCounter, list);
 			connections.put(connection, (Integer)versionCounter);
 			if (!list.isEmpty())
 				versionCounter++;

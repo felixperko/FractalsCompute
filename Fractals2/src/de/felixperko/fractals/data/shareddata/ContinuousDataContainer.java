@@ -1,6 +1,5 @@
 package de.felixperko.fractals.data.shareddata;
 
-import java.io.Serializable;
 import java.util.List;
 
 public class ContinuousDataContainer extends DataContainer{
@@ -9,8 +8,8 @@ public class ContinuousDataContainer extends DataContainer{
 	
 	int version;
 	
-	public ContinuousDataContainer(int version, List<SharedDataUpdate> updates) {
-		super(updates);
+	public ContinuousDataContainer(String dataIdentifier, int version, List<SharedDataUpdate> updates) {
+		super(dataIdentifier, updates);
 		this.version = version;
 	}
 }

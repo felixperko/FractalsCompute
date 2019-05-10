@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import de.felixperko.fractals.data.shareddata.DataContainer;
+import de.felixperko.fractals.data.shareddata.SharedDataUpdate;
 import de.felixperko.fractals.system.parameters.ParameterConfiguration;
 import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
 import de.felixperko.fractals.system.task.FractalsTask;
@@ -49,4 +51,6 @@ public abstract class ClientMessageInterface {
 	public abstract void serverStateUpdated(ServerStateInfo serverStateInfo);
 	
 	public abstract void assignedTasks(List<FractalsTask> tasks);
+
+	public abstract void updateSharedData(DataContainer container);
 }
