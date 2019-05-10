@@ -1,24 +1,30 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 import de.felixperko.fractals.data.AbstractArrayChunk;
+import de.felixperko.fractals.data.BorderAlignment;
+import de.felixperko.fractals.data.Chunk;
+import de.felixperko.fractals.data.ChunkBorderData;
+import de.felixperko.fractals.data.ChunkBorderDataImplNull;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 
 public class BreadthFirstMultilayerQueue extends AbstractBreadthFirstMultilayerQueue<BreadthFirstTask, BreadthFirstLayer> {
 	
 
-	BreadthFirstTaskManager taskManager;
+	BreadthFirstTaskManagerNew taskManager;
 	
 	Queue<BreadthFirstTask> newQueue = new LinkedList<>(); //for generation
 	
 	double border_generation = 0;
 	double border_dispose = 5;
 
-	public BreadthFirstMultilayerQueue(BreadthFirstTaskManager taskManager, List<BreadthFirstLayer> layers,
+	public BreadthFirstMultilayerQueue(BreadthFirstTaskManagerNew taskManager, List<BreadthFirstLayer> layers,
 			Comparator<BreadthFirstTask> comparator_priority, Comparator<BreadthFirstTask> comparator_distance) {
 		super(layers, comparator_priority, comparator_distance);
 		this.taskManager = taskManager;
@@ -137,5 +143,48 @@ public class BreadthFirstMultilayerQueue extends AbstractBreadthFirstMultilayerQ
 	public synchronized void reset() {
 		super.reset();
 		newQueue.clear();
+	}
+
+	@Override
+	protected void onPoll(BreadthFirstTask obj) {
+		if (obj.getPreviousLayer() != null && obj.getPreviousLayer().cullingEnabled()) {
+			Map<BorderAlignment, ChunkBorderData> neighbourBorderData = new HashMap<>();
+			AbstractArrayChunk chunk = ((AbstractArrayChunk)obj.getChunk());
+			int x = chunk.getChunkX();
+			int y = chunk.getChunkX();
+			for (BorderAlignment alignment : BorderAlignment.values()) {
+				Chunk c = taskManager.viewData.getChunk(alignment.getNeighbourX(x), alignment.getNeighbourY(y));
+				BorderAlignment relative = alignment.getAlignmentForNeighbour();
+				if (c == null) {
+					neighbourBorderData.put(relative, new ChunkBorderDataImplNull());
+				} else {
+					AbstractArrayChunk neighbour = (AbstractArrayChunk) c;
+					neighbourBorderData.put(relative, neighbour.getBorderData(alignment));
+				}
+			}
+			chunk.setNeighbourBorderData(neighbourBorderData);
+		}
+		obj.getStateInfo().setState(TaskState.ASSIGNED);
+	}
+
+	public boolean setGenerationBorder(Double value) {
+		if (value == null || border_generation == value)
+			return false;
+		border_generation = value;
+		return true;
+	}
+
+	public boolean setDisposeBorder(Double value) {
+		if (value == null || border_dispose == value)
+			return false;
+		border_dispose = value;
+		return true;
+	}
+
+	public boolean setTaskBufferSize(Integer value) {
+		if (value == null || buffer == value)
+			return false;
+		buffer = value;
+		return true;
 	}
 }

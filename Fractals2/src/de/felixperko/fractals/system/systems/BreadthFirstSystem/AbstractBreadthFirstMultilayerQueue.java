@@ -11,10 +11,37 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import de.felixperko.fractals.data.AbstractArrayChunk;
+import de.felixperko.fractals.data.BorderAlignment;
+import de.felixperko.fractals.data.Chunk;
+import de.felixperko.fractals.data.ChunkBorderData;
+import de.felixperko.fractals.data.ChunkBorderDataImplNull;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.messages.ChunkUpdateMessage;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
+import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.system.task.TaskProviderAdapter;
+
+//first chunk at relative 0, 0
+//generate neighbours -> add to open queue
+/* N N N N N
+* N N C N N
+* N C 1 C N
+* N N C N N
+* N N N N N */
+//choose next neigbour with lowest euclidian distance
+//neighbour extracted -> generate neighbours that don't exist
+/* N N C N N
+* N C 1 C N
+* C 1 1 1 C
+* N C 1 C N
+* N N C N N */
+
+/* N C C C N
+* C 1 1 1 C
+* C 1 1 1 C
+* C 1 1 1 C
+* N C C C N*/
+//multiple layers -> multiple search instances (collect next task for each instance in queue according to prioritization (fetch new from pass when taken)
 
 public abstract class AbstractBreadthFirstMultilayerQueue<O extends BreadthFirstQueueEntry, L> {
 	
@@ -36,18 +63,51 @@ public abstract class AbstractBreadthFirstMultilayerQueue<O extends BreadthFirst
 		this.comparator_distance = comparator_distance;
 		this.comparator_priority = comparator_priority;
 		
-		this.layers = layers;
 		this.nextOpenTasks = new PriorityQueue<>(comparator_priority);
 		this.nextBufferedTasks = new PriorityQueue<>(comparator_priority);
 		
 		init();
 	}
 	
+	public void add(O obj) {
+		openTasks.get(obj.getLayerId()).add(obj);
+	}
+	
 	public synchronized void init() {
+		openTasks.clear();
+		tempList.clear();
 		for (int i = 0 ; i < layers.size() ; i++) {
 			openTasks.add(new PriorityQueue<>(comparator_distance));
 			tempList.add(new ArrayList<>());
 		}
+	}
+	
+	public void setLayers(List<L> layers) {
+		this.layers = layers;
+		init();
+	}
+	
+	public List<O> poll(int count) {
+		List<O> polled = new ArrayList<>();
+		for (int i = 0 ; i < count ; i++) {
+			O obj = null;
+			for (int try1 = 0 ; try1 < 3 ; try1++){
+				try {
+					obj = nextBufferedTasks.poll();
+					if (obj != null)
+						break;
+				} catch (NullPointerException e) {
+					e.printStackTrace();
+				}
+			}
+			if (obj == null)
+				break;
+			
+			onPoll(obj);
+				
+			polled.add(obj);
+		}
+		return polled;
 	}
 	
 	public synchronized boolean fillQueues() {
@@ -100,7 +160,6 @@ public abstract class AbstractBreadthFirstMultilayerQueue<O extends BreadthFirst
 	public void predictedMidpointUpdated() {
 		//clear queues to update sorting
 		synchronized (this) {
-//			List<BreadthFirstLayer> layers = layerConfig.getLayers();
 			for (int l = 0 ; l < layers.size() ; l++) {
 				tempList.get(l).addAll(openTasks.get(l));
 				openTasks.get(l).clear();
@@ -126,11 +185,8 @@ public abstract class AbstractBreadthFirstMultilayerQueue<O extends BreadthFirst
 			}
 			
 			//re-add
-//			boolean addedMidpoint = false;
 			for (int l = 0 ; l < layers.size() ; l++) {
 				for (O task : tempList.get(l)) {
-//					if (task.getChunk().getChunkX() == (long)midpointChunkX && task.getChunk().getChunkY() == (long)midpointChunkY)
-//						addedMidpoint = true;
 					if (isConditionDispose(task)) {
 						inDisposal(task);
 						continue;
@@ -155,6 +211,8 @@ public abstract class AbstractBreadthFirstMultilayerQueue<O extends BreadthFirst
 		nextBufferedTasks.clear();
 		borderTasks.clear();
 	}
+	
+	protected abstract void onPoll(O obj);
 	
 	protected abstract void updateTaskPriority(O task, int layer);
 	
