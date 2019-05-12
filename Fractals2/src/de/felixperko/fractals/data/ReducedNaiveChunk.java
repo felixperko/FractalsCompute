@@ -1,20 +1,5 @@
 package de.felixperko.fractals.data;
 
-import java.awt.image.SampleModel;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.zip.DataFormatException;
-import java.util.zip.Deflater;
-import java.util.zip.GZIPOutputStream;
-import java.util.zip.Inflater;
-
-import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstViewData;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.ViewData;
 
 public class ReducedNaiveChunk extends AbstractArrayChunk {

@@ -353,7 +353,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		rightUpperCornerChunkX = getChunkX(rightUpperCorner);
 		rightUpperCornerChunkY = getChunkY(rightUpperCorner);
 		
-		if (params.get("midpoint").isChanged() || params.get("width").isChanged() || params.get("height").isChanged()) {
+		if (params.get("midpoint").isChanged() || params.get("width").isChanged() || params.get("height").isChanged() || params.get("zoom").isChanged()) {
 			updatePredictedMidpoint();
 			if (!reset)
 				predictedMidpointUpdated();

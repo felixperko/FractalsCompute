@@ -35,7 +35,7 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 	
 	TaskFactory factory_task = new ClassTaskFactory(BreadthFirstTask.class);
 	
-	BreadthFirstTaskManagerNew taskManager;
+	BreadthFirstTaskManager taskManager;
 	
 	List<ClientConfiguration> clients = new ArrayList<>();
 	
@@ -223,7 +223,7 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 	public boolean onInit(Map<String, ParamSupplier> params) {
 		
 		log.log("initializing");
-		taskManager = new BreadthFirstTaskManagerNew(managers, this);
+		taskManager = new BreadthFirstTaskManager(managers, this);
 		taskManager.setParameters(params);
 		
 		return true;
