@@ -20,10 +20,11 @@ import de.felixperko.fractals.system.systems.infra.ClassSystemFactory;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
 import de.felixperko.fractals.util.CategoryLogger;
+import de.felixperko.fractals.util.ColorContainer;
 
 public class SystemManager extends Manager{
 	
-	CategoryLogger log = new CategoryLogger("systems", Color.YELLOW);
+	CategoryLogger log = new CategoryLogger("systems", ColorContainer.YELLOW);
 	
 	Map<UUID, CalcSystem> activeSystems = new HashMap<>();
 	
