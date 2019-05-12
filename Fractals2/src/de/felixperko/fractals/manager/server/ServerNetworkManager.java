@@ -23,6 +23,7 @@ import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsa
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.util.CategoryLogger;
+import de.felixperko.fractals.util.ColorContainer;
 
 /**
  * Server class.
@@ -31,7 +32,7 @@ import de.felixperko.fractals.util.CategoryLogger;
 
 public class ServerNetworkManager extends Manager implements NetworkManager{
 	
-	CategoryLogger log = new CategoryLogger("com/server", Color.MAGENTA);
+	CategoryLogger log = new CategoryLogger("com/server", ColorContainer.MAGENTA);
 	
 	ServerConnectThread serverConnectThread;
 	

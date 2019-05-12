@@ -8,12 +8,13 @@ import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.util.CategoryLogger;
+import de.felixperko.fractals.util.ColorContainer;
 
 public class ClientLocalConnection extends AbstractConnection<ServerNetworkManager> implements ClientConnection{
 	
 	SenderInfo senderInfo;
 	
-	CategoryLogger log = new CategoryLogger("com/local", Color.MAGENTA);
+	CategoryLogger log = new CategoryLogger("com/local", ColorContainer.MAGENTA);
 	
 	ServerNetworkManager networkManager;
 	

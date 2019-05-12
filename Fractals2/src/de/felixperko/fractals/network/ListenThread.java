@@ -18,10 +18,11 @@ import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.util.CategoryLogger;
+import de.felixperko.fractals.util.ColorContainer;
 
 public class ListenThread extends AbstractFractalsThread {
 	
-	final static CategoryLogger LOGGER_GENERIC = new CategoryLogger("com/server/generic/in", Color.MAGENTA);
+	final static CategoryLogger LOGGER_GENERIC = new CategoryLogger("com/server/generic/in", ColorContainer.MAGENTA);
 	
 	static int ID_COUNTER = 0;
 

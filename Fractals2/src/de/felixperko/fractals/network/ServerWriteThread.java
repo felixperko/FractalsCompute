@@ -10,11 +10,12 @@ import de.felixperko.fractals.network.infra.connection.ClientRemoteConnection;
 import de.felixperko.fractals.network.messages.ConnectedMessage;
 import de.felixperko.fractals.network.messages.ReachableRequestMessage;
 import de.felixperko.fractals.util.CategoryLogger;
+import de.felixperko.fractals.util.ColorContainer;
 import de.felixperko.fractals.util.NumberUtil;
 
 public class ServerWriteThread extends WriteThread {
 	
-	final static CategoryLogger superLog = new CategoryLogger("com/server", Color.MAGENTA);
+	final static CategoryLogger superLog = new CategoryLogger("com/server", ColorContainer.MAGENTA);
 	
 	ClientRemoteConnection clientConnection;
 	

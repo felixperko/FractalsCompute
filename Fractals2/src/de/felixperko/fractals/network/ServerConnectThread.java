@@ -14,10 +14,11 @@ import de.felixperko.fractals.system.systems.infra.LifeCycleComponent;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.util.CategoryLogger;
+import de.felixperko.fractals.util.ColorContainer;
 
 public class ServerConnectThread extends AbstractFractalsThread{
 
-	CategoryLogger log = new CategoryLogger("com/server", Color.MAGENTA);
+	CategoryLogger log = new CategoryLogger("com/server", ColorContainer.MAGENTA);
 	
 	public ServerConnectThread(ServerManagers managers) {
 		super(managers, "COM_CONN");
