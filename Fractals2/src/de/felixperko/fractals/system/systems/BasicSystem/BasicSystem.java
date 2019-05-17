@@ -3,6 +3,7 @@ package de.felixperko.fractals.system.systems.BasicSystem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.SystemClientData;
@@ -10,7 +11,6 @@ import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.network.messages.SystemConnectedMessage;
 import de.felixperko.fractals.system.parameters.ParameterConfiguration;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
-import de.felixperko.fractals.system.systems.BreadthFirstSystem.LayerConfiguration;
 import de.felixperko.fractals.system.systems.infra.AbstractCalcSystem;
 import de.felixperko.fractals.system.task.ClassTaskFactory;
 import de.felixperko.fractals.system.task.TaskFactory;

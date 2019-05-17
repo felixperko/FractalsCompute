@@ -1,15 +1,10 @@
 package de.felixperko.fractals.network;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
 import de.felixperko.fractals.manager.client.ClientManagers;
-import de.felixperko.fractals.manager.client.ClientNetworkManager;
-import de.felixperko.fractals.manager.server.ServerManagers;
-import de.felixperko.fractals.manager.server.ServerNetworkManager;
-import de.felixperko.fractals.manager.server.ServerThreadManager;
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.util.CategoryLogger;

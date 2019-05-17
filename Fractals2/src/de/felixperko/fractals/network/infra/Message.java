@@ -6,7 +6,6 @@ import java.util.List;
 
 import de.felixperko.fractals.network.Connection;
 import de.felixperko.fractals.network.SenderInfo;
-import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.util.CategoryLogger;
 import de.felixperko.fractals.util.NumberUtil;
 

@@ -1,10 +1,6 @@
 package de.felixperko.fractals.system.parameters.suppliers;
 
-import java.util.Random;
-
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
-import de.felixperko.fractals.system.Numbers.infra.Number;
-import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
 
 public abstract class CoordinateParamSupplier extends MappedParamSupplier {
 	

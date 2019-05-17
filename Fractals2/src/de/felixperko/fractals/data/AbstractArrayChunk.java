@@ -1,11 +1,14 @@
 package de.felixperko.fractals.data;
 
+import static de.felixperko.fractals.data.BorderAlignment.DOWN;
+import static de.felixperko.fractals.data.BorderAlignment.LEFT;
+import static de.felixperko.fractals.data.BorderAlignment.RIGHT;
+import static de.felixperko.fractals.data.BorderAlignment.UP;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.ViewData;
-
-import static de.felixperko.fractals.data.BorderAlignment.*;
 
 public abstract class AbstractArrayChunk extends AbstractChunk {
 	

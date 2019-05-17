@@ -2,11 +2,7 @@ package de.felixperko.fractals.network.messages;
 
 import java.util.UUID;
 
-import de.felixperko.fractals.data.AbstractArrayChunk;
-import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.CompressedChunk;
-import de.felixperko.fractals.network.infra.Message;
-import de.felixperko.fractals.network.infra.ServerMessage;
 import de.felixperko.fractals.network.infra.SystemServerMessage;
 import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
 

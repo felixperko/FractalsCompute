@@ -1,25 +1,18 @@
 package de.felixperko.fractals.system.systems.BasicSystem;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.imageio.ImageIO;
 
 import de.felixperko.fractals.data.AbstractArrayChunk;
+import de.felixperko.fractals.data.ArrayChunkFactory;
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.NaiveChunk;
-import de.felixperko.fractals.data.ArrayChunkFactory;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.manager.server.ServerNetworkManager;
-import de.felixperko.fractals.manager.server.ServerThreadManager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
 import de.felixperko.fractals.system.Numbers.DoubleNumber;
@@ -37,13 +30,8 @@ import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstLaye
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.task.AbstractTaskManager;
-import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.system.task.Layer;
-import de.felixperko.fractals.system.task.TaskManager;
 import de.felixperko.fractals.system.task.TaskProviderAdapter;
-import de.felixperko.fractals.system.thread.AbstractFractalsThread;
-import de.felixperko.fractals.system.thread.AbstractSystemThread;
-import de.felixperko.fractals.util.NumberUtil;
 
 public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 	

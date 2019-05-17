@@ -1,6 +1,7 @@
 package de.felixperko.fractals.network.messages;
 
 import java.util.List;
+
 import de.felixperko.fractals.data.shareddata.DataContainer;
 import de.felixperko.fractals.network.infra.ServerMessage;
 

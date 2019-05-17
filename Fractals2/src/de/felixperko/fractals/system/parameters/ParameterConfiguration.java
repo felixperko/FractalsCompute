@@ -2,6 +2,7 @@ package de.felixperko.fractals.system.parameters;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ public class ParameterConfiguration implements Serializable{
 	List<ParameterDefinition> parameters = new ArrayList<>();
 	Map<String, ParamValueType> types = new HashMap<>();
 	Map<String, Selection<?>> selections = new HashMap<>();
+	Map<String, List<ParamValueType>> listTypes = new HashMap<>();
 	
 	public void addParameterDefinition(ParameterDefinition definition) {
 		parameters.add(definition);
@@ -56,5 +58,16 @@ public class ParameterConfiguration implements Serializable{
 	
 	public void addSelection(Selection<?> selection) {
 		selections.put(selection.getName(), selection);
+	}
+
+	public void addListTypes(String listId, ParamValueType... possibleTypes) {
+		listTypes.put(listId, Arrays.asList(possibleTypes));
+	}
+	
+	public List<ParamValueType> getListTypes(String listId) {
+		List<ParamValueType> ans = listTypes.get(listId);
+//		if (ans == null)
+//			ans = new ArrayList<>();
+		return ans;
 	}
 }

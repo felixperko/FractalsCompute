@@ -1,7 +1,6 @@
 package de.felixperko.fractals.network.messages;
 
 import de.felixperko.fractals.network.infra.ClientMessage;
-import de.felixperko.fractals.network.infra.Message;
 
 public class ReachableResponseMessage extends ClientMessage{
 

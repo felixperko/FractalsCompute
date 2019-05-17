@@ -1,12 +1,9 @@
 package de.felixperko.fractals.network;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
-import de.felixperko.fractals.system.systems.infra.CalcSystem;
 
 public class SystemClientData implements Serializable{
 	

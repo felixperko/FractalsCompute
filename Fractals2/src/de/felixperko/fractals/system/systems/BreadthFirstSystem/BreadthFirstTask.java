@@ -12,8 +12,6 @@ import de.felixperko.fractals.system.systems.BasicSystem.BasicTask;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskManager;
-import de.felixperko.fractals.system.task.statistics.TaskStats;
-import de.felixperko.fractals.system.task.statistics.TaskStatsEmpty;
 
 public class BreadthFirstTask extends BasicTask implements BreadthFirstQueueEntry {
 	

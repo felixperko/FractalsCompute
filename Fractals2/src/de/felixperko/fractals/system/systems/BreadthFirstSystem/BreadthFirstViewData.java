@@ -1,11 +1,9 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
-import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
 
 import de.felixperko.fractals.data.Chunk;
-import de.felixperko.fractals.data.NaiveChunk;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.util.CategoryLogger;
 

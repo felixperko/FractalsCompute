@@ -2,7 +2,6 @@ package de.felixperko.fractals.network;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
@@ -15,8 +14,6 @@ import org.xerial.snappy.SnappyOutputStream;
 
 import de.felixperko.fractals.data.shareddata.SharedDataController;
 import de.felixperko.fractals.manager.common.Managers;
-import de.felixperko.fractals.manager.server.ServerManagers;
-import de.felixperko.fractals.manager.server.ServerThreadManager;
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;

@@ -1,6 +1,5 @@
 package de.felixperko.fractals.network.messages;
 
-import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.network.infra.ServerMessage;
 
 public class SessionInitResponseMessage extends ServerMessage{

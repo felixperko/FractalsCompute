@@ -1,7 +1,6 @@
 package de.felixperko.fractals.system.calculator;
 
 import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
-import de.felixperko.fractals.system.Numbers.DoubleNumber;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.calculator.infra.NewtonFractalCalculator;
 

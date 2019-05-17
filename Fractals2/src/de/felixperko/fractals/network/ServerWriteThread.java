@@ -1,10 +1,8 @@
 package de.felixperko.fractals.network;
 
-import java.awt.Color;
 import java.net.Socket;
 
 import de.felixperko.fractals.manager.server.ServerManagers;
-import de.felixperko.fractals.manager.server.ServerThreadManager;
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.network.infra.connection.ClientRemoteConnection;
 import de.felixperko.fractals.network.messages.ConnectedMessage;

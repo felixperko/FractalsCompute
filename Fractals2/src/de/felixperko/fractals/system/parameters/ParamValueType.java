@@ -14,9 +14,9 @@ public class ParamValueType implements Serializable{
 	
 	public ParamValueType(String name, ParamValueField... fields) {
 		this.name = name;
-		if (fields != null && fields.length > 0) {
-			this.fields = new ArrayList<>();
-			for (int i = 0; i < fields.length; i++) {
+		this.fields = new ArrayList<>();
+		if (fields != null) {
+			for (int i = 0 ; i < fields.length ; i++) {
 				this.fields.add(fields[i]);
 			}
 		}

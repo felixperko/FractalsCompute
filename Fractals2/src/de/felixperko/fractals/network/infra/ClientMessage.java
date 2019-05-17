@@ -1,9 +1,7 @@
 package de.felixperko.fractals.network.infra;
 
-import de.felixperko.fractals.network.Connection;
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
-import de.felixperko.fractals.network.infra.connection.ServerConnection;
 
 public abstract class ClientMessage extends Message<ClientConnection, ClientConnection> {
 	

@@ -1,8 +1,6 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,9 +12,6 @@ import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.network.messages.SystemConnectedMessage;
 import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
 import de.felixperko.fractals.system.Numbers.DoubleNumber;
-import de.felixperko.fractals.system.calculator.BurningShipCalculator;
-import de.felixperko.fractals.system.calculator.MandelbrotCalculator;
-import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.parameters.ParamValueField;
 import de.felixperko.fractals.system.parameters.ParamValueType;
 import de.felixperko.fractals.system.parameters.ParameterConfiguration;
@@ -65,11 +60,11 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		ParamValueType arraychunkfactoryType = new ParamValueType("arraychunkfactory",
 				new ParamValueField("chunkClass", classType, ReducedNaiveChunk.class),
 				new ParamValueField("chunkSize", integerType, 200));
-		ParamValueType layerType = new ParamValueType("Layer",
+		ParamValueType layerType = new ParamValueType("BreadthFirstLayer",
 				new ParamValueField("priority_shift", doubleType, 0d),
 				new ParamValueField("priority_multiplier", doubleType, 0d),
 				new ParamValueField("samples", integerType, 1));
-		ParamValueType upsampleLayerType = new ParamValueType("UpsampleLayer", 
+		ParamValueType upsampleLayerType = new ParamValueType("BreadthFirstUpsampleLayer", 
 				new ParamValueField("priority_shift", doubleType, 0d),
 				new ParamValueField("priority_multiplier", doubleType, 0d),
 				new ParamValueField("upsample", integerType, 1),
@@ -120,10 +115,10 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		List<ParameterDefinition> defs = new ArrayList<>();
 		defs.add(new ParameterDefinition("iterations", StaticParamSupplier.class, integerType));
 		defs.add(new ParameterDefinition("calculator", StaticParamSupplier.class, selectionType));
+		defs.add(new ParameterDefinition("layerConfiguration", StaticParamSupplier.class, layerconfigurationType));
 		defs.add(new ParameterDefinition("pow", varList, complexnumberType));
 		defs.add(new ParameterDefinition("c", varList, complexnumberType));
 		defs.add(new ParameterDefinition("start", varList, complexnumberType));
-		defs.add(new ParameterDefinition("layers", StaticParamSupplier.class, layerconfigurationType));
 		defs.add(new ParameterDefinition("numberFactory", StaticParamSupplier.class, numberfactoryType));
 		defs.add(new ParameterDefinition("chunkFactory", StaticParamSupplier.class, arraychunkfactoryType));
 		defs.add(new ParameterDefinition("limit", StaticParamSupplier.class, doubleType));
@@ -150,6 +145,8 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		Selection<String> systemNameSelection = new Selection<>("systemName");
 		systemNameSelection.addOption("BreadthFirstSystem", "BreadthFirstSystem");
 		parameterConfiguration.addSelection(systemNameSelection);
+		
+		parameterConfiguration.addListTypes("layers", layerType, upsampleLayerType);
 	}
 
 	@Override

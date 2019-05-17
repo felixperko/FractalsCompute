@@ -1,6 +1,5 @@
 package de.felixperko.fractals.system.task;
 
-import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;

@@ -1,6 +1,5 @@
 package de.felixperko.fractals.manager.server;
 
-import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,7 +7,6 @@ import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.data.ReducedNaiveChunk;
 import de.felixperko.fractals.manager.common.Manager;
-import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.manager.common.NetworkManager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.Connection;

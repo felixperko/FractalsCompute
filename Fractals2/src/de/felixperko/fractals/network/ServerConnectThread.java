@@ -1,16 +1,12 @@
 package de.felixperko.fractals.network;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.net.ServerSocket;
 
-import de.felixperko.fractals.FractalsMain;
-import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.manager.server.ServerNetworkManager;
 import de.felixperko.fractals.manager.server.ServerThreadManager;
 import de.felixperko.fractals.network.infra.connection.ClientRemoteConnection;
-import de.felixperko.fractals.system.systems.infra.LifeCycleComponent;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.util.CategoryLogger;

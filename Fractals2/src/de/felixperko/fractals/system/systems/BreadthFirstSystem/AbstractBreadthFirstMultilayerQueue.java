@@ -2,24 +2,10 @@ package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
-
-import de.felixperko.fractals.data.AbstractArrayChunk;
-import de.felixperko.fractals.data.BorderAlignment;
-import de.felixperko.fractals.data.Chunk;
-import de.felixperko.fractals.data.ChunkBorderData;
-import de.felixperko.fractals.data.ChunkBorderDataImplNull;
-import de.felixperko.fractals.network.ClientConfiguration;
-import de.felixperko.fractals.network.messages.ChunkUpdateMessage;
-import de.felixperko.fractals.system.systems.stateinfo.TaskState;
-import de.felixperko.fractals.system.task.FractalsTask;
-import de.felixperko.fractals.system.task.TaskProviderAdapter;
 
 //first chunk at relative 0, 0
 //generate neighbours -> add to open queue

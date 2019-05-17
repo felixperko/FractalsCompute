@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
-import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.util.CategoryLogger;
 
 public abstract class SystemClientMessage extends ClientMessage{

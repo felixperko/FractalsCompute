@@ -1,10 +1,6 @@
 package de.felixperko.fractals.data;
 
-import java.io.Serializable;
-
-import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.ViewData;
-import de.felixperko.fractals.system.task.FractalsTask;
 
 public class NaiveChunk extends AbstractArrayChunk{
 	

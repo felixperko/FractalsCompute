@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.felixperko.fractals.manager.common.NetworkManager;
-import de.felixperko.fractals.manager.server.ServerNetworkManager;
 import de.felixperko.fractals.network.Connection;
 
 public abstract class AbstractConnection<N extends NetworkManager> implements Connection<N> {

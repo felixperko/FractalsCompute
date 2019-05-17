@@ -3,8 +3,6 @@ package de.felixperko.fractals.network.messages;
 import java.util.UUID;
 
 import de.felixperko.fractals.network.ClientConfiguration;
-import de.felixperko.fractals.network.SenderInfo;
-import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.network.infra.SystemServerMessage;
 import de.felixperko.fractals.system.parameters.ParameterConfiguration;
 

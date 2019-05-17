@@ -1,6 +1,5 @@
 package de.felixperko.fractals.network;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +7,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import de.felixperko.fractals.data.shareddata.DataContainer;
-import de.felixperko.fractals.data.shareddata.SharedDataUpdate;
 import de.felixperko.fractals.system.parameters.ParameterConfiguration;
 import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
 import de.felixperko.fractals.system.task.FractalsTask;

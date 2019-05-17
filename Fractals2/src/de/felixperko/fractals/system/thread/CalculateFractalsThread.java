@@ -1,17 +1,10 @@
 package de.felixperko.fractals.system.thread;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.felixperko.fractals.manager.common.Managers;
-import de.felixperko.fractals.manager.server.ServerManagers;
-import de.felixperko.fractals.manager.server.ServerThreadManager;
-import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.system.task.TaskProvider;
-import de.felixperko.fractals.system.task.TaskProviderAdapter;
 
 public class CalculateFractalsThread extends AbstractFractalsThread{
 	

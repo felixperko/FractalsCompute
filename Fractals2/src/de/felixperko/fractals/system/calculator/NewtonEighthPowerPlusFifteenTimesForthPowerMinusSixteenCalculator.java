@@ -1,9 +1,7 @@
 package de.felixperko.fractals.system.calculator;
 
-import de.felixperko.fractals.data.NaiveChunk;
 import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
-import de.felixperko.fractals.system.calculator.infra.AbstractFractalsCalculator;
 import de.felixperko.fractals.system.calculator.infra.NewtonFractalCalculator;
 
 public class NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator extends NewtonFractalCalculator{

@@ -1,11 +1,7 @@
 package de.felixperko.fractals.network.messages;
 
-import java.util.UUID;
-
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.infra.ClientMessage;
-import de.felixperko.fractals.network.infra.Message;
-import de.felixperko.fractals.network.infra.SystemClientMessage;
 
 public class UpdateConfigurationMessage extends ClientMessage {
 

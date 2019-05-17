@@ -1,22 +1,20 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
-
-import javax.imageio.ImageIO;
 
 import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
 import de.felixperko.fractals.system.Numbers.DoubleNumber;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
-import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
+
+//debug image imports
+//import java.awt.image.BufferedImage;
+//import java.io.File;
+//import java.io.IOException;
+//import javax.imageio.ImageIO;
 
 /**
  * Manages layers for a system.
@@ -48,7 +46,7 @@ public class LayerConfiguration implements Serializable{
 	transient boolean prepared = false;
 	
 	
-	Color[] layerColors = new Color[] {new Color(1f, 0, 0), new Color(0f, 1f, 0f), new Color(0.0f,1f,1f), new Color(1f, 0f, 1f)};
+//	Color[] layerColors = new Color[] {new Color(1f, 0, 0), new Color(0f, 1f, 0f), new Color(0.0f,1f,1f), new Color(1f, 0f, 1f)};
 	
 	List<BreadthFirstLayer> layers;
 	double simStep;
@@ -184,8 +182,8 @@ public class LayerConfiguration implements Serializable{
 					System.out.println((lowestDist+"").replace('.', ','));
 			}
 			
-			if (debug)
-				testDraw(temp, maxLayer, step);
+//			if (debug)
+//				testDraw(temp, maxLayer, step);
 		}
 	}
 
@@ -218,44 +216,44 @@ public class LayerConfiguration implements Serializable{
 		temp[layerId] = points;
 	}
 
-	private void testDraw(double[][] temp, int layer, int step) {
-		//draw test picture
-		int width = 200;
-		int height = 200;
-		double minDist = 2./width;
-		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		for (int x = 0 ; x < width ; x++) {
-			for (int y = 0 ; y < height ; y++) {
-				Color color = null;
-				double relX = x/(double)width;
-				double relY = y/(double)height;
-				pointsearch:
-				for (int l2 = 0 ; l2 < temp.length ; l2++) {
-					double[] points2 = temp[l2];
-					if (points2 == null)
-						continue;
-					for (int i = 0 ; i < points2.length ; i+=2) {
-						double x2 = points2[i];
-						double y2 = points2[i+1];
-						double dx = x2-relX;
-						double dy = y2-relY;
-						if (Math.sqrt(dx*dx+dy*dy) < minDist) {
-							color = layerColors[l2];
-							break pointsearch;
-						}
-					}
-				}
-				if (color == null)
-					color = new Color(0, 0, 0, 1);
-				image.setRGB(x, y, color.getRGB());
-			}
-		}
-		try {
-			ImageIO.write(image, "png", new File(layer+"-"+step+".png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+//	private void testDraw(double[][] temp, int layer, int step) {
+//		//draw test picture
+//		int width = 200;
+//		int height = 200;
+//		double minDist = 2./width;
+//		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+//		for (int x = 0 ; x < width ; x++) {
+//			for (int y = 0 ; y < height ; y++) {
+//				Color color = null;
+//				double relX = x/(double)width;
+//				double relY = y/(double)height;
+//				pointsearch:
+//				for (int l2 = 0 ; l2 < temp.length ; l2++) {
+//					double[] points2 = temp[l2];
+//					if (points2 == null)
+//						continue;
+//					for (int i = 0 ; i < points2.length ; i+=2) {
+//						double x2 = points2[i];
+//						double y2 = points2[i+1];
+//						double dx = x2-relX;
+//						double dy = y2-relY;
+//						if (Math.sqrt(dx*dx+dy*dy) < minDist) {
+//							color = layerColors[l2];
+//							break pointsearch;
+//						}
+//					}
+//				}
+//				if (color == null)
+//					color = new Color(0, 0, 0, 1);
+//				image.setRGB(x, y, color.getRGB());
+//			}
+//		}
+//		try {
+//			ImageIO.write(image, "png", new File(layer+"-"+step+".png"));
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
 	
 	private double clamp(double value, double min, double max) {
 		return value < min ? min : (value > max ? max : value);

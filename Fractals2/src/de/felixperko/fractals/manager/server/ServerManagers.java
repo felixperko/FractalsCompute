@@ -1,7 +1,6 @@
 package de.felixperko.fractals.manager.server;
 
 import de.felixperko.fractals.manager.common.Managers;
-import de.felixperko.fractals.manager.common.NetworkManager;
 
 public class ServerManagers implements Managers {
 	
