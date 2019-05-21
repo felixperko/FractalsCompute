@@ -384,13 +384,13 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				int x = chunk.getChunkX();
 				int y = chunk.getChunkX();
 				for (BorderAlignment alignment : BorderAlignment.values()) {
-					Chunk c = viewData.getChunk(alignment.getNeighbourX(x), alignment.getNeighbourY(y));
 					BorderAlignment relative = alignment.getAlignmentForNeighbour();
+					Chunk c = viewData.getChunk(alignment.getNeighbourX(x), alignment.getNeighbourY(y));
 					if (c == null) {
-						neighbourBorderData.put(relative, new ChunkBorderDataImplNull());
+						neighbourBorderData.put(alignment, new ChunkBorderDataImplNull());
 					} else {
 						AbstractArrayChunk neighbour = (AbstractArrayChunk) c;
-						neighbourBorderData.put(relative, neighbour.getBorderData(alignment));
+						neighbourBorderData.put(alignment, neighbour.getBorderData(relative));
 					}
 				}
 				chunk.setNeighbourBorderData(neighbourBorderData);
@@ -559,12 +559,18 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				for (BreadthFirstTask task : tempList.get(l)) {
 //					if (task.getChunk().getChunkX() == (long)midpointChunkX && task.getChunk().getChunkY() == (long)midpointChunkY)
 //						addedMidpoint = true;
-					if (getScreenDistance(task.getChunk()) > border_dispose) {
+					double screenDistance = getScreenDistance(task.getChunk());
+					if (screenDistance > border_dispose) {
 						task.getStateInfo().setState(TaskState.REMOVED);
 						continue;
 					}
 					task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(l));
-					openTasks.get(l).add(task);
+					if (screenDistance > border_generation) {
+						task.getStateInfo().setState(TaskState.BORDER);
+						borderTasks.add(task);
+					} else {
+						openTasks.get(l).add(task);
+					}
 				}
 				tempList.get(l).clear();
 			}

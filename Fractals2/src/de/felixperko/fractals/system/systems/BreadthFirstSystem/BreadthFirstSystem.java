@@ -80,34 +80,7 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 				numberfactoryType, arraychunkfactoryType, layerconfigurationType, layerType, upsampleLayerType, selectionType
 		};
 		parameterConfiguration.addValueTypes(types);
-		/**
-		 * integer:
-		 * width, height, chunkSize, iterations, samples,
-		 * task_buffer
-		 * 
-		 * double:
-		 * border_generation, border_dispose, limit
-		 * 
-		 * number:
-		 * zoom
-		 * 
-		 * complexnumber:
-		 * midpoint, start, c, pow
-		 * 
-		 * string:
-		 * calculator, systemName
-		 * 
-		 * numberfactory: numberFactory
-		 * arraychunkfactory: chunkFactory
-		 * 
-		 * 
-		 * width -> integer
-		 * midpoint -> complexnumber
-		 * zoom -> number
-		 * layers -> List<BreadthFirstLayer>
-		 * calculator -> String from List
-		 * 
-		 */
+		
 		List<Class<? extends ParamSupplier>> varList = new ArrayList<>();
 		varList.add(StaticParamSupplier.class);
 		varList.add(CoordinateBasicShiftParamSupplier.class);

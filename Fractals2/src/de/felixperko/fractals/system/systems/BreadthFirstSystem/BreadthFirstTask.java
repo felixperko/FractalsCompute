@@ -53,8 +53,8 @@ public class BreadthFirstTask extends BasicTask implements BreadthFirstQueueEntr
 			int upsample = prevUpsampled.upsample;
 			int chunkSize = chunk.getChunkDimensions();
 			
-			for (int i = 0 ; i < chunk.getArrayLength() ; i++) {
-			}
+			//for (int i = 0 ; i < chunk.getArrayLength() ; i++) {
+			//}
 			
 			activePixelLoop:
 			for (int i = activePixels.nextSetBit(0) ; i != -1 ; i = activePixels.nextSetBit(i+1)) { //loop active pixels
