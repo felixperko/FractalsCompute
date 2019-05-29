@@ -10,6 +10,10 @@ public class TaskAssignedMessage extends ServerMessage {
 	
 	List<FractalsTask> tasks = new ArrayList<>();
 	
+	public TaskAssignedMessage(List<FractalsTask> tasks) {
+		this.tasks = tasks;
+	}
+	
 	@Override
 	protected void process() {
 		getBackConnection().getNetworkManager().getMessageInterface().assignedTasks(tasks);

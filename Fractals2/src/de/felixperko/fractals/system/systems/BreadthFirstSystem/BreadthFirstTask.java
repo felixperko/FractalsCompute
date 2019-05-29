@@ -119,13 +119,11 @@ public class BreadthFirstTask extends BasicTask implements BreadthFirstQueueEntr
 	public Layer getPreviousLayer() {
 		return previousLayer;
 	}
-
 	
 	@Override
 	public int getLayerId() {
 		return getStateInfo().getLayer().getId();
 	}
-
 	
 	@Override
 	public void updatePriorityAndDistance(double midpointChunkX, double midpointChunkY, BreadthFirstLayer layer) {

@@ -2,10 +2,13 @@ package de.felixperko.fractals.network.messages.task;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
+import de.felixperko.fractals.network.infra.ClientMessage;
 import de.felixperko.fractals.network.infra.SystemClientMessage;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
+import de.felixperko.fractals.system.task.FractalsTask;
 
 public class TaskStateChangedMessage extends SystemClientMessage {
 
@@ -24,7 +27,15 @@ public class TaskStateChangedMessage extends SystemClientMessage {
 
 	@Override
 	protected void process() {
-		// TODO Auto-generated method stub
+		
+		for (Entry<Integer, TaskState> e : map.entrySet()) {
+			FractalsTask task = getReceiverManagers().getSystemManager().getTask(getSystemId(), e.getKey());
+			if (task == null) {
+				log.log("warn", "TaskStateChanged: task is null");
+			} else {
+				task.getStateInfo().setState(e.getValue());
+			}
+		}
 	}
 
 }

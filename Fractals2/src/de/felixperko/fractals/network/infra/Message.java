@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.network.Connection;
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.util.CategoryLogger;
@@ -134,5 +135,9 @@ public abstract class Message<CONN extends Connection, BACKCONN extends Connecti
 
 	public void setSent(boolean sent) {
 		this.sent = sent;
+	}
+	
+	public Managers getReceiverManagers() {
+		return getBackConnection().getNetworkManager().getManagers();
 	}
 }

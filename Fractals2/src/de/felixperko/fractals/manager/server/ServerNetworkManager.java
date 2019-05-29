@@ -118,4 +118,8 @@ public class ServerNetworkManager extends Manager implements NetworkManager{
 	public Map<Integer, ClientConfiguration> getClients(){
 		return clients;
 	}
+	
+	public ServerManagers getServerManagers() {
+		return managers;
+	}
 }

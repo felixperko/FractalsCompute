@@ -25,4 +25,8 @@ public abstract class SystemClientMessage extends ClientMessage{
 		// TODO Auto-generated method stub
 		super.received(connection, log);
 	}
+	
+	public UUID getSystemId() {
+		return systemId;
+	}
 }

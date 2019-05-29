@@ -1,5 +1,8 @@
 package de.felixperko.fractals.system.calculator.infra;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
@@ -29,7 +32,11 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 	int iterations;
 	double limit;
 	int upsample;
-	Chunk chunk;
+	AbstractArrayChunk chunk;
+	
+	Queue<Integer> redo = new LinkedList<Integer>();
+	
+	CalculatePhase phase = null;
 	
 	@Override
 	public void calculate(AbstractArrayChunk chunk) {
@@ -44,6 +51,8 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 		
 		int pixelCount = chunk.getArrayLength();
 		int chunkSize = chunk.getChunkDimensions();
+		
+		phase = CalculatePhase.PHASE_MAINLOOP;
 		
 		loop : 
 		for (int pixel = 0 ; pixel < pixelCount ; pixel++) {
@@ -68,7 +77,21 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 					break loop;
 				calculateSample(pixel, sample);
 			}
-			chunk.getCurrentTask().getStateInfo().setProgress((pixel+1.)/pixelCount);
+			chunk.getCurrentTask().getStateInfo().setProgress((pixel+1.-redo.size())/pixelCount);
+		}
+		
+		redoLoop:
+		while (!redo.isEmpty()) {
+			phase = CalculatePhase.PHASE_REDO;
+			int pixel = redo.poll();
+			for (int sample = chunk.getSampleCount(pixel) ; sample < samples ; sample++) {
+				if (isCancelled()){
+					redo.clear();
+					break redoLoop;
+				}
+				calculateSample(pixel, sample);
+			}
+			chunk.getCurrentTask().getStateInfo().setProgress((pixelCount-redo.size())/pixelCount);
 		}
 	}
 	
@@ -84,11 +107,51 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 			if (abs > limit*limit) {
 //							Math.log( Math.log(real*real+imag*imag)*0.5 / Math.log(2) ) / Math.log(pow)  )
 				res = k - Math.log(Math.log(current.absSqDouble())*0.5/LOG_2)/logPow; //abs...
+				sample_success(pixel);
 				break;
 			}
 		}
 		chunk.addSample(pixel, res, upsample);
 	}
+	
+	private void sample_success(int pixel) {
+		if (chunk.getValue(pixel, true) <= 0)
+			sample_first_success(pixel);
+			
+	}
+	
+	private void sample_first_success(int pixel) {
+		final int chunkDimensions = chunk.getChunkDimensions();
+		final int chunkArrayLength = chunk.getArrayLength();
+		int thisX = pixel / chunkDimensions;
+		int thisY = pixel % chunkDimensions;
+		//disable culling of surrounding pixels
+		for (int dx = -1 ; dx <= 1 ; dx++) {
+			for (int dy = -1 ; dy <= 1 ; dy++) {
+				
+				if (dx == 0 && dy == 0)
+					continue;
+				
+				int x = thisX + dx;
+				int y = thisY + dy;
+				int pixel2 = x*chunkDimensions + y;
+				
+				if ((pixel2 < 0 || pixel2 >= chunkArrayLength))
+					continue;
+				
+				if (chunk.getValue(pixel2, true) == AbstractArrayChunk.FLAG_CULL) {
+					chunk.setCullFlags(pixel2, 1, false);
+					if (phase == CalculatePhase.PHASE_REDO || pixel > pixel2) {
+						redo.add(pixel2);
+					}
+				}
+			}
+		}
+	}
 
 	public abstract void executeKernel(ComplexNumber current, ComplexNumber exp, ComplexNumber c);
+	
+	enum CalculatePhase {
+		PHASE_MAINLOOP, PHASE_REDO;
+	}
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.WeakHashMap;
 
 import de.felixperko.fractals.manager.common.Manager;
 import de.felixperko.fractals.network.ClientConfiguration;
@@ -17,10 +18,13 @@ import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.ClassSystemFactory;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
+import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.util.CategoryLogger;
 import de.felixperko.fractals.util.ColorContainer;
 
 public class SystemManager extends Manager{
+	
+	HashMap<UUID, WeakHashMap<Integer, FractalsTask>> tasks = new HashMap<>();
 	
 	CategoryLogger log = new CategoryLogger("systems", ColorContainer.YELLOW);
 	
@@ -162,6 +166,24 @@ public class SystemManager extends Manager{
 			CalcSystem system = activeSystems.get(systemId);
 			system.removeClient(conf);
 		}
+	}
+
+	
+	public void addTask(FractalsTask task) {
+		getTaskMap(task.getSystemId()).put(task.getId(), task);
+	}
+	
+	public FractalsTask getTask(UUID systemId, Integer taskId) {
+		return getTaskMap(systemId).get(taskId);
+	}
+	
+	private WeakHashMap<Integer, FractalsTask> getTaskMap(UUID systemId) {
+		WeakHashMap<Integer, FractalsTask> map = tasks.get(systemId);
+		if (map == null) {
+			map = new WeakHashMap<Integer, FractalsTask>();
+			tasks.put(systemId, map);
+		}
+		return map;
 	}
 
 //	public CalcSystem initSystem(String systemName) {

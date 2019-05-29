@@ -1,5 +1,6 @@
 package de.felixperko.fractals.network.infra;
 
+import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
 
@@ -38,4 +39,7 @@ public abstract class ClientMessage extends Message<ClientConnection, ClientConn
 		this.backConnection = connection;
 	}
 
+	public ServerManagers getReceiverManagers() {
+		return (ServerManagers) super.getReceiverManagers();
+	}
 }

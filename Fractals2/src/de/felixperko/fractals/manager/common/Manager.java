@@ -7,5 +7,8 @@ public abstract class Manager {
 	public Manager(Managers managers) {
 		this.managers = managers;
 	}
-
+	
+	public Managers getManagers() {
+		return managers;
+	}
 }

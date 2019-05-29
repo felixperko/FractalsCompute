@@ -11,7 +11,7 @@ public class TaskStateInfo implements Serializable{
 	int taskId;
 	TaskState state;
 	double progress;
-	SystemStateInfo systemStateInfo;
+	transient SystemStateInfo systemStateInfo;
 	Layer layer;
 	
 	public TaskStateInfo(int taskId, Layer layer) {

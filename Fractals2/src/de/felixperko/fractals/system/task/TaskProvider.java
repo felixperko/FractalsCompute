@@ -1,5 +1,6 @@
 package de.felixperko.fractals.system.task;
 
+import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 
 public interface TaskProvider {
@@ -13,6 +14,7 @@ public interface TaskProvider {
 	public void removeLocalCalculateThread(CalculateFractalsThread calculateFractalsThread);
 	
 	public void cancelTasks();
+
 	
 //	public void addTaskManager(TaskManager taskManager);
 //	public void removeTaskManager(TaskManager taskManager);

@@ -2,16 +2,25 @@ package de.felixperko.fractals.system.task;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import de.felixperko.fractals.network.infra.connection.ClientConnection;
+import de.felixperko.fractals.network.messages.task.TaskAssignedMessage;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
+import de.felixperko.fractals.util.CategoryLogger;
+import de.felixperko.fractals.util.ColorContainer;
 
 /**
  * basic round robin implementation
  *
  */
 public class LocalTaskProvider implements TaskProvider {
+	
+	static CategoryLogger log = new CategoryLogger("taskprovider", new ColorContainer(0f, 1f, 1f));
 
 	List<TaskManager> taskManagers = Collections.synchronizedList(new ArrayList<>());
 	
@@ -20,6 +29,9 @@ public class LocalTaskProvider implements TaskProvider {
 	List<CalculateFractalsThread> localThreads = new ArrayList<>();
 	
 	LocalTaskProviderAdapter adapter = new LocalTaskProviderAdapter(this);
+	
+	Map<ClientConnection, Integer> requestedTasks = new HashMap<>();
+	Map<ClientConnection, List<FractalsTask>> assignedTasks = new HashMap<>();
 	
 //	Map<TaskManager, Long> threadTimeTaken = new HashMap<>();
 	
@@ -88,12 +100,72 @@ public class LocalTaskProvider implements TaskProvider {
 				return;
 			}
 		}
+		
+		ClientConnection connection = null;
+		int left = 0;
+		for (Entry<ClientConnection, Integer> e : requestedTasks.entrySet()) {
+			if (e.getValue() > left) {
+				connection = e.getKey();
+				left = e.getValue();
+			}
+		}
+		if (connection != null) {
+			FractalsTask task = getNextTask();
+			if (task == null)
+				return;
+			List<FractalsTask> list = new ArrayList<>();
+			list.add(task);
+			
+			assignRemoteTasks(connection, list);
+			
+			if (left == 1) {
+				requestedTasks.remove(connection);
+			} else {
+				requestedTasks.put(connection, left-1);
+			}
+		}
+	}
+	
+	public void assignRemoteTasks(ClientConnection connection, List<FractalsTask> tasks) {
+		getAssignedTaskList(connection).addAll(tasks);
+		TaskAssignedMessage msg = new TaskAssignedMessage(tasks);
+		connection.writeMessage(msg);
+		
+		Integer left = requestedTasks.get(connection);
+		if (left == null) {
+			log.log("warn", "Assigning Task that wasn't requested? (LocalTaskProvider)");
+			left = 0;
+		}
+		left -= tasks.size();
+		if (left <= 0)
+			requestedTasks.remove(connection);
+		else
+			requestedTasks.put(connection, left);
+	}
+	
+	public void completedRemoteTasks(ClientConnection connection, List<FractalsTask> tasks) {
+		getAssignedTaskList(connection).removeAll(tasks);
+		tasks.forEach(t -> finishedTask(t));
+	}
+	
+	private List<FractalsTask> getAssignedTaskList(ClientConnection connection){
+		List<FractalsTask> list = assignedTasks.get(connection);
+		if (list == null) {
+			list = new ArrayList();
+			assignedTasks.put(connection, list);
+		}
+		return list;
 	}
 
 	@Override
 	public void cancelTasks() {
 		for (CalculateFractalsThread t : localThreads)
 			t.abortTask();
+	}
+
+	
+	public void setClientRequests(ClientConnection connection, int tasksLeft) {
+		
 	}
 
 }
