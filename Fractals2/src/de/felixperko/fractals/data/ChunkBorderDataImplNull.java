@@ -13,7 +13,7 @@ public class ChunkBorderDataImplNull implements ChunkBorderData {
 
 	@Override
 	public boolean isSet(int borderIndex) {
-		return true;
+		return false;
 	}
 
 	@Override

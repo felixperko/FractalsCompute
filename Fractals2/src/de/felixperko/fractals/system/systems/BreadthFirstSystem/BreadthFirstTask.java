@@ -51,51 +51,89 @@ public class BreadthFirstTask extends BasicTask implements BreadthFirstQueueEntr
 			BreadthFirstUpsampleLayer prevUpsampled = (BreadthFirstUpsampleLayer) prev;
 			BitSet activePixels = prevUpsampled.getEnabledPixels();
 			int upsample = prevUpsampled.upsample;
-			int chunkSize = chunk.getChunkDimensions();
-			
+			int dim = chunk.getChunkDimensions();
 			//for (int i = 0 ; i < chunk.getArrayLength() ; i++) {
 			//}
 			
 			activePixelLoop:
 			for (int i = activePixels.nextSetBit(0) ; i != -1 ; i = activePixels.nextSetBit(i+1)) { //loop active pixels
-				int x = i / chunkSize;
-				int y = i % chunkSize;
+				int x = i / dim;
+				int y = i % dim;
 				boolean cull = true;
 				
 				evalCullingLoop:
 				for (int dx = -1 ; dx <= 1 ; dx++) {
 					for (int dy = -1 ; dy <= 1 ; dy++) {
-						int neighbourUpsampleIndex = i + dx*upsample*chunkSize + dy*upsample;
-						if (neighbourUpsampleIndex < 0){
-							if (dx == -1) {
-								if (chunk.getNeighbourBorderData(BorderAlignment.LEFT).isSet(y)) {
-									cull = false;
-									break evalCullingLoop;
-								}
-							} if (dy == -1){
-								if (chunk.getNeighbourBorderData(BorderAlignment.UP).isSet(x)) {
-									cull = false;
-									break evalCullingLoop;
-								}
+						
+						int neighbourUpsampleIndex = i + dx*upsample*dim + dy*upsample;
+						int x2 = x+dx*upsample;
+						int y2 = y+dy*upsample;
+
+						boolean local = true;
+						
+						if (x2 < 0){
+							local = false;
+							if (chunk.getNeighbourBorderData(BorderAlignment.LEFT).isSet(y)) {
+								cull = false;
+								break evalCullingLoop;
 							}
-						} else if (neighbourUpsampleIndex >= chunk.getArrayLength()) {
-							if (dx == 1) {
-								if (chunk.getNeighbourBorderData(BorderAlignment.RIGHT).isSet(y)) {
-									cull = false;
-									break evalCullingLoop;
-								}
-							} if (dy == 1){
-								if (chunk.getNeighbourBorderData(BorderAlignment.DOWN).isSet(x)) {
-									cull = false;
-									break evalCullingLoop;
-								}
-							}
-						} else {
-							if (chunk.getValue(neighbourUpsampleIndex, true) > 0) {
+						} else if (x2 >= dim){
+							local = false;
+							if (chunk.getNeighbourBorderData(BorderAlignment.RIGHT).isSet(y)) {
 								cull = false;
 								break evalCullingLoop;
 							}
 						}
+						
+						if (y2 < 0){
+							local = false;
+							if (chunk.getNeighbourBorderData(BorderAlignment.UP).isSet(x)) {
+								cull = false;
+								break evalCullingLoop;
+							}
+						} else if (y2 >= dim){
+							local = false;
+							if (chunk.getNeighbourBorderData(BorderAlignment.DOWN).isSet(x)) {
+								cull = false;
+								break evalCullingLoop;
+							}
+						}
+						
+						if (local && chunk.getValue(neighbourUpsampleIndex, true) > 0) {
+							cull = false;
+							break evalCullingLoop;
+						}
+						
+//						if (neighbourUpsampleIndex < 0){
+//							if (dx == -1) {
+//								if (chunk.getNeighbourBorderData(BorderAlignment.LEFT).isSet(y)) {
+//									cull = false;
+//									break evalCullingLoop;
+//								}
+//							} if (dy == -1){
+//								if (chunk.getNeighbourBorderData(BorderAlignment.UP).isSet(x)) {
+//									cull = false;
+//									break evalCullingLoop;
+//								}
+//							}
+//						} else if (neighbourUpsampleIndex >= chunk.getArrayLength()) {
+//							if (dx == 1) {
+//								if (chunk.getNeighbourBorderData(BorderAlignment.RIGHT).isSet(y)) {
+//									cull = false;
+//									break evalCullingLoop;
+//								}
+//							} if (dy == 1){
+//								if (chunk.getNeighbourBorderData(BorderAlignment.DOWN).isSet(x)) {
+//									cull = false;
+//									break evalCullingLoop;
+//								}
+//							}
+//						} else {
+//							if (chunk.getValue(neighbourUpsampleIndex, true) > 0) {
+//								cull = false;
+//								break evalCullingLoop;
+//							}
+//						}
 					}
 				}
 				

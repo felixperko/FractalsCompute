@@ -90,9 +90,9 @@ public class ReducedNaiveChunk extends AbstractArrayChunk {
 			for (ChunkBorderData data : getIndexBorderData(x, y, upsample)) {
 				BorderAlignment alignment = data.getAlignment();
 				if (alignment.isHorizontal()) {
-					data.set(hasValidValue, clampIndex(x-upsample-1), clampIndex(x+upsample));
+					data.set(!hasValidValue, clampIndex(x-upsample/2), clampIndex(x+upsample/2));//TODO true or false?
 				} else {
-					data.set(hasValidValue, clampIndex(y-upsample-1), clampIndex(y+upsample));
+					data.set(!hasValidValue, clampIndex(y-upsample/2), clampIndex(y+upsample/2));
 				}
 			}
 		}

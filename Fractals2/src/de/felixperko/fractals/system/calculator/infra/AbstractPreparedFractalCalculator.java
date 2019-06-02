@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import de.felixperko.fractals.data.AbstractArrayChunk;
+import de.felixperko.fractals.data.BorderAlignment;
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
@@ -101,6 +102,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 		ComplexNumber c = ((ComplexNumber) p_c.get(pixel,sample)).copy();
 		ComplexNumber pow = ((ComplexNumber) p_pow.get(pixel,sample)).copy();
 		double logPow = Math.log(pow.absDouble());
+//		long t1 = System.nanoTime();
 		for (int k = 0 ; k < iterations ; k++) {
 			executeKernel(current, pow, c);
 			double abs = current.absSqDouble();
@@ -111,6 +113,9 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 				break;
 			}
 		}
+//		long t2 = System.nanoTime();
+//		if (res != -1)
+//			res = (t2-t1);
 		chunk.addSample(pixel, res, upsample);
 	}
 	
@@ -134,15 +139,37 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 				
 				int x = thisX + dx;
 				int y = thisY + dy;
-				int pixel2 = x*chunkDimensions + y;
 				
-				if ((pixel2 < 0 || pixel2 >= chunkArrayLength))
-					continue;
+				//determine if in neighbour chunk
+				boolean local = true;
+				if (x < 0){
+					local = false;
+					if (y > 0 && y < chunkDimensions)
+						chunk.getBorderData(BorderAlignment.LEFT).set(true, y, y);
+				} else if (x >= chunkDimensions){
+					local = false;
+					if (y > 0 && y < chunkDimensions)
+						chunk.getBorderData(BorderAlignment.RIGHT).set(true, y, y);
+				}
 				
-				if (chunk.getValue(pixel2, true) == AbstractArrayChunk.FLAG_CULL) {
-					chunk.setCullFlags(pixel2, 1, false);
-					if (phase == CalculatePhase.PHASE_REDO || pixel > pixel2) {
-						redo.add(pixel2);
+				if (y < 0){
+					local = false;
+					if (x > 0 && x < chunkDimensions)
+						chunk.getBorderData(BorderAlignment.UP).set(true, x, x);
+				} else if (y >= chunkDimensions){
+					local = false;
+					if (x > 0 && x < chunkDimensions)
+						chunk.getBorderData(BorderAlignment.DOWN).set(true, x, x);
+				}
+				
+				//local -> add to redo queue
+				if (local){
+					int pixel2 = x*chunkDimensions + y;
+					if (chunk.getValue(pixel2, true) == AbstractArrayChunk.FLAG_CULL) {
+						chunk.setCullFlags(pixel2, 1, false);
+						if (phase == CalculatePhase.PHASE_REDO || pixel > pixel2) {
+							redo.add(pixel2);
+						}
 					}
 				}
 			}
