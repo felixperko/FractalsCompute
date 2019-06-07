@@ -419,7 +419,7 @@ public class BreadthFirstTaskManagerNew extends AbstractTaskManager<BreadthFirst
 	public ComplexNumber getChunkPos(long chunkX, long chunkY) {
 		ComplexNumber chunkPos = numberFactory.createComplexNumber(chunkX, chunkY);
 		chunkPos.add(relativeStartShift);
-		chunkPos.multNumber(chunkZoom);
+		chunkPos.mult(chunkZoom);
 		chunkPos.add(viewData.anchor);
 		return chunkPos;
 	}

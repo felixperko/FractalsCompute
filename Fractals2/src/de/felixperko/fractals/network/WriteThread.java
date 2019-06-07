@@ -106,7 +106,7 @@ public abstract class WriteThread extends AbstractFractalsThread {
 						if (msg.isCancelled())
 							continue;
 						prepareMessage(msg);
-	//						log.log("sending message: "+msg.getClass().getSimpleName());
+							log.log("sending message: "+msg.getClass().getSimpleName());
 						try {
 							out.writeUnshared(msg);
 							out.reset();
@@ -212,6 +212,10 @@ public abstract class WriteThread extends AbstractFractalsThread {
 			
 			this.compression = compression;
 		}
+	}
+
+	public Socket getSocket() {
+		return socket;
 	}
 	
 //	public void setConnection(Connection connection) {

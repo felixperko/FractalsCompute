@@ -217,5 +217,43 @@ public class CompressedChunk implements Serializable{
 
 	public int getJobId() {
 		return jobId;
+	}	public int getUpsample() {
+		return upsample;
+	}
+
+	public byte[] getValues_compressed() {
+		return values_compressed;
+	}
+
+	public byte[] getSamples_compressed() {
+		return samples_compressed;
+	}
+
+	public byte[] getFailedSamples_compressed() {
+		return failedSamples_compressed;
+	}
+
+	public int getChunkX() {
+		return chunkX;
+	}
+
+	public int getChunkY() {
+		return chunkY;
+	}
+
+	public int getDimensionSize() {
+		return dimensionSize;
+	}
+
+	public ComplexNumber getChunkPos() {
+		return chunkPos;
+	}
+
+	public Map<BorderAlignment, ChunkBorderData> getSelfBorderData() {
+		return selfBorderData;
+	}
+
+	public Map<BorderAlignment, ChunkBorderData> getNeighbourBorderData() {
+		return neighbourBorderData;
 	}
 }

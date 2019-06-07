@@ -64,9 +64,9 @@ public class ListenThread extends AbstractFractalsThread {
 						inObj = new ObjectInputStream(in);
 					}
 				} catch (IOException e) {
-					if (closeConnection)
-						break mainLoop;
+					System.err.println("IOException for connection from "+writeThread.getSocket().getInetAddress().getHostAddress());
 					e.printStackTrace();
+					break mainLoop;
 				}
 			}
 			
