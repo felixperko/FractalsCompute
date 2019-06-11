@@ -36,6 +36,20 @@ public class SystemClientData implements Serializable{
 	public Map<String, ParamSupplier> getClientParameters() {
 		return clientParameters;
 	}
+	
+	public boolean needsReset(Map<String, ParamSupplier> oldParams){
+		boolean reset = false;
+		if (oldParams != null) {
+			for (ParamSupplier supplier : clientParameters.values()) {
+				supplier.updateChanged(oldParams.get(supplier.getName()));
+				if (supplier.isChanged()) {
+					if (supplier.isSystemRelevant() || supplier.isLayerRelevant())
+						reset = true;
+				}
+			}
+		}
+		return reset;
+	}
 
 	@Override
 	public int hashCode() {

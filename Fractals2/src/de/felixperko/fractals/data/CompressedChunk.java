@@ -217,7 +217,9 @@ public class CompressedChunk implements Serializable{
 
 	public int getJobId() {
 		return jobId;
-	}	public int getUpsample() {
+	}
+	
+	public int getUpsample() {
 		return upsample;
 	}
 

@@ -103,6 +103,7 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		defs.add(new ParameterDefinition("zoom", StaticParamSupplier.class, numberType));
 		defs.add(new ParameterDefinition("midpoint", StaticParamSupplier.class, complexnumberType));
 		defs.add(new ParameterDefinition("systemName", StaticParamSupplier.class, selectionType));
+		defs.add(new ParameterDefinition("view", StaticParamSupplier.class, integerType));
 		
 		parameterConfiguration.addParameterDefinitions(defs);
 		

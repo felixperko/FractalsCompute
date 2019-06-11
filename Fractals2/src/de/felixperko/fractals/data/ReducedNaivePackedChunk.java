@@ -11,9 +11,9 @@ public class ReducedNaivePackedChunk extends AbstractArrayChunk{
 	int chunkX;
 	int chunkY;
 	int dimensionSize;
-	int downsample;
+	int upsample;
 	
-	protected ReducedNaivePackedChunk(int chunkX, int chunkY, int dimensionSize, float[] values, byte[] samples, byte[] failedSamples, int downsample) {
+	protected ReducedNaivePackedChunk(int chunkX, int chunkY, int dimensionSize, float[] values, byte[] samples, byte[] failedSamples, int upsample) {
 		super(null, chunkX, chunkY, dimensionSize);
 		this.chunkX = chunkX;
 		this.chunkY = chunkY;
@@ -21,7 +21,7 @@ public class ReducedNaivePackedChunk extends AbstractArrayChunk{
 		this.values = values;
 		this.samples = samples;
 		this.failedSamples = failedSamples;
-		this.downsample = downsample;
+		this.upsample = upsample;
 	}
 
 	public float[] getValues() {
@@ -87,17 +87,17 @@ public class ReducedNaivePackedChunk extends AbstractArrayChunk{
 	
 	@Override
 	public int getDownsample() {
-		return downsample;
+		return upsample;
 	}
 	
 	@Override
 	public int getDownsampleIncrement() {
-		return downsample*downsample;
+		return upsample*upsample;
 	}
 	
 	@Override
 	public int getStartIndex() {
-		return ((downsample/2+1) * (dimensionSize+1))*downsample;
+		return ((upsample/2+1) * (dimensionSize+1))*upsample;
 	}
 	
 	@Override

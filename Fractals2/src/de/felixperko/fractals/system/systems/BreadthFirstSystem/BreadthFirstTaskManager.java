@@ -241,21 +241,27 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		}
 		return changed;
 	}
-
-	@Override
-	public boolean setParameters(Map<String, ParamSupplier> params) {
-		setLifeCycleState(LifeCycleState.PAUSED);
-		System.out.println("setting params... "+System.currentTimeMillis());
+	
+	public static boolean needsReset(Map<String, ParamSupplier> newParams, Map<String, ParamSupplier> oldParams){ //TODO merge with method in SystemClientData
 		boolean reset = false;
-		if (this.parameters != null) {
-			for (ParamSupplier supplier : params.values()) {
-				supplier.updateChanged(this.parameters.get(supplier.getName()));
+		if (oldParams != null) {
+			for (ParamSupplier supplier : newParams.values()) {
+				supplier.updateChanged(oldParams.get(supplier.getName()));
 				if (supplier.isChanged()) {
 					if (supplier.isSystemRelevant() || supplier.isLayerRelevant())
 						reset = true;
 				}
 			}
 		}
+		return reset;
+	}
+
+	@Override
+	public boolean setParameters(Map<String, ParamSupplier> params) {
+		setLifeCycleState(LifeCycleState.PAUSED);
+		
+		boolean reset = needsReset(params, this.parameters);
+		
 		Map<String, ParamSupplier> oldParams = this.parameters;
 		this.parameters = params;
 		
@@ -335,6 +341,11 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		if (viewData == null) {
 			viewData = new BreadthFirstViewData(anchor);
 		}
+		ParamSupplier jobIdSupplier = parameters.get("view");
+		if (jobIdSupplier == null)
+			jobId = 0;
+		else
+			jobId = jobIdSupplier.getGeneral(Integer.class);
 		chunkFactory.setViewData(viewData);
 
 		leftLowerCorner = midpoint.copy();
@@ -379,21 +390,23 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				break;
 			
 			if (task.getPreviousLayer() != null && task.getPreviousLayer().cullingEnabled()) {
-				Map<BorderAlignment, ChunkBorderData> neighbourBorderData = new HashMap<>();
-				AbstractArrayChunk chunk = ((AbstractArrayChunk)task.getChunk());
-				int x = chunk.getChunkX();
-				int y = chunk.getChunkX();
-				for (BorderAlignment alignment : BorderAlignment.values()) {
-					BorderAlignment relative = alignment.getAlignmentForNeighbour();
-					Chunk c = viewData.getChunk(alignment.getNeighbourX(x), alignment.getNeighbourY(y));
-					if (c == null) {
-						neighbourBorderData.put(alignment, new ChunkBorderDataImplNull());
-					} else {
-						AbstractArrayChunk neighbour = (AbstractArrayChunk) c;
-						neighbourBorderData.put(alignment, neighbour.getBorderData(relative));
+				synchronized (this){
+					Map<BorderAlignment, ChunkBorderData> neighbourBorderData = new HashMap<>();
+					AbstractArrayChunk chunk = ((AbstractArrayChunk)task.getChunk());
+					int x = chunk.getChunkX();
+					int y = chunk.getChunkY();
+					for (BorderAlignment alignment : BorderAlignment.values()) {
+						BorderAlignment relative = alignment.getAlignmentForNeighbour();
+						Chunk c = viewData.getChunk(alignment.getNeighbourX(x), alignment.getNeighbourY(y));
+						if (c == null) {
+							neighbourBorderData.put(alignment, new ChunkBorderDataImplNull());
+						} else {
+							AbstractArrayChunk neighbour = (AbstractArrayChunk) c;
+							neighbourBorderData.put(alignment, neighbour.getBorderData(relative));
+						}
 					}
+					chunk.setNeighbourBorderData(neighbourBorderData);
 				}
-				chunk.setNeighbourBorderData(neighbourBorderData);
 			}
 				
 			tasks.add(task);
@@ -508,7 +521,6 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		finishedTasks.clear();
 		borderTasks.clear();
 		newQueue.clear();
-		jobId++;
 		if (viewData != null) {
 			viewData.dispose();
 			viewData = null;

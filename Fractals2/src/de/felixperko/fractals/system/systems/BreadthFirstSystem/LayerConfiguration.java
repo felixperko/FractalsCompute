@@ -9,6 +9,9 @@ import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
 import de.felixperko.fractals.system.Numbers.DoubleNumber;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
+import de.felixperko.fractals.util.CategoryLogger;
+import de.felixperko.fractals.util.ColorContainer;
+import de.felixperko.fractals.util.NumberUtil;
 
 //debug image imports
 //import java.awt.image.BufferedImage;
@@ -23,6 +26,9 @@ import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
  */
 
 public class LayerConfiguration implements Serializable{
+	
+	static CategoryLogger log = new CategoryLogger("systems/bf/LayerConfiguraton", new ColorContainer(1f, 1f, 0f));
+	static long preparedTimeout = (long)(1./NumberUtil.NS_TO_MS);
 	
 	public static void main(String[] args) {
 		List<BreadthFirstLayer> list = new ArrayList<>();
@@ -61,6 +67,16 @@ public class LayerConfiguration implements Serializable{
 	}
 	
 	public synchronized ComplexNumber[] getOffsets(int layerId) {
+		if (!prepared){
+			long waitingSince = System.nanoTime();
+			long time = System.nanoTime();
+			while (!prepared){
+				time = System.nanoTime();
+				if (time-waitingSince > preparedTimeout)
+					break;
+			}
+			log.log("waited for prepartion for "+NumberUtil.getTimeInS(time-waitingSince, 6));
+		}
 		if (!prepared)
 			throw new IllegalStateException("LayerConfiguration has to be prepared first (prepare()).");
 		return offsets[layerId];
