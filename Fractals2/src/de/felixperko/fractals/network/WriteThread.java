@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -94,11 +95,11 @@ public abstract class WriteThread extends AbstractFractalsThread {
 					newMessages.clear();
 				}
 				
-				Iterator<Message> it = pendingMessages.iterator();
-				while (it.hasNext()) {
-					if (closeConnection)
-						break mainLoop;
-					synchronized (pendingMessages) {
+				synchronized (pendingMessages) {
+					Iterator<Message> it = pendingMessages.iterator();
+					while (it.hasNext()) {
+						if (closeConnection)
+							break mainLoop;
 						Message msg = it.next();
 						it.remove();
 						msg.executeSentCallbacks();
@@ -106,7 +107,7 @@ public abstract class WriteThread extends AbstractFractalsThread {
 						if (msg.isCancelled())
 							continue;
 						prepareMessage(msg);
-							log.log("sending message: "+msg.getClass().getSimpleName());
+						log.log("sending message: "+msg.getClass().getSimpleName());
 						try {
 							out.writeUnshared(msg);
 							out.reset();

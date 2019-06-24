@@ -20,7 +20,6 @@ public class ChunkBorderDataImpl implements ChunkBorderData {
 		this.chunk = chunk;
 		this.alignment = alignment;
 		bits = new BitSet();
-//		bits.set(0, chunk.getChunkDimensions());
 	}
 	
 	@Override
@@ -68,6 +67,17 @@ public class ChunkBorderDataImpl implements ChunkBorderData {
 	@Override
 	public BorderAlignment getAlignment() {
 		return alignment;
+	}
+
+	@Override
+	public ChunkBorderData copy() {
+		ChunkBorderDataImpl copy = new ChunkBorderDataImpl(chunk, alignment);
+		copy.setBits((BitSet)bits.clone());
+		return copy;
+	}
+
+	public void setBits(BitSet bits) {
+		this.bits = bits;
 	}
 
 }

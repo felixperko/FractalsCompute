@@ -129,7 +129,10 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 	private ChunkBorderData[] getBorderDataForAlignments(BorderAlignment... alignments) {
 		ChunkBorderData[] res = new ChunkBorderData[alignments.length];
 		for (int i = 0 ; i < alignments.length ; i++) {
-			res[i] = selfBorderData.get(alignments[i]);
+			BorderAlignment alignment = alignments[i];
+			//if (alignment.isHorizontal())
+				alignment = alignment.getAlignmentForNeighbour();
+			res[i] = selfBorderData.get(alignment);
 		}
 		return res;
 	}
@@ -170,11 +173,13 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 	}
 
 	private void setCullFlag(int i, boolean cull, int upsample) {
-		if (cull)
-			addSample(i, FLAG_CULL, upsample);
-		else {
-			if (getValue(i, true) == FLAG_CULL)
-				removeFlag(i);
+		synchronized (selfBorderData) {
+			if (cull)
+				addSample(i, FLAG_CULL, upsample);
+			else {
+				if (getValue(i, true) == FLAG_CULL)
+					removeFlag(i);
+			}
 		}
 	}
 

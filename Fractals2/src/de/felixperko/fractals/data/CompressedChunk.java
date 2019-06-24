@@ -2,7 +2,9 @@ package de.felixperko.fractals.data;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.xerial.snappy.BitShuffle;
 import org.xerial.snappy.Snappy;
@@ -54,8 +56,16 @@ public class CompressedChunk implements Serializable{
 			e.printStackTrace();
 		}
 		if (includeBorderData) {
-			this.selfBorderData = chunk.getSelfBorderData();
-			this.neighbourBorderData = chunk.getNeighbourBorderData();
+			this.selfBorderData = new HashMap<>();
+			for (Entry<BorderAlignment, ChunkBorderData> e : chunk.getSelfBorderData().entrySet())
+				this.selfBorderData.put(e.getKey(), e.getValue().copy());
+
+			Map<BorderAlignment, ChunkBorderData> nbd = chunk.getNeighbourBorderData();
+			if (nbd != null){
+				this.neighbourBorderData = new HashMap<>();
+				for (Entry<BorderAlignment, ChunkBorderData> e : chunk.getSelfBorderData().entrySet())
+					this.neighbourBorderData.put(e.getKey(), e.getValue().copy());
+			}
 		}
 	}
 	

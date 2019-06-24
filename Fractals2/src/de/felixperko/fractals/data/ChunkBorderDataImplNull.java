@@ -35,4 +35,9 @@ public class ChunkBorderDataImplNull implements ChunkBorderData {
 		return null;
 	}
 
+	@Override
+	public ChunkBorderData copy() {
+		return new ChunkBorderDataImplNull();
+	}
+
 }
