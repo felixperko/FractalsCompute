@@ -35,13 +35,11 @@ public class TaskStateInfo implements Serializable{
 	public void setState(TaskState state) {
 		if (this.state == state)
 			return;
-		
-		systemStateInfo.getTaskListForState(this.state).remove(this);
-		
+		TaskState oldState = this.state;
 		this.state = state;
 		
-		if (state != TaskState.REMOVED)
-			systemStateInfo.getTaskListForState(state).add(this);
+		systemStateInfo.taskStateChanged(taskId, oldState, this);
+		
 	}
 
 	public double getProgress() {

@@ -1,6 +1,7 @@
 package de.felixperko.fractals.system.systems.stateinfo;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,8 +15,6 @@ public class SystemStateInfo implements Serializable{
 //	int currentWorkerThreads;
 	Map<Integer, TaskStateInfo> taskStates = new ConcurrentHashMap<>();
 	
-	Map<TaskState, List<TaskStateInfo>> tasksPerState = new ConcurrentHashMap<>();
-	
 	ServerStateInfo serverStateInfo;
 	
 	public void addTaskStateInfo(TaskStateInfo taskStateInfo) {
@@ -27,11 +26,10 @@ public class SystemStateInfo implements Serializable{
 	}
 	
 	public List<TaskStateInfo> getTaskListForState(TaskState state){
-		List<TaskStateInfo> stateList = tasksPerState.get(state);
-		if (stateList == null) {
-			stateList = new CopyOnWriteArrayList<>();
-			tasksPerState.put(state, stateList);
-		}
+		List<TaskStateInfo> stateList = new ArrayList<>();
+		for (TaskStateInfo info : taskStates.values())
+			if (info.getState().equals(state))
+				stateList.add(info);
 		return stateList;
 	}
 	
@@ -47,15 +45,18 @@ public class SystemStateInfo implements Serializable{
 		this.serverStateInfo = serverStateInfo;
 	}
 	
-	public Map<TaskState, List<TaskStateInfo>> getTasksPerState(){
-		return tasksPerState;
-	}
-	
 	protected void updateTime(){
 		serverStateInfo.updateTime();
 	}
 	
 	public long getUpdateTime(){
 		return serverStateInfo.getUpdateTime();
+	}
+
+	
+	public void taskStateChanged(int taskId, TaskState oldState, TaskStateInfo stateInfo) {
+		getTaskListForState(oldState).remove(stateInfo);
+		if (stateInfo.getState() != TaskState.REMOVED)
+			getTaskListForState(stateInfo.getState()).add(stateInfo);
 	}
 }
