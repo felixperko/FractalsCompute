@@ -96,12 +96,8 @@ public class ServerNetworkManager extends Manager implements NetworkManager{
 		return getClientConnection(senderInfo.getClientId());
 	}
 
-	public ChunkUpdateMessage updateChunk(ClientConfiguration client, CalcSystem system, AbstractArrayChunk chunk) {
-		Layer layer = chunk.getCurrentTask().getStateInfo().getLayer();
-		int upsample = 1;
-		if (layer instanceof BreadthFirstUpsampleLayer)
-			upsample = ((BreadthFirstUpsampleLayer)layer).getUpsample();
-		ChunkUpdateMessage message = new ChunkUpdateMessage(system.getId(), new CompressedChunk((ReducedNaiveChunk) chunk, upsample, chunk.getJobId(), true), managers.getSystemManager().getStateInfo());
+	public ChunkUpdateMessage updateChunk(ClientConfiguration client, CalcSystem system, CompressedChunk compressedChunk) {
+		ChunkUpdateMessage message = new ChunkUpdateMessage(system.getId(), compressedChunk, managers.getSystemManager().getStateInfo());
 		ClientConnection connection = client.getConnection();
 		if (connection != null){
 			connection.writeMessage(message);

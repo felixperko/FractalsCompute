@@ -12,6 +12,8 @@ import java.util.Map.Entry;
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.ArrayChunkFactory;
 import de.felixperko.fractals.data.Chunk;
+import de.felixperko.fractals.data.CompressedChunk;
+import de.felixperko.fractals.data.ReducedNaiveChunk;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.manager.server.ServerNetworkManager;
 import de.felixperko.fractals.network.ClientConfiguration;
@@ -320,10 +322,19 @@ public class BreadthFirstTaskManagerNew extends AbstractTaskManager<BreadthFirst
 				final Integer taskId = task.getId();
 				
 				if (task.getStateInfo().getLayer().renderingEnabled()) {
-					//skip clients if message already exists
+					
+					//compress
+					Layer layer = task.chunk.getCurrentTask().getStateInfo().getLayer();
+					int upsample = 1;
+					if (layer instanceof BreadthFirstUpsampleLayer)
+						upsample = ((BreadthFirstUpsampleLayer)layer).getUpsample();
+					CompressedChunk compressedChunk = new CompressedChunk((ReducedNaiveChunk) task.chunk, upsample, task.chunk.getJobId(), true);
+					
+					//update message if message is pending
 					Map<ClientConfiguration, ChunkUpdateMessage> oldMessages = pendingUpdateMessages.get(taskId);
 					if (oldMessages != null) {
 						for (Entry<ClientConfiguration, ChunkUpdateMessage> e : oldMessages.entrySet()) {
+							e.getValue().setChunk(compressedChunk);
 							skipClients.add(e.getKey());
 						}
 					} else {
@@ -333,9 +344,9 @@ public class BreadthFirstTaskManagerNew extends AbstractTaskManager<BreadthFirst
 				
 					//send update messages
 					for (ClientConfiguration client : clients) {
-//						if (skipClients.contains(client))
-//							continue;
-						ChunkUpdateMessage message = ((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, task.chunk);
+						if (skipClients.contains(client))
+							continue;
+						ChunkUpdateMessage message = ((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, compressedChunk);
 						if (message != null){
 							synchronized (oldMessages) {
 								oldMessages.put(client, message);	

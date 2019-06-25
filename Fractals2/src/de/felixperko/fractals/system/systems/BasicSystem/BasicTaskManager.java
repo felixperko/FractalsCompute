@@ -10,7 +10,9 @@ import java.util.Map;
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.ArrayChunkFactory;
 import de.felixperko.fractals.data.Chunk;
+import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.data.NaiveChunk;
+import de.felixperko.fractals.data.ReducedNaiveChunk;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.manager.server.ServerNetworkManager;
 import de.felixperko.fractals.network.ClientConfiguration;
@@ -27,6 +29,7 @@ import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstLayer;
+import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.task.AbstractTaskManager;
@@ -193,8 +196,16 @@ public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 		setLifeCycleState(LifeCycleState.RUNNING);
 		synchronized(this) {
 			for (BasicTask task : finishedTasks) {
+				
+				//compress
+				Layer layer = task.chunk.getCurrentTask().getStateInfo().getLayer();
+				int upsample = 1;
+				if (layer instanceof BreadthFirstUpsampleLayer)
+					upsample = ((BreadthFirstUpsampleLayer)layer).getUpsample();
+				CompressedChunk compressedChunk = new CompressedChunk((ReducedNaiveChunk) task.chunk, upsample, task.chunk.getJobId(), true);
+				
 				for (ClientConfiguration client : ((BasicSystem)system).getClients()) {
-					((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, task.chunk);
+					((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, compressedChunk);
 				}
 				openChunks--;
 				if (openChunks == 0) { //finished
