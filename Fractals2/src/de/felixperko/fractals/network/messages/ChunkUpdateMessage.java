@@ -38,4 +38,9 @@ public class ChunkUpdateMessage extends SystemServerMessage {
 	public void setChunk(CompressedChunk chunk) {
 		this.chunk = chunk;
 	}
+	
+	@Override
+	public double getPriority() {
+		return chunk.getPriority();
+	}
 }

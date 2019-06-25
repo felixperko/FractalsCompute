@@ -27,18 +27,21 @@ public class CompressedChunk implements Serializable{
 	int chunkY;
 	int dimensionSize;
 	
+	double priority;
+	
 	ComplexNumber chunkPos;
 	
 	Map<BorderAlignment, ChunkBorderData> selfBorderData;
 	Map<BorderAlignment, ChunkBorderData> neighbourBorderData;
 	
-	public CompressedChunk(ReducedNaiveChunk chunk, int upsample, int jobId, boolean includeBorderData) {
+	public CompressedChunk(ReducedNaiveChunk chunk, int upsample, int jobId, double priority, boolean includeBorderData) {
 		this.upsample = upsample;
 		this.jobId = jobId;
 		this.chunkX = chunk.chunkX;
 		this.chunkY = chunk.chunkY;
 		this.dimensionSize = chunk.dimensionSize;
 		this.chunkPos = chunk.chunkPos;
+		this.priority = priority;
 		try {
 			long t1 = System.nanoTime();
 			values_compressed = Snappy.compress(BitShuffle.shuffle(getUpsampledFloatArray(chunk.values)));
@@ -267,5 +270,10 @@ public class CompressedChunk implements Serializable{
 
 	public Map<BorderAlignment, ChunkBorderData> getNeighbourBorderData() {
 		return neighbourBorderData;
+	}
+
+	
+	public double getPriority() {
+		return priority;
 	}
 }

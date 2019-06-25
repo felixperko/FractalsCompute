@@ -10,7 +10,7 @@ import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.util.CategoryLogger;
 import de.felixperko.fractals.util.NumberUtil;
 
-public abstract class Message<CONN extends Connection, BACKCONN extends Connection> implements Serializable{
+public abstract class Message<CONN extends Connection, BACKCONN extends Connection> implements Serializable, Comparable<Message<?, ?>>{
 	
 	private static final long serialVersionUID = 3353653767834804430L;
 
@@ -139,5 +139,14 @@ public abstract class Message<CONN extends Connection, BACKCONN extends Connecti
 	
 	public Managers getReceiverManagers() {
 		return getBackConnection().getNetworkManager().getManagers();
+	}
+	
+	public double getPriority() {
+		return 1;
+	}
+	
+	@Override
+	public int compareTo(Message<?, ?> arg0) {
+		return Double.compare(getPriority(), arg0.getPriority());
 	}
 }

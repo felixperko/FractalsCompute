@@ -8,6 +8,7 @@ import java.net.SocketException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.xerial.snappy.SnappyInputStream;
@@ -29,7 +30,7 @@ public abstract class WriteThread extends AbstractFractalsThread {
 	ListenThread listenThread;
 	boolean closeConnection = false;
 	
-	Queue<Message> pendingMessages = new LinkedList<>();
+	Queue<Message> pendingMessages = new PriorityQueue<>();
 	Queue<Message> newMessages = new LinkedList<>();
 //	private ObjectInputStream in;
 	private SnappyInputStream inComp;
