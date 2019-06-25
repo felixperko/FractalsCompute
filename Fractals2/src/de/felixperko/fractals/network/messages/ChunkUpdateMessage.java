@@ -41,6 +41,6 @@ public class ChunkUpdateMessage extends SystemServerMessage {
 	
 	@Override
 	public double getPriority() {
-		return chunk.getPriority();
+		return chunk.getPriority()+2;
 	}
 }
