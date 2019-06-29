@@ -448,10 +448,10 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 					//update message if message is pending
 					Map<ClientConfiguration, ChunkUpdateMessage> oldMessages = pendingUpdateMessages.get(taskId);
 					if (oldMessages != null) {
-						for (Entry<ClientConfiguration, ChunkUpdateMessage> e : oldMessages.entrySet()) {
-							e.getValue().setChunk(compressedChunk);
-							skipClients.add(e.getKey());
-						}
+//						for (Entry<ClientConfiguration, ChunkUpdateMessage> e : oldMessages.entrySet()) {
+//							e.getValue().setChunk(compressedChunk);
+//							skipClients.add(e.getKey());
+//						}
 					} else {
 						oldMessages = new HashMap<>();
 						pendingUpdateMessages.put(taskId, oldMessages);
