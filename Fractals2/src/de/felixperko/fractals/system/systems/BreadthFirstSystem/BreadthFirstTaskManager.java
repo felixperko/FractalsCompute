@@ -126,7 +126,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	
 	List<BreadthFirstTask> finishedTasks = new ArrayList<>();
 	
-	Map<Integer, Map<ClientConfiguration, ChunkUpdateMessage>> pendingUpdateMessages = new HashMap<>(); //TODO replace second map with Set/List of clients?
+	Map<Integer, Map<ClientConfiguration, List<ChunkUpdateMessage>>> pendingUpdateMessages = new HashMap<>(); //TODO replace second map with Set/List of clients?
 	
 	CategoryLogger log;
 
@@ -425,6 +425,20 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	
 	int openChunks;
 	
+	private List<ChunkUpdateMessage> getPendingMessagesList(int taskId, ClientConfiguration clientConfiguration){
+		Map<ClientConfiguration, List<ChunkUpdateMessage>> map = pendingUpdateMessages.get(taskId);
+		if (map == null){
+			map = new HashMap<ClientConfiguration, List<ChunkUpdateMessage>>();
+			pendingUpdateMessages.put(taskId, map);
+		}
+		List<ChunkUpdateMessage> list = map.get(clientConfiguration);
+		if (list == null) {
+			list = new ArrayList<>();
+			map.put(clientConfiguration, list);
+		}
+		return list;
+	}
+	
 	private boolean finishTasks() {
 		if (finishedTasks.isEmpty())
 			return false;
@@ -446,7 +460,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 					CompressedChunk compressedChunk = new CompressedChunk((ReducedNaiveChunk) task.chunk, upsample, task.chunk.getJobId(), task.getPriority()+2, true);
 					
 					//update message if message is pending
-					Map<ClientConfiguration, ChunkUpdateMessage> oldMessages = pendingUpdateMessages.get(taskId);
+					Map<ClientConfiguration, List<ChunkUpdateMessage>> oldMessages = pendingUpdateMessages.get(taskId);
 					if (oldMessages != null) {
 //						for (Entry<ClientConfiguration, ChunkUpdateMessage> e : oldMessages.entrySet()) {
 //							e.getValue().setChunk(compressedChunk);
@@ -464,17 +478,19 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 						ChunkUpdateMessage message = ((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, compressedChunk);
 						if (message != null){
 							synchronized (oldMessages) {
-								oldMessages.put(client, message);	
+								getPendingMessagesList(taskId, client).add(message);
 							}
 							final BreadthFirstTaskManager thisObj = this;
-							final Map<ClientConfiguration, ChunkUpdateMessage> oldMessagesFinal = oldMessages;
+							final Map<ClientConfiguration, List<ChunkUpdateMessage>> oldMessagesFinal = oldMessages;
 							message.addSentCallback(new Runnable() {
 								@Override
 								public void run() {
 									synchronized (thisObj) {
 										oldMessagesFinal.remove(client);
-										if (oldMessagesFinal.isEmpty())
-											pendingUpdateMessages.remove(taskId);
+										if (oldMessagesFinal.isEmpty()) {
+											for (Entry<ClientConfiguration, List<ChunkUpdateMessage>> e : oldMessagesFinal.entrySet())
+												e.getValue().remove(message);
+										}
 									}
 								}
 							});
@@ -518,9 +534,10 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 
 	@Override
 	public synchronized void reset() {
-		for (Map<ClientConfiguration, ChunkUpdateMessage> map : new HashMap<>(pendingUpdateMessages).values()) {
-			for (ChunkUpdateMessage msg : map.values())
-				msg.setCancelled(true);
+		for (Map<ClientConfiguration, List<ChunkUpdateMessage>> map : pendingUpdateMessages.values()) {
+			for (List<ChunkUpdateMessage> msgs : map.values())
+				for (ChunkUpdateMessage msg : msgs)
+					msg.setCancelled(true);
 		}
 		pendingUpdateMessages.clear();
 		for (Queue<BreadthFirstTask> openQueue : openTasks)
