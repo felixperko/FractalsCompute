@@ -111,7 +111,7 @@ public abstract class WriteThread extends AbstractFractalsThread {
 						log.log("sending message: "+msg.getClass().getSimpleName());
 						try {
 							out.writeUnshared(msg);
-							out.reset();
+							out.flush();
 							if (outComp != null)
 								outComp.flush();
 						} catch (SocketException e) {
