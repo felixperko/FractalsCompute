@@ -12,7 +12,7 @@ public class NaiveChunk extends AbstractArrayChunk{
 	// 64 bit + 2 * 32 bit -> 16 byte per pixel
 	
 	NaiveChunk(ViewData viewData, int chunkX, int chunkY, int dimensionSize) {
-		super(viewData, chunkX, chunkY, dimensionSize);
+		super(null, chunkX, chunkY, dimensionSize);
 		this.values = new double[arrayLength];
 		this.samples = new int[arrayLength];
 		this.failedSamples = new int[arrayLength];

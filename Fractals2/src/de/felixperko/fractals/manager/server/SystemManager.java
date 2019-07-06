@@ -10,6 +10,7 @@ import java.util.WeakHashMap;
 
 import de.felixperko.fractals.manager.common.Manager;
 import de.felixperko.fractals.network.ClientConfiguration;
+import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.network.SystemClientData;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.systems.BasicSystem.BasicSystem;
@@ -165,12 +166,8 @@ public class SystemManager extends Manager{
 		for (UUID systemId : conf.getSystemClientData().keySet()) {
 			CalcSystem system = activeSystems.get(systemId);
 			system.removeClient(conf);
+			//TODO stop connection (i/o!)		
 		}
-	}
-
-	
-	public void addTask(FractalsTask task) {
-		getTaskMap(task.getSystemId()).put(task.getId(), task);
 	}
 	
 	public FractalsTask getTask(UUID systemId, Integer taskId) {

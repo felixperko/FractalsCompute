@@ -78,7 +78,7 @@ public abstract class WriteThread extends AbstractFractalsThread {
 					}
 				}
 				
-				while (newMessages.isEmpty()) {
+				while (newMessages.isEmpty() && pendingMessages.isEmpty()) {
 					tick();
 					setLifeCycleState(LifeCycleState.IDLE);
 					try {
@@ -87,6 +87,8 @@ public abstract class WriteThread extends AbstractFractalsThread {
 						if (!closeConnection)
 							e.printStackTrace();
 					}
+					if (closeConnection)
+						break mainLoop;
 				}
 				
 				setLifeCycleState(LifeCycleState.RUNNING);
@@ -98,9 +100,11 @@ public abstract class WriteThread extends AbstractFractalsThread {
 				
 				synchronized (pendingMessages) {
 					Iterator<Message> it = pendingMessages.iterator();
-					while (it.hasNext()) {
-						if (closeConnection)
-							break mainLoop;
+//					while (!pendingMessages.isEmpty()) {
+//						Message msg = pendingMessages.poll();
+					if (it.hasNext()) {
+//						if (closeConnection)
+//							break mainLoop;
 						Message msg = it.next();
 						it.remove();
 						msg.executeSentCallbacks();
@@ -114,6 +118,7 @@ public abstract class WriteThread extends AbstractFractalsThread {
 							out.flush();
 							if (outComp != null)
 								outComp.flush();
+							out.reset();
 						} catch (SocketException e) {
 							try {
 								Thread.sleep(1);

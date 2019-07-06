@@ -225,6 +225,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 						if (!(system.getLifeCycleState() == LifeCycleState.STOPPED))
 							e.printStackTrace();
 					}
+					if (getLifeCycleState() == LifeCycleState.STOPPED)
+						break mainLoop;
 				}
 			}
 		}
@@ -467,8 +469,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 //							skipClients.add(e.getKey());
 //						}
 					} else {
-						oldMessages = new HashMap<>();
-						pendingUpdateMessages.put(taskId, oldMessages);
+//						oldMessages = new HashMap<>();
+//						pendingUpdateMessages.put(taskId, oldMessages);
 					}
 				
 					//send update messages
@@ -477,23 +479,34 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 							continue;
 						ChunkUpdateMessage message = ((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, compressedChunk);
 						if (message != null){
-							synchronized (oldMessages) {
-								getPendingMessagesList(taskId, client).add(message);
-							}
+//							synchronized (oldMessages) {
+//								getPendingMessagesList(taskId, client).add(message);
+//							}
 							final BreadthFirstTaskManager thisObj = this;
-							final Map<ClientConfiguration, List<ChunkUpdateMessage>> oldMessagesFinal = oldMessages;
-							message.addSentCallback(new Runnable() {
-								@Override
-								public void run() {
-									synchronized (thisObj) {
-										oldMessagesFinal.remove(client);
-										if (oldMessagesFinal.isEmpty()) {
-											for (Entry<ClientConfiguration, List<ChunkUpdateMessage>> e : oldMessagesFinal.entrySet())
-												e.getValue().remove(message);
-										}
-									}
-								}
-							});
+							//TODO !!!!debugging mess
+//							final Map<ClientConfiguration, List<ChunkUpdateMessage>> oldMessagesFinal = oldMessages;
+//							message.addSentCallback(new Runnable() {
+//								@Override
+//								public void run() {
+//									synchronized (thisObj) {
+//										//TODO possible bugfix? not optimized!
+////										for (Map<ClientConfiguration, List<ChunkUpdateMessage>> m : pendingUpdateMessages.values()) {
+////											for (List<ChunkUpdateMessage> l : m.values()) {
+////												Iterator<ChunkUpdateMessage> it = l.iterator();
+////												while (it.hasNext()) {
+////													if (it.next() == message)
+////														it.remove();
+////												}
+////											}
+////										}
+//										oldMessagesFinal.remove(client);
+//										if (oldMessagesFinal.isEmpty()) {
+//											for (Entry<ClientConfiguration, List<ChunkUpdateMessage>> e : oldMessagesFinal.entrySet())
+//												e.getValue().remove(message);
+//										}
+//									}
+//								}
+//							});
 						}
 					}
 					skipClients.clear();
@@ -535,9 +548,11 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	@Override
 	public synchronized void reset() {
 		for (Map<ClientConfiguration, List<ChunkUpdateMessage>> map : pendingUpdateMessages.values()) {
-			for (List<ChunkUpdateMessage> msgs : map.values())
+			for (List<ChunkUpdateMessage> msgs : map.values()) {
 				for (ChunkUpdateMessage msg : msgs)
 					msg.setCancelled(true);
+				msgs.clear();
+			}
 		}
 		pendingUpdateMessages.clear();
 		for (Queue<BreadthFirstTask> openQueue : openTasks)

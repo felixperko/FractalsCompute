@@ -162,6 +162,7 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 			clients.remove(oldConfiguration);
 			if (clients.isEmpty())
 				stop();
+			oldConfiguration.getConnection().setClosed();
 		}
 	}
 

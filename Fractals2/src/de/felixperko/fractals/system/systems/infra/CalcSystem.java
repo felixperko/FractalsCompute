@@ -1,13 +1,18 @@
 package de.felixperko.fractals.system.systems.infra;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.WeakHashMap;
 
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.SystemClientData;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.systems.stateinfo.SystemStateInfo;
+import de.felixperko.fractals.system.task.FractalsTask;
 
 public interface CalcSystem extends LifeCycleComponent{
 	public UUID getId();

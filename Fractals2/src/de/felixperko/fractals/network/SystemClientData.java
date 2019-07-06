@@ -5,38 +5,25 @@ import java.util.Map;
 
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 
-public class SystemClientData implements Serializable{
+public class SystemClientData extends ParamContainer implements Serializable{
 	
 	private static final long serialVersionUID = -6322484739454792244L;
 	
-	Map<String, ParamSupplier> clientParameters;
 	int grantThreads;
 	
 	public SystemClientData(Map<String, ParamSupplier> clientParameters, int grantThreads) {
-		this.clientParameters = clientParameters;
+		super(clientParameters);
 		this.grantThreads = grantThreads;
 	}
+	
+	public SystemClientData() {
+		
+	}
 
-	public void addClientParameter(ParamSupplier paramSupplier) {
-		clientParameters.put(paramSupplier.getName(), paramSupplier);
-	}
-	
-	public boolean hasClientParameters() {
-		return clientParameters.size() > 0;
-	}
-	
-	public ParamSupplier getClientParameter(String name) {
-		return clientParameters.get(name);
-	}
-	
 	public int getGrantedThreads() {
 		return grantThreads;
 	}
 
-	public Map<String, ParamSupplier> getClientParameters() {
-		return clientParameters;
-	}
-	
 	public boolean needsReset(Map<String, ParamSupplier> oldParams){
 		boolean reset = false;
 		if (oldParams != null) {

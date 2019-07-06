@@ -12,7 +12,7 @@ public class ReducedNaiveChunk extends AbstractArrayChunk {
 	// 32 bit + 2 * 8 bit -> 6 byte per pixel
 
 	ReducedNaiveChunk(ViewData viewData, int chunkX, int chunkY, int dimensionSize) {
-		super(viewData, chunkX, chunkY, dimensionSize);
+		super(null, chunkX, chunkY, dimensionSize);
 		this.values = new float[arrayLength];
 		this.samples = new byte[arrayLength];
 		this.failedSamples = new byte[arrayLength];
