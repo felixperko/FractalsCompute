@@ -125,7 +125,6 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 
 	@Override
 	public double toDouble() {
-		// TODO Auto-generated method stub
 		return real;
 	}
 	

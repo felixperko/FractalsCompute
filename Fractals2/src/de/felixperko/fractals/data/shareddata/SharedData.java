@@ -1,6 +1,7 @@
 package de.felixperko.fractals.data.shareddata;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.felixperko.fractals.network.Connection;
@@ -20,6 +21,12 @@ public abstract class SharedData<U extends SharedDataUpdate> implements Connecti
 	public abstract void update(U update);
 	public abstract int getVersion();
 	public abstract boolean isEmpty();
+	
+	public void getUpdatesAppendList(Connection connection, List<DataContainer> list) {
+		DataContainer container = getUpdates(connection);
+		if (container != null)
+			list.add(container);
+	}
 	
 	public boolean hasUpdate(Connection<?> connection) {
 		if (isEmpty())

@@ -15,6 +15,10 @@ import de.felixperko.fractals.system.systems.infra.AbstractCalcSystem;
 import de.felixperko.fractals.system.task.ClassTaskFactory;
 import de.felixperko.fractals.system.task.TaskFactory;
 
+/**
+ * First, naive implementation. Likely broken.
+ */
+@Deprecated
 public class BasicSystem extends AbstractCalcSystem {
 
 	public BasicSystem(ServerManagers managers) {
@@ -114,7 +118,6 @@ public class BasicSystem extends AbstractCalcSystem {
 
 	@Override
 	public void changeClientMaxThreadCount(int newGranted, int oldGranted) {
-		//TODO client threads
 	}
 	
 	public List<ClientConfiguration> getClients(){

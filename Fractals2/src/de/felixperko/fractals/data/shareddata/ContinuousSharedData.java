@@ -10,8 +10,9 @@ import de.felixperko.fractals.network.Connection;
 
 /**
  * Continuous data that needs to be synced for clients through update messages.
+ * The data is divided in discrete SharedDataUpdate objects.
  */
-public abstract class ContinuousSharedData extends SharedData<SharedDataUpdate>{
+public class ContinuousSharedData<T extends SharedDataUpdate> extends SharedData<T>{
 	int versionCounter = 0;
 	int disposedCounter = 0;
 	
@@ -30,34 +31,44 @@ public abstract class ContinuousSharedData extends SharedData<SharedDataUpdate>{
 		if (!connections.containsKey(connection))
 			connections.put(connection, (Integer)(-1));
 		int currentVersion = connections.get(connection);
-		if (currentVersion == versionCounter)
-			return null;
-		
-		//accumulate past version updates
-		List<SharedDataUpdate> list = new ArrayList<>();
-		for (int i = Math.max(currentVersion, 0) ; i < versionCounter ; i++) {
-			list.addAll(updates.get(i));
-		}
-		
-		//add current version updates and increment version
+
 		DataContainer ans;
-		synchronized (updates) {
-			list.addAll(updates.get(versionCounter));
-			ans = new ContinuousDataContainer(dataIdentifier, versionCounter, list);
-			connections.put(connection, (Integer)versionCounter);
-			if (!list.isEmpty())
-				versionCounter++;
+		
+		synchronized (this) {
+			if (currentVersion == versionCounter)
+				return null;
 			
-			if (disposeDistributed) {
-				disposeDistributed();
+			//accumulate past version updates
+			List<SharedDataUpdate> list = new ArrayList<>();
+			for (int i = Math.max(currentVersion, 0) ; i < versionCounter ; i++) {
+				for (SharedDataUpdate update : updates.get(i)) {
+					update.setSent();
+					list.add(update);
+				}
 			}
 			
+			//add current version updates and increment version
+			synchronized (updates) {
+				for (SharedDataUpdate update : updates.get(versionCounter)) {
+					update.setSent();
+					list.add(update);
+				}
+				ans = new ContinuousDataContainer(dataIdentifier, versionCounter, list);
+				connections.put(connection, (Integer)versionCounter);
+				if (!list.isEmpty())
+					versionCounter++;
+				
+				if (disposeDistributed) {
+					disposeDistributed();
+				}
+				
+			}
 		}
 		
 		
 		return ans;
 	}
-	
+		
 	public void update(SharedDataUpdate update) {
 		synchronized (updates) {
 			updates.get(versionCounter).add(update);
@@ -99,4 +110,16 @@ public abstract class ContinuousSharedData extends SharedData<SharedDataUpdate>{
 			disposeDistributed();
 		}
 	}
+
+	@Override
+	public synchronized int getVersion() {
+		return versionCounter;
+	}
+	
+	@Override
+	public boolean isEmpty() {
+		return updates.isEmpty();
+	}
+
+
 }

@@ -8,7 +8,7 @@ import de.felixperko.fractals.network.Connection;
 /**
  * Shares the latest state update between clients
  */
-public class SharedStateData extends SharedData<SharedStateUpdate> {
+public class SharedStateData<T extends SharedStateUpdate> extends SharedData<T> {
 	
 	int versionCounter = 0;
 	SharedStateUpdate currentState;
@@ -29,6 +29,7 @@ public class SharedStateData extends SharedData<SharedStateUpdate> {
 			return null;
 		
 		List<SharedDataUpdate> list = new ArrayList<SharedDataUpdate>();
+		currentState.setSent();
 		list.add(currentState);
 		return new DataContainer(dataIdentifier, list);
 	}
