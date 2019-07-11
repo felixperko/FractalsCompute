@@ -25,6 +25,7 @@ import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.manager.server.ServerNetworkManager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.messages.ChunkUpdateMessage;
+import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.Number;
 import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
@@ -642,6 +643,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				openTasks.get(0).add(rootTask);
 				openChunks++;
 			}
+			
+			getSystem().getSystemStateInfo().getServerStateInfo().updateMidpoint(numberFactory.createComplexNumber(midpointChunkX, midpointChunkY));
 			
 			//re-fill
 //			fillQueues();//TODO sync?

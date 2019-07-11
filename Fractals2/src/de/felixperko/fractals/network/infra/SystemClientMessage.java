@@ -8,6 +8,7 @@ import de.felixperko.fractals.util.CategoryLogger;
 
 public abstract class SystemClientMessage extends ClientMessage{
 	
+	private static final long serialVersionUID = -1052338656210978218L;
 	UUID systemId;
 	
 	public SystemClientMessage(UUID systemId) {
@@ -22,7 +23,6 @@ public abstract class SystemClientMessage extends ClientMessage{
 	
 	@Override
 	public void received(ClientConnection connection, CategoryLogger log) {
-		// TODO Auto-generated method stub
 		super.received(connection, log);
 	}
 	

@@ -29,7 +29,7 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	public AbstractCalcSystem(ServerManagers managers) {
 		this.managers = managers;
 		this.number = CALC_SYSTEM_COUNTER++;
-		this.systemStateInfo = new SystemStateInfo();
+		this.systemStateInfo = new SystemStateInfo(id);
 		managers.getSystemManager().getStateInfo().addSystemStateInfo(id, this.systemStateInfo);
 	}
 	

@@ -97,9 +97,9 @@ public class ServerNetworkManager extends Manager implements NetworkManager{
 	}
 
 	public ChunkUpdateMessage updateChunk(ClientConfiguration client, CalcSystem system, CompressedChunk compressedChunk) {
-		ChunkUpdateMessage message = new ChunkUpdateMessage(system.getId(), compressedChunk, managers.getSystemManager().getStateInfo());
 		ClientConnection connection = client.getConnection();
 		if (connection != null){
+			ChunkUpdateMessage message = new ChunkUpdateMessage(connection, system.getId(), compressedChunk, managers.getSystemManager().getStateInfo());
 			connection.writeMessage(message);
 			return message;
 		}

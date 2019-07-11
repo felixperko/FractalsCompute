@@ -36,6 +36,10 @@ import de.felixperko.fractals.system.task.AbstractTaskManager;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskProviderAdapter;
 
+/**
+ * First, naive implementation. Likely broken.
+ */
+@Deprecated
 public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 	
 	static Map<String, Class<? extends FractalsCalculator>> availableCalculators = new HashMap<>();
@@ -150,7 +154,7 @@ public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 					ComplexNumber chunkPos = numberFactory.createComplexNumber(x/(double)dimX-0.5, y/(double)dimX-0.5);
 					chunkPos.multNumber(zoom);
 					chunkPos.add(midpoint);
-					openTasks.add(new BasicTask(id, this, chunk, currentParameters, chunkPos, createCalculator(), layer, jobId));//TODO calculator for each thread not each task
+					openTasks.add(new BasicTask(id, this, chunk, currentParameters, chunkPos, createCalculator(), layer, jobId));
 					calculate = true;
 					id++;
 				}
@@ -219,26 +223,18 @@ public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 
 	@Override
 	public void endTasks() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void addTaskProviderAdapter(TaskProviderAdapter taskProviderAdapter) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void removeTaskProviderAdapter(TaskProviderAdapter taskProviderAdapter) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	

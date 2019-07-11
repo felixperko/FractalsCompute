@@ -4,15 +4,15 @@ import java.io.Serializable;
 
 import de.felixperko.fractals.system.task.Layer;
 
-public class TaskStateInfo implements Serializable{
-	
-	private static final long serialVersionUID = -5333555292596681679L;
+public class TaskStateInfo{
 	
 	int taskId;
 	TaskState state;
 	double progress;
 	transient SystemStateInfo systemStateInfo;
 	Layer layer;
+	
+	transient TaskStateUpdate updateMessage;
 	
 	public TaskStateInfo(int taskId, Layer layer) {
 		this.taskId = taskId;
@@ -38,8 +38,7 @@ public class TaskStateInfo implements Serializable{
 		TaskState oldState = this.state;
 		this.state = state;
 		
-		systemStateInfo.taskStateChanged(taskId, oldState, this);
-		
+		updateMessage(state, oldState);
 	}
 
 	public double getProgress() {
@@ -48,6 +47,21 @@ public class TaskStateInfo implements Serializable{
 
 	public void setProgress(double progress) {
 		this.progress = progress;
+		updateMessage(state);
+	}
+	
+	private void updateMessage(TaskState state) {
+		updateMessage(state, state);
+	}
+
+	private void updateMessage(TaskState state, TaskState oldState) {
+		if (updateMessage == null || updateMessage.isSent())
+			updateMessage = systemStateInfo.taskStateChanged(taskId, oldState, this);
+		else {
+			synchronized (updateMessage) {
+				updateMessage.refresh(state, layer.getId(), progress);
+			}
+		}
 	}
 
 	public int getTaskId() {

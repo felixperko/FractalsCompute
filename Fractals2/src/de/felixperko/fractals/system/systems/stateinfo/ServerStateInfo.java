@@ -8,6 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import de.felixperko.fractals.data.shareddata.ContinuousSharedData;
+import de.felixperko.fractals.data.shareddata.DataContainer;
+import de.felixperko.fractals.data.shareddata.SharedDataUpdate;
+import de.felixperko.fractals.data.shareddata.SharedStateData;
+import de.felixperko.fractals.manager.common.NetworkManager;
+import de.felixperko.fractals.network.Connection;
+import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
+
 public class ServerStateInfo implements Serializable{
 	
 	private static final long serialVersionUID = -7691605222394919234L;
@@ -15,6 +23,9 @@ public class ServerStateInfo implements Serializable{
 	int localWorkerThreads;
 	List<Integer> remoteWorkerThreads = new ArrayList<>();
 	Map<UUID, SystemStateInfo> systemStates = new HashMap<>();
+	
+	ContinuousSharedData<TaskStateUpdate> taskStateChanges = new ContinuousSharedData<TaskStateUpdate>("taskStates", true);
+	SharedStateData<ComplexNumberUpdate> currentMidpointData = new SharedStateData<ComplexNumberUpdate>("currentMidpoint");
 	
 	long updateTime = 0;
 	
@@ -41,5 +52,16 @@ public class ServerStateInfo implements Serializable{
 
 	public long getUpdateTime() {
 		return updateTime;
+	}
+	
+	public List<DataContainer> getSharedDataUpdates(Connection connection){
+		List<DataContainer> list = new ArrayList<>();
+		taskStateChanges.getUpdatesAppendList(connection, list);
+		currentMidpointData.getUpdatesAppendList(connection, list);
+		return list;
+	}
+
+	public void updateMidpoint(ComplexNumber midpoint) {
+		currentMidpointData.update(new ComplexNumberUpdate(midpoint));
 	}
 }

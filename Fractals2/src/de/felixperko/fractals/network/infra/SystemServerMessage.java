@@ -36,10 +36,4 @@ public abstract class SystemServerMessage extends ServerMessage {
 			throw new IllegalStateException("No system interface found");
 		return csi;
 	}
-
-	@Override
-	public void received(ServerConnection connection, CategoryLogger log) {
-		clientMessageInterface = connection.getNetworkManager().getMessageInterface();
-		super.received(connection, log);
-	}
 }

@@ -42,7 +42,7 @@ public class ServerWriteThread extends WriteThread {
 	protected void tick() {
 		if (System.nanoTime() - lastReachableTime > reachableRequestInterval) {
 			lastReachableTime = System.nanoTime();
-			writeMessage(new ReachableRequestMessage());
+			writeMessage(new ReachableRequestMessage(clientConnection, ((ServerManagers)managers).getSystemManager().getStateInfo()));
 		}
 	}
 

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -17,6 +18,12 @@ public class SystemStateInfo implements Serializable{
 	
 	ServerStateInfo serverStateInfo;
 	
+	UUID systemId;
+	
+	public SystemStateInfo(UUID id) {
+		this.systemId = id;
+	}
+
 	public void addTaskStateInfo(TaskStateInfo taskStateInfo) {
 		taskStateInfo.setSystemStateInfo(this);
 		taskStates.put((Integer)taskStateInfo.getTaskId(), taskStateInfo);
@@ -54,9 +61,15 @@ public class SystemStateInfo implements Serializable{
 	}
 
 	
-	public void taskStateChanged(int taskId, TaskState oldState, TaskStateInfo stateInfo) {
-		getTaskListForState(oldState).remove(stateInfo);
-		if (stateInfo.getState() != TaskState.REMOVED)
-			getTaskListForState(stateInfo.getState()).add(stateInfo);
+	public TaskStateUpdate taskStateChanged(int taskId, TaskState oldState, TaskStateInfo stateInfo) {
+		if (stateInfo.getState() != oldState) {
+			getTaskListForState(oldState).remove(stateInfo);
+			if (stateInfo.getState() != TaskState.REMOVED)
+				getTaskListForState(stateInfo.getState()).add(stateInfo);
+		}
+		
+		TaskStateUpdate update = new TaskStateUpdate(systemId, taskId, stateInfo.getState(), stateInfo.layer.getId(), stateInfo.progress);
+		serverStateInfo.taskStateChanges.update(update);
+		return update;
 	}
 }

@@ -51,4 +51,9 @@ public abstract class ClientMessageInterface {
 	public abstract void assignedTasks(List<FractalsTask> tasks);
 
 	public abstract void updateSharedData(DataContainer container);
+
+	public void sharedDataUpdated(List<DataContainer> sharedDataStateUpdates) {
+		// TODO Auto-generated method stub
+		
+	}
 }
