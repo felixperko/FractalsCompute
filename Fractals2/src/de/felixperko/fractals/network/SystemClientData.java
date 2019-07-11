@@ -1,6 +1,7 @@
 package de.felixperko.fractals.network;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
@@ -36,6 +37,24 @@ public class SystemClientData extends ParamContainer implements Serializable{
 			}
 		}
 		return reset;
+	}
+	
+	public void applyParams(ParamContainer paramContainer) {
+		Map<String, ParamSupplier> old = getClientParameters();
+		this.clientParameters = new HashMap<>(paramContainer.getClientParameters());
+		for (String key : old.keySet())
+			if (!this.clientParameters.containsKey(key))
+				this.clientParameters.put(key, old.get(key).copy());
+	}
+	
+	public boolean applyParamsAndNeedsReset(ParamContainer paramContainer) {
+		Map<String, ParamSupplier> old = getClientParameters();
+		applyParams(paramContainer);
+		return needsReset(old);
+	}
+	
+	public ParamContainer exportParams() {
+		return new ParamContainer(new HashMap<String, ParamSupplier>(clientParameters));
 	}
 
 	@Override

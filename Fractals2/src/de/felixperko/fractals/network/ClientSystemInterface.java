@@ -7,5 +7,6 @@ import de.felixperko.fractals.system.parameters.ParameterConfiguration;
 public interface ClientSystemInterface {
 	public void chunkUpdated(CompressedChunk chunk);
 	public void chunksCleared();
+	public ParameterConfiguration getParamConfiguration();
 	public void updateParameterConfiguration(ClientConfiguration clientConfiguration, ParameterConfiguration parameterConfiguration);
 }
