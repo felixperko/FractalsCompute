@@ -13,7 +13,6 @@ public abstract class SystemServerMessage extends ServerMessage {
 	private static final long serialVersionUID = 2778751289918945301L;
 	
 //	ClientSystemInterface clientInterface;
-	ClientMessageInterface clientMessageInterface;
 	protected UUID systemId;
 	
 	public SystemServerMessage(UUID systemId) {
@@ -26,9 +25,9 @@ public abstract class SystemServerMessage extends ServerMessage {
 		this.systemId = systemId;
 	}
 
-	public ClientMessageInterface getClientMessageInterface() {
-		return clientMessageInterface;
-	}
+//	public ClientMessageInterface getClientMessageInterface() {
+//		return clientMessageInterface;
+//	}
 	
 	public ClientSystemInterface getClientSystemInterface() {
 		ClientSystemInterface csi = clientMessageInterface.getSystemInterface(systemId);

@@ -460,7 +460,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 					int upsample = 1;
 					if (layer instanceof BreadthFirstUpsampleLayer)
 						upsample = ((BreadthFirstUpsampleLayer)layer).getUpsample();
-					CompressedChunk compressedChunk = new CompressedChunk((ReducedNaiveChunk) task.chunk, upsample, task.chunk.getJobId(), task.getPriority()+2, true);
+					CompressedChunk compressedChunk = new CompressedChunk((ReducedNaiveChunk) task.chunk, upsample, task, task.getPriority()+2, true);
 					
 					//update message if message is pending
 					Map<ClientConfiguration, List<ChunkUpdateMessage>> oldMessages = pendingUpdateMessages.get(taskId);
@@ -644,7 +644,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				openChunks++;
 			}
 			
-			getSystem().getSystemStateInfo().getServerStateInfo().updateMidpoint(numberFactory.createComplexNumber(midpointChunkX, midpointChunkY));
+			getSystem().getSystemStateInfo().getServerStateInfo().updateMidpoint(system.getId(), numberFactory.createComplexNumber(midpointChunkX, midpointChunkY));
 			
 			//re-fill
 //			fillQueues();//TODO sync?
@@ -806,5 +806,10 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	
 	public void removeTaskProviderAdapter(TaskProviderAdapter taskProviderAdapter) {
 		taskProviders.remove(taskProviderAdapter);
+	}
+
+	@Override
+	public ComplexNumber getAnchor() {
+		return viewData.getAnchor();
 	}
 }

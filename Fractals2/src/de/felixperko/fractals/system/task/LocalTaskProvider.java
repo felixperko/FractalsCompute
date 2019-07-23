@@ -35,13 +35,13 @@ public class LocalTaskProvider implements TaskProvider {
 	
 //	Map<TaskManager, Long> threadTimeTaken = new HashMap<>();
 	
-	public void addTaskManager(TaskManager taskManager) {
+	public synchronized void addTaskManager(TaskManager taskManager) {
 		taskManagers.add(taskManager);
 		taskManager.addTaskProviderAdapter(adapter);
 //		threadTimeTaken.clear();
 	}
 	
-	public void removeTaskManager(TaskManager taskManager) {
+	public synchronized void removeTaskManager(TaskManager taskManager) {
 		taskManagers.remove(taskManager);
 		taskManager.removeTaskProviderAdapter(adapter);
 //		threadTimeTaken.clear();

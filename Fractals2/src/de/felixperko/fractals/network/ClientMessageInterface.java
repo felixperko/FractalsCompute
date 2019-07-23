@@ -53,7 +53,7 @@ public abstract class ClientMessageInterface {
 	public abstract void updateSharedData(DataContainer container);
 
 	public void sharedDataUpdated(List<DataContainer> sharedDataStateUpdates) {
-		// TODO Auto-generated method stub
-		
+		for (DataContainer dataContainer : sharedDataStateUpdates)
+			updateSharedData(dataContainer);
 	}
 }

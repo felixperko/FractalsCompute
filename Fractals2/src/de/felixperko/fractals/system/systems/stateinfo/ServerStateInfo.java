@@ -61,7 +61,7 @@ public class ServerStateInfo implements Serializable{
 		return list;
 	}
 
-	public void updateMidpoint(ComplexNumber midpoint) {
-		currentMidpointData.update(new ComplexNumberUpdate(midpoint));
+	public void updateMidpoint(UUID systemId, ComplexNumber midpoint) {
+		currentMidpointData.update(new ComplexNumberUpdate(systemId, midpoint));
 	}
 }

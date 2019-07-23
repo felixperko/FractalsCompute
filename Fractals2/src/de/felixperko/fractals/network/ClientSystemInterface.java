@@ -12,5 +12,4 @@ public interface ClientSystemInterface {
 	public void chunksCleared();
 	public ParameterConfiguration getParamConfiguration();
 	public void updateParameterConfiguration(ClientConfiguration clientConfiguration, ParameterConfiguration parameterConfiguration);
-	public void sharedDataUpdated(List<DataContainer> sharedDataStateUpdates);
 }

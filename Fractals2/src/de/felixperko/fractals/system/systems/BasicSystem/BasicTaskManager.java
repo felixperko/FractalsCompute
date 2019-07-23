@@ -206,7 +206,7 @@ public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 				int upsample = 1;
 				if (layer instanceof BreadthFirstUpsampleLayer)
 					upsample = ((BreadthFirstUpsampleLayer)layer).getUpsample();
-				CompressedChunk compressedChunk = new CompressedChunk((ReducedNaiveChunk) task.chunk, upsample, task.chunk.getJobId(), 2, true);
+				CompressedChunk compressedChunk = new CompressedChunk((ReducedNaiveChunk) task.chunk, upsample, task, 2, true);
 				
 				for (ClientConfiguration client : ((BasicSystem)system).getClients()) {
 					((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, compressedChunk);

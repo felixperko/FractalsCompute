@@ -328,7 +328,7 @@ public class BreadthFirstTaskManagerNew extends AbstractTaskManager<BreadthFirst
 					int upsample = 1;
 					if (layer instanceof BreadthFirstUpsampleLayer)
 						upsample = ((BreadthFirstUpsampleLayer)layer).getUpsample();
-					CompressedChunk compressedChunk = new CompressedChunk((ReducedNaiveChunk) task.chunk, upsample, task.chunk.getJobId(), task.getPriority()+2, true);
+					CompressedChunk compressedChunk = new CompressedChunk((ReducedNaiveChunk) task.chunk, upsample, task, task.getPriority()+2, true);
 					
 					//update message if message is pending
 					Map<ClientConfiguration, ChunkUpdateMessage> oldMessages = pendingUpdateMessages.get(taskId);

@@ -1,6 +1,7 @@
 package de.felixperko.fractals.data.shareddata;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,13 +36,13 @@ public class ContinuousSharedData<T extends SharedDataUpdate> extends SharedData
 		DataContainer ans;
 		
 		synchronized (this) {
-			if (currentVersion == versionCounter)
+			if (currentVersion == versionCounter || (currentVersion == versionCounter-1 && getUpdateList(versionCounter, false).isEmpty()))
 				return null;
 			
 			//accumulate past version updates
 			List<SharedDataUpdate> list = new ArrayList<>();
 			for (int i = Math.max(currentVersion, 0) ; i < versionCounter ; i++) {
-				for (SharedDataUpdate update : updates.get(i)) {
+				for (SharedDataUpdate update : getUpdateList(i, false)) {
 					update.setSent();
 					list.add(update);
 				}
@@ -49,14 +50,15 @@ public class ContinuousSharedData<T extends SharedDataUpdate> extends SharedData
 			
 			//add current version updates and increment version
 			synchronized (updates) {
-				for (SharedDataUpdate update : updates.get(versionCounter)) {
+				for (SharedDataUpdate update : getUpdateList(versionCounter, false)) {
 					update.setSent();
 					list.add(update);
 				}
-				ans = new ContinuousDataContainer(dataIdentifier, versionCounter, list);
+				if (list.isEmpty())
+					return null;
 				connections.put(connection, (Integer)versionCounter);
-				if (!list.isEmpty())
-					versionCounter++;
+				versionCounter++;
+				ans = new ContinuousDataContainer(dataIdentifier, versionCounter, list);
 				
 				if (disposeDistributed) {
 					disposeDistributed();
@@ -69,9 +71,24 @@ public class ContinuousSharedData<T extends SharedDataUpdate> extends SharedData
 		return ans;
 	}
 		
+	@SuppressWarnings("unchecked")
+	private List<SharedDataUpdate> getUpdateList(Integer versionCounter, boolean insertIfNull) {
+		if (!insertIfNull)
+			return updates.getOrDefault(versionCounter, Collections.EMPTY_LIST);
+		else {
+			List<SharedDataUpdate> list = updates.get(versionCounter);
+			if (list == null) {
+				list = new ArrayList<>();
+				updates.put(versionCounter, list);
+			}
+			return list;
+		}
+	}
+
 	public void update(SharedDataUpdate update) {
 		synchronized (updates) {
-			updates.get(versionCounter).add(update);
+			List<SharedDataUpdate> list = getUpdateList(versionCounter, true);
+			list.add(update);
 		}
 	}
 
@@ -85,6 +102,7 @@ public class ContinuousSharedData<T extends SharedDataUpdate> extends SharedData
 		for (Entry<Connection<?>, Integer> e : connections.entrySet()) {
 			int version = e.getValue();
 			if (version < lowestDistributedVersion)
+//				lowestDistributedVersion = version-1;
 				lowestDistributedVersion = version;
 		}
 		

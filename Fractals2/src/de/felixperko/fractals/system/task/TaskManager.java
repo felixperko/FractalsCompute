@@ -3,6 +3,7 @@ package de.felixperko.fractals.system.task;
 import java.util.List;
 import java.util.Map;
 
+import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 
@@ -14,6 +15,8 @@ public interface TaskManager<T> {
 	void taskFinished(T task);
 	List<? extends FractalsTask> getTasks(int count);
 	CalcSystem getSystem();
+	
+	ComplexNumber getAnchor();
 	
 	public void addTaskProviderAdapter(TaskProviderAdapter taskProviderAdapter);
 	public void removeTaskProviderAdapter(TaskProviderAdapter taskProviderAdapter);

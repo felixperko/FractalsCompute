@@ -53,4 +53,9 @@ public class BreadthFirstViewData implements ViewData {
 	public void dispose() {
 		chunks.clear();
 	}
+
+	@Override
+	public ComplexNumber getAnchor() {
+		return anchor;
+	}
 }

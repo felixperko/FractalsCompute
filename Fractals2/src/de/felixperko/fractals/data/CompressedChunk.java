@@ -10,6 +10,7 @@ import org.xerial.snappy.BitShuffle;
 import org.xerial.snappy.Snappy;
 
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
+import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.util.NumberUtil;
 
 public class CompressedChunk implements Serializable{
@@ -18,6 +19,7 @@ public class CompressedChunk implements Serializable{
 
 	int upsample;
 	int jobId;
+	int taskId;
 	
 	byte[] values_compressed;
 	byte[] samples_compressed;
@@ -34,9 +36,10 @@ public class CompressedChunk implements Serializable{
 	Map<BorderAlignment, ChunkBorderData> selfBorderData;
 	Map<BorderAlignment, ChunkBorderData> neighbourBorderData;
 	
-	public CompressedChunk(ReducedNaiveChunk chunk, int upsample, int jobId, double priority, boolean includeBorderData) {
+	public CompressedChunk(ReducedNaiveChunk chunk, int upsample, FractalsTask task, double priority, boolean includeBorderData) {
 		this.upsample = upsample;
-		this.jobId = jobId;
+		this.jobId = task.getJobId();
+		this.taskId = task.getId();
 		this.chunkX = chunk.chunkX;
 		this.chunkY = chunk.chunkY;
 		this.dimensionSize = chunk.dimensionSize;
@@ -228,6 +231,10 @@ public class CompressedChunk implements Serializable{
 		return ans;
 	}
 
+	public int getTaskId() {
+		return taskId;
+	}
+
 	public int getJobId() {
 		return jobId;
 	}
@@ -271,7 +278,6 @@ public class CompressedChunk implements Serializable{
 	public Map<BorderAlignment, ChunkBorderData> getNeighbourBorderData() {
 		return neighbourBorderData;
 	}
-
 	
 	public double getPriority() {
 		return priority;
