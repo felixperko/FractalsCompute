@@ -1,4 +1,4 @@
-package de.felixperko.fractals.network;
+package de.felixperko.fractals.network.interfaces;
 
 import java.util.HashMap;
 import java.util.List;
@@ -7,6 +7,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import de.felixperko.fractals.data.shareddata.DataContainer;
+import de.felixperko.fractals.network.ClientConfiguration;
+import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.system.parameters.ParameterConfiguration;
 import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
 import de.felixperko.fractals.system.task.FractalsTask;
@@ -14,7 +16,12 @@ import de.felixperko.fractals.system.task.FractalsTask;
 public abstract class ClientMessageInterface {
 	
 	Map<UUID, ClientSystemInterface> systemInterfaces = new HashMap<>();
+	ServerConnection serverConnection;
 	
+	public ClientMessageInterface(ServerConnection serverConnection) {
+		this.serverConnection = serverConnection;
+	}
+
 	protected abstract ClientSystemInterface createSystemInterface(ClientConfiguration clientConfiguration);
 	
 	public Set<UUID> getRegisteredSystems(){

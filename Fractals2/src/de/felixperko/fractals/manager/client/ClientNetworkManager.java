@@ -2,60 +2,60 @@ package de.felixperko.fractals.manager.client;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import de.felixperko.fractals.FractalsMain;
 import de.felixperko.fractals.manager.common.Manager;
 import de.felixperko.fractals.manager.common.NetworkManager;
-import de.felixperko.fractals.network.ClientMessageInterface;
 import de.felixperko.fractals.network.ClientWriteThread;
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
+import de.felixperko.fractals.network.interfaces.ClientMessageInterface;
+import de.felixperko.fractals.network.interfaces.NetworkInterfaceFactory;
 
 public class ClientNetworkManager extends Manager implements NetworkManager{
 
-	ServerConnection serverConnection = null;
-	
-	SenderInfo clientSenderInfo = null;
-	
-	ClientMessageInterface clientMessageInterface;
+	List<ServerConnection> serverConnections = new ArrayList<>();
+	Map<ServerConnection, ClientMessageInterface> clientMessageInterfaces = new HashMap<>();
+	NetworkInterfaceFactory networkInterfaceFactory;
 	
 	ClientWriteThread clientWriteThread;
 
-	public ClientNetworkManager(ClientManagers managers, ClientMessageInterface clientMessageInterface) {
+	public ClientNetworkManager(ClientManagers managers, NetworkInterfaceFactory networkInterfaceFactory) {
 		super(managers);
-		this.clientMessageInterface = clientMessageInterface;
-		serverConnection = new ServerConnection(this);
+		this.networkInterfaceFactory = networkInterfaceFactory;
 	}
 	
 	public void connectToServer(String host, int port) {
 		Socket socket;
 		try {
 			socket = new Socket(host, port);
-			clientWriteThread = new ClientWriteThread((ClientManagers)managers, socket);
+			ServerConnection serverConnection = new ServerConnection(this);
+			serverConnections.add(serverConnection);
+			ClientMessageInterface clientMessageInterface = networkInterfaceFactory.createMessageInterface(serverConnection);
+			clientMessageInterfaces.put(serverConnection, clientMessageInterface);
+			clientWriteThread = new ClientWriteThread((ClientManagers)managers, socket, serverConnection);
 			clientWriteThread.start();
-			serverConnection.setWriteToServer(clientWriteThread);
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(0);
 		}
 	}
-	
-	public ServerConnection getServerConnection() {
-		return serverConnection;
-	}
-	
-	public SenderInfo getClientInfo() {
-		return clientSenderInfo;
-	}
-	
-	public void setClientInfo(SenderInfo clientInfo) {
-		this.clientSenderInfo = clientInfo;
+
+	public ClientMessageInterface getMessageInterface(ServerConnection serverConnection) {
+		return clientMessageInterfaces.get(serverConnection);
 	}
 
-	public ClientMessageInterface getMessageInterface() {
-		return clientMessageInterface;
-	}
-
-	public void closeServerConnection() {
+	public void closeServerConnection(ServerConnection serverConnection) {
 		serverConnection.getWriteToServer().closeConnection();
+		serverConnections.remove(serverConnection);
+	}
+
+	@Override
+	public List<ServerConnection> getServerConnections() {
+		return serverConnections;
 	}
 }

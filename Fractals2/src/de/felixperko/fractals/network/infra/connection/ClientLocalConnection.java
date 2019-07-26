@@ -22,12 +22,12 @@ public class ClientLocalConnection extends AbstractConnection<ServerNetworkManag
 	}
 
 	@Override
-	public SenderInfo getSenderInfo() {
+	public SenderInfo getClientInfo() {
 		return senderInfo;
 	}
 
 	@Override
-	public void setSenderInfo(SenderInfo clientInfo) {
+	public void setClientInfo(SenderInfo clientInfo) {
 		this.senderInfo = clientInfo;
 	}
 	

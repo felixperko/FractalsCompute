@@ -43,7 +43,7 @@ public class SystemManager extends Manager{
 	}
 	
 	public void insertAvailableSystems() {
-		availableSystems.put("BasicSystem", new ClassSystemFactory(BasicSystem.class));
+		//availableSystems.put("BasicSystem", new ClassSystemFactory(BasicSystem.class));
 		availableSystems.put("BreadthFirstSystem", new ClassSystemFactory(BreadthFirstSystem.class));
 	}
 

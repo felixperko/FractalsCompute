@@ -17,6 +17,5 @@ public class FractalsMain {
 		
 		managers.getThreadManager().startWorkerThreads(THREAD_COUNT);
 		managers.getServerNetworkManager().startServerConnectThread();
-		
 	}
 }

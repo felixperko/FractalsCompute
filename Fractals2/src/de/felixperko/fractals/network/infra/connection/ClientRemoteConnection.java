@@ -7,14 +7,14 @@ import de.felixperko.fractals.network.infra.Message;
 
 public class ClientRemoteConnection extends AbstractConnection<ServerNetworkManager> implements ClientConnection{
 	
-	SenderInfo info;
+	SenderInfo clientInfo;
 	ServerWriteThread writeThread;
 	ServerNetworkManager networkManager;
 	boolean closed;
 	
 	public ClientRemoteConnection(ServerNetworkManager networkManager, SenderInfo info, ServerWriteThread writeThread) {
 		this.networkManager = networkManager;
-		this.info = info;
+		this.clientInfo = info;
 		this.writeThread = writeThread;
 	}
 	
@@ -24,7 +24,7 @@ public class ClientRemoteConnection extends AbstractConnection<ServerNetworkMana
 	}
 
 	public SenderInfo getSenderInfo() {
-		return info;
+		return clientInfo;
 	}
 
 	@Override
@@ -33,8 +33,13 @@ public class ClientRemoteConnection extends AbstractConnection<ServerNetworkMana
 	}
 
 	@Override
-	public void setSenderInfo(SenderInfo clientInfo) {
-		this.info = clientInfo;
+	public SenderInfo getClientInfo() {
+		return clientInfo;
+	}
+	
+	@Override
+	public void setClientInfo(SenderInfo clientInfo) {
+		this.clientInfo = clientInfo;
 	}
 	
 	@Override
@@ -51,7 +56,7 @@ public class ClientRemoteConnection extends AbstractConnection<ServerNetworkMana
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((info == null) ? 0 : info.hashCode());
+		result = prime * result + ((clientInfo == null) ? 0 : clientInfo.hashCode());
 		return result;
 	}
 
@@ -64,10 +69,10 @@ public class ClientRemoteConnection extends AbstractConnection<ServerNetworkMana
 		if (getClass() != obj.getClass())
 			return false;
 		ClientRemoteConnection other = (ClientRemoteConnection) obj;
-		if (info == null) {
-			if (other.info != null)
+		if (clientInfo == null) {
+			if (other.clientInfo != null)
 				return false;
-		} else if (!info.equals(other.info))
+		} else if (!clientInfo.equals(other.clientInfo))
 			return false;
 		return true;
 	}

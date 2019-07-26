@@ -1,6 +1,8 @@
 package de.felixperko.fractals.manager.server;
 
 import de.felixperko.fractals.manager.common.Managers;
+import de.felixperko.fractals.network.interfaces.NetworkInterfaceFactory;
+import de.felixperko.fractals.network.interfaces.ServerMessageInterface;
 
 public class ServerManagers implements Managers {
 	
@@ -11,7 +13,7 @@ public class ServerManagers implements Managers {
 	public ServerManagers() {
 		systemManager = new SystemManager(this);
 		threadManager = new ServerThreadManager(this);
-		networkManager = new ServerNetworkManager(this);
+		networkManager = new ServerNetworkManager(this, new NetworkInterfaceFactory(ServerMessageInterface.class, null));
 	}
 	
 	public SystemManager getSystemManager() {

@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import de.felixperko.fractals.manager.client.ClientManagers;
 import de.felixperko.fractals.network.ClientConfiguration;
-import de.felixperko.fractals.network.ClientMessageInterface;
-import de.felixperko.fractals.network.ClientSystemInterface;
+import de.felixperko.fractals.network.interfaces.ClientMessageInterface;
+import de.felixperko.fractals.network.interfaces.ClientSystemInterface;
 import de.felixperko.fractals.system.parameters.ParameterConfiguration;
 import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
 import de.felixperko.fractals.system.systems.stateinfo.SystemStateInfo;

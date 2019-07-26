@@ -9,7 +9,11 @@ public class ClientThreadManager extends ThreadManager {
 
 	public ClientThreadManager(ClientManagers managers) {
 		super(managers);
-		taskProvider = new RemoteTaskProvider(managers, 5);
+		taskProvider = new RemoteTaskProvider(5);
+	}
+	
+	public RemoteTaskProvider getRemoteTaskProvider() {
+		return taskProvider;
 	}
 
 }
