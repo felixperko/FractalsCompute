@@ -1,9 +1,9 @@
 package de.felixperko.fractals.network.infra;
 
-import de.felixperko.fractals.network.ClientMessageInterface;
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
+import de.felixperko.fractals.network.interfaces.ClientMessageInterface;
 import de.felixperko.fractals.util.CategoryLogger;
 
 public abstract class ServerMessage extends Message<ClientConnection, ServerConnection>{
@@ -24,7 +24,7 @@ public abstract class ServerMessage extends Message<ClientConnection, ServerConn
 	
 	@Override
 	public void received(ServerConnection connection, CategoryLogger log) {
-		clientMessageInterface = connection.getNetworkManager().getMessageInterface();
+		clientMessageInterface = connection.getNetworkManager().getMessageInterface(connection);
 		super.received(connection, log);
 	}
 	

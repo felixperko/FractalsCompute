@@ -1,11 +1,13 @@
 package de.felixperko.fractals.system.task;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
-import de.felixperko.fractals.manager.client.ClientManagers;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.network.messages.task.TaskFinishedMessage;
 import de.felixperko.fractals.network.messages.task.TaskRequestMessage;
@@ -17,25 +19,34 @@ public class RemoteTaskProvider implements TaskProvider {
 	int bufferSize;
 	
 	Queue<FractalsTask> bufferedTasks = new LinkedList<>();
-	ClientManagers managers;
-	
+	List<ServerConnection> serverConnections = new ArrayList<>();
 	List<CalculateFractalsThread> localThreads = new ArrayList<>();
 	
-	public RemoteTaskProvider(ClientManagers managers, int bufferSize) {
-		this.managers = managers;
+	Map<FractalsTask, ServerConnection> taskConnectionMap = new HashMap<>();
+	
+	public RemoteTaskProvider(int bufferSize) {
 		this.bufferSize = bufferSize;
 	}
 	
-	private ServerConnection getServerConnection() {
-		return managers.getNetworkManager().getServerConnection();
+	public void addServerConnection(ServerConnection serverConnection) {
+		serverConnections.add(serverConnection);
 	}
 	
 	protected void requestTasks(int amount) {
-		getServerConnection().writeMessage(new TaskRequestMessage(amount));
+		int connCount = serverConnections.size();
+		//TODO client at multiple connections -> balance requests
+		for (ServerConnection serverConnection : serverConnections) {
+			int amount2 = amount/connCount;
+			amount -= amount2;
+			connCount--;
+			serverConnection.writeMessage(new TaskRequestMessage(amount2));
+		}
 	}
 	
-	public void addTasks(List<FractalsTask> taskList) {
+	public void addTasks(List<FractalsTask> taskList, ServerConnection serverConnection) {
 		bufferedTasks.addAll(taskList);
+		for (FractalsTask task : taskList)
+			taskConnectionMap.put(task, serverConnection);
 	}
 
 	@Override
@@ -44,12 +55,20 @@ public class RemoteTaskProvider implements TaskProvider {
 	}
 	
 	public void taskStateChanged(FractalsTask task) {
-		getServerConnection().writeMessage(new TaskStateChangedMessage(task.getSystemId(), task.getId(), task.getState()));
+		ServerConnection serverConnection = taskConnectionMap.get(task);
+		if (serverConnection != null)
+			serverConnection.writeMessage(new TaskStateChangedMessage(task.getSystemId(), task.getId(), task.getState()));
+		else
+			throw new IllegalStateException("Can't find connection for task");
 	}
 
 	@Override
 	public void finishedTask(FractalsTask task) {
-		getServerConnection().writeMessage(new TaskFinishedMessage(task));
+		ServerConnection serverConnection = taskConnectionMap.get(task);
+		if (serverConnection != null)
+			serverConnection.writeMessage(new TaskFinishedMessage(task));
+		else
+			throw new IllegalStateException("Can't find connection for task");
 	}
 
 	@Override

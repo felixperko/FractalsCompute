@@ -1,6 +1,7 @@
 package de.felixperko.fractals.network.infra.connection;
 
 import de.felixperko.fractals.manager.client.ClientNetworkManager;
+import de.felixperko.fractals.manager.common.NetworkManager;
 import de.felixperko.fractals.network.ClientWriteThread;
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.Message;
@@ -8,15 +9,17 @@ import de.felixperko.fractals.network.infra.Message;
 /**
  * connection to the server
  */
-public class ServerConnection extends AbstractConnection<ClientNetworkManager>{
+public class ServerConnection extends AbstractConnection<NetworkManager>{
 	
 	ClientWriteThread writeToServer;
 	
-	ClientNetworkManager networkManager;
+	NetworkManager networkManager;
 	
 	boolean closed = false;
 	
-	public ServerConnection(ClientNetworkManager networkManager){
+	SenderInfo clientInfo;
+	
+	public ServerConnection(NetworkManager networkManager){
 		this.networkManager = networkManager;
 	}
 	
@@ -35,19 +38,9 @@ public class ServerConnection extends AbstractConnection<ClientNetworkManager>{
 		writeToServer.writeMessage(msg);
 	}
 
-	@Override
-	public SenderInfo getSenderInfo() {
-		throw new IllegalArgumentException("ServerConnection has no SenderInfo");
-	}
-
-	@Override
-	public void setSenderInfo(SenderInfo clientInfo) {
-		throw new IllegalArgumentException("ServerConnection has no SenderInfo");
-	}
-
 	
 	@Override
-	public ClientNetworkManager getNetworkManager() {
+	public NetworkManager getNetworkManager() {
 		return networkManager;
 	}
 
@@ -61,5 +54,15 @@ public class ServerConnection extends AbstractConnection<ClientNetworkManager>{
 	@Override
 	public void setClosed() {
 		closed = true;
+	}
+	
+	@Override
+	public void setClientInfo(SenderInfo clientInfo) {
+		this.clientInfo = clientInfo;
+	}
+	
+	@Override
+	public SenderInfo getClientInfo() {
+		return clientInfo;
 	}
 }

@@ -7,11 +7,11 @@ import de.felixperko.fractals.network.infra.connection.ConnectionListener;
 public interface Connection<N extends NetworkManager> {
 	public void writeMessage(Message msg);
 
-	public SenderInfo getSenderInfo();
 	
 	public N getNetworkManager();
 
-	public void setSenderInfo(SenderInfo clientInfo);
+	public SenderInfo getClientInfo();
+	public void setClientInfo(SenderInfo clientInfo);
 	
 	public boolean isClosed();
 	public void setClosed();

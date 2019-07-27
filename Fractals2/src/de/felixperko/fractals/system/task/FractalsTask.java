@@ -12,10 +12,10 @@ import de.felixperko.fractals.system.thread.FractalsThread;
 public interface FractalsTask extends Serializable{
 
 	TaskManager getTaskManager();
-
-	Integer getId();
 	
+	Integer getId();
 	Integer getJobId();
+	UUID getSystemId();
 
 	TaskStateInfo getStateInfo();
 	TaskState getState();
@@ -26,7 +26,6 @@ public interface FractalsTask extends Serializable{
 	
 	public void run() throws InterruptedException;
 
-	UUID getSystemId();
 	
 	public TaskStats getTaskStats();
 	public void setTaskStats(TaskStats taskStats);

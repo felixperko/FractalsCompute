@@ -3,6 +3,7 @@ package de.felixperko.fractals.network.messages;
 import java.util.List;
 
 import de.felixperko.fractals.data.shareddata.DataContainer;
+import de.felixperko.fractals.manager.client.ClientNetworkManager;
 import de.felixperko.fractals.network.infra.ServerMessage;
 
 public class SharedDataUpdateMessage extends ServerMessage{
@@ -19,6 +20,6 @@ public class SharedDataUpdateMessage extends ServerMessage{
 	@Override
 	protected void process() {
 		for (DataContainer container : updates)
-			getBackConnection().getNetworkManager().getMessageInterface().updateSharedData(container);
+			getClientMessageInterface().updateSharedData(container);
 	}
 }

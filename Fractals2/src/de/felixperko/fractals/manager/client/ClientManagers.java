@@ -2,16 +2,17 @@ package de.felixperko.fractals.manager.client;
 
 import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.manager.common.ThreadManager;
-import de.felixperko.fractals.network.ClientMessageInterface;
+import de.felixperko.fractals.network.interfaces.ClientMessageInterface;
+import de.felixperko.fractals.network.interfaces.NetworkInterfaceFactory;
 
 public class ClientManagers implements Managers {
 	
 	ThreadManager threadManager;
 	ClientNetworkManager networkManager;
 	
-	public ClientManagers(ClientMessageInterface clientMessageInterface) {
+	public ClientManagers(NetworkInterfaceFactory networkInterfaceFactory) {
 		this.threadManager = new ClientThreadManager(this);
-		this.networkManager = new ClientNetworkManager(this, clientMessageInterface);
+		this.networkManager = new ClientNetworkManager(this, networkInterfaceFactory);
 	}
 
 	@Override

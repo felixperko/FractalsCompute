@@ -1,5 +1,6 @@
 package de.felixperko.fractals.network.messages;
 
+import de.felixperko.fractals.manager.client.ClientNetworkManager;
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.ServerMessage;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
@@ -11,13 +12,12 @@ public class ConnectedMessage extends ServerMessage {
 	SenderInfo clientInfo;
 	
 	public ConnectedMessage(ClientConnection clientConnection) {
-		this.clientInfo = clientConnection.getSenderInfo();
+		this.clientInfo = clientConnection.getClientInfo();
 	}
 
 	@Override
 	protected void process() {
-		getBackConnection().getNetworkManager().setClientInfo(clientInfo);
-//		getBackConnection().setSenderInfo(clientInfo);
+		getBackConnection().setClientInfo(clientInfo);
 		log.log("Got client info!");
 		answer(new ConnectedAckMessage());
 	}

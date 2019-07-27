@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import de.felixperko.fractals.manager.client.ClientManagers;
+import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.util.CategoryLogger;
@@ -14,8 +15,12 @@ public class ClientWriteThread extends WriteThread{
 	
 	final static CategoryLogger superLogger = new CategoryLogger("com/client", ColorContainer.MAGENTA);
 	
-	public ClientWriteThread(ClientManagers managers, Socket socket) throws UnknownHostException, IOException {
+	ServerConnection serverConnection;
+	
+	public ClientWriteThread(Managers managers, Socket socket, ServerConnection serverConnection) throws UnknownHostException, IOException {
 		super(managers, socket);
+		this.serverConnection = serverConnection;
+		this.serverConnection.setWriteToServer(this);
 		log = superLogger.createSubLogger("out");
 		setListenLogger(new CategoryLogger("com/client/in", ColorContainer.MAGENTA));
 //		setConnection(managers.getClientNetworkManager().getServerConnection());
@@ -29,7 +34,7 @@ public class ClientWriteThread extends WriteThread{
 	@Override
 	protected void prepareMessage(Message msg) {
 		if (msg.getSender() == null) {
-			SenderInfo info = ((ClientManagers)managers).getClientNetworkManager().getClientInfo();
+			SenderInfo info = serverConnection.getClientInfo();
 			if (info == null)
 				throw new IllegalStateException("message can't be adressed");
 			msg.setSender(info);
@@ -39,6 +44,6 @@ public class ClientWriteThread extends WriteThread{
 
 	@Override
 	public ServerConnection getConnection() {
-		return ((ClientManagers)managers).getNetworkManager().getServerConnection();
+		return serverConnection;
 	}
 }

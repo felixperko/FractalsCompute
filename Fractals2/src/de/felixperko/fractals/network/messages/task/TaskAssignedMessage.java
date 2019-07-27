@@ -16,7 +16,7 @@ public class TaskAssignedMessage extends ServerMessage {
 	
 	@Override
 	protected void process() {
-		getBackConnection().getNetworkManager().getMessageInterface().assignedTasks(tasks);
+		getClientMessageInterface().assignedTasks(tasks);
 	}
 
 }
