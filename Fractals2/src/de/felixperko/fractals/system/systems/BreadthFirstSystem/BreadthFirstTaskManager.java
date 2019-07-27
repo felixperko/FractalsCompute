@@ -807,9 +807,4 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	public void removeTaskProviderAdapter(TaskProviderAdapter taskProviderAdapter) {
 		taskProviders.remove(taskProviderAdapter);
 	}
-
-	@Override
-	public ComplexNumber getAnchor() {
-		return viewData.getAnchor();
-	}
 }

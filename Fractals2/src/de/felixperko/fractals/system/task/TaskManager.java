@@ -16,8 +16,6 @@ public interface TaskManager<T> {
 	List<? extends FractalsTask> getTasks(int count);
 	CalcSystem getSystem();
 	
-	ComplexNumber getAnchor();
-	
 	public void addTaskProviderAdapter(TaskProviderAdapter taskProviderAdapter);
 	public void removeTaskProviderAdapter(TaskProviderAdapter taskProviderAdapter);
 }
