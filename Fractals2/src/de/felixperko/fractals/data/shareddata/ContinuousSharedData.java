@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.felixperko.fractals.network.Connection;
+import de.felixperko.fractals.network.infra.connection.ConnectionListener;
 
 /**
  * Continuous data that needs to be synced for clients through update messages.
@@ -29,8 +30,16 @@ public class ContinuousSharedData<T extends SharedDataUpdate> extends SharedData
 	public DataContainer getUpdates(Connection<?> connection){
 		
 		//prepare state
-		if (!connections.containsKey(connection))
+		if (!connections.containsKey(connection)) {
+			final ContinuousSharedData<T> thisData = this;
+			connection.addConnectionListener(new ConnectionListener() {
+				@Override
+				public void connectionClosed(Connection<?> connection) {
+					thisData.connectionClosed(connection);
+				}
+			});
 			connections.put(connection, (Integer)(-1));
+		}
 		int currentVersion = connections.get(connection);
 
 		DataContainer ans;

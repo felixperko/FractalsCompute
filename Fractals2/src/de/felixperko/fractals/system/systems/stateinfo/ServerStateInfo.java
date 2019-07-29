@@ -12,7 +12,7 @@ import de.felixperko.fractals.data.shareddata.ContinuousSharedData;
 import de.felixperko.fractals.data.shareddata.DataContainer;
 import de.felixperko.fractals.data.shareddata.SharedDataUpdate;
 import de.felixperko.fractals.data.shareddata.SharedStateData;
-import de.felixperko.fractals.manager.common.NetworkManager;
+import de.felixperko.fractals.manager.common.INetworkManager;
 import de.felixperko.fractals.network.Connection;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 

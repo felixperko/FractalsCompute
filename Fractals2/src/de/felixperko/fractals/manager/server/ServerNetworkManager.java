@@ -13,6 +13,7 @@ import de.felixperko.fractals.data.ReducedNaiveChunk;
 import de.felixperko.fractals.manager.client.ClientManagers;
 import de.felixperko.fractals.manager.common.Manager;
 import de.felixperko.fractals.manager.common.NetworkManager;
+import de.felixperko.fractals.manager.common.INetworkManager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.ClientWriteThread;
 import de.felixperko.fractals.network.Connection;
@@ -38,7 +39,7 @@ import de.felixperko.fractals.util.ColorContainer;
  * Manages connections to clients.
  */
 
-public class ServerNetworkManager extends Manager implements NetworkManager{
+public class ServerNetworkManager extends NetworkManager implements INetworkManager{
 	
 	CategoryLogger log = new CategoryLogger("com/server", ColorContainer.MAGENTA);
 	
@@ -50,15 +51,9 @@ public class ServerNetworkManager extends Manager implements NetworkManager{
 	
 	ServerManagers managers;
 	
-	List<ServerConnection> serverConnections = new ArrayList<>();
-	Map<ServerConnection, ClientMessageInterface> messageInterfaces = new HashMap<>();
-	NetworkInterfaceFactory networkInterfaceFactory;
-	List<ClientWriteThread> writeThreadsToServers = new ArrayList<>();
-	
 	public ServerNetworkManager(ServerManagers managers, NetworkInterfaceFactory networkInterfaceFactory) {
-		super(managers);
+		super(managers, networkInterfaceFactory);
 		this.managers = managers;
-		this.networkInterfaceFactory = networkInterfaceFactory;
 	}
 	
 	public void startServerConnectThread() {
@@ -76,7 +71,8 @@ public class ServerNetworkManager extends Manager implements NetworkManager{
 		return clientConnection;
 	}
 	
-	public void connectToServer(String host, int port) {
+	@Override
+	public ServerConnection connectToServer(String host, int port) {
 		Socket socket;
 		try {
 			socket = new Socket(host, port);
@@ -85,14 +81,14 @@ public class ServerNetworkManager extends Manager implements NetworkManager{
 			ClientMessageInterface messageInterface = networkInterfaceFactory.createMessageInterface(serverConnection);
 			messageInterfaces.put(serverConnection, messageInterface);
 			ClientWriteThread clientWriteThread = new ClientWriteThread(managers, socket, serverConnection);
-			serverConnection.setWriteToServer(clientWriteThread);
 			writeThreadsToServers.add(clientWriteThread);
 			clientWriteThread.start();
-			
+			return serverConnection;
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(0);
 		}
+		return null;
 	}
 	
 	public void updateClientConfiguration(SenderInfo senderInfo, ClientConfiguration newConfiguration) {
@@ -152,16 +148,5 @@ public class ServerNetworkManager extends Manager implements NetworkManager{
 	
 	public ServerManagers getServerManagers() {
 		return managers;
-	}
-
-	
-	@Override
-	public ClientMessageInterface getMessageInterface(ServerConnection serverConnection) {
-		return messageInterfaces.get(serverConnection);
-	}
-
-	@Override
-	public List<ServerConnection> getServerConnections() {
-		return serverConnections;
 	}
 }

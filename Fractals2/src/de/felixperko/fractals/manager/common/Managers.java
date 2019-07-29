@@ -4,6 +4,6 @@ public interface Managers {
 
 	ThreadManager getThreadManager();
 
-	NetworkManager getNetworkManager();
+	INetworkManager getNetworkManager();
 
 }

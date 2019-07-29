@@ -8,7 +8,7 @@ import java.util.Map;
 import de.felixperko.fractals.data.ArrayChunkFactory;
 import de.felixperko.fractals.data.ReducedNaiveChunk;
 import de.felixperko.fractals.manager.client.ClientManagers;
-import de.felixperko.fractals.manager.client.ClientNetworkManager;
+import de.felixperko.fractals.manager.common.NetworkManager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.SystemClientData;
 import de.felixperko.fractals.network.interfaces.ClientMessageInterface;

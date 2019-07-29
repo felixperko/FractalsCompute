@@ -1,6 +1,6 @@
 package de.felixperko.fractals.network.infra.connection;
 
-import de.felixperko.fractals.manager.client.ClientNetworkManager;
+import de.felixperko.fractals.manager.common.INetworkManager;
 import de.felixperko.fractals.manager.common.NetworkManager;
 import de.felixperko.fractals.network.ClientWriteThread;
 import de.felixperko.fractals.network.SenderInfo;
@@ -9,17 +9,17 @@ import de.felixperko.fractals.network.infra.Message;
 /**
  * connection to the server
  */
-public class ServerConnection extends AbstractConnection<NetworkManager>{
+public class ServerConnection extends AbstractConnection<INetworkManager>{
 	
 	ClientWriteThread writeToServer;
 	
-	NetworkManager networkManager;
+	INetworkManager networkManager;
 	
 	boolean closed = false;
 	
 	SenderInfo clientInfo;
 	
-	public ServerConnection(NetworkManager networkManager){
+	public ServerConnection(INetworkManager networkManager){
 		this.networkManager = networkManager;
 	}
 	
@@ -40,20 +40,8 @@ public class ServerConnection extends AbstractConnection<NetworkManager>{
 
 	
 	@Override
-	public NetworkManager getNetworkManager() {
+	public INetworkManager getNetworkManager() {
 		return networkManager;
-	}
-
-	
-	@Override
-	public boolean isClosed() {
-		return closed;
-	}
-	
-
-	@Override
-	public void setClosed() {
-		closed = true;
 	}
 	
 	@Override

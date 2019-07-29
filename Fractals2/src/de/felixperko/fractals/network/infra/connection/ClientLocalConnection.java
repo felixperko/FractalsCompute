@@ -42,14 +42,4 @@ public class ClientLocalConnection extends AbstractConnection<ServerNetworkManag
 		return networkManager;
 	}
 
-	@Override
-	public boolean isClosed() {
-		return closed;
-	}
-
-	@Override
-	public void setClosed() {
-		this.closed = true;
-	}
-
 }

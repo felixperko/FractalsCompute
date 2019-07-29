@@ -35,7 +35,7 @@ public abstract class ClientMessageInterface {
 	public void createdSystem(UUID systemId, ClientConfiguration clientConfiguration, ParameterConfiguration parameterConfiguration) {
 		ClientSystemInterface systemInterface = createSystemInterface(clientConfiguration);
 		addSystemInterface(systemId, systemInterface);
-		systemInterface.updateParameterConfiguration(clientConfiguration, parameterConfiguration);
+		systemInterface.updateParameterConfiguration(clientConfiguration.getSystemClientData(systemId), parameterConfiguration);
 	}
 	
 	public void removedSystem(UUID systemId) {
@@ -62,5 +62,9 @@ public abstract class ClientMessageInterface {
 	public void sharedDataUpdated(List<DataContainer> sharedDataStateUpdates) {
 		for (DataContainer dataContainer : sharedDataStateUpdates)
 			updateSharedData(dataContainer);
+	}
+	
+	public ServerConnection getServerConnection() {
+		return serverConnection;
 	}
 }

@@ -41,16 +41,6 @@ public class ClientRemoteConnection extends AbstractConnection<ServerNetworkMana
 	public void setClientInfo(SenderInfo clientInfo) {
 		this.clientInfo = clientInfo;
 	}
-	
-	@Override
-	public boolean isClosed() {
-		return closed;
-	}
-
-	@Override
-	public void setClosed() {
-		closed = true;
-	}
 
 	@Override
 	public int hashCode() {
