@@ -8,6 +8,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import de.felixperko.fractals.data.shareddata.MappedSharedDataUpdate;
+
 public class SystemStateInfo implements Serializable{
 	
 	private static final long serialVersionUID = -2682394717324577351L;
@@ -69,7 +71,11 @@ public class SystemStateInfo implements Serializable{
 		}
 		
 		TaskStateUpdate update = new TaskStateUpdate(systemId, taskId, stateInfo.getState(), stateInfo.layer.getId(), stateInfo.progress);
-		serverStateInfo.taskStateChanges.update(update);
+		serverStateInfo.taskStateChanges.update(new MappedSharedDataUpdate<TaskStateUpdate>(systemId.toString()+taskId, update));
 		return update;
+	}
+
+	public void taskStateUpdated(TaskStateUpdate updateMessage) {
+		serverStateInfo.taskStateChanges.update(new MappedSharedDataUpdate<TaskStateUpdate>(systemId.toString()+updateMessage.getTaskId(), updateMessage));
 	}
 }

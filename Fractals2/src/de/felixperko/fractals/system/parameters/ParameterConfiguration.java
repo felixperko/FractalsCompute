@@ -14,6 +14,7 @@ public class ParameterConfiguration implements Serializable{
 	private static final long serialVersionUID = -6181978740061515601L;
 	
 	List<ParameterDefinition> parameters = new ArrayList<>();
+	Map<String, List<ParameterDefinition>> calculatorParameters = new HashMap<>();
 	Map<String, ParamValueType> types = new HashMap<>();
 	Map<String, Selection<?>> selections = new HashMap<>();
 	Map<String, List<ParamValueType>> listTypes = new HashMap<>();
@@ -35,7 +36,16 @@ public class ParameterConfiguration implements Serializable{
 	public List<ParameterDefinition> getParameters() {
 		return parameters;
 	}
-
+	
+	public List<ParameterDefinition> getCalculatorParameters(String calculatorName){
+		List<ParameterDefinition> list = this.calculatorParameters.get(calculatorName);
+		return list;
+	}
+	
+	public void addCalculatorParameters(String calculatorName, List<ParameterDefinition> parameterDefinitions) {
+		this.calculatorParameters.put(calculatorName, parameterDefinitions);	
+	}
+	
 	public Map<String, ParamValueType> getTypes() {
 		return types;
 	}

@@ -51,7 +51,7 @@ public class TaskStateInfo{
 	}
 	
 	private void updateMessage(TaskState state) {
-		updateMessage(state, state);
+		updateMessage(state, this.state);
 	}
 
 	private void updateMessage(TaskState state, TaskState oldState) {
@@ -60,6 +60,7 @@ public class TaskStateInfo{
 		else {
 			synchronized (updateMessage) {
 				updateMessage.refresh(state, layer.getId(), progress);
+				systemStateInfo.taskStateUpdated(updateMessage);
 			}
 		}
 	}

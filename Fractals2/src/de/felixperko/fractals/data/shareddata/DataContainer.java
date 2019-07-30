@@ -1,6 +1,7 @@
 package de.felixperko.fractals.data.shareddata;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DataContainer implements Serializable{
@@ -15,6 +16,12 @@ public class DataContainer implements Serializable{
 		this.updates = updates;
 	}
 	
+	public DataContainer(String dataIdentifier, MappedSharedDataUpdate<?> update) {
+		this.identifier = dataIdentifier;
+		this.updates = new ArrayList<>();
+		this.updates.add(update);
+	}
+
 	public List<SharedDataUpdate> getUpdates(){
 		return updates;
 	}

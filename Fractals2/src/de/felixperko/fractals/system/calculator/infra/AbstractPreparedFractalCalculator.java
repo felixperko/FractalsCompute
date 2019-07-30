@@ -73,9 +73,9 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 //				}
 				continue;
 			}
+			if (isCancelled())
+				break loop;
 			for (int sample = chunk.getSampleCount(pixel) ; sample < samples ; sample++){
-				if (isCancelled())
-					break loop;
 				calculateSample(pixel, sample);
 			}
 			chunk.getCurrentTask().getStateInfo().setProgress((pixel+1.-redo.size())/pixelCount);
@@ -113,7 +113,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 			double abs = current.absSqDouble();
 			if (abs > limit*limit) {
 //							Math.log( Math.log(real*real+imag*imag)*0.5 / Math.log(2) ) / Math.log(pow)  )
-				res = k - Math.log(Math.log(current.absSqDouble())*0.5/LOG_2)/logPow; //abs...
+				res = k - Math.log(Math.log(abs)*0.5/LOG_2)/logPow; //abs...
 				sample_success(pixel);
 				break;
 			}

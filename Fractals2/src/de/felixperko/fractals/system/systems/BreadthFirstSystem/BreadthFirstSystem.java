@@ -89,9 +89,6 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		defs.add(new ParameterDefinition("iterations", StaticParamSupplier.class, integerType));
 		defs.add(new ParameterDefinition("calculator", StaticParamSupplier.class, selectionType));
 		defs.add(new ParameterDefinition("layerConfiguration", StaticParamSupplier.class, layerconfigurationType));
-		defs.add(new ParameterDefinition("pow", varList, complexnumberType));
-		defs.add(new ParameterDefinition("c", varList, complexnumberType));
-		defs.add(new ParameterDefinition("start", varList, complexnumberType));
 		defs.add(new ParameterDefinition("numberFactory", StaticParamSupplier.class, numberfactoryType));
 		defs.add(new ParameterDefinition("chunkFactory", StaticParamSupplier.class, arraychunkfactoryType));
 		defs.add(new ParameterDefinition("limit", StaticParamSupplier.class, doubleType));
@@ -104,8 +101,17 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		defs.add(new ParameterDefinition("midpoint", StaticParamSupplier.class, complexnumberType));
 		defs.add(new ParameterDefinition("systemName", StaticParamSupplier.class, selectionType));
 		defs.add(new ParameterDefinition("view", StaticParamSupplier.class, integerType));
-		
+
 		parameterConfiguration.addParameterDefinitions(defs);
+
+		List<ParameterDefinition> calculator_defs = new ArrayList<>();
+		calculator_defs.add(new ParameterDefinition("pow", varList, complexnumberType));
+		calculator_defs.add(new ParameterDefinition("c", varList, complexnumberType));
+		calculator_defs.add(new ParameterDefinition("start", varList, complexnumberType));
+		
+		parameterConfiguration.addCalculatorParameters("MandelbrotCalculator", calculator_defs);
+		parameterConfiguration.addCalculatorParameters("BurningShipCalculator", calculator_defs);
+		parameterConfiguration.addCalculatorParameters("NewtonThridPowerMinusOneCalculator", calculator_defs);
 		
 //		Selection<Class<? extends FractalsCalculator>> calculatorSelection = new Selection<>("calculator");
 //		calculatorSelection.addOption("Mandelbrot", MandelbrotCalculator.class);
@@ -114,6 +120,7 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		Selection<String> calculatorSelection = new Selection<>("calculator");
 		calculatorSelection.addOption("Mandelbrot", "MandelbrotCalculator");
 		calculatorSelection.addOption("BurningShip", "BurningShipCalculator");
+		calculatorSelection.addOption("Newton x^3-1", "NewtonThridPowerMinusOneCalculator");
 		parameterConfiguration.addSelection(calculatorSelection);
 		
 		Selection<String> systemNameSelection = new Selection<>("systemName");
