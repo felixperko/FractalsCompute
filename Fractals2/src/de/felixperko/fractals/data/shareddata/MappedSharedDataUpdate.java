@@ -1,14 +1,14 @@
 package de.felixperko.fractals.data.shareddata;
 
-import java.util.ArrayList;
+import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import de.felixperko.fractals.system.systems.stateinfo.TaskStateUpdate;
+public class MappedSharedDataUpdate<T> implements SharedDataUpdate<T>, Serializable {
 
-public class MappedSharedDataUpdate<T> implements SharedDataUpdate {
-
+	private static final long serialVersionUID = -510929972128464350L;
+	
 	boolean sent = false;
 	Map<String, T> updates = new HashMap<>();
 	boolean clearExisting = false;
@@ -39,8 +39,12 @@ public class MappedSharedDataUpdate<T> implements SharedDataUpdate {
 		updates.put(key, null);
 	}
 	
-	public Map<String, T> getUpdates(){
+	public Map<String, T> getUpdateMap(){
 		return updates;
+	}
+	
+	public Collection<T> getUpdates(){
+		return updates.values();
 	}
 	
 	public boolean isClearExisting() {
