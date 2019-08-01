@@ -4,12 +4,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
@@ -25,7 +23,6 @@ import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.manager.server.ServerNetworkManager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.messages.ChunkUpdateMessage;
-import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.Number;
 import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
@@ -448,7 +445,6 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		setLifeCycleState(LifeCycleState.RUNNING);
 		synchronized (this) {
 			List<ClientConfiguration> clients = new ArrayList<>(((BreadthFirstSystem)system).getClients());
-			HashSet<ClientConfiguration> skipClients = new HashSet<>();
 			for (BreadthFirstTask task : finishedTasks) {
 				
 				final Integer taskId = task.getId();
@@ -462,55 +458,10 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 						upsample = ((BreadthFirstUpsampleLayer)layer).getUpsample();
 					CompressedChunk compressedChunk = new CompressedChunk((ReducedNaiveChunk) task.chunk, upsample, task, task.getPriority()+2, true);
 					
-					//update message if message is pending
-					Map<ClientConfiguration, List<ChunkUpdateMessage>> oldMessages = pendingUpdateMessages.get(taskId);
-					if (oldMessages != null) {
-//						for (Entry<ClientConfiguration, ChunkUpdateMessage> e : oldMessages.entrySet()) {
-//							e.getValue().setChunk(compressedChunk);
-//							skipClients.add(e.getKey());
-//						}
-					} else {
-//						oldMessages = new HashMap<>();
-//						pendingUpdateMessages.put(taskId, oldMessages);
-					}
-				
 					//send update messages
 					for (ClientConfiguration client : clients) {
-						if (skipClients.contains(client))
-							continue;
-						ChunkUpdateMessage message = ((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, compressedChunk);
-						if (message != null){
-//							synchronized (oldMessages) {
-//								getPendingMessagesList(taskId, client).add(message);
-//							}
-							final BreadthFirstTaskManager thisObj = this;
-							//TODO !!!!debugging mess
-//							final Map<ClientConfiguration, List<ChunkUpdateMessage>> oldMessagesFinal = oldMessages;
-//							message.addSentCallback(new Runnable() {
-//								@Override
-//								public void run() {
-//									synchronized (thisObj) {
-//										//TODO possible bugfix? not optimized!
-////										for (Map<ClientConfiguration, List<ChunkUpdateMessage>> m : pendingUpdateMessages.values()) {
-////											for (List<ChunkUpdateMessage> l : m.values()) {
-////												Iterator<ChunkUpdateMessage> it = l.iterator();
-////												while (it.hasNext()) {
-////													if (it.next() == message)
-////														it.remove();
-////												}
-////											}
-////										}
-//										oldMessagesFinal.remove(client);
-//										if (oldMessagesFinal.isEmpty()) {
-//											for (Entry<ClientConfiguration, List<ChunkUpdateMessage>> e : oldMessagesFinal.entrySet())
-//												e.getValue().remove(message);
-//										}
-//									}
-//								}
-//							});
-						}
+						((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, compressedChunk);
 					}
-					skipClients.clear();
 				}
 				
 				//update layer and re-add or dispose

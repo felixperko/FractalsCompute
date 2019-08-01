@@ -122,11 +122,6 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 		imag = real*imag*2;
 		real = temp;
 	}
-
-	@Override
-	public double toDouble() {
-		return real;
-	}
 	
 	@Override
 	public String toString() {

@@ -1,6 +1,5 @@
 package de.felixperko.fractals.system.task;
 
-import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 
 public interface TaskProvider {

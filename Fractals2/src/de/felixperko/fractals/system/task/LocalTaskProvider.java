@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.network.messages.task.TaskAssignedMessage;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
+import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 import de.felixperko.fractals.util.CategoryLogger;
 import de.felixperko.fractals.util.ColorContainer;
@@ -22,7 +23,7 @@ public class LocalTaskProvider implements TaskProvider {
 	
 	static CategoryLogger log = new CategoryLogger("taskprovider", new ColorContainer(0f, 1f, 1f));
 
-	List<TaskManager> taskManagers = Collections.synchronizedList(new ArrayList<>());
+	List<TaskManager<?>> taskManagers = Collections.synchronizedList(new ArrayList<>());
 	
 	int roundRobinIndex = 0;
 	
@@ -35,13 +36,13 @@ public class LocalTaskProvider implements TaskProvider {
 	
 //	Map<TaskManager, Long> threadTimeTaken = new HashMap<>();
 	
-	public synchronized void addTaskManager(TaskManager taskManager) {
+	public synchronized void addTaskManager(TaskManager<?> taskManager) {
 		taskManagers.add(taskManager);
 		taskManager.addTaskProviderAdapter(adapter);
 //		threadTimeTaken.clear();
 	}
 	
-	public synchronized void removeTaskManager(TaskManager taskManager) {
+	public synchronized void removeTaskManager(TaskManager<?> taskManager) {
 		taskManagers.remove(taskManager);
 		taskManager.removeTaskProviderAdapter(adapter);
 //		threadTimeTaken.clear();
@@ -73,7 +74,7 @@ public class LocalTaskProvider implements TaskProvider {
 		for (int i = 0 ; i < taskManagers.size() ; i++) {
 			if (roundRobinIndex >= taskManagers.size())
 				roundRobinIndex = 0;
-			TaskManager manager = taskManagers.get(roundRobinIndex++);
+			TaskManager<?> manager = taskManagers.get(roundRobinIndex++);
 			List<? extends FractalsTask> tasks = manager.getTasks(1);
 			if (tasks != null && tasks.size() == 1)
 				return tasks.get(0);
@@ -94,6 +95,7 @@ public class LocalTaskProvider implements TaskProvider {
 	@Override
 	public void taskAvailable() {
 		
+		//try to find local idle thread to notify
 		for (CalculateFractalsThread thread : localThreads) {
 			if (thread.getLifeCycleState().equals(LifeCycleState.IDLE)) {
 				thread.taskAvailable();
@@ -101,6 +103,7 @@ public class LocalTaskProvider implements TaskProvider {
 			}
 		}
 		
+		//distribute to remote if not locally assigned
 		ClientConnection connection = null;
 		int left = 0;
 		for (Entry<ClientConnection, Integer> e : requestedTasks.entrySet()) {
@@ -126,16 +129,44 @@ public class LocalTaskProvider implements TaskProvider {
 		}
 	}
 	
-	public void assignRemoteTasks(ClientConnection connection, List<FractalsTask> tasks) {
+	public void assignRemoteTasks(ClientConnection connection, int amount) {
+		
+		//updated requested count
+		Integer left = requestedTasks.get(connection);
+		if (left == null) {
+			left = 0;
+		}
+		if (amount > left)
+			requestedTasks.put(connection, (Integer)amount);
+		
+		//get tasks
+		List<FractalsTask> tasks = new ArrayList<>();
+		for (int i = 0 ; i < left ; i++) {
+			FractalsTask task = getTask();
+			if (task == null)
+				break;
+			tasks.add(task);
+		}
+		
+		assignRemoteTasks(connection, tasks);
+		
+	}
+	
+	protected void assignRemoteTasks(ClientConnection connection, List<FractalsTask> tasks) {
+		if (tasks.isEmpty())
+			return;
+		
+		//assign tasks
+		for (FractalsTask task : tasks)
+			task.getStateInfo().setState(TaskState.ASSIGNED);
 		getAssignedTaskList(connection).addAll(tasks);
+		
+		//send message
 		TaskAssignedMessage msg = new TaskAssignedMessage(tasks);
 		connection.writeMessage(msg);
 		
+		//update requested tasks count
 		Integer left = requestedTasks.get(connection);
-		if (left == null) {
-			log.log("warn", "Assigning Task that wasn't requested? (LocalTaskProvider)");
-			left = 0;
-		}
 		left -= tasks.size();
 		if (left <= 0)
 			requestedTasks.remove(connection);
@@ -151,7 +182,7 @@ public class LocalTaskProvider implements TaskProvider {
 	private List<FractalsTask> getAssignedTaskList(ClientConnection connection){
 		List<FractalsTask> list = assignedTasks.get(connection);
 		if (list == null) {
-			list = new ArrayList();
+			list = new ArrayList<>();
 			assignedTasks.put(connection, list);
 		}
 		return list;

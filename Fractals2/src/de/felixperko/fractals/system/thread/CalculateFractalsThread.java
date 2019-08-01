@@ -4,6 +4,7 @@ import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.FractalsTask;
+import de.felixperko.fractals.system.task.LocalTaskProvider;
 import de.felixperko.fractals.system.task.TaskProvider;
 
 public class CalculateFractalsThread extends AbstractFractalsThread{
@@ -28,7 +29,8 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 	
 	public void setTaskProvider(TaskProvider taskProvider) {
 		this.taskProvider = taskProvider;
-		taskProvider.addLocalCalculateThread(this);
+		if (taskProvider instanceof LocalTaskProvider)
+			taskProvider.addLocalCalculateThread(this);
 	}
 	
 	@Override

@@ -49,9 +49,9 @@ public class ContinuousSharedData<T extends SharedDataUpdate> extends SharedData
 				return null;
 			
 			//accumulate past version updates
-			List<SharedDataUpdate> list = new ArrayList<>();
+			List<SharedDataUpdate<?>> list = new ArrayList<>();
 			for (int i = Math.max(currentVersion, 0) ; i < versionCounter ; i++) {
-				for (SharedDataUpdate update : getUpdateList(i, false)) {
+				for (SharedDataUpdate<?> update : getUpdateList(i, false)) {
 					update.setSent();
 					list.add(update);
 				}
@@ -59,7 +59,7 @@ public class ContinuousSharedData<T extends SharedDataUpdate> extends SharedData
 			
 			//add current version updates and increment version
 			synchronized (updates) {
-				for (SharedDataUpdate update : getUpdateList(versionCounter, false)) {
+				for (SharedDataUpdate<?> update : getUpdateList(versionCounter, false)) {
 					update.setSent();
 					list.add(update);
 				}

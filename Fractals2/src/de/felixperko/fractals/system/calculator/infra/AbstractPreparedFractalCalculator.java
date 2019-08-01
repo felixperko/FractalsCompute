@@ -5,7 +5,6 @@ import java.util.Queue;
 
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.BorderAlignment;
-import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
@@ -51,7 +50,6 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 //			System.out.println("test chunk");
 		
 		int pixelCount = chunk.getArrayLength();
-		int chunkSize = chunk.getChunkDimensions();
 		
 		phase = CalculatePhase.PHASE_MAINLOOP;
 		
@@ -103,9 +101,9 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 	
 	private void calculateSample(int pixel, int sample) {
 		double res = -1;
-		ComplexNumber current = ((ComplexNumber) p_start.get(pixel,sample)).copy();
-		ComplexNumber c = ((ComplexNumber) p_c.get(pixel,sample)).copy();
-		ComplexNumber pow = ((ComplexNumber) p_pow.get(pixel,sample)).copy();
+		ComplexNumber<?, ?> current = ((ComplexNumber<?, ?>) p_start.get(pixel,sample)).copy();
+		ComplexNumber<?, ?> c = ((ComplexNumber<?, ?>) p_c.get(pixel,sample)).copy();
+		ComplexNumber<?, ?> pow = ((ComplexNumber<?, ?>) p_pow.get(pixel,sample)).copy();
 		double logPow = Math.log(pow.absDouble());
 //		long t1 = System.nanoTime();
 		for (int k = 0 ; k < iterations ; k++) {
@@ -181,7 +179,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 		}
 	}
 
-	public abstract void executeKernel(ComplexNumber current, ComplexNumber exp, ComplexNumber c);
+	public abstract void executeKernel(ComplexNumber<?, ?> current, ComplexNumber<?, ?> exp, ComplexNumber<?, ?> c);
 	
 	enum CalculatePhase {
 		PHASE_MAINLOOP, PHASE_REDO;

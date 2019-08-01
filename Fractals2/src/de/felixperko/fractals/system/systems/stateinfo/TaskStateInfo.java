@@ -1,7 +1,5 @@
 package de.felixperko.fractals.system.systems.stateinfo;
 
-import java.io.Serializable;
-
 import de.felixperko.fractals.system.task.Layer;
 
 public class TaskStateInfo{

@@ -1,6 +1,5 @@
 package de.felixperko.fractals.system.systems.stateinfo;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 public class TaskStateUpdate extends AbstractSharedDataUpdate {

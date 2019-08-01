@@ -15,7 +15,9 @@ public class FractalsMain {
 
 		managers.getSystemManager().insertAvailableSystems();
 		
-		managers.getThreadManager().startWorkerThreads(THREAD_COUNT);
+		managers.getThreadManager().startWorkerThreads(THREAD_COUNT, false);
 		managers.getServerNetworkManager().startServerConnectThread();
+		
+		managers.getThreadManager().startInputScannerThread();
 	}
 }

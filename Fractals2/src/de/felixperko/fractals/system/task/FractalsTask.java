@@ -11,7 +11,7 @@ import de.felixperko.fractals.system.thread.FractalsThread;
 
 public interface FractalsTask extends Serializable{
 
-	TaskManager getTaskManager();
+	TaskManager<?> getTaskManager();
 	
 	Integer getId();
 	Integer getJobId();

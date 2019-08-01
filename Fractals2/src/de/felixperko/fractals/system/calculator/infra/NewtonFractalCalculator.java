@@ -43,7 +43,8 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 				ComplexNumber c = (ComplexNumber) p_c.get(pixel, sample);
 				ComplexNumber copy1;
 				ComplexNumber copy2;
-				double res = -1;
+				
+				iterationLoop:
 				for (int j = 0 ; j < it ; j++) {
 					copy1 = current.copy();
 					copy2 = current.copy();
@@ -58,9 +59,10 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 						DoubleComplexNumber root = roots[i];
 						if (Math.abs(current.realDouble()-root.realDouble()) < limit && Math.abs(current.imagDouble()-root.imagDouble()) < limit) {
 							chunk.addSample(pixel, getRootValue(i), upsample);
-							break;
+							break iterationLoop;
 						}
 					}
+					chunk.addSample(pixel, -1, upsample);
 				}
 			}
 		}

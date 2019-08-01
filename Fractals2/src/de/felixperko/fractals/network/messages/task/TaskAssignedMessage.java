@@ -8,6 +8,8 @@ import de.felixperko.fractals.system.task.FractalsTask;
 
 public class TaskAssignedMessage extends ServerMessage {
 	
+	private static final long serialVersionUID = 4803194986477065648L;
+	
 	List<FractalsTask> tasks = new ArrayList<>();
 	
 	public TaskAssignedMessage(List<FractalsTask> tasks) {

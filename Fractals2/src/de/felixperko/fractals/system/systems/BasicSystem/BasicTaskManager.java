@@ -86,7 +86,7 @@ public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 	
 	@Override
 	public void run() {
-		mainLoop : while (getLifeCycleState() != LifeCycleState.STOPPED) {
+		while (getLifeCycleState() != LifeCycleState.STOPPED) {
 			while (getLifeCycleState() == LifeCycleState.PAUSED || !calculate) {//calculate = false -> pause()
 				try {
 					Thread.sleep(1);

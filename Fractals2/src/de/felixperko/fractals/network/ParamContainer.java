@@ -1,7 +1,6 @@
 package de.felixperko.fractals.network;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;

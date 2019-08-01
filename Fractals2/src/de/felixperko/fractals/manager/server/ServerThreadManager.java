@@ -3,19 +3,32 @@ package de.felixperko.fractals.manager.server;
 import java.net.Socket;
 
 import de.felixperko.fractals.manager.common.ThreadManager;
+import de.felixperko.fractals.network.InputScannerThread;
 import de.felixperko.fractals.network.ServerWriteThread;
 import de.felixperko.fractals.system.task.LocalTaskProvider;
+import de.felixperko.fractals.system.task.RemoteTaskProvider;
+import de.felixperko.fractals.system.task.TaskProvider;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 
 public class ServerThreadManager extends ThreadManager{
 	
-	LocalTaskProvider taskProvider = new LocalTaskProvider();
+	LocalTaskProvider localTaskProvider = new LocalTaskProvider();
+	RemoteTaskProvider remoteTaskProvider = null;
+	
+	InputScannerThread inputScannerThread;
 	
 	public ServerThreadManager(ServerManagers managers) {
 		super(managers);
 	}
 	
-	public void startWorkerThreads(int count) {
+	public void initRemoteTaskProvider(int buffer) {
+		remoteTaskProvider = new RemoteTaskProvider(buffer);
+	}
+	
+	public void startWorkerThreads(int count, boolean useRemoteTaskProvider) {
+		TaskProvider taskProvider = useRemoteTaskProvider ? remoteTaskProvider : localTaskProvider;
+		if (taskProvider == null)
+			throw new IllegalAccessError("task provider is null (initRemoteTaskProvider() not called?)");
 		for (int i = 0 ; i < count ; i++){
 			CalculateFractalsThread thread = new CalculateFractalsThread(managers, taskProvider);
 			addThread(thread);
@@ -32,7 +45,17 @@ public class ServerThreadManager extends ThreadManager{
 	}
 	
 	public LocalTaskProvider getTaskProvider() {
-		return taskProvider;
+		return localTaskProvider;
+	}
+	
+	public void startInputScannerThread() {
+		inputScannerThread = new InputScannerThread(managers);
+		inputScannerThread.start();
+	}
+
+	
+	public RemoteTaskProvider getRemoteTaskProvider() {
+		return remoteTaskProvider;
 	}
 
 }

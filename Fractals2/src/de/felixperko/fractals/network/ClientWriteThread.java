@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import de.felixperko.fractals.manager.client.ClientManagers;
 import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;

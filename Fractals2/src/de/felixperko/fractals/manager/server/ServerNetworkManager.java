@@ -2,18 +2,12 @@ package de.felixperko.fractals.manager.server;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.CompressedChunk;
-import de.felixperko.fractals.data.ReducedNaiveChunk;
-import de.felixperko.fractals.manager.client.ClientManagers;
-import de.felixperko.fractals.manager.common.Manager;
-import de.felixperko.fractals.manager.common.NetworkManager;
 import de.felixperko.fractals.manager.common.INetworkManager;
+import de.felixperko.fractals.manager.common.NetworkManager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.ClientWriteThread;
 import de.felixperko.fractals.network.Connection;
@@ -26,11 +20,8 @@ import de.felixperko.fractals.network.infra.connection.ClientRemoteConnection;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.network.interfaces.ClientMessageInterface;
 import de.felixperko.fractals.network.interfaces.NetworkInterfaceFactory;
-import de.felixperko.fractals.network.interfaces.ServerMessageInterface;
 import de.felixperko.fractals.network.messages.ChunkUpdateMessage;
-import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
-import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.util.CategoryLogger;
 import de.felixperko.fractals.util.ColorContainer;
 

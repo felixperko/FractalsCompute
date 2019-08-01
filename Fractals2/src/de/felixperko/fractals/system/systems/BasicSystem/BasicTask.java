@@ -15,16 +15,17 @@ import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskManager;
 import de.felixperko.fractals.system.thread.FractalsThread;
 
-public class BasicTask extends AbstractFractalsTask {
+public class BasicTask extends AbstractFractalsTask<BasicTask> {
 	
+	private static final long serialVersionUID = -5097907338004813946L;
 	public AbstractArrayChunk chunk;
 	Map<String, ParamSupplier> parameters;
 	
 	FractalsCalculator calculator;
 	FractalsThread thread;
 	
-	public BasicTask(int id, TaskManager taskManager, AbstractArrayChunk chunk, Map<String, ParamSupplier> taskParameters,
-			ComplexNumber chunkPos, FractalsCalculator calculator, Layer layer, int jobId) {
+	public BasicTask(int id, TaskManager<BasicTask> taskManager, AbstractArrayChunk chunk, Map<String, ParamSupplier> taskParameters,
+			ComplexNumber<?, ?> chunkPos, FractalsCalculator calculator, Layer layer, int jobId) {
 		super(id, taskManager, layer, jobId);
 		this.chunk = chunk;
 		this.calculator = calculator;
@@ -57,6 +58,13 @@ public class BasicTask extends AbstractFractalsTask {
 	@Override
 	public FractalsCalculator getCalculator() {
 		return calculator;
+	}
+
+	
+	@Override
+	public TaskManager<BasicTask> getTaskManager() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

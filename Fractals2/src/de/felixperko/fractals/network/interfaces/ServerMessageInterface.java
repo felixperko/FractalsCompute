@@ -3,8 +3,9 @@ package de.felixperko.fractals.network.interfaces;
 import java.util.List;
 import java.util.UUID;
 
+import de.felixperko.fractals.FractalsMain;
 import de.felixperko.fractals.data.shareddata.DataContainer;
-import de.felixperko.fractals.manager.common.Managers;
+import de.felixperko.fractals.manager.server.ServerNetworkManager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.system.parameters.ParameterConfiguration;
@@ -13,8 +14,6 @@ import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.system.task.RemoteTaskProvider;
 
 public class ServerMessageInterface extends ClientMessageInterface {
-	
-	RemoteTaskProvider taskProvider;
 	
 	public ServerMessageInterface(ServerConnection serverConnection) {
 		super(serverConnection);
@@ -39,7 +38,7 @@ public class ServerMessageInterface extends ClientMessageInterface {
 
 	@Override
 	public void assignedTasks(List<FractalsTask> tasks) {
-		taskProvider.addTasks(tasks, serverConnection);
+		((ServerNetworkManager)serverConnection.getNetworkManager()).getServerManagers().getThreadManager().getRemoteTaskProvider().addTasks(tasks, serverConnection);
 	}
 
 	@Override

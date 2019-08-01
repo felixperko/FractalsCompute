@@ -10,7 +10,7 @@ import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.util.CategoryLogger;
 import de.felixperko.fractals.util.NumberUtil;
 
-public abstract class Message<CONN extends Connection, BACKCONN extends Connection> implements Serializable, Comparable<Message<?, ?>>{
+public abstract class Message<CONN extends Connection<?>, BACKCONN extends Connection<?>> implements Serializable, Comparable<Message<?, ?>>{
 	
 	private static final long serialVersionUID = 3353653767834804430L;
 
@@ -34,7 +34,7 @@ public abstract class Message<CONN extends Connection, BACKCONN extends Connecti
 		
 	}
 	
-	public Message(SenderInfo sender, Message lastMessage) {
+	public Message(SenderInfo sender, Message<?, ?> lastMessage) {
 		this.sender = sender;
 		this.creationTime = System.nanoTime();
 		if (lastMessage != null)
@@ -104,7 +104,7 @@ public abstract class Message<CONN extends Connection, BACKCONN extends Connecti
 		this.lastMessageTime = lastMessageTime;
 	}
 	
-	protected void answer(Message message) {
+	protected void answer(Message<?, ?> message) {
 		getBackConnection().writeMessage(message);
 	}
 	

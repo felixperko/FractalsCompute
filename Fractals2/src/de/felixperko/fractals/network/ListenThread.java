@@ -7,8 +7,8 @@ import java.net.SocketException;
 
 import org.xerial.snappy.SnappyInputStream;
 
-import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.manager.common.INetworkManager;
+import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;

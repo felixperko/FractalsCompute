@@ -1,6 +1,5 @@
 package de.felixperko.fractals.system.task;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -32,7 +31,7 @@ public class RemoteTaskProvider implements TaskProvider {
 		serverConnections.add(serverConnection);
 	}
 	
-	protected void requestTasks(int amount) {
+	public void requestTasks(int amount) {
 		int connCount = serverConnections.size();
 		//TODO client at multiple connections -> balance requests
 		for (ServerConnection serverConnection : serverConnections) {

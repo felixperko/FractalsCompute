@@ -7,19 +7,19 @@ import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
 import de.felixperko.fractals.system.task.statistics.TaskStats;
 import de.felixperko.fractals.system.task.statistics.TaskStatsEmpty;
 
-public abstract class AbstractFractalsTask implements FractalsTask{
+public abstract class AbstractFractalsTask<T> implements FractalsTask{
 	
 	private static final long serialVersionUID = -3755610537350804691L;
 	
 	Integer id;
-	transient TaskManager taskManager;
+	transient TaskManager<T> taskManager;
 	TaskStateInfo stateInfo;
 	int jobId;
 	UUID systemId;
 	
 	TaskStats taskStats = new TaskStatsEmpty();
 	
-	public AbstractFractalsTask(Integer id, TaskManager taskManager, Layer layer, int jobId) {
+	public AbstractFractalsTask(Integer id, TaskManager<T> taskManager, Layer layer, int jobId) {
 		this.id = id;
 		this.jobId = jobId;
 		this.systemId = taskManager.getSystem().getId();
@@ -30,10 +30,6 @@ public abstract class AbstractFractalsTask implements FractalsTask{
 
 	public Integer getId() {
 		return id;
-	}
-
-	public TaskManager getTaskManager() {
-		return taskManager;
 	}
 	
 	@Override

@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
-import de.felixperko.fractals.network.infra.ClientMessage;
 import de.felixperko.fractals.network.infra.SystemClientMessage;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.FractalsTask;
