@@ -1,8 +1,12 @@
 package de.felixperko.fractals.system.systems.stateinfo;
 
+import java.io.Serializable;
+
 import de.felixperko.fractals.system.task.Layer;
 
-public class TaskStateInfo{
+public class TaskStateInfo implements Serializable{
+	
+	private static final long serialVersionUID = 4129352632333138169L;
 	
 	int taskId;
 	TaskState state;
@@ -53,7 +57,9 @@ public class TaskStateInfo{
 	}
 
 	private void updateMessage(TaskState state, TaskState oldState) {
-		if (updateMessage == null || updateMessage.isSent())
+		if (systemStateInfo == null)
+			return;
+		if ((updateMessage == null || updateMessage.isSent()))
 			updateMessage = systemStateInfo.taskStateChanged(taskId, oldState, this);
 		else {
 			synchronized (updateMessage) {

@@ -21,8 +21,10 @@ public class ServerThreadManager extends ThreadManager{
 		super(managers);
 	}
 	
-	public void initRemoteTaskProvider(int buffer) {
-		remoteTaskProvider = new RemoteTaskProvider(buffer);
+	public RemoteTaskProvider initRemoteTaskProvider(int buffer) {
+		if (remoteTaskProvider == null)
+			remoteTaskProvider = new RemoteTaskProvider(buffer);
+		return remoteTaskProvider;
 	}
 	
 	public void startWorkerThreads(int count, boolean useRemoteTaskProvider) {

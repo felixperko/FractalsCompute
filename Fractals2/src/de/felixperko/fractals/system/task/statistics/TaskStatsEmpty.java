@@ -4,6 +4,8 @@ import de.felixperko.fractals.system.task.Layer;
 
 public class TaskStatsEmpty implements TaskStats {
 
+	private static final long serialVersionUID = 2749138511498142258L;
+
 	@Override
 	public void addSample(float value, long startTime, Layer currentLayer) {
 	}
