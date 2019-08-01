@@ -60,12 +60,5 @@ public class BasicTask extends AbstractFractalsTask<BasicTask> {
 		return calculator;
 	}
 
-	
-	@Override
-	public TaskManager<BasicTask> getTaskManager() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 
 }

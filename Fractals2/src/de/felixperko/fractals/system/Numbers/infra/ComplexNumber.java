@@ -1,6 +1,8 @@
 package de.felixperko.fractals.system.Numbers.infra;
 
-public interface ComplexNumber<T extends Number<T>, N extends ComplexNumber<T, N>>{
+import java.io.Serializable;
+
+public interface ComplexNumber<T extends Number<T>, N extends ComplexNumber<T, N>> extends Serializable{
 	public T abs();
 	public double absDouble();
 	public double absSqDouble();

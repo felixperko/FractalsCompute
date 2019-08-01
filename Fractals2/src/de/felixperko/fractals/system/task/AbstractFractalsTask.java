@@ -59,4 +59,9 @@ public abstract class AbstractFractalsTask<T> implements FractalsTask{
 	public void setTaskStats(TaskStats taskStats) {
 		this.taskStats = taskStats;
 	}
+	
+	@Override
+	public TaskManager<?> getTaskManager() {
+		return taskManager;
+	}
 }

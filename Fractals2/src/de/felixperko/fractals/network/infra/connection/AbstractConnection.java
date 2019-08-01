@@ -28,6 +28,7 @@ public abstract class AbstractConnection<N extends INetworkManager> implements C
 	@Override
 	public void setClosed() {
 		this.closed = true;
-		listeners.forEach(l -> l.connectionClosed(this));
+		for (ConnectionListener listener : new ArrayList<>(listeners))
+			listener.connectionClosed(this);
 	}
 }

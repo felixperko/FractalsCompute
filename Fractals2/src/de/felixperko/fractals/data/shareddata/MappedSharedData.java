@@ -62,6 +62,9 @@ public class MappedSharedData<T> extends SharedData<MappedSharedDataUpdate<T>> {
 									updateTimes.remove(key);
 								}
 							}
+						} else {
+							map.clear();
+							updateTimes.clear();
 						}
 					}
 				}

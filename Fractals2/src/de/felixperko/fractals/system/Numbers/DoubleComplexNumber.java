@@ -1,5 +1,7 @@
 package de.felixperko.fractals.system.Numbers;
 
+import java.io.Serializable;
+
 import de.felixperko.fractals.system.Numbers.infra.AbstractComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 

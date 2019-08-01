@@ -14,8 +14,6 @@ public class ClientLocalConnection extends AbstractConnection<ServerNetworkManag
 	
 	ServerNetworkManager networkManager;
 	
-	boolean closed;
-	
 	public ClientLocalConnection(ServerNetworkManager networkManager, SenderInfo localSenderInfo) {
 		this.networkManager = networkManager;
 		this.senderInfo = localSenderInfo;
