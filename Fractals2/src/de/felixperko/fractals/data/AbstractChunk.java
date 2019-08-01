@@ -12,7 +12,7 @@ public abstract class AbstractChunk implements Chunk {
 	
 	public ComplexNumber<?, ?> chunkPos;
 	
-	FractalsTask currentTask;
+	transient FractalsTask currentTask;
 	transient ViewData viewData;
 	
 	int jobId;
