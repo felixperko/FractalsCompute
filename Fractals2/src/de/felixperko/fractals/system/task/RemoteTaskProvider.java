@@ -13,7 +13,7 @@ import de.felixperko.fractals.network.messages.task.TaskRequestMessage;
 import de.felixperko.fractals.network.messages.task.TaskStateChangedMessage;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 
-public class RemoteTaskProvider implements TaskProvider {
+public class RemoteTaskProvider extends Thread implements TaskProvider {
 	
 	int bufferSize;
 	
@@ -25,6 +25,20 @@ public class RemoteTaskProvider implements TaskProvider {
 	
 	public RemoteTaskProvider(int bufferSize) {
 		this.bufferSize = bufferSize;
+		this.start();
+	}
+	
+	@Override
+	public void run() {
+		while (!Thread.interrupted()) {
+			if (bufferedTasks.size() < bufferSize)
+				requestTasks(bufferSize-bufferedTasks.size());
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public void addServerConnection(ServerConnection serverConnection) {
@@ -32,6 +46,7 @@ public class RemoteTaskProvider implements TaskProvider {
 	}
 	
 	public void requestTasks(int amount) {
+		
 		int connCount = serverConnections.size();
 		//TODO client at multiple connections -> balance requests
 		for (ServerConnection serverConnection : serverConnections) {
