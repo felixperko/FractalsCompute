@@ -19,10 +19,10 @@ public class BasicTask extends AbstractFractalsTask<BasicTask> {
 	
 	private static final long serialVersionUID = -5097907338004813946L;
 	public AbstractArrayChunk chunk;
-	Map<String, ParamSupplier> parameters;
+	Map<String, ParamSupplier> parameters; //TODO transient
 	
 	FractalsCalculator calculator;
-	FractalsThread thread;
+	transient FractalsThread thread;
 	
 	public BasicTask(int id, TaskManager<BasicTask> taskManager, AbstractArrayChunk chunk, Map<String, ParamSupplier> taskParameters,
 			ComplexNumber<?, ?> chunkPos, FractalsCalculator calculator, Layer layer, int jobId) {
