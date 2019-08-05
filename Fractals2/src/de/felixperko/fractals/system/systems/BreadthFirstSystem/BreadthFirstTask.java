@@ -35,7 +35,7 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	transient Layer previousLayer;
 	
 	public transient AbstractArrayChunk chunk;
-	private CompressedChunk compressed_chunk;
+	CompressedChunk compressed_chunk;
 	
 	transient Map<String, ParamSupplier> parameters; //TODO transient
 	
