@@ -17,6 +17,8 @@ public class CompressedChunk implements Serializable{
 	
 	private static final long serialVersionUID = 2576995300129069335L;
 
+	FractalsTask task;
+	
 	int upsample;
 	int jobId;
 	int taskId;
@@ -38,13 +40,14 @@ public class CompressedChunk implements Serializable{
 	
 	public CompressedChunk(ReducedNaiveChunk chunk, int upsample, FractalsTask task, double priority, boolean includeBorderData) {
 		this.upsample = upsample;
+		this.priority = priority;
+		this.task = task;
 		this.jobId = task.getJobId();
 		this.taskId = task.getId();
 		this.chunkX = chunk.chunkX;
 		this.chunkY = chunk.chunkY;
 		this.dimensionSize = chunk.dimensionSize;
 		this.chunkPos = chunk.chunkPos;
-		this.priority = priority;
 		try {
 			long t1 = System.nanoTime();
 			values_compressed = Snappy.compress(BitShuffle.shuffle(getUpsampledFloatArray(chunk.values)));
@@ -101,6 +104,7 @@ public class CompressedChunk implements Serializable{
 			byte[] failedSamples = Snappy.uncompress(failedSamples_compressed);
 			AbstractArrayChunk chunk = new ReducedNaivePackedChunk(chunkX, chunkY, dimensionSize, values, samples, failedSamples, upsample);
 			chunk.setJobId(jobId);
+			chunk.setCurrentTask(task);
 			chunk.chunkPos = chunkPos;
 			if (selfBorderData != null)
 				chunk.setSelfBorderData(selfBorderData);

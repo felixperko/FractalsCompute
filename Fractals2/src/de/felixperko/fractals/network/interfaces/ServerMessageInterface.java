@@ -38,7 +38,9 @@ public class ServerMessageInterface extends ClientMessageInterface {
 
 	@Override
 	public void assignedTasks(List<FractalsTask> tasks) {
-		((ServerNetworkManager)serverConnection.getNetworkManager()).getServerManagers().getThreadManager().getRemoteTaskProvider().addTasks(tasks, serverConnection);
+		ServerNetworkManager serverNetworkManager = ((ServerNetworkManager)serverConnection.getNetworkManager());
+		RemoteTaskProvider remoteTaskProvider = serverNetworkManager.getServerManagers().getThreadManager().getRemoteTaskProvider();
+		remoteTaskProvider.addTasks(tasks, serverConnection);
 	}
 
 	@Override

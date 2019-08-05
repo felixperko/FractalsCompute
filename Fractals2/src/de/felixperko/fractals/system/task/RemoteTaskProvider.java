@@ -57,14 +57,16 @@ public class RemoteTaskProvider extends Thread implements TaskProvider {
 	}
 	
 	public void addTasks(List<FractalsTask> taskList, ServerConnection serverConnection) {
-		bufferedTasks.addAll(taskList);
+		for (FractalsTask task : taskList)
+			bufferedTasks.add(task);
 		for (FractalsTask task : taskList)
 			taskConnectionMap.put(task, serverConnection);
 	}
 
 	@Override
 	public FractalsTask getTask() {
-		return bufferedTasks.poll();
+		FractalsTask task = bufferedTasks.poll();
+		return task;
 	}
 	
 	public void taskStateChanged(FractalsTask task) {
