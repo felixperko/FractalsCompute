@@ -1,39 +1,70 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.BorderAlignment;
+import de.felixperko.fractals.data.Chunk;
+import de.felixperko.fractals.data.CompressedChunk;
+import de.felixperko.fractals.data.ReducedNaiveChunk;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
-import de.felixperko.fractals.system.systems.BasicSystem.BasicTask;
+import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
+import de.felixperko.fractals.system.task.AbstractFractalsTask;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskManager;
+import de.felixperko.fractals.system.thread.FractalsThread;
 
-public class BreadthFirstTask extends BasicTask implements BreadthFirstQueueEntry {
+public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> implements BreadthFirstQueueEntry {
 	
 	private static final long serialVersionUID = 428442040367400862L;
 
 	Double distance;
 	Double priority;
 	
-	Layer previousLayer;
-
-	public BreadthFirstTask(int id, TaskManager taskManager, AbstractArrayChunk chunk, Map<String, ParamSupplier> taskParameters,
-			ComplexNumber chunkPos, FractalsCalculator calculator, Layer layer, int jobId) {
-		super(id, taskManager, chunk, taskParameters, chunkPos, calculator, layer, jobId);
-		chunk.setCurrentTask(this);
+	transient FractalsThread thread;
+	
+	transient Layer previousLayer;
+	
+	public transient AbstractArrayChunk chunk;
+	private CompressedChunk compressed_chunk;
+	
+	transient Map<String, ParamSupplier> parameters; //TODO transient
+	
+	FractalsCalculator calculator;
+	
+	public BreadthFirstTask(int id, TaskManager taskManager, AbstractArrayChunk chunk, Map<String, ParamSupplier> taskParameters, ComplexNumber chunkPos, 
+			FractalsCalculator calculator, Layer layer, int jobId) {
+		super(id, taskManager, jobId, layer);
 		getStateInfo().setState(TaskState.OPEN);
+		this.calculator = calculator;
+		this.chunk = chunk;
+		this.chunk.chunkPos = chunkPos.copy();
+		chunk.setCurrentTask(this);
+			
+		this.parameters = new HashMap<>();
+		for (Entry<String, ParamSupplier> e : taskParameters.entrySet()){
+			this.parameters.put(e.getKey(), e.getValue().copy());
+		}
+		this.parameters.put("chunkpos", new StaticParamSupplier("chunkpos", this.chunk.chunkPos.copy()));
+		this.parameters.put("chunksize", new StaticParamSupplier("chunksize", (Integer)chunk.getChunkDimensions()));
 	}
 	
 	@Override
 	public void run() {
 		preprocess();
 		previousLayer = getStateInfo().getLayer();
-		super.run();
+		parameters.put("layer", new StaticParamSupplier("layer", (Integer)getStateInfo().getLayer().getId()));
+		calculator.setParams(parameters);
+		calculator.calculate(chunk);
 	}
 
 	private void preprocess() {
@@ -167,5 +198,32 @@ public class BreadthFirstTask extends BasicTask implements BreadthFirstQueueEntr
 	public void updatePriorityAndDistance(double midpointChunkX, double midpointChunkY, BreadthFirstLayer layer) {
 		updateDistance(midpointChunkX, midpointChunkX);
 		priority = distance * layer.getPriorityMultiplier() + layer.getPriorityShift();
+	}
+	
+	public Chunk getChunk() {
+		return chunk;
+	}
+
+	@Override
+	public void setThread(FractalsThread thread) {
+		this.thread = thread;
+	}
+
+	@Override
+	public FractalsCalculator getCalculator() {
+		return calculator;
+	}
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.defaultWriteObject();
+		Layer layer = getStateInfo().getLayer();
+		int upsample = layer instanceof BreadthFirstUpsampleLayer ? ((BreadthFirstUpsampleLayer)layer).getUpsample() : 1;
+		compressed_chunk = new CompressedChunk((ReducedNaiveChunk) chunk, upsample, this, priority, true);
+	}
+	
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+		in.defaultReadObject();
+		chunk = compressed_chunk.decompress();
+		chunk.setCurrentTask(this);
 	}
 }

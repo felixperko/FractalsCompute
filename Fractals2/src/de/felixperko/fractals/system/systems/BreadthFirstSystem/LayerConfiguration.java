@@ -9,6 +9,7 @@ import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
 import de.felixperko.fractals.system.Numbers.DoubleNumber;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
+import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.util.CategoryLogger;
 import de.felixperko.fractals.util.ColorContainer;
 import de.felixperko.fractals.util.NumberUtil;
@@ -307,5 +308,10 @@ public class LayerConfiguration implements Serializable{
 	
 	public NumberFactory getNumberFactory() {
 		return numberFactory;
+	}
+
+	
+	public Layer getLayer(int layerId) {
+		return layers.get(layerId);
 	}
 }

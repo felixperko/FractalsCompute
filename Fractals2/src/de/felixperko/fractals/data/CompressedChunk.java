@@ -16,8 +16,6 @@ import de.felixperko.fractals.util.NumberUtil;
 public class CompressedChunk implements Serializable{
 	
 	private static final long serialVersionUID = 2576995300129069335L;
-
-	FractalsTask task;
 	
 	int upsample;
 	int jobId;
@@ -41,7 +39,6 @@ public class CompressedChunk implements Serializable{
 	public CompressedChunk(ReducedNaiveChunk chunk, int upsample, FractalsTask task, double priority, boolean includeBorderData) {
 		this.upsample = upsample;
 		this.priority = priority;
-		this.task = task;
 		this.jobId = task.getJobId();
 		this.taskId = task.getId();
 		this.chunkX = chunk.chunkX;
@@ -104,7 +101,6 @@ public class CompressedChunk implements Serializable{
 			byte[] failedSamples = Snappy.uncompress(failedSamples_compressed);
 			AbstractArrayChunk chunk = new ReducedNaivePackedChunk(chunkX, chunkY, dimensionSize, values, samples, failedSamples, upsample);
 			chunk.setJobId(jobId);
-			chunk.setCurrentTask(task);
 			chunk.chunkPos = chunkPos;
 			if (selfBorderData != null)
 				chunk.setSelfBorderData(selfBorderData);

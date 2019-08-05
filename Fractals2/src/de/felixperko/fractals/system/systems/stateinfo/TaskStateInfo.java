@@ -16,11 +16,10 @@ public class TaskStateInfo implements Serializable{
 	
 	transient TaskStateUpdate updateMessage;
 	
-	public TaskStateInfo(int taskId, Layer layer) {
+	public TaskStateInfo(int taskId) {
 		this.taskId = taskId;
 		this.state = TaskState.PLANNED;
 		this.progress = 0;
-		this.layer = layer;
 	}
 	
 	public TaskStateInfo() {
