@@ -57,9 +57,7 @@ public class TaskStateInfo implements Serializable{
 	}
 
 	private void updateMessage(TaskState state, TaskState oldState) {
-		if (systemStateInfo == null)
-			return;
-		if ((updateMessage == null || updateMessage.isSent()))
+		if (updateMessage == null || updateMessage.isSent())
 			updateMessage = systemStateInfo.taskStateChanged(taskId, oldState, this);
 		else {
 			synchronized (updateMessage) {

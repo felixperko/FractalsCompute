@@ -5,8 +5,6 @@ import java.util.Scanner;
 import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
-import de.felixperko.fractals.system.task.RemoteTaskProvider;
-import de.felixperko.fractals.system.task.TaskProvider;
 
 public class InputScannerThread extends Thread {
 	
@@ -40,25 +38,18 @@ public class InputScannerThread extends Thread {
 				return;
 			}
 			String host = to[0];
-			RemoteTaskProvider provider = null;
 			try {
 				int port = Integer.parseInt(to[1]);
 				int startThreads = 0;
 				if (input.length == 3) {
 					startThreads = Integer.parseInt(input[2]);
 					if (managers instanceof ServerManagers) {
-						provider = ((ServerManagers)managers).getThreadManager().initRemoteTaskProvider(startThreads);
+						((ServerManagers)managers).getThreadManager().initRemoteTaskProvider(startThreads);
 						((ServerManagers)managers).getThreadManager().startWorkerThreads(startThreads, true);
 					}
 					//TODO Client?!
 				}
-				ServerConnection connection = managers.getNetworkManager().connectToServer(host, port);
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				provider.addServerConnection(connection);
+				managers.getNetworkManager().connectToServer(host, port);
 			} catch (NumberFormatException e) {
 				System.out.println(USAGE_CONNECT);
 				return;
