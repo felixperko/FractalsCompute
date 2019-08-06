@@ -20,6 +20,12 @@ public class InputScannerThread extends Thread {
 		Scanner scanner = new Scanner(System.in);
 		
 		while (!Thread.interrupted()) {
+			while (!scanner.hasNext())
+				try {
+					Thread.sleep(1);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			parse(scanner.nextLine());
 		}
 	}

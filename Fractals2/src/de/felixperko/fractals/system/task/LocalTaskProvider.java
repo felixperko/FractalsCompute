@@ -156,6 +156,8 @@ public class LocalTaskProvider implements TaskProvider {
 		if (tasks.isEmpty())
 			return;
 		
+		Thread.dumpStack();
+		
 		//assign tasks
 		for (FractalsTask task : tasks)
 			task.getStateInfo().setState(TaskState.ASSIGNED);

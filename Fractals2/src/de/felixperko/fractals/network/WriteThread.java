@@ -97,37 +97,43 @@ public abstract class WriteThread extends AbstractFractalsThread {
 					newMessages.clear();
 				}
 				
-				synchronized (pendingMessages) {
-					Iterator<Message> it = pendingMessages.iterator();
-//					while (!pendingMessages.isEmpty()) {
-//						Message msg = pendingMessages.poll();
-					if (it.hasNext()) {
-//						if (closeConnection)
-//							break mainLoop;
-						Message msg = it.next();
-						it.remove();
-						msg.executeSentCallbacks();
-						msg.setSent(true);
-						if (msg.isCancelled())
-							continue;
-						prepareMessage(msg);
-						log.log("sending message: "+msg.getClass().getSimpleName());
-						try {
-							out.writeUnshared(msg);
-							out.flush();
-							if (outComp != null)
-								outComp.flush();
-							out.reset();
-						} catch (SocketException e) {
+				try {
+					synchronized (pendingMessages) {
+						Iterator<Message> it = pendingMessages.iterator();
+	//					while (!pendingMessages.isEmpty()) {
+	//						Message msg = pendingMessages.poll();
+						if (it.hasNext()) {
+	//						if (closeConnection)
+	//							break mainLoop;
+							Message msg = it.next();
+							it.remove();
+							msg.executeSentCallbacks();
+							msg.setSent(true);
+							if (msg.isCancelled())
+								continue;
+							prepareMessage(msg);
+							log.log("sending message: "+msg.getClass().getSimpleName());
 							try {
-								Thread.sleep(1);
-							} catch (InterruptedException e1) {
-								e1.printStackTrace();
+								out.writeUnshared(msg);
+								out.flush();
+								if (outComp != null)
+									outComp.flush();
+								out.reset();
+							} catch (SocketException e) {
+								try {
+									Thread.sleep(1);
+								} catch (InterruptedException e1) {
+									e1.printStackTrace();
+								}
+								if (!closeConnection)
+									throw e;
 							}
-							if (!closeConnection)
-								throw e;
 						}
 					}
+				} catch (Exception e){
+					if (closeConnection)
+						break mainLoop;
+					throw e;
 				}
 			}
 			
