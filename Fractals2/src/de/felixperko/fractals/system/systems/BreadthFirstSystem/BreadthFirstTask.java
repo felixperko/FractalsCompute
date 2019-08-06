@@ -32,12 +32,12 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	
 	transient FractalsThread thread;
 	
-	transient Layer previousLayer;
+	Layer previousLayer;
 	
 	public transient AbstractArrayChunk chunk;
 	transient CompressedChunk compressed_chunk;
 	
-	transient Map<String, ParamSupplier> parameters; //TODO transient
+	Map<String, ParamSupplier> parameters; //TODO transient
 	
 	FractalsCalculator calculator;
 	
@@ -215,17 +215,17 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	}
 	
 	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.defaultWriteObject();
 		Layer layer = getStateInfo().getLayer();
 		int upsample = layer instanceof BreadthFirstUpsampleLayer ? ((BreadthFirstUpsampleLayer)layer).getUpsample() : 1;
 		compressed_chunk = new CompressedChunk((ReducedNaiveChunk) chunk, upsample, this, priority, true);
 		out.writeObject(compressed_chunk);
+		out.defaultWriteObject();
 	}
 	
 	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-		in.defaultReadObject();
 		compressed_chunk = (CompressedChunk)in.readObject();
 		chunk = compressed_chunk.decompress();
 		chunk.setCurrentTask(this);
+		in.defaultReadObject();
 	}
 }

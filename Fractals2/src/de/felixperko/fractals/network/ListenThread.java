@@ -11,6 +11,7 @@ import de.felixperko.fractals.manager.common.INetworkManager;
 import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.infra.Message;
+import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.util.CategoryLogger;
@@ -81,7 +82,7 @@ public class ListenThread extends AbstractFractalsThread {
 			} catch (SocketException e) {
 				log.log("lost connection");
 				setCloseConnection(true);
-				if (managers instanceof ServerManagers)
+				if (writeThread.getConnection() instanceof ClientConnection)
 					((ServerManagers)managers).getServerNetworkManager().removeClient(writeThread.getConnection());
 			} catch (Exception e) {
 				e.printStackTrace();
