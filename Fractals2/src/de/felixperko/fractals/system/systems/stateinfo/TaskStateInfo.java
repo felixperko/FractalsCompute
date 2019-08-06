@@ -56,13 +56,17 @@ public class TaskStateInfo implements Serializable{
 	}
 
 	private void updateMessage(TaskState state, TaskState oldState) {
-		if (updateMessage == null || updateMessage.isSent())
-			updateMessage = systemStateInfo.taskStateChanged(taskId, oldState, this);
-		else {
-			synchronized (updateMessage) {
-				updateMessage.refresh(state, layer.getId(), progress);
-				systemStateInfo.taskStateUpdated(updateMessage);
+		if (systemStateInfo != null) { //TODO local
+			if (updateMessage == null || updateMessage.isSent())
+				updateMessage = systemStateInfo.taskStateChanged(taskId, oldState, this);
+			else {
+				synchronized (updateMessage) {
+					updateMessage.refresh(state, layer.getId(), progress);
+					systemStateInfo.taskStateUpdated(updateMessage);
+				}
 			}
+		} else {
+			//TODO send message to server!
 		}
 	}
 

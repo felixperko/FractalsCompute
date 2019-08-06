@@ -49,7 +49,7 @@ public class LayerConfiguration implements Serializable{
 	boolean debug = false;
 	
 	transient ComplexNumber[][] offsets;
-	transient NumberFactory numberFactory;
+	NumberFactory numberFactory;
 	transient boolean prepared = false;
 	
 	
