@@ -225,7 +225,10 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
 		compressed_chunk = (CompressedChunk)in.readObject();
 		chunk = compressed_chunk.decompress();
+		
+		//TODO dedicated post chunk decompression method
 		chunk.setCurrentTask(this);
+		
 		in.defaultReadObject();
 	}
 }

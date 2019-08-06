@@ -139,6 +139,8 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 	
 	public void setNeighbourBorderData(Map<BorderAlignment, ChunkBorderData> neighbourBorderData) {
 		this.neighbourBorderData = neighbourBorderData;
+		for (ChunkBorderData data : neighbourBorderData.values())
+			data.setChunk(this);
 	}
 	
 	public ChunkBorderData getNeighbourBorderData(BorderAlignment alignment) {
@@ -155,6 +157,8 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 
 	public void setSelfBorderData(Map<BorderAlignment, ChunkBorderData> selfBorderData) {
 		this.selfBorderData = selfBorderData;
+		for (ChunkBorderData data : selfBorderData.values())
+			data.setChunk(this);
 	}
 
 	public void setCullFlags(int upsampleIndex, int upsample, boolean cull) {

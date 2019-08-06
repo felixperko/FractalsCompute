@@ -26,6 +26,11 @@ public class ChunkBorderDataImpl implements ChunkBorderData {
 	public AbstractArrayChunk getChunk() {
 		return chunk;
 	}
+	
+	@Override
+	public void setChunk(AbstractArrayChunk chunk) {
+		this.chunk = chunk;
+	}
 
 //	@Override
 //	public AbstractArrayChunk getBorderChunk() {

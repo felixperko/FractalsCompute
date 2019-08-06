@@ -6,6 +6,7 @@ import java.util.List;
 public interface ChunkBorderData extends Serializable{
 
 	public AbstractArrayChunk getChunk();
+	public void setChunk(AbstractArrayChunk chunk);
 //	public AbstractArrayChunk getBorderChunk();
 	
 	public boolean isSet(int borderIndex);

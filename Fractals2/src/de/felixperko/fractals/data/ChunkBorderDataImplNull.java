@@ -10,6 +10,11 @@ public class ChunkBorderDataImplNull implements ChunkBorderData {
 	public AbstractArrayChunk getChunk() {
 		return null;
 	}
+	
+	@Override
+	public void setChunk(AbstractArrayChunk chunk) {
+		throw new IllegalStateException("setChunk() shouldn't be called for null implementation");
+	}
 
 	@Override
 	public boolean isSet(int borderIndex) {
