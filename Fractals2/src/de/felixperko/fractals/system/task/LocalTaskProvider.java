@@ -85,7 +85,18 @@ public class LocalTaskProvider implements TaskProvider {
 	@Override
 	public void finishedTask(FractalsTask task) {
 		TaskManager tm = task.getTaskManager();
-		tm.taskFinished(task);
+		if (tm != null){
+			tm.taskFinished(task);
+			return;
+		} else {
+			for (TaskManager<?> tm2 : taskManagers){
+				if (tm2.getSystem().getId().equals(task.getSystemId())){
+					tm2.taskFinished(task);
+					return;
+				}
+			}
+		}
+		throw new IllegalStateException("cant find task manager for task");
 //		Long oldTime = threadTimeTaken.get(tm);
 //		if (oldTime == null)
 //			oldTime = 0L;
@@ -177,6 +188,14 @@ public class LocalTaskProvider implements TaskProvider {
 	}
 	
 	public void completedRemoteTasks(ClientConnection connection, List<FractalsTask> tasks) {
+		List<FractalsTask> localList = getAssignedTaskList(connection);
+		for (FractalsTask localTask : localList){
+			for (FractalsTask remoteTask : tasks){
+				if (remoteTask.equals(localTask)){
+					
+				}
+			}
+		}
 		getAssignedTaskList(connection).removeAll(tasks);
 		tasks.forEach(t -> finishedTask(t));
 	}

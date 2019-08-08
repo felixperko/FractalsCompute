@@ -293,8 +293,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	}
 
 	@Override
-	public synchronized void taskFinished(BreadthFirstTask task) {
-		finishedTasks.add(task);
+	public synchronized void taskFinished(FractalsTask task) {
+		finishedTasks.add((BreadthFirstTask)task);
 		task.getStateInfo().setState(TaskState.FINISHED);
 	}
 	
