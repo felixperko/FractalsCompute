@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
+import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
 import de.felixperko.fractals.system.task.statistics.TaskStats;
@@ -29,5 +30,9 @@ public interface FractalsTask extends Serializable{
 	
 	public TaskStats getTaskStats();
 	public void setTaskStats(TaskStats taskStats);
+
+	void setStateInfo(TaskStateInfo taskStateInfo);
+
+	SystemContext getContext();
 	
 }

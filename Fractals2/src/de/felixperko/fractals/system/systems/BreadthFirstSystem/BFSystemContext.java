@@ -1,9 +1,15 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 import de.felixperko.fractals.data.ArrayChunkFactory;
+import de.felixperko.fractals.data.Chunk;
+import de.felixperko.fractals.network.infra.connection.ServerConnection;
+import de.felixperko.fractals.network.messages.task.TaskStateChangedMessage;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.Number;
 import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
@@ -14,13 +20,19 @@ import de.felixperko.fractals.system.calculator.NewtonThridPowerMinusOneCalculat
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
-import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
+import de.felixperko.fractals.system.systems.stateinfo.SystemStateInfo;
+import de.felixperko.fractals.system.systems.stateinfo.TaskState;
+import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
+import de.felixperko.fractals.system.systems.stateinfo.TaskStateUpdate;
 import de.felixperko.fractals.system.task.Layer;
+import de.felixperko.fractals.system.task.TaskManager;
 
 public class BFSystemContext implements SystemContext {
 	
-	static Map<String, Class<? extends FractalsCalculator>> availableCalculators = new HashMap<>();
+	private static final long serialVersionUID = -6082120140942989559L;
+
+	transient static Map<String, Class<? extends FractalsCalculator>> availableCalculators = new HashMap<>();
 	static {
 		availableCalculators.put("MandelbrotCalculator", MandelbrotCalculator.class);
 		availableCalculators.put("BurningShipCalculator", BurningShipCalculator.class);
@@ -28,40 +40,62 @@ public class BFSystemContext implements SystemContext {
 		availableCalculators.put("NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator", NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator.class);
 	}
 	
-	BreadthFirstTaskManager taskManager;
+	transient TaskManager<?> taskManager;
 	
-	public Map<String, ParamSupplier> parameters;
-	public Class<? extends FractalsCalculator> calculatorClass;
-	public Integer chunkSize;
-	public ComplexNumber midpoint;
-	public Number zoom;
-	public NumberFactory numberFactory;
-	public ArrayChunkFactory chunkFactory;
-	public Integer width;
-	public Integer height;
-	public Double border_generation;
-	public Double border_dispose;
-	public Integer buffer;
-	public BreadthFirstViewData viewData;
-	public int chunksWidth;
-	public int chunksHeight;
-	public ComplexNumber relativeStartShift;
-	public Number chunkZoom;
-	public LayerConfiguration layerConfig;
-	public int jobId;
-	public ComplexNumber leftLowerCorner;
-	public double leftLowerCornerChunkY;
-	public double leftLowerCornerChunkX;
-	public ComplexNumber rightUpperCorner;
-	public double rightUpperCornerChunkX;
-	public double rightUpperCornerChunkY;
+	public transient Map<String, ParamSupplier> parameters;
+	public transient Class<? extends FractalsCalculator> calculatorClass;
 	
-	public BFSystemContext(BreadthFirstTaskManager taskManager) {
+	public transient NumberFactory numberFactory;
+	public transient ArrayChunkFactory chunkFactory;
+	
+	public transient ComplexNumber midpoint;
+	public transient int chunkSize;
+	public transient Number zoom;
+	public transient Number chunkZoom;
+	
+	
+	public transient Integer width;
+	public transient Integer height;
+	
+	public transient int buffer = 10;
+	public transient double border_generation = 0d;
+	public transient double border_dispose = 5d;
+	
+	public transient BreadthFirstViewData viewData;
+	
+	public transient int chunksWidth;
+	public transient int chunksHeight;
+	
+	public transient ComplexNumber relativeStartShift;
+	
+	public transient LayerConfiguration layerConfig;
+	
+	public transient int jobId;
+	
+	public transient ComplexNumber leftLowerCorner;
+	public transient double leftLowerCornerChunkX;
+	public transient double leftLowerCornerChunkY;
+	public transient ComplexNumber rightUpperCorner;
+	public transient double rightUpperCornerChunkX;
+	public transient double rightUpperCornerChunkY;
+	
+	transient SystemStateInfo systemStateInfo = null;
+	transient ServerConnection serverConnection;
+	
+	public BFSystemContext(TaskManager<?> taskManager) {
 		this.taskManager = taskManager;
+		if (taskManager != null)
+			systemStateInfo = taskManager.getSystem().getSystemStateInfo();
 	}
 	
-	public BreadthFirstLayer getLayer(int layerId) {
-		return (BreadthFirstLayer) layerConfig.getLayer(layerId);
+	@Override
+	public Layer getLayer(int layerId) {
+		return layerConfig.getLayer(layerId);
+	}
+	
+	@Override
+	public NumberFactory getNumberFactory() {
+		return numberFactory;
 	}
 
 	@Override
@@ -114,7 +148,7 @@ public class BFSystemContext implements SystemContext {
 		anchor.multNumber(numberFactory.createNumber(-0.5));
 		anchor.add(midpoint);
 		
-		if (reset)
+		if (reset && taskManager != null)
 			taskManager.reset();
 		
 		LayerConfiguration oldLayerConfig = null;
@@ -165,16 +199,7 @@ public class BFSystemContext implements SystemContext {
 		rightUpperCornerChunkX = getChunkX(rightUpperCorner);
 		rightUpperCornerChunkY = getChunkY(rightUpperCorner);
 		
-		if (params.get("midpoint").isChanged() || params.get("width").isChanged() || params.get("height").isChanged() || params.get("zoom").isChanged()) {
-			taskManager.updatePredictedMidpoint();
-			if (!reset)
-				taskManager.predictedMidpointUpdated();
-		}
-		
-		if (reset)
-			taskManager.generateRootTask();
-		
-		return true;
+		return reset;
 	}
 	
 	public static boolean needsReset(Map<String, ParamSupplier> newParams, Map<String, ParamSupplier> oldParams){ //TODO merge with method in SystemClientData
@@ -203,5 +228,67 @@ public class BFSystemContext implements SystemContext {
 		value.sub(viewData.anchor.getImag());
 		value.div(chunkZoom);
 		return value.toDouble();
+	}
+
+	public ComplexNumber getChunkPos(long chunkX, long chunkY) {
+		ComplexNumber chunkPos = numberFactory.createComplexNumber(chunkX, chunkY);
+		chunkPos.add(relativeStartShift);
+		chunkPos.multNumber(chunkZoom);
+		chunkPos.add(viewData.anchor);
+		return chunkPos;
+	}
+
+	public double getScreenDistance(long chunkX, long chunkY) {
+		if (chunkX+1 >= leftLowerCornerChunkX && chunkY+1 >= leftLowerCornerChunkY) {
+			if (chunkX <= rightUpperCornerChunkX && chunkY <= rightUpperCornerChunkY) {
+				return 0;
+			}
+			double dx = chunkX > rightUpperCornerChunkX ? chunkX-rightUpperCornerChunkX : 0;
+			double dy = chunkY > rightUpperCornerChunkY ? chunkY-rightUpperCornerChunkY : 0;
+			return Math.sqrt(dx*dx + dy*dy);
+		}
+		chunkX++;
+		chunkY++;
+		double dx = chunkX < leftLowerCornerChunkX ? leftLowerCornerChunkX-chunkX : 0;
+		double dy = chunkY < leftLowerCornerChunkY ? leftLowerCornerChunkY-chunkY : 0;
+		return Math.sqrt(dx*dx + dy*dy);
+	}
+
+	public double getScreenDistance(Chunk chunk) {
+		return getScreenDistance(chunk.getChunkX(), chunk.getChunkY());
+	}
+
+	@Override
+	public void taskStateUpdated(TaskStateInfo taskStateInfo, TaskState oldState) {
+		if (systemStateInfo != null) { //TODO local
+			TaskStateUpdate updateMessage = taskStateInfo.getUpdateMessage();
+			if (updateMessage == null || updateMessage.isSent())
+				taskStateInfo.setUpdateMessage(systemStateInfo.taskStateChanged(taskStateInfo.getTaskId(), oldState, taskStateInfo));
+			else {
+				synchronized (updateMessage) {
+					updateMessage.refresh(taskStateInfo.getState(), taskStateInfo.getLayerId(), taskStateInfo.getProgress());
+					systemStateInfo.taskStateUpdated(updateMessage);
+				}
+			}
+		} else {
+			TaskStateChangedMessage msg = new TaskStateChangedMessage(taskStateInfo);
+			serverConnection.writeMessage(msg);
+		}
+	}
+
+	@Override
+	public void setServerConnection(ServerConnection serverConnection) {
+		this.serverConnection = serverConnection;
+	}
+	
+	private void writeObject(ObjectOutputStream oos) throws IOException{
+		oos.defaultWriteObject();
+		oos.writeObject(parameters);
+	}
+	
+	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
+		ois.defaultReadObject();
+		Map<String, ParamSupplier> parameters = (Map<String, ParamSupplier>) ois.readObject();
+		setParameters(parameters);
 	}
 }

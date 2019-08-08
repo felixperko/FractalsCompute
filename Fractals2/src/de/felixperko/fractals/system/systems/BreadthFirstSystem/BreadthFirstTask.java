@@ -17,6 +17,7 @@ import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
+import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.AbstractFractalsTask;
 import de.felixperko.fractals.system.task.Layer;
@@ -32,7 +33,7 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	
 	transient FractalsThread thread;
 	
-	Layer previousLayer;
+	int previousLayerId;
 	
 	public transient AbstractArrayChunk chunk;
 	transient CompressedChunk compressed_chunk;
@@ -61,19 +62,15 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	@Override
 	public void run() {
 		preprocess();
-		previousLayer = getStateInfo().getLayer();
+		previousLayerId = getStateInfo().getLayerId()-1;
 		parameters.put("layer", new StaticParamSupplier("layer", (Integer)getStateInfo().getLayer().getId()));
 		calculator.setParams(parameters);
 		calculator.calculate(chunk);
 	}
 
 	private void preprocess() {
-		if (previousLayer == null || !(previousLayer instanceof BreadthFirstLayer))
-			return;
-		BreadthFirstLayer prev = (BreadthFirstLayer) previousLayer;
-		
-		if (prev.cullingEnabled()){
-			preprocess_culling(prev);
+		if (isPreviousLayerCullingEnabled()){
+			preprocess_culling((BreadthFirstLayer) getContext().getLayer(previousLayerId));
 		}
 	}
 
@@ -185,8 +182,15 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 		return priority;
 	}
 	
-	public Layer getPreviousLayer() {
-		return previousLayer;
+	public int getPreviousLayerId() {
+		return previousLayerId;
+	}
+	
+	public boolean isPreviousLayerCullingEnabled() {
+		if (previousLayerId == -1)
+			return false;
+		Layer layer = getContext().getLayer(previousLayerId);
+		return layer.cullingEnabled();
 	}
 	
 	@Override

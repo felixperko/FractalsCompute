@@ -26,7 +26,6 @@ public class SystemStateInfo implements Serializable{
 	}
 
 	public void addTaskStateInfo(TaskStateInfo taskStateInfo) {
-		taskStateInfo.setSystemStateInfo(this);
 		taskStates.put((Integer)taskStateInfo.getTaskId(), taskStateInfo);
 		
 		getTaskListForState(taskStateInfo.getState()).add(taskStateInfo);
@@ -61,7 +60,6 @@ public class SystemStateInfo implements Serializable{
 		return serverStateInfo.getUpdateTime();
 	}
 
-	
 	public TaskStateUpdate taskStateChanged(int taskId, TaskState oldState, TaskStateInfo stateInfo) {
 		if (stateInfo.getState() != oldState) {
 			getTaskListForState(oldState).remove(stateInfo);
@@ -69,7 +67,7 @@ public class SystemStateInfo implements Serializable{
 				getTaskListForState(stateInfo.getState()).add(stateInfo);
 		}
 		
-		TaskStateUpdate update = new TaskStateUpdate(systemId, taskId, stateInfo.getState(), stateInfo.layer.getId(), stateInfo.progress);
+		TaskStateUpdate update = new TaskStateUpdate(systemId, taskId, stateInfo.getState(), stateInfo.getLayerId(), stateInfo.progress);
 		serverStateInfo.taskStateChanges.update(new MappedSharedDataUpdate<TaskStateUpdate>(systemId.toString()+taskId, update));
 		return update;
 	}

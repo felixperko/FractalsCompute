@@ -1,33 +1,38 @@
 package de.felixperko.fractals.system.systems.stateinfo;
 
 import java.io.Serializable;
+import java.util.UUID;
 
+import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.task.Layer;
 
 public class TaskStateInfo implements Serializable{
 	
 	private static final long serialVersionUID = 4129352632333138169L;
 	
+	transient SystemContext systemContext;
+	private transient TaskStateUpdate updateMessage;
+	
 	int taskId;
+	UUID systemId;
+	
 	TaskState state;
+	int layerId;
 	double progress;
-	transient SystemStateInfo systemStateInfo;
-	Layer layer;
 	
-	transient TaskStateUpdate updateMessage;
-	
-	public TaskStateInfo(int taskId) {
+	public TaskStateInfo(int taskId, UUID systemId) {
 		this.taskId = taskId;
+		this.systemId = systemId;
 		this.state = TaskState.PLANNED;
 		this.progress = 0;
 	}
 	
-	public TaskStateInfo() {
-		this.taskId = -1;
-		this.state = TaskState.PLANNED;
-		this.progress = 0;
-		this.layer = null;
-	}
+//	public TaskStateInfo() {
+//		this.taskId = -1;
+//		this.state = TaskState.PLANNED;
+//		this.progress = 0;
+//		this.layerId = -1;
+//	}
 
 	public TaskState getState() {
 		return state;
@@ -39,7 +44,7 @@ public class TaskStateInfo implements Serializable{
 		TaskState oldState = this.state;
 		this.state = state;
 		
-		updateMessage(state, oldState);
+		updateMessage(oldState);
 	}
 
 	public double getProgress() {
@@ -51,23 +56,8 @@ public class TaskStateInfo implements Serializable{
 		updateMessage(state);
 	}
 	
-	private void updateMessage(TaskState state) {
-		updateMessage(state, this.state);
-	}
-
-	private void updateMessage(TaskState state, TaskState oldState) {
-		if (systemStateInfo != null) { //TODO local
-			if (updateMessage == null || updateMessage.isSent())
-				updateMessage = systemStateInfo.taskStateChanged(taskId, oldState, this);
-			else {
-				synchronized (updateMessage) {
-					updateMessage.refresh(state, layer.getId(), progress);
-					systemStateInfo.taskStateUpdated(updateMessage);
-				}
-			}
-		} else {
-			//TODO send message to server!
-		}
+	private void updateMessage(TaskState oldState) {
+		systemContext.taskStateUpdated(this, oldState);
 	}
 
 	public int getTaskId() {
@@ -77,23 +67,37 @@ public class TaskStateInfo implements Serializable{
 	protected void setTaskId(int taskId) {
 		this.taskId = taskId;
 	}
-
-	public SystemStateInfo getSystemStateInfo() {
-		return systemStateInfo;
-	}
-
-	protected void setSystemStateInfo(SystemStateInfo systemStateInfo) {
-		this.systemStateInfo = systemStateInfo;
-	}
-
 	
 	public Layer getLayer() {
-		return layer;
+		return systemContext.getLayer(layerId);
 	}
 	
-
 	public void setLayer(Layer layer) {
-		this.layer = layer;
+		this.layerId = layer.getId();
+	}
+
+	public TaskStateUpdate getUpdateMessage() {
+		return updateMessage;
+	}
+
+	public void setUpdateMessage(TaskStateUpdate updateMessage) {
+		this.updateMessage = updateMessage;
+	}
+
+	public int getLayerId() {
+		return layerId;
+	}
+
+	public UUID getSystemId() {
+		return systemId;
+	}
+	
+	public void setSystemId(UUID systemId) {
+		this.systemId = systemId;
+	}
+	
+	public void setContext(SystemContext systemContext) {
+		this.systemContext = systemContext;
 	}
 
 }

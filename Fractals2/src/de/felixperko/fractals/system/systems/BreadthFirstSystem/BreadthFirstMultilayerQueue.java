@@ -147,7 +147,7 @@ public class BreadthFirstMultilayerQueue extends AbstractBreadthFirstMultilayerQ
 
 	@Override
 	protected void onPoll(BreadthFirstTask obj) {
-		if (obj.getPreviousLayer() != null && obj.getPreviousLayer().cullingEnabled()) {
+		if (obj.isPreviousLayerCullingEnabled()) {
 			Map<BorderAlignment, ChunkBorderData> neighbourBorderData = new HashMap<>();
 			AbstractArrayChunk chunk = ((AbstractArrayChunk)obj.getChunk());
 			int x = chunk.getChunkX();

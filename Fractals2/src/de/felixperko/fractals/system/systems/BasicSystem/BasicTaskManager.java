@@ -33,6 +33,7 @@ import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsa
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.task.AbstractTaskManager;
+import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskProviderAdapter;
 
@@ -189,8 +190,8 @@ public class BasicTaskManager extends AbstractTaskManager<BasicTask>{
 	}
 
 	@Override
-	public synchronized void taskFinished(BasicTask task) {
-		finishedTasks.add(task);
+	public synchronized void taskFinished(FractalsTask task) {
+		finishedTasks.add((BasicTask)task);
 		System.out.println("task finished "+task.getId()+"/"+totalChunkCount);
 	}
 	

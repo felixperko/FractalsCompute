@@ -11,10 +11,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import com.sun.xml.internal.bind.CycleRecoverable.Context;
-
 import de.felixperko.fractals.data.AbstractArrayChunk;
-import de.felixperko.fractals.data.ArrayChunkFactory;
 import de.felixperko.fractals.data.BorderAlignment;
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.ChunkBorderData;
@@ -151,9 +148,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	int id_counter_tasks = 0;
 	
 //	int width, height;
-	int chunksWidth, chunksHeight;
-	
-	int jobId = 0;
+//	int chunksWidth, chunksHeight;
 
 	List<TaskProviderAdapter> taskProviders = new ArrayList<>();
 
@@ -184,7 +179,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 //		pos.multValues(relativeStartShift);
 //		pos.add(midpoint);
 		BreadthFirstTask rootTask = new BreadthFirstTask(id_counter_tasks++, this, chunk, context.parameters, 
-				getChunkPos(0, 0), createCalculator(), context.layerConfig.getLayers().get(0), jobId);
+				context.getChunkPos(0, 0), createCalculator(), context.layerConfig.getLayers().get(0), context.jobId);
 		rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, context.layerConfig.getLayers().get(0));
 		context.viewData.addChunk(chunk);
 		openTasks.get(0).add(rootTask);
@@ -243,10 +238,21 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	@Override
 	public boolean setParameters(Map<String, ParamSupplier> params) {
 		setLifeCycleState(LifeCycleState.PAUSED);
-		context.setParameters(params);		
+		
+		boolean reset = context.setParameters(params);
+		
+		if (params.get("midpoint").isChanged() || params.get("width").isChanged() || params.get("height").isChanged() || params.get("zoom").isChanged()) {
+			updatePredictedMidpoint();
+			if (!reset)
+				predictedMidpointUpdated();
+		}
+		
 		setLifeCycleState(LifeCycleState.RUNNING);
-//		System.out.println("params set "+System.currentTimeMillis());
-		return true;
+		
+		if (reset)
+			generateRootTask();
+		
+		return reset;
 	}
 
 	@Override
@@ -254,7 +260,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		List<BreadthFirstTask> tasks = new ArrayList<>();
 		for (int i = 0 ; i < count ; i++) {
 			BreadthFirstTask task = null;
-			for (int try1 = 0 ; try1 < 3 ; try1++){
+			for (int try1 = 0 ; try1 < 3 ; try1++){//TODO remove
 				try {
 					task = nextBufferedTasks.poll();
 					if (task != null)
@@ -266,7 +272,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			if (task == null)
 				break;
 			
-			if (task.getPreviousLayer() != null && task.getPreviousLayer().cullingEnabled()) {
+			if (task.isPreviousLayerCullingEnabled()) {
 				synchronized (this){
 					Map<BorderAlignment, ChunkBorderData> neighbourBorderData = new HashMap<>();
 					AbstractArrayChunk chunk = ((AbstractArrayChunk)task.getChunk());
@@ -287,6 +293,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			}
 				
 			tasks.add(task);
+			task.setContext(context);
 			task.getStateInfo().setState(TaskState.ASSIGNED);
 		}
 		return tasks;
@@ -428,7 +435,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			Iterator<BreadthFirstTask> borderIt = borderTasks.iterator();
 			while (borderIt.hasNext()) {
 				BreadthFirstTask borderTask = borderIt.next();
-				if (getScreenDistance(borderTask.getChunk()) <= context.border_generation) {
+				if (context.getScreenDistance(borderTask.getChunk()) <= context.border_generation) {
 					borderTask.getStateInfo().setState(TaskState.OPEN);
 					openTasks.get(borderTask.getStateInfo().getLayer().getId()).add(borderTask);
 					borderIt.remove();
@@ -441,7 +448,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				for (BreadthFirstTask task : tempList.get(l)) {
 //					if (task.getChunk().getChunkX() == (long)midpointChunkX && task.getChunk().getChunkY() == (long)midpointChunkY)
 //						addedMidpoint = true;
-					double screenDistance = getScreenDistance(task.getChunk());
+					double screenDistance = context.getScreenDistance(task.getChunk());
 					if (screenDistance > context.border_dispose) {
 						task.getStateInfo().setState(TaskState.REMOVED);
 						continue;
@@ -463,7 +470,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			if (!context.viewData.hasChunk(midpointChunkXFloor, midpointChunkYFloor)){
 				AbstractArrayChunk chunk = context.chunkFactory.createChunk(midpointChunkXFloor, midpointChunkYFloor);
 				BreadthFirstTask rootTask = new BreadthFirstTask(id_counter_tasks++, this, chunk, context.parameters,
-						getChunkPos(midpointChunkXFloor, midpointChunkYFloor), createCalculator(), layers.get(0), jobId);
+						context.getChunkPos(midpointChunkXFloor, midpointChunkYFloor), createCalculator(), layers.get(0), context.jobId);
 				rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(0));
 				context.viewData.addChunk(chunk);
 				openTasks.get(0).add(rootTask);
@@ -539,7 +546,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		generateNeighbourIfNotExists(polledTask, 0, -1);
 		//add new neigbours to storing queue
 		for (BreadthFirstTask newTask : newQueue) {
-			double screenDistance = getScreenDistance(newTask.getChunk());
+			double screenDistance = context.getScreenDistance(newTask.getChunk());
 			if (screenDistance > context.border_generation) {
 				newTask.getStateInfo().setState(TaskState.BORDER);
 				borderTasks.add(newTask);
@@ -567,7 +574,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				chunk = context.chunkFactory.createChunk(chunkX, chunkY);
 				break;
 			} catch (Exception e) {
-				if (try1 == 9 && parentTask.getJobId() == jobId)
+				if (try1 == 9 && parentTask.getJobId() == context.jobId)
 					throw e;
 				else
 					try {
@@ -578,7 +585,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			}
 		}
 		BreadthFirstTask task = new BreadthFirstTask(id_counter_tasks++, this, chunk, context.parameters,
-				getChunkPos(chunkX, chunkY), createCalculator(), context.layerConfig.getLayers().get(0), jobId);
+				context.getChunkPos(chunkX, chunkY), createCalculator(), context.layerConfig.getLayers().get(0), context.jobId);
 		task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, context.layerConfig.getLayers().get(0));
 		openChunks++;
 		newQueue.add(task);
@@ -586,34 +593,6 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		return true;
 	}
 
-	public ComplexNumber getChunkPos(long chunkX, long chunkY) {
-		ComplexNumber chunkPos = context.numberFactory.createComplexNumber(chunkX, chunkY);
-		chunkPos.add(context.relativeStartShift);
-		chunkPos.multNumber(context.chunkZoom);
-		chunkPos.add(context.viewData.anchor);
-		return chunkPos;
-	}
-	
-	public double getScreenDistance(long chunkX, long chunkY) {
-		if (chunkX+1 >= context.leftLowerCornerChunkX && chunkY+1 >= context.leftLowerCornerChunkY) {
-			if (chunkX <= context.rightUpperCornerChunkX && chunkY <= context.rightUpperCornerChunkY) {
-				return 0;
-			}
-			double dx = chunkX > context.rightUpperCornerChunkX ? chunkX-context.rightUpperCornerChunkX : 0;
-			double dy = chunkY > context.rightUpperCornerChunkY ? chunkY-context.rightUpperCornerChunkY : 0;
-			return Math.sqrt(dx*dx + dy*dy);
-		}
-		chunkX++;
-		chunkY++;
-		double dx = chunkX < context.leftLowerCornerChunkX ? context.leftLowerCornerChunkX-chunkX : 0;
-		double dy = chunkY < context.leftLowerCornerChunkY ? context.leftLowerCornerChunkY-chunkY : 0;
-		return Math.sqrt(dx*dx + dy*dy);
-	}
-
-	public double getScreenDistance(Chunk chunk) {
-		return getScreenDistance(chunk.getChunkX(), chunk.getChunkY());
-	}
-	
 	public void addTaskProviderAdapter(TaskProviderAdapter taskProviderAdapter) {
 		taskProviders.add(taskProviderAdapter);
 	}

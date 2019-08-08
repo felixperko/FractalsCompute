@@ -58,10 +58,11 @@ public class RemoteTaskProvider extends Thread implements TaskProvider {
 	}
 	
 	public void addTasks(List<FractalsTask> taskList, ServerConnection serverConnection) {
-		for (FractalsTask task : taskList)
+		for (FractalsTask task : taskList) {
+			task.getContext().setServerConnection(serverConnection);
 			bufferedTasks.add(task);
-		for (FractalsTask task : taskList)
 			taskConnectionMap.put(task, serverConnection);
+		}
 	}
 
 	@Override
@@ -73,7 +74,7 @@ public class RemoteTaskProvider extends Thread implements TaskProvider {
 	public void taskStateChanged(FractalsTask task) {
 		ServerConnection serverConnection = taskConnectionMap.get(task);
 		if (serverConnection != null)
-			serverConnection.writeMessage(new TaskStateChangedMessage(task.getSystemId(), task.getId(), task.getState()));
+			serverConnection.writeMessage(new TaskStateChangedMessage(task.getStateInfo()));
 		else
 			throw new IllegalStateException("Can't find connection for task");
 	}
