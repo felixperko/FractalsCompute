@@ -62,8 +62,8 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 							break iterationLoop;
 						}
 					}
-					chunk.addSample(pixel, -1, upsample);
 				}
+				chunk.addSample(pixel, -1, upsample);
 			}
 		}
 	}

@@ -11,7 +11,7 @@ public interface TaskManager<T> {
 	void endTasks();
 	boolean setParameters(Map<String, ParamSupplier> params);
 	void reset();
-	void taskFinished(T task);
+	void taskFinished(FractalsTask task);
 	List<? extends FractalsTask> getTasks(int count);
 	CalcSystem getSystem();
 	

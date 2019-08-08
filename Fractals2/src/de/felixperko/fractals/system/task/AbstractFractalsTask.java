@@ -65,4 +65,14 @@ public abstract class AbstractFractalsTask<T> implements FractalsTask{
 	public TaskManager<?> getTaskManager() {
 		return taskManager;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		if (!(obj instanceof AbstractFractalsTask<?>))
+			return false;
+		AbstractFractalsTask<?> other = (AbstractFractalsTask<?>)obj;
+		return (other.id == id && other.systemId.equals(systemId) && other.jobId == jobId);
+	}
 }
