@@ -33,7 +33,7 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	
 	transient FractalsThread thread;
 	
-	int previousLayerId;
+	int previousLayerId = -1;
 	
 	public transient AbstractArrayChunk chunk;
 	transient CompressedChunk compressed_chunk;
@@ -42,9 +42,9 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	
 	FractalsCalculator calculator;
 	
-	public BreadthFirstTask(int id, TaskManager taskManager, AbstractArrayChunk chunk, Map<String, ParamSupplier> taskParameters, ComplexNumber chunkPos, 
+	public BreadthFirstTask(SystemContext context, int id, TaskManager taskManager, AbstractArrayChunk chunk, Map<String, ParamSupplier> taskParameters, ComplexNumber chunkPos, 
 			FractalsCalculator calculator, Layer layer, int jobId) {
-		super(id, taskManager, jobId, layer);
+		super(context, id, taskManager, jobId, layer);
 		getStateInfo().setState(TaskState.OPEN);
 		this.calculator = calculator;
 		this.chunk = chunk;

@@ -10,7 +10,7 @@ public class TaskStateInfo implements Serializable{
 	
 	private static final long serialVersionUID = 4129352632333138169L;
 	
-	transient SystemContext systemContext;
+	SystemContext systemContext;
 	private transient TaskStateUpdate updateMessage;
 	
 	int taskId;
@@ -20,9 +20,10 @@ public class TaskStateInfo implements Serializable{
 	int layerId;
 	double progress;
 	
-	public TaskStateInfo(int taskId, UUID systemId) {
+	public TaskStateInfo(int taskId, UUID systemId, SystemContext context) {
 		this.taskId = taskId;
 		this.systemId = systemId;
+		this.systemContext = context;
 		this.state = TaskState.PLANNED;
 		this.progress = 0;
 	}
@@ -57,7 +58,8 @@ public class TaskStateInfo implements Serializable{
 	}
 	
 	private void updateMessage(TaskState oldState) {
-		systemContext.taskStateUpdated(this, oldState);
+		if (systemContext != null)
+			systemContext.taskStateUpdated(this, oldState);
 	}
 
 	public int getTaskId() {

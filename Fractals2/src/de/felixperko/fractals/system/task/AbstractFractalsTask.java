@@ -21,10 +21,11 @@ public abstract class AbstractFractalsTask<T> implements FractalsTask{
 	
 	TaskStats taskStats = new TaskStatsEmpty();
 	
-	public AbstractFractalsTask(Integer id, TaskManager<T> taskManager, int jobId, Layer layer) {
+	public AbstractFractalsTask(SystemContext context, Integer id, TaskManager<T> taskManager, int jobId, Layer layer) {
 		this.jobId = jobId;
 		this.taskManager = taskManager;
-		this.stateInfo = new TaskStateInfo(id, taskManager.getSystem().getId());
+		this.context = context;
+		this.stateInfo = new TaskStateInfo(id, taskManager.getSystem().getId(), context);
 		stateInfo.setLayer(layer);
 		taskManager.getSystem().getSystemStateInfo().addTaskStateInfo(stateInfo);
 	}
@@ -36,6 +37,7 @@ public abstract class AbstractFractalsTask<T> implements FractalsTask{
 	
 	public void setContext(SystemContext context) {
 		this.context = context;
+		stateInfo.setContext(context);
 	}
 
 	public Integer getId() {
