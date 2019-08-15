@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.felixperko.fractals.network.ClientWriteThread;
+import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.network.interfaces.ClientMessageInterface;
 import de.felixperko.fractals.network.interfaces.NetworkInterfaceFactory;
@@ -57,5 +58,13 @@ public class NetworkManager extends Manager implements INetworkManager{
 	@Override
 	public List<ServerConnection> getServerConnections() {
 		return serverConnections;
+	}
+	
+	public ServerConnection getServerConnection(SenderInfo senderInfo){
+		for (ServerConnection conn : serverConnections){
+			if (senderInfo.equals(conn.getClientInfo()))
+				return conn;
+		}
+		return null;
 	}
 }

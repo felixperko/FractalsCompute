@@ -23,6 +23,10 @@ public class TaskStateChangedMessage extends ClientMessage {
 		taskStateInfos.add(stateInfo);
 	}
 	
+	public TaskStateChangedMessage(List<TaskStateInfo> stateInfos){
+		this.taskStateInfos = stateInfos;
+	}
+	
 	public void addEntry(TaskStateInfo stateInfo) {
 		taskStateInfos.add(stateInfo);
 	}

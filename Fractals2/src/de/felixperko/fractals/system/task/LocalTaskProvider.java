@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.felixperko.fractals.FractalsMain;
+import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.network.messages.task.TaskAssignedMessage;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
@@ -22,6 +24,8 @@ import de.felixperko.fractals.util.ColorContainer;
 public class LocalTaskProvider implements TaskProvider {
 	
 	static CategoryLogger log = new CategoryLogger("taskprovider", new ColorContainer(0f, 1f, 1f));
+	
+	ServerManagers managers;
 
 	List<TaskManager<?>> taskManagers = Collections.synchronizedList(new ArrayList<>());
 	
@@ -36,6 +40,10 @@ public class LocalTaskProvider implements TaskProvider {
 	
 //	Map<TaskManager, Long> threadTimeTaken = new HashMap<>();
 	
+	public LocalTaskProvider(ServerManagers managers) {
+		this.managers = managers;
+	}
+
 	public synchronized void addTaskManager(TaskManager<?> taskManager) {
 		taskManagers.add(taskManager);
 		taskManager.addTaskProviderAdapter(adapter);
@@ -170,8 +178,10 @@ public class LocalTaskProvider implements TaskProvider {
 		Thread.dumpStack();
 		
 		//assign tasks
-		for (FractalsTask task : tasks)
+		for (FractalsTask task : tasks){
 			task.getStateInfo().setState(TaskState.ASSIGNED);
+			managers.getSystemManager().addTask(task);
+		}
 		getAssignedTaskList(connection).addAll(tasks);
 		
 		//send message
@@ -192,7 +202,8 @@ public class LocalTaskProvider implements TaskProvider {
 		for (FractalsTask localTask : localList){
 			for (FractalsTask remoteTask : tasks){
 				if (remoteTask.equals(localTask)){
-					
+					localTask.getTaskManager().taskFinished(remoteTask);
+					managers.getSystemManager().removeTask(localTask);
 				}
 			}
 		}

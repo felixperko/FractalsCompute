@@ -17,6 +17,8 @@ import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.ClassSystemFactory;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
+import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
+import de.felixperko.fractals.system.systems.stateinfo.TaskStateUpdate;
 import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.util.CategoryLogger;
 import de.felixperko.fractals.util.ColorContainer;
@@ -168,6 +170,14 @@ public class SystemManager extends Manager{
 		}
 	}
 	
+	public void addTask(FractalsTask task){
+		getTaskMap(task.getStateInfo().getSystemId()).put(task.getId(), task);
+	}
+	
+	public void removeTask(FractalsTask task){
+		getTaskMap(task.getStateInfo().getSystemId()).remove(task.getId());
+	}
+	
 	public FractalsTask getTask(UUID systemId, Integer taskId) {
 		return getTaskMap(systemId).get(taskId);
 	}
@@ -179,6 +189,19 @@ public class SystemManager extends Manager{
 			tasks.put(systemId, map);
 		}
 		return map;
+	}
+
+	public boolean updateTaskState(TaskStateUpdate update) {
+		FractalsTask task = getTask(update.getSystemId(), update.getTaskId());
+		if (task != null){
+			TaskStateInfo tsi = task.getStateInfo();
+			if (update.getLayerId() != tsi.getLayerId())
+				return false;
+			tsi.setProgress(update.getProgress());
+			tsi.setState(update.getTaskState());
+			return true;
+		}
+		return false;
 	}
 
 //	public CalcSystem initSystem(String systemName) {

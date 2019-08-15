@@ -24,7 +24,7 @@ public class ReachableRequestMessage extends ServerMessage {
 
 	@Override
 	protected void process() {
-		answer(new ReachableResponseMessage());
+		answer(new ReachableResponseMessage(getBackConnection()));
 		if (sharedDataStateUpdates != null && !sharedDataStateUpdates.isEmpty())
 			getClientMessageInterface().sharedDataUpdated(sharedDataStateUpdates);
 	}

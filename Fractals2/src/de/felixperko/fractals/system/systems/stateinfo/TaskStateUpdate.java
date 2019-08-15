@@ -12,8 +12,13 @@ public class TaskStateUpdate extends AbstractSharedDataUpdate {
 	TaskState taskState;
 	double progress;
 	
-	public TaskStateUpdate() {
+	public TaskStateUpdate(TaskStateInfo taskStateInfo) {
 		super();
+		this.systemId = taskStateInfo.getSystemId();
+		this.taskId = taskStateInfo.getTaskId();
+		this.taskState = taskStateInfo.getState();
+		this.layerId = taskStateInfo.getLayerId();
+		this.progress = taskStateInfo.getProgress();
 	}
 
 	public TaskStateUpdate(UUID systemId, int taskId, TaskState taskState, int layerId, double progress) {

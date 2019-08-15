@@ -12,13 +12,14 @@ import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 
 public class ServerThreadManager extends ThreadManager{
 	
-	LocalTaskProvider localTaskProvider = new LocalTaskProvider();
+	LocalTaskProvider localTaskProvider;
 	RemoteTaskProvider remoteTaskProvider = null;
 	
 	InputScannerThread inputScannerThread;
 	
 	public ServerThreadManager(ServerManagers managers) {
 		super(managers);
+		localTaskProvider = new LocalTaskProvider(managers);
 	}
 	
 	public RemoteTaskProvider initRemoteTaskProvider(int buffer) {

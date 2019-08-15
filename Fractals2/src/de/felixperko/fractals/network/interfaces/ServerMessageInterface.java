@@ -5,11 +5,16 @@ import java.util.UUID;
 
 import de.felixperko.fractals.FractalsMain;
 import de.felixperko.fractals.data.shareddata.DataContainer;
+import de.felixperko.fractals.data.shareddata.MappedSharedDataUpdate;
+import de.felixperko.fractals.data.shareddata.SharedDataUpdate;
+import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.manager.server.ServerNetworkManager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.system.parameters.ParameterConfiguration;
+import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
+import de.felixperko.fractals.system.systems.stateinfo.TaskStateUpdate;
 import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.system.task.RemoteTaskProvider;
 
@@ -45,7 +50,20 @@ public class ServerMessageInterface extends ClientMessageInterface {
 
 	@Override
 	public void updateSharedData(DataContainer container) {
-		// TODO Auto-generated method stub
-		
+		for (SharedDataUpdate<?> sdu : container.getUpdates()){
+			if (container.getIdentifier().equals("taskStates")){
+				if (sdu instanceof MappedSharedDataUpdate<?>){
+					@SuppressWarnings("unchecked")
+					MappedSharedDataUpdate<TaskStateUpdate> msdu = (MappedSharedDataUpdate<TaskStateUpdate>) sdu;
+					for (TaskStateUpdate update : msdu.getUpdates()){
+						boolean updated = ((ServerManagers)serverConnection.getNetworkManager().getManagers()).getSystemManager().updateTaskState(update);
+						if (!updated){
+							System.err.println("Couldn't update TaskStateInfo");
+							Thread.dumpStack();
+						}
+					}
+				}
+			}
+		}
 	}
 }

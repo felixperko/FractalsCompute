@@ -5,9 +5,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import de.felixperko.fractals.data.ArrayChunkFactory;
 import de.felixperko.fractals.data.Chunk;
+import de.felixperko.fractals.data.shareddata.MappedSharedData;
+import de.felixperko.fractals.data.shareddata.MappedSharedDataUpdate;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.network.messages.task.TaskStateChangedMessage;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
@@ -271,8 +274,13 @@ public class BFSystemContext implements SystemContext {
 				}
 			}
 		} else {
-			TaskStateChangedMessage msg = new TaskStateChangedMessage(taskStateInfo);
-			serverConnection.writeMessage(msg);
+			
+			MappedSharedDataUpdate<TaskStateUpdate> update = new MappedSharedDataUpdate<>();
+			update.setValue(taskStateInfo.getSystemId()+""+taskStateInfo.getTaskId(), new TaskStateUpdate(taskStateInfo));
+			serverConnection.stateUpdates.update(update);
+			
+//			TaskStateChangedMessage msg = new TaskStateChangedMessage(taskStateInfo);
+//			serverConnection.writeMessage(msg);
 		}
 	}
 
