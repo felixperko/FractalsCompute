@@ -21,7 +21,7 @@ public class ServerConnection extends AbstractConnection<INetworkManager>{
 	
 	INetworkManager networkManager;
 	
-	public MappedSharedData<TaskStateUpdate> stateUpdates = new MappedSharedData<>("taskStates", true);
+	public MappedSharedData<TaskStateUpdate> stateUpdates = new MappedSharedData<>("remoteTaskStates", true);
 	
 	boolean closed = false;
 	
