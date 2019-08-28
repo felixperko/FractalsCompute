@@ -45,6 +45,13 @@ public class NetworkManager extends Manager implements INetworkManager{
 		return null;
 	}
 	
+//	public ServerConnection connectToServerLocal() {
+//		ServerConnection connection = new ServerConnection(this);
+//		serverConnections.add(connection);
+//		ClientMessageInterface clientMessageInterface = networkInterfaceFactory.createMessageInterface(connection);
+//		messageInterfaces.put(connection, clientMessageInterface);
+//	}
+	
 	@Override
 	public ClientMessageInterface getMessageInterface(ServerConnection serverConnection) {
 		return messageInterfaces.get(serverConnection);

@@ -89,9 +89,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		}
 	};
 	
-//	int buffer = 10;
-//	double border_generation = 0;
-//	double border_dispose = 5;
+	CategoryLogger log;
 	
 	List<Queue<BreadthFirstTask>> openTasks = new ArrayList<>();
 	Queue<BreadthFirstTask> nextOpenTasks = new PriorityQueue<>(comparator_priority);//one entry for each pass -> 
@@ -99,58 +97,26 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	List<List<BreadthFirstTask>> tempList = new ArrayList<>(); //used when refreshing sorting order
 	List<BreadthFirstTask> borderTasks = new ArrayList<>();
 	Queue<BreadthFirstTask> newQueue = new LinkedList<>(); //for generation
+	List<BreadthFirstTask> finishedTasks = new ArrayList<>();
 
-	
-	
-//	LayerConfiguration layerConfig;
-	//List<BreadthFirstLayer> layers = new ArrayList<>();
+	BFSystemContext context = new BFSystemContext(this);
 	
 	boolean done = false;
 	
-	BFSystemContext context = new BFSystemContext(this);
-//	BreadthFirstViewData viewData;
+	Map<Integer, Map<ClientConfiguration, List<ChunkUpdateMessage>>> pendingUpdateMessages = new HashMap<>(); //TODO use! ; replace second map with Set/List of clients?
 	
-	
-//	Class<? extends FractalsCalculator> calculatorClass;
-//	int chunkSize;
-	
-	List<BreadthFirstTask> finishedTasks = new ArrayList<>();
-	
-	Map<Integer, Map<ClientConfiguration, List<ChunkUpdateMessage>>> pendingUpdateMessages = new HashMap<>(); //TODO replace second map with Set/List of clients?
-	
-	CategoryLogger log;
+	double midpointChunkX;
+	double midpointChunkY;
+
+	List<TaskProviderAdapter> taskProviders = new ArrayList<>();
+	Map<Integer, CalculateThreadReference> calculateThreadReferences = new HashMap<>(); //TODO remove?
+
+	int id_counter_tasks = 0;
 
 	public BreadthFirstTaskManager(ServerManagers managers, CalcSystem system) {
 		super(managers, system);
 		log = ((BreadthFirstSystem)system).getLogger().createSubLogger("tm");
 	}
-	
-	double midpointChunkX;
-	double midpointChunkY;
-	
-	
-//	NumberFactory numberFactory;
-//	ArrayChunkFactory chunkFactory;
-	
-//	ComplexNumber midpoint;
-//	ComplexNumber leftLowerCorner;
-//	ComplexNumber rightUpperCorner;
-//	double leftLowerCornerChunkX, leftLowerCornerChunkY;
-//	double rightUpperCornerChunkX, rightUpperCornerChunkY;
-//	Number zoom;
-//	Number chunkZoom;
-//	ComplexNumber relativeStartShift;
-	
-//	Map<String, ParamSupplier> parameters;
-	
-	Map<Integer, CalculateThreadReference> calculateThreadReferences = new HashMap<>();
-
-	int id_counter_tasks = 0;
-	
-//	int width, height;
-//	int chunksWidth, chunksHeight;
-
-	List<TaskProviderAdapter> taskProviders = new ArrayList<>();
 
 	@Override
 	public void startTasks() {
@@ -273,6 +239,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				break;
 
 			synchronized (this){
+				
+				//Prepare culling
 				if (task.isPreviousLayerCullingEnabled()) {
 					Map<BorderAlignment, ChunkBorderData> neighbourBorderData = new HashMap<>();
 					AbstractArrayChunk chunk = ((AbstractArrayChunk)task.getChunk());
@@ -307,26 +275,26 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	
 	int openChunks;
 	
-	private List<ChunkUpdateMessage> getPendingMessagesList(int taskId, ClientConfiguration clientConfiguration){
-		Map<ClientConfiguration, List<ChunkUpdateMessage>> map = pendingUpdateMessages.get(taskId);
-		if (map == null){
-			map = new HashMap<ClientConfiguration, List<ChunkUpdateMessage>>();
-			pendingUpdateMessages.put(taskId, map);
-		}
-		List<ChunkUpdateMessage> list = map.get(clientConfiguration);
-		if (list == null) {
-			list = new ArrayList<>();
-			map.put(clientConfiguration, list);
-		}
-		return list;
-	}
+//	private List<ChunkUpdateMessage> getPendingMessagesList(int taskId, ClientConfiguration clientConfiguration){
+//		Map<ClientConfiguration, List<ChunkUpdateMessage>> map = pendingUpdateMessages.get(taskId);
+//		if (map == null){
+//			map = new HashMap<ClientConfiguration, List<ChunkUpdateMessage>>();
+//			pendingUpdateMessages.put(taskId, map);
+//		}
+//		List<ChunkUpdateMessage> list = map.get(clientConfiguration);
+//		if (list == null) {
+//			list = new ArrayList<>();
+//			map.put(clientConfiguration, list);
+//		}
+//		return list;
+//	}
 	
 	private boolean finishTasks() {
 		if (finishedTasks.isEmpty())
 			return false;
 		setLifeCycleState(LifeCycleState.RUNNING);
 		synchronized (this) {
-			List<ClientConfiguration> clients = new ArrayList<>(((BreadthFirstSystem)system).getClients());
+			List<ClientConfiguration> clients = new ArrayList<>(system.getClients());
 			for (BreadthFirstTask task : finishedTasks) {
 				
 				final Integer taskId = task.getId();
@@ -485,7 +453,6 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		}
 		
 	}
-	
 	
 	private synchronized boolean fillQueues() {
 		boolean changed = false;

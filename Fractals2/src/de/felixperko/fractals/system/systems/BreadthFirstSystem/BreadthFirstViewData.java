@@ -5,6 +5,7 @@ import java.util.Map;
 
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
+import de.felixperko.fractals.system.systems.infra.ViewData;
 import de.felixperko.fractals.util.CategoryLogger;
 
 public class BreadthFirstViewData implements ViewData {

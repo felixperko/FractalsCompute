@@ -1,4 +1,4 @@
-package de.felixperko.fractals.system.systems.BreadthFirstSystem;
+package de.felixperko.fractals.system.systems.infra;
 
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;

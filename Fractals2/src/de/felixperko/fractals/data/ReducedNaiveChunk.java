@@ -1,6 +1,6 @@
 package de.felixperko.fractals.data;
 
-import de.felixperko.fractals.system.systems.BreadthFirstSystem.ViewData;
+import de.felixperko.fractals.system.systems.infra.ViewData;
 
 public class ReducedNaiveChunk extends AbstractArrayChunk {
 	
