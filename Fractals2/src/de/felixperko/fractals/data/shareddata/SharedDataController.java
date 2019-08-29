@@ -3,7 +3,7 @@ package de.felixperko.fractals.data.shareddata;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.felixperko.fractals.network.Connection;
+import de.felixperko.fractals.network.infra.connection.Connection;
 import de.felixperko.fractals.network.messages.SharedDataUpdateMessage;
 
 public class SharedDataController {

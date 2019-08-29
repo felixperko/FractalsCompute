@@ -1,4 +1,4 @@
-package de.felixperko.fractals.network;
+package de.felixperko.fractals.network.threads;
 
 import java.net.Socket;
 
@@ -23,19 +23,6 @@ public class ServerWriteThread extends WriteThread {
 	public ServerWriteThread(ServerManagers managers, Socket socket) {
 		super(managers, socket);
 		lastReachableTime = System.nanoTime();
-	}
-	
-	@Override
-	public void writeMessage(Message msg) {
-		//TODO seems to be wrong (messages from server don't have a SenderInfo, right?)
-//		if (clientConnection != null) {
-//			if (msg.getSender() == null)
-//				msg.setSender(clientConnection.getSenderInfo());
-//			else if (!msg.getSender().equals(clientConnection.getSenderInfo())){
-//				throw new IllegalStateException("Wrong thread to send message to client");
-//			}
-//		}
-		super.writeMessage(msg);
 	}
 	
 	@Override

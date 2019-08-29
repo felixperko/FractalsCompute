@@ -3,8 +3,8 @@ package de.felixperko.fractals.manager.server;
 import java.net.Socket;
 
 import de.felixperko.fractals.manager.common.ThreadManager;
-import de.felixperko.fractals.network.InputScannerThread;
-import de.felixperko.fractals.network.ServerWriteThread;
+import de.felixperko.fractals.network.threads.InputScannerThread;
+import de.felixperko.fractals.network.threads.ServerWriteThread;
 import de.felixperko.fractals.system.task.LocalTaskProvider;
 import de.felixperko.fractals.system.task.RemoteTaskProvider;
 import de.felixperko.fractals.system.task.TaskProvider;

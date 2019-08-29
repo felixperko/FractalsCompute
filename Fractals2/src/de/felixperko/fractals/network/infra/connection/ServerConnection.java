@@ -6,10 +6,10 @@ import java.util.List;
 import de.felixperko.fractals.data.shareddata.DataContainer;
 import de.felixperko.fractals.data.shareddata.MappedSharedData;
 import de.felixperko.fractals.manager.common.INetworkManager;
-import de.felixperko.fractals.network.ClientWriteThread;
-import de.felixperko.fractals.network.Connection;
+import de.felixperko.fractals.network.ComAdapter;
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.Message;
+import de.felixperko.fractals.network.threads.ClientWriteThread;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateUpdate;
 
 /**
@@ -17,7 +17,7 @@ import de.felixperko.fractals.system.systems.stateinfo.TaskStateUpdate;
  */
 public class ServerConnection extends AbstractConnection<INetworkManager>{
 	
-	ClientWriteThread writeToServer;
+	ComAdapter writeToServer;
 	
 	INetworkManager networkManager;
 	
@@ -31,11 +31,11 @@ public class ServerConnection extends AbstractConnection<INetworkManager>{
 		this.networkManager = networkManager;
 	}
 	
-	public ClientWriteThread getWriteToServer() {
+	public ComAdapter getWriteToServer() {
 		return writeToServer;
 	}
 
-	public void setWriteToServer(ClientWriteThread writeToServer) {
+	public void setWriteToServer(ComAdapter writeToServer) {
 		this.writeToServer = writeToServer;
 	}
 

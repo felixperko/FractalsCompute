@@ -1,4 +1,4 @@
-package de.felixperko.fractals.network;
+package de.felixperko.fractals.network.threads;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,12 +15,14 @@ import org.xerial.snappy.SnappyOutputStream;
 
 import de.felixperko.fractals.data.shareddata.SharedDataController;
 import de.felixperko.fractals.manager.common.Managers;
+import de.felixperko.fractals.network.ComAdapter;
 import de.felixperko.fractals.network.infra.Message;
+import de.felixperko.fractals.network.infra.connection.Connection;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.util.CategoryLogger;
 
-public abstract class WriteThread extends AbstractFractalsThread {
+public abstract class WriteThread extends AbstractFractalsThread implements ComAdapter {
 	
 	static int ID_COUNTER = 0;
 	
@@ -31,8 +33,6 @@ public abstract class WriteThread extends AbstractFractalsThread {
 	
 	Queue<Message> pendingMessages = new PriorityQueue<>();
 	Queue<Message> newMessages = new LinkedList<>();
-//	private ObjectInputStream in;
-	private SnappyInputStream inComp;
 	private ObjectOutputStream out;
 	private SnappyOutputStream outComp;
 	protected Socket socket;
@@ -152,7 +152,8 @@ public abstract class WriteThread extends AbstractFractalsThread {
 		}
 	}
 	
-	protected void prepareMessage(Message msg) {
+	@Override
+	public void prepareMessage(Message msg) {
 		msg.setSentTime();
 	}
 
@@ -160,28 +161,17 @@ public abstract class WriteThread extends AbstractFractalsThread {
 		sharedDataController.sendMessageIfUpdatesAvailable(getConnection());
 	}
 
+	/* (non-Javadoc)
+	 * @see de.felixperko.fractals.network.threads.ComAdapter#writeMessage(de.felixperko.fractals.network.infra.Message)
+	 */
+	@Override
 	public void writeMessage(Message msg) {
 		synchronized (newMessages) {
 			newMessages.add(msg);
 		}
 	}
 	
-//	public boolean cancelMessage(Message msg) {
-//		synchronized (newMessages) {
-//			if (newMessages.contains(msg)) {
-//				newMessages.remove(msg);
-//				return true;
-//			}
-//		}
-//		synchronized (pendingMessages) {
-//			if (pendingMessages.contains(msg)) {
-//				pendingMessages.remove(msg);
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-	
+	@Override
 	public void closeConnection() {
 		closeConnection = true;
 		getConnection().setClosed();
@@ -189,6 +179,7 @@ public abstract class WriteThread extends AbstractFractalsThread {
 			continueThread();
 	}
 
+	@Override
 	public boolean isCloseConnection() {
 		return closeConnection;
 	};
@@ -199,7 +190,8 @@ public abstract class WriteThread extends AbstractFractalsThread {
 			listenThread.setLogger(listenLogger);
 	}
 
-	public abstract Connection getConnection();
+	@Override
+	public abstract Connection<?> getConnection();
 	
 	public void setCompression(boolean compression) {
 		if (this.compression != compression) {
@@ -229,12 +221,4 @@ public abstract class WriteThread extends AbstractFractalsThread {
 	public Socket getSocket() {
 		return socket;
 	}
-	
-//	public void setConnection(Connection connection) {
-//		this.connection = connection;
-//	}
-	
-//	public Connection getConnection() {
-//		return connection;
-//	}
 }

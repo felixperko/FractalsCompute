@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import de.felixperko.fractals.network.Connection;
+import de.felixperko.fractals.network.infra.connection.Connection;
 import de.felixperko.fractals.network.infra.connection.ConnectionListener;
 
 /**
