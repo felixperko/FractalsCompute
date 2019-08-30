@@ -1,9 +1,12 @@
-package de.felixperko.fractals.network;
+package de.felixperko.fractals.network.interfaces;
 
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.network.infra.connection.Connection;
 
-public interface ComAdapter {
+/**
+ * Interface for message communication with another instance (server/client)
+ */
+public interface Messageable {
 	
 	Connection<?> getConnection();
 	void closeConnection();

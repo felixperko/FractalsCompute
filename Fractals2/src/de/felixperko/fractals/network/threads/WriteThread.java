@@ -15,14 +15,14 @@ import org.xerial.snappy.SnappyOutputStream;
 
 import de.felixperko.fractals.data.shareddata.SharedDataController;
 import de.felixperko.fractals.manager.common.Managers;
-import de.felixperko.fractals.network.ComAdapter;
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.network.infra.connection.Connection;
+import de.felixperko.fractals.network.interfaces.Messageable;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.util.CategoryLogger;
 
-public abstract class WriteThread extends AbstractFractalsThread implements ComAdapter {
+public abstract class WriteThread extends AbstractFractalsThread implements Messageable {
 	
 	static int ID_COUNTER = 0;
 	
