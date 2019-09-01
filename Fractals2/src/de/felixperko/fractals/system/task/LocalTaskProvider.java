@@ -175,8 +175,6 @@ public class LocalTaskProvider implements TaskProvider {
 		if (tasks.isEmpty())
 			return;
 		
-		Thread.dumpStack();
-		
 		//assign tasks
 		for (FractalsTask task : tasks){
 			task.getStateInfo().setState(TaskState.ASSIGNED);
@@ -202,6 +200,7 @@ public class LocalTaskProvider implements TaskProvider {
 		for (FractalsTask localTask : localList){
 			for (FractalsTask remoteTask : tasks){
 				if (remoteTask.equals(localTask)){
+					remoteTask.applyLocalState(localTask);
 					localTask.getTaskManager().taskFinished(remoteTask);
 					managers.getSystemManager().removeTask(localTask);
 				}

@@ -90,4 +90,9 @@ public abstract class AbstractFractalsTask<T> implements FractalsTask{
 		AbstractFractalsTask<?> other = (AbstractFractalsTask<?>)obj;
 		return (other.stateInfo.getTaskId() == stateInfo.getTaskId() && other.stateInfo.getSystemId().equals(stateInfo.getSystemId()) && other.jobId == jobId);
 	}
+	
+	@Override
+	public void applyLocalState(FractalsTask localTask) {
+		setContext(localTask.getContext());
+	}
 }

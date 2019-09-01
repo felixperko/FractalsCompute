@@ -3,6 +3,7 @@ package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -283,6 +284,16 @@ public class BFSystemContext implements SystemContext {
 //			serverConnection.writeMessage(msg);
 		}
 	}
+	
+	@Override
+	public FractalsCalculator createCalculator() {
+		try {
+			return calculatorClass.getDeclaredConstructor().newInstance();
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
+			throw new IllegalStateException("Failed to create calculator for class: "+calculatorClass.getName());
+		}
+	}
 
 	@Override
 	public void setServerConnection(ServerConnection serverConnection) {
@@ -298,5 +309,10 @@ public class BFSystemContext implements SystemContext {
 		ois.defaultReadObject();
 		Map<String, ParamSupplier> parameters = (Map<String, ParamSupplier>) ois.readObject();
 		setParameters(parameters);
+	}
+
+	@Override
+	public Map<String, ParamSupplier> getParameters() {
+		return parameters;
 	}
 }

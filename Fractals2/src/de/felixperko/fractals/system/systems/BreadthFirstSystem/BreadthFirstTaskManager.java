@@ -178,21 +178,12 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 //		ComplexNumber pos = numberFactory.createComplexNumber(chunkZoom, chunkZoom);
 //		pos.multValues(relativeStartShift);
 //		pos.add(midpoint);
-		BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.parameters, 
-				context.getChunkPos(0, 0), createCalculator(), context.layerConfig.getLayers().get(0), context.jobId);
+		BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getChunkPos(0, 0), 
+				context.createCalculator(), context.layerConfig.getLayers().get(0), context.jobId);
 		rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, context.layerConfig.getLayers().get(0));
 		context.viewData.addChunk(chunk);
 		openTasks.get(0).add(rootTask);
 		openChunks++;
-	}
-	
-	public FractalsCalculator createCalculator() {
-		try {
-			return context.calculatorClass.getDeclaredConstructor().newInstance();
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
-			throw new IllegalStateException("Failed to create calculator for class: "+context.calculatorClass.getName());
-		}
 	}
 	
 	@Override
@@ -469,8 +460,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			int midpointChunkYFloor = (int)midpointChunkY;
 			if (!context.viewData.hasChunk(midpointChunkXFloor, midpointChunkYFloor)){
 				AbstractArrayChunk chunk = context.chunkFactory.createChunk(midpointChunkXFloor, midpointChunkYFloor);
-				BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.parameters,
-						context.getChunkPos(midpointChunkXFloor, midpointChunkYFloor), createCalculator(), layers.get(0), context.jobId);
+				BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getChunkPos(midpointChunkXFloor, midpointChunkYFloor),
+						context.createCalculator(), layers.get(0), context.jobId);
 				rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(0));
 				context.viewData.addChunk(chunk);
 				openTasks.get(0).add(rootTask);
@@ -584,8 +575,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 					}
 			}
 		}
-		BreadthFirstTask task = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.parameters,
-				context.getChunkPos(chunkX, chunkY), createCalculator(), context.layerConfig.getLayers().get(0), context.jobId);
+		BreadthFirstTask task = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getChunkPos(chunkX, chunkY),
+				context.createCalculator(), context.layerConfig.getLayers().get(0), context.jobId);
 		task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, context.layerConfig.getLayers().get(0));
 		openChunks++;
 		newQueue.add(task);

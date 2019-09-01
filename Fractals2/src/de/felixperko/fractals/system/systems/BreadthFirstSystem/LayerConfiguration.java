@@ -68,16 +68,16 @@ public class LayerConfiguration implements Serializable{
 	}
 	
 	public synchronized ComplexNumber[] getOffsets(int layerId) {
-		if (!prepared){
-			long waitingSince = System.nanoTime();
-			long time = System.nanoTime();
-			while (!prepared){
-				time = System.nanoTime();
-				if (time-waitingSince > preparedTimeout)
-					break;
-			}
-			log.log("waited for prepartion for "+NumberUtil.getTimeInS(time-waitingSince, 6));
-		}
+//		if (!prepared){
+//			long waitingSince = System.nanoTime();
+//			long time = System.nanoTime();
+//			while (!prepared){
+//				time = System.nanoTime();
+//				if (time-waitingSince > preparedTimeout)
+//					break;
+//			}
+//			log.log("waited for prepartion for "+NumberUtil.getTimeInS(time-waitingSince, 6));
+//		}
 		if (!prepared)
 			throw new IllegalStateException("LayerConfiguration has to be prepared first (prepare()).");
 		return offsets[layerId];

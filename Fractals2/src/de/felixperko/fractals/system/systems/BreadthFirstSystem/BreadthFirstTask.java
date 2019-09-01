@@ -36,13 +36,11 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	int previousLayerId = -1;
 	
 	public transient AbstractArrayChunk chunk;
-	transient CompressedChunk compressed_chunk;
+	private transient CompressedChunk compressed_chunk;
 	
-	Map<String, ParamSupplier> parameters; //TODO transient
+	transient FractalsCalculator calculator;
 	
-	FractalsCalculator calculator;
-	
-	public BreadthFirstTask(SystemContext context, int id, TaskManager taskManager, AbstractArrayChunk chunk, Map<String, ParamSupplier> taskParameters, ComplexNumber chunkPos, 
+	public BreadthFirstTask(SystemContext context, int id, TaskManager taskManager, AbstractArrayChunk chunk, ComplexNumber chunkPos, 
 			FractalsCalculator calculator, Layer layer, int jobId) {
 		super(context, id, taskManager, jobId, layer);
 		getStateInfo().setState(TaskState.OPEN);
@@ -51,18 +49,18 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 		this.chunk.chunkPos = chunkPos.copy();
 		chunk.setCurrentTask(this);
 			
-		this.parameters = new HashMap<>();
-		for (Entry<String, ParamSupplier> e : taskParameters.entrySet()){
-			this.parameters.put(e.getKey(), e.getValue().copy());
-		}
-		this.parameters.put("chunkpos", new StaticParamSupplier("chunkpos", this.chunk.chunkPos.copy()));
-		this.parameters.put("chunksize", new StaticParamSupplier("chunksize", (Integer)chunk.getChunkDimensions()));
 	}
 	
 	@Override
 	public void run() {
 		preprocess();
 		previousLayerId = getStateInfo().getLayerId()-1;
+		Map<String, ParamSupplier> parameters = new HashMap<>();
+		for (Entry<String, ParamSupplier> e : getContext().getParameters().entrySet()){
+			parameters.put(e.getKey(), e.getValue().copy());
+		}
+		parameters.put("chunkpos", new StaticParamSupplier("chunkpos", this.chunk.chunkPos.copy()));
+		parameters.put("chunksize", new StaticParamSupplier("chunksize", (Integer)chunk.getChunkDimensions()));
 		parameters.put("layer", new StaticParamSupplier("layer", (Integer)getStateInfo().getLayer().getId()));
 		calculator.setParams(parameters);
 		calculator.calculate(chunk);
@@ -216,6 +214,12 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	@Override
 	public FractalsCalculator getCalculator() {
 		return calculator;
+	}
+	
+	@Override
+	public void setContext(SystemContext context) {
+		super.setContext(context);
+		this.calculator = context.createCalculator();
 	}
 	
 	private void writeObject(ObjectOutputStream out) throws IOException {

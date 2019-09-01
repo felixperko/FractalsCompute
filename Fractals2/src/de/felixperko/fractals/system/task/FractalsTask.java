@@ -34,5 +34,7 @@ public interface FractalsTask extends Serializable{
 	void setStateInfo(TaskStateInfo taskStateInfo);
 
 	SystemContext getContext();
+
+	void applyLocalState(FractalsTask localTask);
 	
 }

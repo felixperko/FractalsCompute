@@ -6,6 +6,7 @@ import java.util.Map;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
+import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
@@ -21,4 +22,8 @@ public interface SystemContext extends Serializable{
 	void taskStateUpdated(TaskStateInfo taskStateInfo, TaskState oldState);
 
 	void setServerConnection(ServerConnection serverConnection);
+
+	FractalsCalculator createCalculator();
+
+	Map<String, ParamSupplier> getParameters();
 }
