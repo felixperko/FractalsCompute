@@ -8,7 +8,7 @@ import static de.felixperko.fractals.data.BorderAlignment.UP;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.felixperko.fractals.system.systems.BreadthFirstSystem.ViewData;
+import de.felixperko.fractals.system.systems.infra.ViewData;
 
 public abstract class AbstractArrayChunk extends AbstractChunk {
 	

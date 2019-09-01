@@ -1,4 +1,4 @@
-package de.felixperko.fractals.network;
+package de.felixperko.fractals.network.threads;
 
 import java.util.Scanner;
 

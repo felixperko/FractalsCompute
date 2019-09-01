@@ -61,19 +61,21 @@ public class SystemManager extends Manager{
 		
 		//evaluate parameter changes for existing systems
 		for (Entry<UUID, SystemClientData> e : newDataMap.entrySet()) {
-			if (!oldDataMap.containsKey(e.getKey())) {//new parameter (didn't exist in oldDataMap)
-//				newSystemClientData.put(e.getKey(), e.getValue());
-				CalcSystem system = activeSystems.get(e.getKey());
+			
+			UUID systemId = e.getKey();
+			SystemClientData systemClientData = e.getValue();
+			
+			if (!oldDataMap.containsKey(systemId)) {//new parameter (didn't exist in oldDataMap)
+				CalcSystem system = activeSystems.get(systemId);
 				if (system == null)
 					continue;
-				system.addClient(newConfiguration, e.getValue());
+				system.addClient(newConfiguration, systemClientData);
 			} else {//parameter was changed
 				boolean changed = false;
-				SystemClientData newData = e.getValue();
 				SystemClientData oldData = null;
 				if (oldConfiguration != null) {
 					oldData = oldConfiguration.getSystemClientData(e.getKey());
-					for (Entry<String, ParamSupplier> param : newData.getClientParameters().entrySet()) {
+					for (Entry<String, ParamSupplier> param : systemClientData.getClientParameters().entrySet()) {
 						String paramName = param.getKey();
 						ParamSupplier newParam = param.getValue();
 						ParamSupplier oldParam = oldData.getClientParameter(paramName);
@@ -84,7 +86,7 @@ public class SystemManager extends Manager{
 				}
 				
 				int oldGranted = oldData != null ? oldData.getGrantedThreads() : 0;
-				int newGranted = newData.getGrantedThreads();
+				int newGranted = systemClientData.getGrantedThreads();
 				
 				if (!changed && oldGranted == newGranted) {
 					continue;
@@ -95,7 +97,7 @@ public class SystemManager extends Manager{
 					continue;
 
 				if (changed)
-					system.changedClient(newConfiguration, oldConfiguration);
+					system.changeClient(newConfiguration, oldConfiguration);
 				
 				if (oldGranted != newGranted) {
 					system.changeClientMaxThreadCount(newGranted, oldGranted);

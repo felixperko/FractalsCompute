@@ -18,9 +18,6 @@ public class SessionInitRequestMessage extends ClientMessage{
 	
 	@Override
 	protected void process() {
-//		if (!(connection instanceof ClientConnection))
-//			throw new IllegalStateException("Client has recieved SessionInitRequestMessage?");
-//		FractalsServerMain.dataContainer.newClient(new Client((ClientConnection)connection, configuration));
 		configuration.setConnection(getConnection());
 		getBackConnection().getNetworkManager().updateClientConfiguration(getSender(), configuration);
 		answer(new SessionInitResponseMessage());

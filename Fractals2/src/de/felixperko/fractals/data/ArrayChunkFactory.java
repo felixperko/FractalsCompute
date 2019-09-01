@@ -3,7 +3,7 @@ package de.felixperko.fractals.data;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 
-import de.felixperko.fractals.system.systems.BreadthFirstSystem.ViewData;
+import de.felixperko.fractals.system.systems.infra.ViewData;
 
 public class ArrayChunkFactory implements Serializable{
 	

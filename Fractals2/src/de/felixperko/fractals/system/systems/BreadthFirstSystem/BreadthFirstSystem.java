@@ -31,20 +31,15 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 	TaskFactory factory_task = new ClassTaskFactory(BreadthFirstTask.class);
 	
 	BreadthFirstTaskManager taskManager;
-	
-	List<ClientConfiguration> clients = new ArrayList<>();
-	
-	ParameterConfiguration parameterConfiguration;
 
 	public BreadthFirstSystem(ServerManagers managers) {
 		super(managers);
 		log = managers.getSystemManager().getLogger().createSubLogger(getNumber()+"_BF");
-		createParameterConfiguration();
 	}
 
-	private void createParameterConfiguration() {
-
-		parameterConfiguration = new ParameterConfiguration();
+	@Override
+	public ParameterConfiguration createParameterConfiguration() {
+		ParameterConfiguration parameterConfiguration = new ParameterConfiguration();
 		ParamValueType integerType = new ParamValueType("integer");
 		ParamValueType doubleType = new ParamValueType("double");
 		ParamValueType booleanType = new ParamValueType("boolean");
@@ -118,10 +113,6 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		parameterConfiguration.addCalculatorParameters("NewtonThridPowerMinusOneCalculator", mandelbrot_calculator_defs);									//TODO test -> newton_calculator_defs!
 		parameterConfiguration.addCalculatorParameters("NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator", mandelbrot_calculator_defs);	//
 		
-//		Selection<Class<? extends FractalsCalculator>> calculatorSelection = new Selection<>("calculator");
-//		calculatorSelection.addOption("Mandelbrot", MandelbrotCalculator.class);
-//		calculatorSelection.addOption("BurningShip", BurningShipCalculator.class);
-//		parameterConfiguration.addSelection(calculatorSelection);
 		Selection<String> calculatorSelection = new Selection<>("calculator");
 		calculatorSelection.addOption("Mandelbrot", "MandelbrotCalculator");
 		calculatorSelection.addOption("BurningShip", "BurningShipCalculator");
@@ -134,74 +125,8 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		parameterConfiguration.addSelection(systemNameSelection);
 		
 		parameterConfiguration.addListTypes("layers", layerType, upsampleLayerType);
-	}
-
-	@Override
-	public void reset() {
-		taskManager.reset();
-	}
-
-	@Override
-	public void addClient(ClientConfiguration newConfiguration, SystemClientData systemClientData) {
-		synchronized (clients) {
-			clients.add(newConfiguration);
-			newConfiguration.getSystemRequests().remove(systemClientData);
-			newConfiguration.getSystemClientData().put(id, systemClientData);
-			newConfiguration.getConnection().writeMessage(new SystemConnectedMessage(id, newConfiguration, getParameterConfiguration()));
-			taskManager.setParameters(systemClientData.getClientParameters());
-		}
-	}
-
-	@Override
-	public void changedClient(ClientConfiguration newConfiguration, ClientConfiguration oldConfiguration) {
 		
-		Map<String, ParamSupplier> newParameters = newConfiguration.getSystemClientData(getId()).getClientParameters();
-		
-		boolean applicable = isApplicable(newConfiguration.getConnection(), newParameters);
-		System.out.println("is Applicable()? "+applicable);
-		synchronized(clients) {
-			if (oldConfiguration != null)
-				clients.remove(oldConfiguration);
-			if (applicable) {
-				clients.add(newConfiguration);
-				taskManager.setParameters(newParameters);
-			}
-		}
-	}
-
-	@Override
-	public void removeClient(ClientConfiguration oldConfiguration) {
-		synchronized(clients) {
-			clients.remove(oldConfiguration);
-			if (clients.isEmpty())
-				stop();
-			oldConfiguration.getConnection().setClosed();
-		}
-	}
-
-	@Override
-	public void changeClientMaxThreadCount(int newGranted, int oldGranted) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public boolean isApplicable(ClientConnection connection, Map<String, ParamSupplier> parameters) {
-		boolean hasClient = false;
-		for (ClientConfiguration conf : clients) {
-			if (conf.getConnection() == connection) {
-				hasClient = true;
-				break;
-			}
-		}
-		if (hasClient && clients.size() == 1)
-			return true;
-		for (ParamSupplier param : parameters.values()) {
-			if (param.isSystemRelevant() || param.isLayerRelevant() || param.isViewRelevant()) {
-				return false;
-			}
-		}
-		return true;
+		return parameterConfiguration;
 	}
 
 	@Override
@@ -243,16 +168,33 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		return true;
 	}
 
-	public List<ClientConfiguration> getClients() {
-		return clients;
+	@Override
+	public void addedClient(ClientConfiguration newConfiguration, SystemClientData systemClientData) {
+		taskManager.setParameters(systemClientData.getClientParameters());
+	}
+
+	@Override
+	public void changedClient(Map<String, ParamSupplier> newParameters) {
+		taskManager.setParameters(newParameters);
+	}
+
+	@Override
+	public void removedClient(ClientConfiguration oldConfiguration) {
+	}
+
+	@Override
+	public void reset() {
+		taskManager.reset();
+	}
+
+	@Override
+	public void changeClientMaxThreadCount(int newGranted, int oldGranted) {
+		// TODO Auto-generated method stub
+
 	}
 	
 	public CategoryLogger getLogger(){
 		return log;
-	}
-
-	public ParameterConfiguration getParameterConfiguration() {
-		return parameterConfiguration;
 	}
 
 }

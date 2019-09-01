@@ -6,6 +6,11 @@ import java.util.Map;
 import java.util.UUID;
 
 import de.felixperko.fractals.manager.server.ServerManagers;
+import de.felixperko.fractals.network.ClientConfiguration;
+import de.felixperko.fractals.network.SystemClientData;
+import de.felixperko.fractals.network.infra.connection.ClientConnection;
+import de.felixperko.fractals.network.messages.SystemConnectedMessage;
+import de.felixperko.fractals.system.parameters.ParameterConfiguration;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.systems.stateinfo.SystemStateInfo;
 import de.felixperko.fractals.system.thread.FractalsThread;
@@ -15,9 +20,9 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	static int CALC_SYSTEM_COUNTER = 0;
 	
 	protected UUID id = UUID.randomUUID();
-	
 	int number = 0;
 	
+	List<ClientConfiguration> clients = new ArrayList<>();
 	LifeCycleState state = LifeCycleState.NOT_INITIALIZED;
 	
 	List<FractalsThread> threads = new ArrayList<>();
@@ -26,11 +31,14 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	
 	SystemStateInfo systemStateInfo;
 	
+	ParameterConfiguration parameterConfiguration;
+	
 	public AbstractCalcSystem(ServerManagers managers) {
 		this.managers = managers;
 		this.number = CALC_SYSTEM_COUNTER++;
 		this.systemStateInfo = new SystemStateInfo(id);
 		managers.getSystemManager().getStateInfo().addSystemStateInfo(id, this.systemStateInfo);
+		this.parameterConfiguration = createParameterConfiguration();
 	}
 	
 	@Override
@@ -73,6 +81,77 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	public abstract boolean onStart();
 	public abstract boolean onPause();
 	public abstract boolean onStop();
+	
+	@Override
+	public void addClient(ClientConfiguration newConfiguration, SystemClientData systemClientData) {
+		synchronized (clients) {
+			clients.add(newConfiguration);
+			newConfiguration.getSystemRequests().remove(systemClientData);
+			newConfiguration.getSystemClientData().put(id, systemClientData);
+			newConfiguration.getConnection().writeMessage(new SystemConnectedMessage(id, newConfiguration, getParameterConfiguration()));
+			addedClient(newConfiguration, systemClientData);
+		}
+	}
+	
+	@Override
+	public void changeClient(ClientConfiguration newConfiguration, ClientConfiguration oldConfiguration) {
+		
+		Map<String, ParamSupplier> newParameters = newConfiguration.getSystemClientData(getId()).getClientParameters();
+		
+		boolean applicable = isApplicable(newConfiguration.getConnection(), newParameters);
+		synchronized(clients) {
+			if (oldConfiguration != null)
+				clients.remove(oldConfiguration);
+			if (applicable) {
+				clients.add(newConfiguration);
+			}
+			changedClient(newParameters);
+		}
+	}
+	
+	@Override
+	public void removeClient(ClientConfiguration oldConfiguration) {
+		synchronized(clients) {
+			clients.remove(oldConfiguration);
+			if (clients.isEmpty())
+				stop();
+			oldConfiguration.getConnection().setClosed();
+			removedClient(oldConfiguration);
+		}
+	}
+	
+	public abstract void addedClient(ClientConfiguration newConfiguration, SystemClientData systemClientData);
+	public abstract void changedClient(Map<String, ParamSupplier> newParameters);
+	public abstract void removedClient(ClientConfiguration oldConfiguration);
+	
+	@Override
+	public boolean isApplicable(ClientConnection connection, Map<String, ParamSupplier> parameters) {
+		boolean hasClient = false;
+		for (ClientConfiguration conf : clients) {
+			if (conf.getConnection() == connection) {
+				hasClient = true;
+				break;
+			}
+		}
+		if (hasClient && clients.size() == 1)
+			return true;
+		for (ParamSupplier param : parameters.values()) {
+			if (param.isSystemRelevant() || param.isLayerRelevant() || param.isViewRelevant()) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	@Override
+	public List<ClientConfiguration> getClients() {
+		return clients;
+	}
+	
+	@Override
+	public ParameterConfiguration getParameterConfiguration() {
+		return parameterConfiguration;
+	}
 	
 	@Override
 	public LifeCycleState getLifeCycleState() {

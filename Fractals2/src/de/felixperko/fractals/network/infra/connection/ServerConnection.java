@@ -6,10 +6,10 @@ import java.util.List;
 import de.felixperko.fractals.data.shareddata.DataContainer;
 import de.felixperko.fractals.data.shareddata.MappedSharedData;
 import de.felixperko.fractals.manager.common.INetworkManager;
-import de.felixperko.fractals.network.ClientWriteThread;
-import de.felixperko.fractals.network.Connection;
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.Message;
+import de.felixperko.fractals.network.interfaces.Messageable;
+import de.felixperko.fractals.network.threads.ClientWriteThread;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateUpdate;
 
 /**
@@ -17,7 +17,7 @@ import de.felixperko.fractals.system.systems.stateinfo.TaskStateUpdate;
  */
 public class ServerConnection extends AbstractConnection<INetworkManager>{
 	
-	ClientWriteThread writeToServer;
+	Messageable writeToServer;
 	
 	INetworkManager networkManager;
 	
@@ -31,18 +31,18 @@ public class ServerConnection extends AbstractConnection<INetworkManager>{
 		this.networkManager = networkManager;
 	}
 	
-	public ClientWriteThread getWriteToServer() {
+	public Messageable getWriteToServer() {
 		return writeToServer;
 	}
 
-	public void setWriteToServer(ClientWriteThread writeToServer) {
+	public void setWriteToServer(Messageable writeToServer) {
 		this.writeToServer = writeToServer;
 	}
 
 	@Override
 	public void writeMessage(Message msg) {
 		if (writeToServer == null)
-			throw new IllegalStateException("Attempted to write a message but the 'write to server' thread wasn't set");
+			throw new IllegalStateException("Attempted to write a message but the 'write to server' adapter wasn't set");
 		writeToServer.writeMessage(msg);
 	}
 

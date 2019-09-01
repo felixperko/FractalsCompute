@@ -14,12 +14,6 @@ import de.felixperko.fractals.util.CategoryLogger;
 import de.felixperko.fractals.util.ColorContainer;
 import de.felixperko.fractals.util.NumberUtil;
 
-//debug image imports
-//import java.awt.image.BufferedImage;
-//import java.io.File;
-//import java.io.IOException;
-//import javax.imageio.ImageIO;
-
 /**
  * Manages layers for a system.
  * Tries to generate and distribute offsets for even sampling (might be a bit buggy atm).

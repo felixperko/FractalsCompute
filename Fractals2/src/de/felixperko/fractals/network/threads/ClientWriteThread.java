@@ -1,10 +1,11 @@
-package de.felixperko.fractals.network;
+package de.felixperko.fractals.network.threads;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
 import de.felixperko.fractals.manager.common.Managers;
+import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.util.CategoryLogger;
@@ -22,16 +23,10 @@ public class ClientWriteThread extends WriteThread{
 		this.serverConnection.setWriteToServer(this);
 		log = superLogger.createSubLogger("out");
 		setListenLogger(new CategoryLogger("com/client/in", ColorContainer.MAGENTA));
-//		setConnection(managers.getClientNetworkManager().getServerConnection());
 	}
 	
-//	@Override
-//	public Connection getConnection() {
-//		return ((ClientNetworkManager)managers.getNetworkManager()).getServerConnection();
-//	}
-	
 	@Override
-	protected void prepareMessage(Message msg) {
+	public void prepareMessage(Message msg) {
 		if (msg.getSender() == null) {
 			SenderInfo info = serverConnection.getClientInfo();
 			if (info == null)

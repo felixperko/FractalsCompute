@@ -9,18 +9,18 @@ import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.manager.common.INetworkManager;
 import de.felixperko.fractals.manager.common.NetworkManager;
 import de.felixperko.fractals.network.ClientConfiguration;
-import de.felixperko.fractals.network.ClientWriteThread;
-import de.felixperko.fractals.network.Connection;
 import de.felixperko.fractals.network.SenderInfo;
-import de.felixperko.fractals.network.ServerConnectThread;
-import de.felixperko.fractals.network.ServerWriteThread;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.network.infra.connection.ClientLocalConnection;
 import de.felixperko.fractals.network.infra.connection.ClientRemoteConnection;
+import de.felixperko.fractals.network.infra.connection.Connection;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.network.interfaces.ClientMessageInterface;
 import de.felixperko.fractals.network.interfaces.NetworkInterfaceFactory;
 import de.felixperko.fractals.network.messages.ChunkUpdateMessage;
+import de.felixperko.fractals.network.threads.ClientWriteThread;
+import de.felixperko.fractals.network.threads.ServerConnectThread;
+import de.felixperko.fractals.network.threads.ServerWriteThread;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.util.CategoryLogger;
 import de.felixperko.fractals.util.ColorContainer;
@@ -60,26 +60,6 @@ public class ServerNetworkManager extends NetworkManager implements INetworkMana
 		clients.put((Integer)clientConnection.getSenderInfo().getClientId(), configuration);
 		log.log("new client connected. ID="+info.getClientId());
 		return clientConnection;
-	}
-	
-	@Override
-	public ServerConnection connectToServer(String host, int port) {
-		Socket socket;
-		try {
-			socket = new Socket(host, port);
-			ServerConnection serverConnection = new ServerConnection(this);
-			serverConnections.add(serverConnection);
-			ClientMessageInterface messageInterface = networkInterfaceFactory.createMessageInterface(serverConnection);
-			messageInterfaces.put(serverConnection, messageInterface);
-			ClientWriteThread clientWriteThread = new ClientWriteThread(managers, socket, serverConnection);
-			writeThreadsToServers.add(clientWriteThread);
-			clientWriteThread.start();
-			return serverConnection;
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(0);
-		}
-		return null;
 	}
 	
 	public void updateClientConfiguration(SenderInfo senderInfo, ClientConfiguration newConfiguration) {
