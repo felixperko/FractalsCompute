@@ -43,7 +43,7 @@ public class ClientConfiguration implements Serializable{
 	}
 	
 	public <T> T getParameterGeneralValue(UUID systemId, String name, Class<T> cls) {
-		return (T) getParameter(systemId, name).get(null, 0, 0, null);
+		return getParameter(systemId, name).get(null, cls, null, 0, 0);
 	}
 	
 	public List<SystemClientData> getSystemRequests(){

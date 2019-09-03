@@ -26,37 +26,8 @@ public abstract class AbstractFractalsCalculator implements FractalsCalculator {
 	}
 	
 	@Override
-	public void setParams(SystemContext systemContext, Map<String, ParamSupplier> localParameters) {
-		//params = new ParamSupplier[parameters.size()];
+	public void setContext(SystemContext systemContext) {
 		this.systemContext = systemContext;
-		
-		int index = 0;
-		
-		if (fields == null) {
-			fields = new HashMap<>();
-			for (Field f : fieldClass.getDeclaredFields()) {
-				if (f.getName().startsWith("p_")) {
-					fields.put(f.getName().substring(2), f);
-				}
-			}
-		}
-		
-		for (Entry<String, ParamSupplier> e : localParameters.entrySet()) {
-			ParamSupplier param = e.getValue();
-			if (param instanceof MappedParamSupplier) {
-				((MappedParamSupplier)param).bindParameters(systemContext, localParameters);
-			}
-			//params[index] = e.getValue();
-			//set index field if found
-			Field f = fields.get(e.getKey());
-			if (f != null) {
-				try {
-					f.set(this, param);
-				} catch (IllegalArgumentException | IllegalAccessException e1) {
-					e1.printStackTrace();
-				}
-			}
-		}
 	}
 	
 	@Override

@@ -64,7 +64,7 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 		localParameters.put("chunkpos", new StaticParamSupplier("chunkpos", this.chunk.chunkPos.copy()));
 		localParameters.put("chunksize", new StaticParamSupplier("chunksize", (Integer)chunk.getChunkDimensions()));
 		localParameters.put("layer", new StaticParamSupplier("layer", (Integer)getStateInfo().getLayer().getId()));
-		calculator.setParams(getContext(), localParameters);
+		calculator.setContext(getContext());
 		calculator.calculate(chunk);
 	}
 

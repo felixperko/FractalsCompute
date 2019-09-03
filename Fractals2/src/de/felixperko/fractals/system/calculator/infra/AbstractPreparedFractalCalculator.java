@@ -102,10 +102,9 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 	
 	private void calculateSample(int pixel, int sample) {
 		double res = -1;
-		Map<String, ParamSupplier> globalParameters = systemContext.getParameters();
-		ComplexNumber<?, ?> current = ((ComplexNumber<?, ?>) globalParameters.get("start").get(chunk.chunkPos,pixel,sample,systemContext)).copy();
-		ComplexNumber<?, ?> c = ((ComplexNumber<?, ?>) globalParameters.get("c").get(chunk.chunkPos,pixel,sample,systemContext)).copy();
-		ComplexNumber<?, ?> pow = ((ComplexNumber<?, ?>) globalParameters.get("pow").get(chunk.chunkPos,pixel,sample,systemContext)).copy();
+		ComplexNumber<?, ?> current = systemContext.getParamValue("start", ComplexNumber.class, chunk.chunkPos, pixel, sample).copy();
+		ComplexNumber<?, ?> c = systemContext.getParamValue("c", ComplexNumber.class, chunk.chunkPos, pixel, sample);
+		ComplexNumber<?, ?> pow = systemContext.getParamValue("pow", ComplexNumber.class, chunk.chunkPos, pixel, sample);
 		double logPow = Math.log(pow.absDouble());
 //		long t1 = System.nanoTime();
 		for (int k = 0 ; k < iterations ; k++) {

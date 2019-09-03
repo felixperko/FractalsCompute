@@ -45,6 +45,8 @@ public class LayerConfiguration implements Serializable{
 	transient ComplexNumber[][] offsets;
 	NumberFactory numberFactory;
 	transient boolean prepared = false;
+	transient int[] firstSampleOfLayer;
+	transient int[] layerBySample;
 	
 	
 //	Color[] layerColors = new Color[] {new Color(1f, 0, 0), new Color(0f, 1f, 0f), new Color(0.0f,1f,1f), new Color(1f, 0f, 1f)};
@@ -53,6 +55,7 @@ public class LayerConfiguration implements Serializable{
 	double simStep;
 	int simCount;
 	long seed;
+	
 
 	public LayerConfiguration(List<BreadthFirstLayer> layers, double simStep, int simCount, long seed) {
 		this.layers = layers;
@@ -82,6 +85,8 @@ public class LayerConfiguration implements Serializable{
 	}
 	
 	public synchronized void prepare(NumberFactory numberFactory) {
+		prepareLayerSampleLookupTables();
+		
 		this.numberFactory = numberFactory;
 		for (int i = 0; i < layers.size() ; i++) {
 			layers.get(i).setId(i);
@@ -105,6 +110,28 @@ public class LayerConfiguration implements Serializable{
 		
 		convertToComplex(layers, numberFactory, temp);
 		prepared = true;
+	}
+	
+	private void prepareLayerSampleLookupTables() {
+		this.firstSampleOfLayer = new int[layers.size()];
+		int counter = 0;
+		int totalSamples = 0;
+		for (int i = 0; i < firstSampleOfLayer.length; i++) {
+			int sampleCount = layers.get(i).getSampleCount();
+			this.firstSampleOfLayer[i] = counter;
+			counter += sampleCount;
+			totalSamples += sampleCount;
+		}
+		this.layerBySample = new int[totalSamples];
+		int layerCounter = 0;
+		int nextLayerSample = firstSampleOfLayer.length > layerCounter ? firstSampleOfLayer[layerCounter+1] : Integer.MAX_VALUE;
+		for (int i = 0; i < layerBySample.length; i++) {
+			if (i == nextLayerSample) {
+				layerCounter++;
+				nextLayerSample = firstSampleOfLayer.length > layerCounter ? firstSampleOfLayer[layerCounter+1] : Integer.MAX_VALUE;
+			}
+			layerBySample[i] = layerCounter;
+		}
 	}
 
 	private void convertToComplex(List<BreadthFirstLayer> layers, NumberFactory numberFactory, double[][] temp) {
@@ -307,5 +334,16 @@ public class LayerConfiguration implements Serializable{
 	
 	public Layer getLayer(int layerId) {
 		return layers.get(layerId);
+	}
+
+	
+	public ComplexNumber getOffsetForSample(int sample) {
+		int layer = layerBySample[sample];
+		int sampleInLayer = sample - firstSampleOfLayer[layer];
+		return offsets[layer][sampleInLayer];
+	}
+	
+	public int getLayerIdForSample(int sample) {
+		return layerBySample[sample];
 	}
 }

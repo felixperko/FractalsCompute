@@ -1,5 +1,8 @@
 package de.felixperko.fractals.system.parameters.suppliers;
 
+import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
+import de.felixperko.fractals.system.systems.infra.SystemContext;
+
 public abstract class AbstractParamSupplier implements ParamSupplier {
 	
 	private static final long serialVersionUID = -7127742325514423406L;
@@ -62,10 +65,31 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 	public boolean isChanged() {
 		return changed;
 	}
+
+	@Override
+	public Object getGeneral() {
+		return get(null, null, 0, 0);
+	}
 	
 	@Override
 	public <C> C getGeneral(Class<C> cls) {
-		Object obj = get(null,0,0,null);
-		return (C) obj;
+		return cast(getGeneral(), cls);
+	}
+	
+	@Override
+	public Object get(SystemContext systemContext, ComplexNumber chunkPos, int pixel, int sample) {
+		return get(systemContext, chunkPos, pixel, sample);
+	}
+	
+	@Override
+	public <C> C get(SystemContext systemContext, Class<C> valueCls, ComplexNumber chunkPos, int pixel, int sample) {
+		return cast(get(systemContext, chunkPos, pixel, sample), valueCls);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <C> C cast(Object object, Class<C> cls) {
+		if (cls.isInstance(object))
+			return (C)object;
+		throw new IllegalArgumentException("object can't be cast to class");
 	}
 }

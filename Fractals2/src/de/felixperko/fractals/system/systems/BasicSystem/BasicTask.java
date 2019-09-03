@@ -42,7 +42,7 @@ public class BasicTask extends AbstractFractalsTask<BasicTask> {
 	@Override
 	public void run() {
 		parameters.put("layer", new StaticParamSupplier("layer", (Integer)getStateInfo().getLayer().getId()));
-		calculator.setParams(parameters);
+		calculator.setContext(parameters);
 		calculator.calculate(chunk);
 	}
 	

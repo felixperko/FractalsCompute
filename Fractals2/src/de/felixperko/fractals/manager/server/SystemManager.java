@@ -143,7 +143,7 @@ public class SystemManager extends Manager{
 			System.err.println("Invalid system request: systemName parameters not set.");
 			return null;
 		}
-		String systemName = (String) systemNameParam.get(null, 0, 0, null);
+		String systemName = (String) systemNameParam.get(null, null, 0, 0);
 		if (!availableSystems.containsKey(systemName)) {
 			System.err.println("Invalid system request: system for name doesn't exist: "+systemName);
 			return null;
