@@ -1,6 +1,7 @@
 package de.felixperko.fractals.system.calculator.infra;
 
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 
 import de.felixperko.fractals.data.AbstractArrayChunk;
@@ -22,12 +23,12 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 		super(AbstractPreparedFractalCalculator.class);
 	}
 
-	ParamSupplier p_start;
-	ParamSupplier p_c;
-	ParamSupplier p_pow;
-	ParamSupplier p_iterations;
-	ParamSupplier p_limit;
-	ParamSupplier p_samples;
+//	ParamSupplier p_start;
+//	ParamSupplier p_c;
+//	ParamSupplier p_pow;
+//	ParamSupplier p_iterations;
+//	ParamSupplier p_limit;
+//	ParamSupplier p_samples;
 	
 	int iterations;
 	double limit;
@@ -41,8 +42,8 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 	@Override
 	public void calculate(AbstractArrayChunk chunk) {
 		this.chunk = chunk;
-		limit = (Double) p_limit.get(0,0);
-		iterations = (Integer) p_iterations.get(0,0);
+		limit = systemContext.getParamValue("limit", Double.class);
+		iterations = systemContext.getParamValue("iterations", Integer.class);
 		Layer layer = chunk.getCurrentTask().getStateInfo().getLayer();
 		upsample = (layer instanceof BreadthFirstUpsampleLayer) ? ((BreadthFirstUpsampleLayer)layer).getUpsample()/2 : 0;
 		int samples = layer.getSampleCount();
@@ -101,9 +102,10 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 	
 	private void calculateSample(int pixel, int sample) {
 		double res = -1;
-		ComplexNumber<?, ?> current = ((ComplexNumber<?, ?>) p_start.get(pixel,sample)).copy();
-		ComplexNumber<?, ?> c = ((ComplexNumber<?, ?>) p_c.get(pixel,sample)).copy();
-		ComplexNumber<?, ?> pow = ((ComplexNumber<?, ?>) p_pow.get(pixel,sample)).copy();
+		Map<String, ParamSupplier> globalParameters = systemContext.getParameters();
+		ComplexNumber<?, ?> current = ((ComplexNumber<?, ?>) globalParameters.get("start").get(chunk.chunkPos,pixel,sample,systemContext)).copy();
+		ComplexNumber<?, ?> c = ((ComplexNumber<?, ?>) globalParameters.get("c").get(chunk.chunkPos,pixel,sample,systemContext)).copy();
+		ComplexNumber<?, ?> pow = ((ComplexNumber<?, ?>) globalParameters.get("pow").get(chunk.chunkPos,pixel,sample,systemContext)).copy();
 		double logPow = Math.log(pow.absDouble());
 //		long t1 = System.nanoTime();
 		for (int k = 0 ; k < iterations ; k++) {

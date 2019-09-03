@@ -1,5 +1,8 @@
 package de.felixperko.fractals.system.parameters.suppliers;
 
+import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
+import de.felixperko.fractals.system.systems.infra.SystemContext;
+
 public class StaticParamSupplier extends AbstractParamSupplier {
 	
 	private static final long serialVersionUID = 8842788371106789651L;
@@ -12,7 +15,7 @@ public class StaticParamSupplier extends AbstractParamSupplier {
 	}
 
 	@Override
-	public Object get(int pixel, int sample) {
+	public Object get(ComplexNumber chunkPos, int pixel, int sample, SystemContext systemContext) {
 		return obj;
 	}
 

@@ -2,11 +2,14 @@ package de.felixperko.fractals.system.parameters.suppliers;
 
 import java.io.Serializable;
 
+import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
+import de.felixperko.fractals.system.systems.infra.SystemContext;
+
 public interface ParamSupplier extends Serializable{
 	
 	public String getName();
 	
-	public Object get(int pixel, int sample);
+	public Object get(ComplexNumber chunkPos, int pixel, int sample, SystemContext systemContext);
 	
 	public boolean isSystemRelevant();
 	public boolean isLayerRelevant();

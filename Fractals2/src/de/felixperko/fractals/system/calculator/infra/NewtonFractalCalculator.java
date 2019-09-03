@@ -11,11 +11,11 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 
 	private static final long serialVersionUID = -6099194301035200237L;
 	
-	ParamSupplier p_iterations;
-	ParamSupplier p_samples;
-	ParamSupplier p_start;
-	ParamSupplier p_limit;
-	ParamSupplier p_c;
+//	ParamSupplier p_iterations;
+//	ParamSupplier p_samples;
+//	ParamSupplier p_start;
+//	ParamSupplier p_limit;
+//	ParamSupplier p_c;
 	
 	protected DoubleComplexNumber[] roots;
 	
@@ -26,8 +26,8 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 	@Override
 	public void calculate(AbstractArrayChunk chunk) {
 		setRoots();
-		double limit = (Double) p_limit.get(0,0); //TODO arbitrary precision
-		int it = (Integer) p_iterations.get(0,0);
+		double limit = (Double) systemContext.getParamValue("limit", Double.class); //TODO arbitrary precision
+		int it = (Integer) systemContext.getParamValue("iterations", Integer.class);
 		Layer layer = chunk.getCurrentTask().getStateInfo().getLayer();
 		int samples = layer.getSampleCount();
 		int upsample = (layer instanceof BreadthFirstUpsampleLayer) ? ((BreadthFirstUpsampleLayer)layer).getUpsample()/2 : 0;
@@ -38,9 +38,9 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 			for (int sample = 0 ; sample < samples ; sample++){
 				if (cancelled)
 					break loop;
-				ComplexNumber current = ((ComplexNumber) p_start.get(pixel, sample)).copy();
+				ComplexNumber current = systemContext.getParamValue("start", ComplexNumber.class, chunk.chunkPos, pixel, sample).copy();
 //				boolean test = current.realDouble() == -2. && current.imagDouble() == -2.;
-				ComplexNumber c = (ComplexNumber) p_c.get(pixel, sample);
+				ComplexNumber c = systemContext.getParamValue("c", ComplexNumber.class, chunk.chunkPos, pixel, sample);
 				ComplexNumber copy1;
 				ComplexNumber copy2;
 				

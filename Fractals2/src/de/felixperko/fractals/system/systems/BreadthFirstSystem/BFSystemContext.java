@@ -110,9 +110,9 @@ public class BFSystemContext implements SystemContext {
 		Map<String, ParamSupplier> oldParams = this.parameters;
 		this.parameters = params;
 		
-		calculatorClass = availableCalculators.get(((String)params.get("calculator").get(0, 0)));
+		calculatorClass = availableCalculators.get(((String)params.get("calculator").get(null, 0, 0, this)));
 		if (calculatorClass == null)
-			throw new IllegalStateException("Couldn't find calculator for name: "+params.get("calculator").get(0, 0).toString());
+			throw new IllegalStateException("Couldn't find calculator for name: "+params.get("calculator").get(null, 0, 0, this).toString());
 		
 		chunkSize = parameters.get("chunkSize").getGeneral(Integer.class);
 		midpoint = parameters.get("midpoint").getGeneral(ComplexNumber.class);
@@ -314,5 +314,16 @@ public class BFSystemContext implements SystemContext {
 	@Override
 	public Map<String, ParamSupplier> getParameters() {
 		return parameters;
+	}
+
+	@Override
+	public <T> T getParamValue(String parameterKey, Class<T> valueCls) {
+		return parameters.get(parameterKey).getGeneral(valueCls);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T getParamValue(String parameterKey, Class<T> valueCls, ComplexNumber chunkPos, int pixel, int sample) {
+		return (T) parameters.get(parameterKey).get(chunkPos, pixel, sample, this);
 	}
 }

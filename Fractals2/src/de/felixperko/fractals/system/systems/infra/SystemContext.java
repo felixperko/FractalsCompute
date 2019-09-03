@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
+import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
@@ -26,4 +27,7 @@ public interface SystemContext extends Serializable{
 	FractalsCalculator createCalculator();
 
 	Map<String, ParamSupplier> getParameters();
+
+	<T> T getParamValue(String parameterKey, Class<T> valueCls);
+	<T> T getParamValue(String parameterKey, Class<T> valueCls, ComplexNumber chunkPos, int pixel, int sample);
 }

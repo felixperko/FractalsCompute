@@ -7,12 +7,15 @@ import java.util.Map.Entry;
 
 import de.felixperko.fractals.system.parameters.suppliers.MappedParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
+import de.felixperko.fractals.system.systems.infra.SystemContext;
 
 public abstract class AbstractFractalsCalculator implements FractalsCalculator {
 
 	private static final long serialVersionUID = 448587812207550305L;
 
 	transient Map<String, Field> fields = null;
+	
+	SystemContext systemContext;
 	
 	Class<? extends AbstractFractalsCalculator> fieldClass;
 	
@@ -22,8 +25,11 @@ public abstract class AbstractFractalsCalculator implements FractalsCalculator {
 		this.fieldClass = fieldClass;
 	}
 	
-	public void setParams(Map<String, ParamSupplier> parameters) {
+	@Override
+	public void setParams(SystemContext systemContext, Map<String, ParamSupplier> localParameters) {
 		//params = new ParamSupplier[parameters.size()];
+		this.systemContext = systemContext;
+		
 		int index = 0;
 		
 		if (fields == null) {
@@ -35,10 +41,10 @@ public abstract class AbstractFractalsCalculator implements FractalsCalculator {
 			}
 		}
 		
-		for (Entry<String, ParamSupplier> e : parameters.entrySet()) {
+		for (Entry<String, ParamSupplier> e : localParameters.entrySet()) {
 			ParamSupplier param = e.getValue();
 			if (param instanceof MappedParamSupplier) {
-				((MappedParamSupplier)param).bindParameters(parameters);
+				((MappedParamSupplier)param).bindParameters(systemContext, localParameters);
 			}
 			//params[index] = e.getValue();
 			//set index field if found

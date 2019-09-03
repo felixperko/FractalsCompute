@@ -65,7 +65,7 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 	
 	@Override
 	public <C> C getGeneral(Class<C> cls) {
-		Object obj = get(0,0);
+		Object obj = get(null,0,0,null);
 		return (C) obj;
 	}
 }

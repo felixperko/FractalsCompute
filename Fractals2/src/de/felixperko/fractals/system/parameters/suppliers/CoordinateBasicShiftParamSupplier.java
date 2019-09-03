@@ -6,14 +6,15 @@ import java.util.Map;
 
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.Number;
+import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.LayerConfiguration;
+import de.felixperko.fractals.system.systems.infra.SystemContext;
 
 public class CoordinateBasicShiftParamSupplier extends CoordinateParamSupplier {
 	
 	private static final long serialVersionUID = 2317887367642326504L;
 	
 	ComplexNumber[] shifts;
-	LayerConfiguration layerConfiguration;
 //	int dim = 0;
 	
 //	public CoordinateBasicShiftParamSupplier(String name, NumberFactory numberFactory, int dim) {
@@ -29,19 +30,6 @@ public class CoordinateBasicShiftParamSupplier extends CoordinateParamSupplier {
 	
 	public CoordinateBasicShiftParamSupplier(String name) {
 		super(name);
-	}
-	
-	public CoordinateBasicShiftParamSupplier(String name, LayerConfiguration layerConfiguration) {
-		super(name);
-		this.layerConfiguration = layerConfiguration;
-		if (this.layerConfiguration != null) {
-			List<ComplexNumber> shifts = new ArrayList<>();
-			for (int i = 0 ; i < layerConfiguration.getLayers().size() ; i++) {
-				for (ComplexNumber n : layerConfiguration.getOffsets(i))
-					shifts.add(n);
-			}
-			this.shifts = shifts.toArray(new ComplexNumber[shifts.size()]);
-		}
 	}
 	
 //	private CoordinateBasicShiftParamSupplier(String name, NumberFactory numberFactory, ComplexNumber[] shifts) {
@@ -61,33 +49,32 @@ public class CoordinateBasicShiftParamSupplier extends CoordinateParamSupplier {
 		return true;
 	}
 	
-	ParamSupplier p_pixelzoom;
-	ParamSupplier p_chunkpos;
-	ParamSupplier p_chunksize;
-	ParamSupplier p_layer;
+//	ParamSupplier p_pixelzoom;
+//	ParamSupplier p_chunkpos;
+//	ParamSupplier p_chunksize;
+//	ParamSupplier p_layer;
 	
 	@Override
-	public void bindParameters(Map<String, ParamSupplier> parameters) {
-		super.bindParameters(parameters);
-		if (layerConfiguration == null) {
-			this.layerConfiguration = parameters.get("layerConfiguration").getGeneral(LayerConfiguration.class);
-			List<ComplexNumber> shifts = new ArrayList<>();
-			for (int i = 0 ; i < layerConfiguration.getLayers().size() ; i++) {
-				for (ComplexNumber n : layerConfiguration.getOffsets(i))
-					shifts.add(n);
-			}
-			this.shifts = shifts.toArray(new ComplexNumber[shifts.size()]);
+	public void bindParameters(SystemContext context, Map<String, ParamSupplier> localParameters) {
+		super.bindParameters(context, localParameters);
+		
+		LayerConfiguration layerConfiguration = context.getParameters().get("layerConfiguration").getGeneral(LayerConfiguration.class);
+		List<ComplexNumber> shifts = new ArrayList<>();
+		for (int i = 0 ; i < layerConfiguration.getLayers().size() ; i++) {
+			for (ComplexNumber n : layerConfiguration.getOffsets(i))
+				shifts.add(n);
 		}
+		
+		this.shifts = shifts.toArray(new ComplexNumber[shifts.size()]);
 	}
 	
 	@Override
-	public Object get(int pixel, int sample) {
-		int chunkSize = (Integer)p_chunksize.get(0, 0);
+	public Object get(ComplexNumber chunkPos, int pixel, int sample, SystemContext systemContext) {
+		int chunkSize = systemContext.getParamValue("chunkSize", Integer.class);
 		int x = pixel/chunkSize;
 		int y = pixel%chunkSize;
-		ComplexNumber chunkPos = (ComplexNumber)p_chunkpos.get(0, 0);
-		Number pixelzoom = (Number)p_pixelzoom.get(0, 0);
-		ComplexNumber n = layerConfiguration.getNumberFactory().createComplexNumber(x, y);
+		Number pixelzoom = systemContext.getParamValue("pixelzoom", Number.class);
+		ComplexNumber n = systemContext.getParamValue("numberFactory", NumberFactory.class).createComplexNumber(x, y);
 		applyRelativeSampleShift(n, sample);
 		n.multNumber(pixelzoom);
 		n.add(chunkPos);
@@ -96,8 +83,7 @@ public class CoordinateBasicShiftParamSupplier extends CoordinateParamSupplier {
 
 	@Override
 	public ParamSupplier copy() {
-		//TODO remove recopy at copy!
-		return new CoordinateBasicShiftParamSupplier(name, layerConfiguration);
+		return new CoordinateBasicShiftParamSupplier(name);
 	}
 
 	@Override

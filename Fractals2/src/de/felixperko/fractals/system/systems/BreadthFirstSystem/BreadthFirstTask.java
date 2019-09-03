@@ -15,6 +15,7 @@ import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.data.ReducedNaiveChunk;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
+import de.felixperko.fractals.system.parameters.suppliers.MappedParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
@@ -55,14 +56,15 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	public void run() {
 		preprocess();
 		previousLayerId = getStateInfo().getLayerId()-1;
-		Map<String, ParamSupplier> parameters = new HashMap<>();
+		Map<String, ParamSupplier> localParameters = new HashMap<>();
 		for (Entry<String, ParamSupplier> e : getContext().getParameters().entrySet()){
-			parameters.put(e.getKey(), e.getValue().copy());
+			if (e.getValue() instanceof MappedParamSupplier)
+				localParameters.put(e.getKey(), e.getValue().copy());
 		}
-		parameters.put("chunkpos", new StaticParamSupplier("chunkpos", this.chunk.chunkPos.copy()));
-		parameters.put("chunksize", new StaticParamSupplier("chunksize", (Integer)chunk.getChunkDimensions()));
-		parameters.put("layer", new StaticParamSupplier("layer", (Integer)getStateInfo().getLayer().getId()));
-		calculator.setParams(parameters);
+		localParameters.put("chunkpos", new StaticParamSupplier("chunkpos", this.chunk.chunkPos.copy()));
+		localParameters.put("chunksize", new StaticParamSupplier("chunksize", (Integer)chunk.getChunkDimensions()));
+		localParameters.put("layer", new StaticParamSupplier("layer", (Integer)getStateInfo().getLayer().getId()));
+		calculator.setParams(getContext(), localParameters);
 		calculator.calculate(chunk);
 	}
 

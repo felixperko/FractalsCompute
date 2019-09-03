@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.felixperko.fractals.system.systems.infra.SystemContext;
+
 public abstract class MappedParamSupplier extends AbstractParamSupplier{
 	
 	private static final long serialVersionUID = 6838402763464871572L;
@@ -17,7 +19,7 @@ public abstract class MappedParamSupplier extends AbstractParamSupplier{
 	
 	//transient ParamSupplier[] parameters;
 	
-	public void bindParameters(Map<String, ParamSupplier> parameters) {
+	public void bindParameters(SystemContext systemContext, Map<String, ParamSupplier> localParameters) {
 		
 		//get param fields
 		Map<String, Field> fields = new HashMap<>();
@@ -33,7 +35,11 @@ public abstract class MappedParamSupplier extends AbstractParamSupplier{
 			
 			//set param field if found
 			Field f = e.getValue();
-			ParamSupplier ps = parameters.get(name);
+			ParamSupplier ps = localParameters.get(name);
+			if (ps == null){
+				ps = systemContext.getParameters().get(name);
+			}
+			
 			if (f != null && ps != null) {
 				try {
 					f.set(this, ps);
