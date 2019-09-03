@@ -6,5 +6,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="C:/Programmierung/libs/snappy-java-1.1.7.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
