@@ -28,6 +28,7 @@ public interface SystemContext extends Serializable{
 
 	Map<String, ParamSupplier> getParameters();
 
+	Object getParamValue(String parameterKey);
 	<T> T getParamValue(String parameterKey, Class<T> valueCls);
 	<T> T getParamValue(String parameterKey, Class<T> valueCls, ComplexNumber chunkPos, int pixel, int sample);
 }

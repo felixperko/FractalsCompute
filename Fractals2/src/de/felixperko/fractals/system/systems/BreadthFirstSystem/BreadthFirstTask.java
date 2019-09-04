@@ -54,18 +54,22 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	
 	@Override
 	public void run() {
-		preprocess();
-		previousLayerId = getStateInfo().getLayerId()-1;
-		Map<String, ParamSupplier> localParameters = new HashMap<>();
-		for (Entry<String, ParamSupplier> e : getContext().getParameters().entrySet()){
-			if (e.getValue() instanceof MappedParamSupplier)
-				localParameters.put(e.getKey(), e.getValue().copy());
+		try {
+			preprocess();
+			previousLayerId = getStateInfo().getLayerId()-1;
+			Map<String, ParamSupplier> localParameters = new HashMap<>();
+			for (Entry<String, ParamSupplier> e : getContext().getParameters().entrySet()){
+				if (e.getValue() instanceof MappedParamSupplier)
+					localParameters.put(e.getKey(), e.getValue().copy());
+			}
+			localParameters.put("chunkpos", new StaticParamSupplier("chunkpos", this.chunk.chunkPos.copy()));
+			localParameters.put("chunksize", new StaticParamSupplier("chunksize", (Integer)chunk.getChunkDimensions()));
+			localParameters.put("layer", new StaticParamSupplier("layer", (Integer)getStateInfo().getLayer().getId()));
+			calculator.setContext(getContext());
+			calculator.calculate(chunk);
+		} catch (Exception e){
+			e.printStackTrace();
 		}
-		localParameters.put("chunkpos", new StaticParamSupplier("chunkpos", this.chunk.chunkPos.copy()));
-		localParameters.put("chunksize", new StaticParamSupplier("chunksize", (Integer)chunk.getChunkDimensions()));
-		localParameters.put("layer", new StaticParamSupplier("layer", (Integer)getStateInfo().getLayer().getId()));
-		calculator.setParams(getContext(), localParameters);
-		calculator.calculate(chunk);
 	}
 
 	private void preprocess() {

@@ -11,5 +11,5 @@ public interface FractalsCalculator extends Serializable{
 	public void calculate(AbstractArrayChunk chunk);
 	public boolean isCancelled();
 	public void setCancelled();
-	public void setParams(SystemContext systemContext, Map<String, ParamSupplier> localParameters);
+	public void setContext(SystemContext systemContext);
 }

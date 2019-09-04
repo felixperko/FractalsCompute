@@ -43,9 +43,10 @@ public class NumberFactory implements Serializable{
 		if (complexNumberClass == null)
 			throw new IllegalStateException("NumberFactory has no complexNumberClass configured");
 		try {
-			Number r = createNumber(real);
-			Number i = createNumber(imag);
-			return complexNumberClass.getDeclaredConstructor(numberClass, numberClass).newInstance(r, i);
+//			Number r = createNumber(real);
+//			Number i = createNumber(imag);
+//			return complexNumberClass.getDeclaredConstructor(numberClass, numberClass).newInstance(r, i);
+			return complexNumberClass.getDeclaredConstructor(double.class, double.class).newInstance(real, imag);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();

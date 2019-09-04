@@ -4,19 +4,36 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.felixperko.fractals.data.Chunk;
+import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
+import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.systems.infra.ViewData;
 import de.felixperko.fractals.util.CategoryLogger;
+import de.felixperko.fractals.util.Nestable;
+import de.felixperko.fractals.util.NestedMap;
 
 public class BreadthFirstViewData implements ViewData {
+	private static final long serialVersionUID = -6980552871281336220L;
+
 	CategoryLogger log = CategoryLogger.WARNING.createSubLogger("calc/taskmanager/bf_data");
 	
-	Map<Integer, Map<Integer, Chunk>> chunks = new HashMap<>();
+	SystemContext systemContext;
+	
+	transient Map<Integer, Map<Integer, Chunk>> chunks = new HashMap<>(); //key1 = chunkX, key2 = chunkY, value = chunk
+	Nestable<Integer, CompressedChunk> chunks_compressed = new NestedMap<>(); //key1 = chunkX, key2 = chunkY, value = compressedChunk
 	
 	ComplexNumber anchor;
 	
 	public BreadthFirstViewData(ComplexNumber anchor) {
 		this.anchor = anchor;
+	}
+	
+	public boolean insertCompressedChunk(CompressedChunk compressedChunk) {
+		return this.chunks_compressed.getOrMakeChild(compressedChunk.getChunkX()).getOrMakeChild(compressedChunk.getChunkY()).setValue(compressedChunk);
+	}
+	
+	public CompressedChunk getCompressedChunk(Integer chunkX, Integer chunkY) {
+		return chunks_compressed.getChild(chunkX).getChild(chunkY).getValue();
 	}
 	
 	@Override
@@ -53,6 +70,7 @@ public class BreadthFirstViewData implements ViewData {
 	@Override
 	public void dispose() {
 		chunks.clear();
+		chunks_compressed.clear();
 	}
 
 	@Override

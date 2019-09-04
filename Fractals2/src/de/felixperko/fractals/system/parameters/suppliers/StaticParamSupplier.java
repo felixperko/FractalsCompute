@@ -15,7 +15,7 @@ public class StaticParamSupplier extends AbstractParamSupplier {
 	}
 
 	@Override
-	public Object get(ComplexNumber chunkPos, int pixel, int sample, SystemContext systemContext) {
+	public Object get(SystemContext systemContext, ComplexNumber chunkPos, int pixel, int sample) {
 		return obj;
 	}
 

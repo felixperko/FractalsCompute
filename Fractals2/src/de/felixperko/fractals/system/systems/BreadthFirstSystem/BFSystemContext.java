@@ -108,100 +108,104 @@ public class BFSystemContext implements SystemContext {
 		boolean reset = needsReset(params, this.parameters);
 		
 		Map<String, ParamSupplier> oldParams = this.parameters;
-		this.parameters = params;
 		
-		calculatorClass = availableCalculators.get(((String)params.get("calculator").get(null, 0, 0, this)));
-		if (calculatorClass == null)
-			throw new IllegalStateException("Couldn't find calculator for name: "+params.get("calculator").get(null, 0, 0, this).toString());
+		synchronized (this) {
+			this.parameters = params;
+			
+			calculatorClass = availableCalculators.get(getParamValue("calculator", String.class));
+			if (calculatorClass == null)
+				throw new IllegalStateException("Couldn't find calculator for name: "+getParamValue("calculator", String.class));
+			
+			chunkSize = parameters.get("chunkSize").getGeneral(Integer.class);
+			midpoint = parameters.get("midpoint").getGeneral(ComplexNumber.class);
+			zoom = parameters.get("zoom").getGeneral(Number.class);
+			
+			numberFactory = parameters.get("numberFactory").getGeneral(NumberFactory.class);
+			chunkFactory = parameters.get("chunkFactory").getGeneral(ArrayChunkFactory.class);
+			
+			LayerConfiguration oldLayerConfig = null;
+			if (oldParams != null)
+				oldLayerConfig = oldParams.get("layerConfiguration").getGeneral(LayerConfiguration.class);
+			ParamSupplier newLayerConfigSupplier = params.get("layerConfiguration");
+			LayerConfiguration newLayerConfig = newLayerConfigSupplier.getGeneral(LayerConfiguration.class);
+			if (oldLayerConfig == null || newLayerConfigSupplier.isChanged()) {
+				layerConfig = newLayerConfig;
+				layerConfig.prepare(numberFactory);
+			} else {
+				parameters.put("layerConfiguration", oldParams.get("layerConfiguration"));
+			}
 		
-		chunkSize = parameters.get("chunkSize").getGeneral(Integer.class);
-		midpoint = parameters.get("midpoint").getGeneral(ComplexNumber.class);
-		zoom = parameters.get("zoom").getGeneral(Number.class);
-		
-		numberFactory = parameters.get("numberFactory").getGeneral(NumberFactory.class);
-		chunkFactory = parameters.get("chunkFactory").getGeneral(ArrayChunkFactory.class);
-		
-		width = parameters.get("width").getGeneral(Integer.class);
-		height = parameters.get("height").getGeneral(Integer.class);
-		
-		border_generation = parameters.get("border_generation").getGeneral(Double.class);
-		border_dispose = parameters.get("border_dispose").getGeneral(Double.class);
-		buffer = parameters.get("task_buffer").getGeneral(Integer.class);
-
-		if (viewData == null || reset) {
-			chunksWidth = (int)Math.ceil(width/(double)chunkSize);
-			chunksHeight = (int)Math.ceil(height/(double)chunkSize);
-			relativeStartShift = numberFactory.createComplexNumber((chunksWidth%2 == 0 ? -0.5 : 0), chunksHeight%2 == 0 ? -0.5 : 0);
+			width = parameters.get("width").getGeneral(Integer.class);
+			height = parameters.get("height").getGeneral(Integer.class);
+			
+			border_generation = parameters.get("border_generation").getGeneral(Double.class);
+			border_dispose = parameters.get("border_dispose").getGeneral(Double.class);
+			buffer = parameters.get("task_buffer").getGeneral(Integer.class);
+	
+			if (viewData == null || reset) {
+				chunksWidth = (int)Math.ceil(width/(double)chunkSize);
+				chunksHeight = (int)Math.ceil(height/(double)chunkSize);
+				relativeStartShift = numberFactory.createComplexNumber((chunksWidth%2 == 0 ? -0.5 : 0), chunksHeight%2 == 0 ? -0.5 : 0);
+			}
+			
+			Number pixelzoom = numberFactory.createNumber(width >= height ? 1./height : 1./width);
+			pixelzoom.mult(zoom);
+			params.put("pixelzoom", new StaticParamSupplier("pixelzoom", pixelzoom));
+			chunkZoom = pixelzoom.copy();
+			chunkZoom.mult(numberFactory.createNumber(chunkSize));
+			
+			Number rX = numberFactory.createNumber(0.5*(width+chunkSize));
+			rX.mult(pixelzoom);
+	//		Number rY = numberFactory.createNumber(0.5 * ((width > height) ? width/(double)height : 1));
+			Number rY = numberFactory.createNumber(0.5*(height+chunkSize));
+			rY.mult(pixelzoom);
+			ComplexNumber sideDist = numberFactory.createComplexNumber(rX, rY);
+	
+			
+			ComplexNumber anchor = numberFactory.createComplexNumber(chunkZoom, chunkZoom);
+			anchor.multNumber(numberFactory.createNumber(-0.5));
+			anchor.add(midpoint);
+			
+			if (reset && taskManager != null)
+				taskManager.reset();
+			
+			
+	//		ParamSupplier layersParam = parameters.get("layers");
+	//		List<?> layers2 = layersParam.getGeneral(List.class);
+	//		if (layers.isEmpty() || layersParam.isChanged()) {
+	//			layers.clear();
+	//			for (Object obj : layers2) {
+	//				if (!(obj instanceof BreadthFirstLayer))
+	//					throw new IllegalStateException("content in layers isn't compartible with BreadthFirstLayer");
+	//				layers.add((BreadthFirstLayer)obj);
+	//				
+	//				openTasks.add(new PriorityQueue<>(comparator_distance));
+	//				tempList.add(new ArrayList<>());
+	//			}
+	//			if (layers.isEmpty())
+	//				throw new IllegalStateException("no layers configured");
+	//		}
+			
+			if (viewData == null) {
+				viewData = new BreadthFirstViewData(anchor);
+			}
+			ParamSupplier jobIdSupplier = parameters.get("view");
+			if (jobIdSupplier == null)
+				jobId = 0;
+			else
+				jobId = jobIdSupplier.getGeneral(Integer.class);
+			chunkFactory.setViewData(viewData);
+	
+			leftLowerCorner = midpoint.copy();
+			leftLowerCorner.sub(sideDist);
+			leftLowerCornerChunkX = getChunkX(leftLowerCorner);
+			leftLowerCornerChunkY = getChunkY(leftLowerCorner);
+			
+			rightUpperCorner = sideDist;
+			rightUpperCorner.add(midpoint);
+			rightUpperCornerChunkX = getChunkX(rightUpperCorner);
+			rightUpperCornerChunkY = getChunkY(rightUpperCorner);
 		}
-		
-		Number pixelzoom = numberFactory.createNumber(width >= height ? 1./height : 1./width);
-		pixelzoom.mult(zoom);
-		params.put("pixelzoom", new StaticParamSupplier("pixelzoom", pixelzoom));
-		chunkZoom = pixelzoom.copy();
-		chunkZoom.mult(numberFactory.createNumber(chunkSize));
-		
-		Number rX = numberFactory.createNumber(0.5*(width+chunkSize));
-		rX.mult(pixelzoom);
-//		Number rY = numberFactory.createNumber(0.5 * ((width > height) ? width/(double)height : 1));
-		Number rY = numberFactory.createNumber(0.5*(height+chunkSize));
-		rY.mult(pixelzoom);
-		ComplexNumber sideDist = numberFactory.createComplexNumber(rX, rY);
-
-		
-		ComplexNumber anchor = numberFactory.createComplexNumber(chunkZoom, chunkZoom);
-		anchor.multNumber(numberFactory.createNumber(-0.5));
-		anchor.add(midpoint);
-		
-		if (reset && taskManager != null)
-			taskManager.reset();
-		
-		LayerConfiguration oldLayerConfig = null;
-		if (oldParams != null)
-			oldLayerConfig = oldParams.get("layerConfiguration").getGeneral(LayerConfiguration.class);
-		ParamSupplier newLayerConfigSupplier = params.get("layerConfiguration");
-		LayerConfiguration newLayerConfig = newLayerConfigSupplier.getGeneral(LayerConfiguration.class);
-		if (oldLayerConfig == null || newLayerConfigSupplier.isChanged()) {
-			layerConfig = newLayerConfig;
-			layerConfig.prepare(numberFactory);
-		} else {
-			parameters.put("layerConfiguration", oldParams.get("layerConfiguration"));
-		}
-		
-//		ParamSupplier layersParam = parameters.get("layers");
-//		List<?> layers2 = layersParam.getGeneral(List.class);
-//		if (layers.isEmpty() || layersParam.isChanged()) {
-//			layers.clear();
-//			for (Object obj : layers2) {
-//				if (!(obj instanceof BreadthFirstLayer))
-//					throw new IllegalStateException("content in layers isn't compartible with BreadthFirstLayer");
-//				layers.add((BreadthFirstLayer)obj);
-//				
-//				openTasks.add(new PriorityQueue<>(comparator_distance));
-//				tempList.add(new ArrayList<>());
-//			}
-//			if (layers.isEmpty())
-//				throw new IllegalStateException("no layers configured");
-//		}
-		
-		if (viewData == null) {
-			viewData = new BreadthFirstViewData(anchor);
-		}
-		ParamSupplier jobIdSupplier = parameters.get("view");
-		if (jobIdSupplier == null)
-			jobId = 0;
-		else
-			jobId = jobIdSupplier.getGeneral(Integer.class);
-		chunkFactory.setViewData(viewData);
-
-		leftLowerCorner = midpoint.copy();
-		leftLowerCorner.sub(sideDist);
-		leftLowerCornerChunkX = getChunkX(leftLowerCorner);
-		leftLowerCornerChunkY = getChunkY(leftLowerCorner);
-		
-		rightUpperCorner = sideDist;
-		rightUpperCorner.add(midpoint);
-		rightUpperCornerChunkX = getChunkX(rightUpperCorner);
-		rightUpperCornerChunkY = getChunkY(rightUpperCorner);
 		
 		return reset;
 	}
@@ -312,18 +316,22 @@ public class BFSystemContext implements SystemContext {
 	}
 
 	@Override
-	public Map<String, ParamSupplier> getParameters() {
+	public synchronized Map<String, ParamSupplier> getParameters() {
 		return parameters;
 	}
 
 	@Override
-	public <T> T getParamValue(String parameterKey, Class<T> valueCls) {
-		return parameters.get(parameterKey).getGeneral(valueCls);
+	public synchronized <T> T getParamValue(String parameterKey, Class<T> valueCls) {
+		return parameters.get(parameterKey).get(this, valueCls, null, 0, 0);
+	}
+	
+	@Override
+	public synchronized Object getParamValue(String parameterKey) {
+		return parameters.get(parameterKey).get(this, null, 0, 0);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getParamValue(String parameterKey, Class<T> valueCls, ComplexNumber chunkPos, int pixel, int sample) {
-		return (T) parameters.get(parameterKey).get(chunkPos, pixel, sample, this);
+	public synchronized <T> T getParamValue(String parameterKey, Class<T> valueCls, ComplexNumber chunkPos, int pixel, int sample) {
+		return parameters.get(parameterKey).get(this, valueCls, chunkPos, pixel, sample);
 	}
 }
