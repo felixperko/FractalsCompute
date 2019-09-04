@@ -1,5 +1,9 @@
 package de.felixperko.fractals.util;
 
+import java.util.Collection;
+
+import de.felixperko.fractals.data.CompressedChunk;
+
 public interface Nestable<K, V> {
 
 	boolean hasChild(K k);
@@ -15,5 +19,11 @@ public interface Nestable<K, V> {
 	boolean setValue(V v);
 
 	void clear();
+
+	Collection<NestedMap<K, V>> getChildren();
+
+	boolean removeChild(K k);
+
+	boolean hasChildren();
 
 }

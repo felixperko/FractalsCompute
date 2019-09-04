@@ -127,7 +127,7 @@ public class BreadthFirstTaskManagerNew extends AbstractTaskManager<BreadthFirst
 //		pos.add(midpoint);
 		BreadthFirstTask rootTask = new BreadthFirstTask(id_counter_tasks++, this, chunk, parameters, getChunkPos(0, 0), createCalculator(), layerConfig.getLayers().get(0), jobId);
 		rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layerConfig.getLayers().get(0));
-		viewData.addChunk(chunk);
+		viewData.insertBufferedChunk(chunk);
 		queue.add(rootTask);
 		openChunks++;
 	}

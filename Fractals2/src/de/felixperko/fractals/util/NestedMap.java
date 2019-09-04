@@ -1,17 +1,15 @@
 package de.felixperko.fractals.util;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-
-import de.felixperko.fractals.data.Chunk;
 
 /**
  * Provides functionality to store and retrieve data in nested HashMaps using a common key classs
  */
 public class NestedMap<K, V> implements Nestable<K, V>{
 
-    @SuppressWarnings("rawtypes")
-	private final HashMap<K, NestedMap> child;
+	private final HashMap<K, NestedMap<K, V>> child;
     private V value;
 
     public NestedMap() {
@@ -73,11 +71,28 @@ public class NestedMap<K, V> implements Nestable<K, V>{
      */
 	@Override
 	public void clear() {
-		Iterator<NestedMap> childIt = child.values().iterator();
+		Iterator<NestedMap<K, V>> childIt = child.values().iterator();
 		while (childIt.hasNext()) {
 			childIt.next().clear();
 		}
 		child.clear();
 		this.value = null;
+	}
+	
+
+	@Override
+	public Collection<NestedMap<K, V>> getChildren() {
+		return child.values();
+	}
+
+	@Override
+	public boolean removeChild(K key) {
+		return child.remove(key) != null;
+	}
+	
+
+	@Override
+	public boolean hasChildren() {
+		return !child.isEmpty();
 	}
 }

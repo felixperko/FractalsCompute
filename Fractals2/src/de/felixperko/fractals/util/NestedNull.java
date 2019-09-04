@@ -1,5 +1,8 @@
 package de.felixperko.fractals.util;
 
+import java.util.Collection;
+import java.util.Collections;
+
 /**
  * Contains a singleton that represents an empty node in the nested structure for null-safe traversal of the nested structure.
  * Accessible through NestedNull.getInstance();
@@ -52,6 +55,24 @@ public class NestedNull<K, V> implements Nestable<K, V> {
 
 	@Override
 	public void clear() {
+	}
+
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Collection<NestedMap<K, V>> getChildren() {
+		return Collections.EMPTY_LIST;
+	}
+
+	@Override
+	public boolean removeChild(K k) {
+		return false;
+	}
+
+	
+	@Override
+	public boolean hasChildren() {
+		return false;
 	}
 	
 	

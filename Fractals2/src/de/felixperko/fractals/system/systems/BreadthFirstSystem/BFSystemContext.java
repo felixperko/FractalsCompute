@@ -25,6 +25,7 @@ import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
+import de.felixperko.fractals.system.systems.infra.ViewData;
 import de.felixperko.fractals.system.systems.stateinfo.SystemStateInfo;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
@@ -65,7 +66,7 @@ public class BFSystemContext implements SystemContext {
 	public transient double border_generation = 0d;
 	public transient double border_dispose = 5d;
 	
-	public transient BreadthFirstViewData viewData;
+	private transient BFViewContainer viewContainer = new BFViewContainer(1); //TODO multiple
 	
 	public transient int chunksWidth;
 	public transient int chunksHeight;
@@ -142,7 +143,7 @@ public class BFSystemContext implements SystemContext {
 			border_dispose = parameters.get("border_dispose").getGeneral(Double.class);
 			buffer = parameters.get("task_buffer").getGeneral(Integer.class);
 	
-			if (viewData == null || reset) {
+			if (getActiveViewData() == null || reset) {
 				chunksWidth = (int)Math.ceil(width/(double)chunkSize);
 				chunksHeight = (int)Math.ceil(height/(double)chunkSize);
 				relativeStartShift = numberFactory.createComplexNumber((chunksWidth%2 == 0 ? -0.5 : 0), chunksHeight%2 == 0 ? -0.5 : 0);
@@ -186,15 +187,15 @@ public class BFSystemContext implements SystemContext {
 	//				throw new IllegalStateException("no layers configured");
 	//		}
 			
-			if (viewData == null) {
-				viewData = new BreadthFirstViewData(anchor);
+			if (getActiveViewData() == null) {
+				setActiveViewData(new BreadthFirstViewData(anchor));
 			}
 			ParamSupplier jobIdSupplier = parameters.get("view");
 			if (jobIdSupplier == null)
 				jobId = 0;
 			else
 				jobId = jobIdSupplier.getGeneral(Integer.class);
-			chunkFactory.setViewData(viewData);
+			chunkFactory.setViewData(getActiveViewData());
 	
 			leftLowerCorner = midpoint.copy();
 			leftLowerCorner.sub(sideDist);
@@ -226,14 +227,14 @@ public class BFSystemContext implements SystemContext {
 	
 	public double getChunkX(ComplexNumber pos) {
 		Number value = pos.getReal();
-		value.sub(viewData.anchor.getReal());
+		value.sub(getActiveViewData().anchor.getReal());
 		value.div(chunkZoom);
 		return value.toDouble();
 	}
 	
 	public double getChunkY(ComplexNumber pos) {
 		Number value = pos.getImag();
-		value.sub(viewData.anchor.getImag());
+		value.sub(getActiveViewData().anchor.getImag());
 		value.div(chunkZoom);
 		return value.toDouble();
 	}
@@ -242,8 +243,16 @@ public class BFSystemContext implements SystemContext {
 		ComplexNumber chunkPos = numberFactory.createComplexNumber(chunkX, chunkY);
 		chunkPos.add(relativeStartShift);
 		chunkPos.multNumber(chunkZoom);
-		chunkPos.add(viewData.anchor);
+		chunkPos.add(getActiveViewData().anchor);
 		return chunkPos;
+	}
+	
+	public BreadthFirstViewData getActiveViewData() {
+		return viewContainer.getActiveViewData();
+	}
+	
+	public void setActiveViewData(BreadthFirstViewData viewData) {
+		viewContainer.setActiveViewData(viewData);
 	}
 
 	public double getScreenDistance(long chunkX, long chunkY) {

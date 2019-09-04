@@ -40,7 +40,7 @@ public class BreadthFirstMultilayerQueue extends AbstractBreadthFirstMultilayerQ
 			BreadthFirstTask rootTask = new BreadthFirstTask(taskManager.id_counter_tasks++, taskManager,
 					chunk, taskManager.parameters, taskManager.getChunkPos(midpointChunkXFloor, midpointChunkYFloor), taskManager.createCalculator(), layers.get(0), taskManager.jobId);
 			rootTask.updatePriorityAndDistance(taskManager.midpointChunkX, taskManager.midpointChunkY, layers.get(0));
-			taskManager.viewData.addChunk(chunk);
+			taskManager.viewData.insertBufferedChunk(chunk);
 			openTasks.get(0).add(rootTask);
 			taskManager.openChunks++;
 		}
@@ -78,7 +78,7 @@ public class BreadthFirstMultilayerQueue extends AbstractBreadthFirstMultilayerQ
 		task.updatePriorityAndDistance(taskManager.midpointChunkX, taskManager.midpointChunkY, taskManager.layerConfig.getLayers().get(0));
 		taskManager.openChunks++;
 		newQueue.add(task);
-		taskManager.viewData.addChunk(chunk);
+		taskManager.viewData.insertBufferedChunk(chunk);
 		return true;
 	}
 
@@ -153,7 +153,7 @@ public class BreadthFirstMultilayerQueue extends AbstractBreadthFirstMultilayerQ
 			int x = chunk.getChunkX();
 			int y = chunk.getChunkX();
 			for (BorderAlignment alignment : BorderAlignment.values()) {
-				Chunk c = taskManager.viewData.getChunk(alignment.getNeighbourX(x), alignment.getNeighbourY(y));
+				Chunk c = taskManager.viewData.getBufferedChunk(alignment.getNeighbourX(x), alignment.getNeighbourY(y));
 				BorderAlignment relative = alignment.getAlignmentForNeighbour();
 				if (c == null) {
 					neighbourBorderData.put(relative, new ChunkBorderDataImplNull());

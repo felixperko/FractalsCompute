@@ -1,31 +1,29 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
-import de.felixperko.fractals.system.systems.infra.SystemContext;
-import de.felixperko.fractals.system.systems.infra.ViewData;
-import de.felixperko.fractals.util.CategoryLogger;
 import de.felixperko.fractals.util.Nestable;
 import de.felixperko.fractals.util.NestedMap;
+import de.felixperko.fractals.util.NestedNull;
 
-public class BreadthFirstViewData implements ViewData {
+public class BreadthFirstViewData extends AbstractBFViewData {
 	private static final long serialVersionUID = -6980552871281336220L;
 
-	CategoryLogger log = CategoryLogger.WARNING.createSubLogger("calc/taskmanager/bf_data");
+//	CategoryLogger log = CategoryLogger.WARNING.createSubLogger("calc/taskmanager/bf_data");
 	
-	SystemContext systemContext;
+//	SystemContext systemContext;
 	
-	transient Map<Integer, Map<Integer, Chunk>> chunks = new HashMap<>(); //key1 = chunkX, key2 = chunkY, value = chunk
+	transient Map<Integer, Map<Integer, Chunk>> chunks_buffered = new HashMap<>(); //key1 = chunkX, key2 = chunkY, value = chunk
 	Nestable<Integer, CompressedChunk> chunks_compressed = new NestedMap<>(); //key1 = chunkX, key2 = chunkY, value = compressedChunk
 	
-	ComplexNumber anchor;
-	
 	public BreadthFirstViewData(ComplexNumber anchor) {
-		this.anchor = anchor;
+		super(anchor);
 	}
 	
 	public boolean insertCompressedChunk(CompressedChunk compressedChunk) {
@@ -37,44 +35,140 @@ public class BreadthFirstViewData implements ViewData {
 	}
 	
 	@Override
-	public void addChunk(Chunk chunk) {
+	public boolean insertBufferedChunk(Chunk chunk) {
 		Map<Integer, Chunk> xMap = getXMap(chunk.getChunkX());
-		if (xMap.containsKey(chunk.getChunkY()))
-			log.log("overwriting existing chunk");
+		boolean overwrite = xMap.containsKey(chunk.getChunkY());
 		xMap.put(chunk.getChunkY(), chunk);
+		lastSeenNow(chunk.getChunkX(), chunk.getChunkY());
+		return overwrite;
 	}
 	
 	@Override
-	public Chunk getChunk(Integer chunkX, Integer chunkY) {
+	public Chunk getBufferedChunk(Integer chunkX, Integer chunkY) {
 		Chunk c = getXMap(chunkX).get(chunkY);
+		if (c == null)
+			c = loadBuffer(chunkX, chunkY);
 		return c;
 	}
 	
+	private Chunk loadBuffer(Integer chunkX, Integer chunkY) {
+		CompressedChunk chunk = getCompressedChunk(chunkX, chunkY);
+		if (chunk != null) {
+			Chunk bufferedChunk = chunk.decompress();
+			insertBufferedChunk(bufferedChunk);
+			return bufferedChunk;
+		}
+		return null;
+	}
+
 	private Map<Integer, Chunk> getXMap(Integer chunkX){
-		Map<Integer, Chunk> ans = chunks.get(chunkX);
+		Map<Integer, Chunk> ans = chunks_buffered.get(chunkX);
 		if (ans == null) {
 			ans = new HashMap<Integer, Chunk>();
-			chunks.put(chunkX, ans);
+			chunks_buffered.put(chunkX, ans);
 		}
 		return ans;
 	}
 
 	@Override
-	public boolean hasChunk(Integer chunkX, Integer chunkY) {
-		Map<Integer, Chunk> map = chunks.get(chunkX);
-		if (map == null)
-			return false;
-		return map.get(chunkY) != null;
-	}
-	
-	@Override
-	public void dispose() {
-		chunks.clear();
-		chunks_compressed.clear();
+	public boolean updateBufferedChunk(Chunk chunk) {
+		boolean overwrite = hasBufferedChunk(chunk);
+		getXMap(chunk.getChunkX()).put(chunk.getChunkY(), chunk);
+		return overwrite;
 	}
 
 	@Override
-	public ComplexNumber getAnchor() {
-		return anchor;
+	public List<Chunk> getBufferedChunks() {
+		List<Chunk> chunks = new ArrayList<>();
+		for (Map<Integer, Chunk> xMap : chunks_buffered.values())
+			chunks.addAll(xMap.values());
+		return chunks;
+	}
+
+	@Override
+	public boolean hasBufferedChunk(Integer chunkX, Integer chunkY) {
+		Map<Integer, Chunk> xMap = chunks_buffered.get(chunkX);
+		if (xMap == null)
+			return false;
+		return xMap.containsKey(chunkY);
+	}
+
+	@Override
+	public boolean removeBufferedChunk(Integer chunkX, Integer chunkY, boolean removeCompressed) {
+		boolean hasBuffered = !hasBufferedChunk(chunkX, chunkY);
+		if (removeCompressed) {
+			removeCompressedChunk(chunkX, chunkY);
+			return true;
+		}
+		else {
+			if (!hasBuffered)
+				return false;
+			Map<Integer, Chunk> xMap = getXMap(chunkX);
+			xMap.remove(chunkY);
+			if (xMap.isEmpty())
+				chunks_buffered.remove(chunkX);
+			return true;
+		}
+	}
+
+	@Override
+	public void clearBufferedChunks() {
+		chunks_buffered.clear();
+	}
+
+	@Override
+	public boolean insertCompressedChunk(CompressedChunk compressedChunk, boolean insertBuffered) {
+		boolean overwritten = chunks_compressed.getOrMakeChild(compressedChunk.getChunkX()).getOrMakeChild(compressedChunk.getChunkY()).setValue(compressedChunk);
+		if (insertBuffered)
+			insertBufferedChunk(compressedChunk.decompress());
+		return overwritten;
+	}
+
+	@Override
+	public boolean updateCompressedChunk(CompressedChunk compressedChunk, boolean updateBuffered) {
+		return insertCompressedChunk(compressedChunk, updateBuffered);
+	}
+
+	@Override
+	public List<CompressedChunk> getCompressedChunks() {
+		List<CompressedChunk> list = new ArrayList<>();
+		for (NestedMap<Integer, CompressedChunk> xMap : chunks_compressed.getChildren()) {
+			for (NestedMap<Integer, CompressedChunk> yMap : xMap.getChildren()) {
+				CompressedChunk compressedChunk = yMap.getValue();
+				if (compressedChunk != null)
+					list.add(compressedChunk);
+				else
+					throw new NullPointerException("value of NestedMap is null");
+			}
+		}
+		return list;
+	}
+
+	@Override
+	public boolean hasCompressedChunk(Integer chunkX, Integer chunkY) {
+		return chunks_compressed.getChild(chunkX).getChild(chunkY).getValue() != null;
+	}
+
+	@Override
+	public boolean removeCompressedChunk(Integer chunkX, Integer chunkY) {
+		
+		Nestable<Integer, CompressedChunk> nestable1 = chunks_compressed.getChild(chunkX);
+		if (nestable1 instanceof NestedNull)
+			return false;
+		
+		Nestable<Integer, CompressedChunk> nestable2 = nestable1.getChild(chunkY);
+		if (nestable2 instanceof NestedNull)
+			return false;
+		
+		nestable1.removeChild(chunkY);
+		if (!nestable1.hasChildren())
+			chunks_compressed.removeChild(chunkX);
+		
+		return true;
+	}
+
+	@Override
+	public void clearCompressedChunks() {
+		chunks_compressed.clear();
 	}
 }

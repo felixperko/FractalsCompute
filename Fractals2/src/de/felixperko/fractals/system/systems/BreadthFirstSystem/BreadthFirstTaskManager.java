@@ -34,6 +34,7 @@ import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
+import de.felixperko.fractals.system.systems.infra.ViewData;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.AbstractTaskManager;
 import de.felixperko.fractals.system.task.FractalsTask;
@@ -147,7 +148,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getChunkPos(0, 0), 
 				context.createCalculator(), context.layerConfig.getLayers().get(0), context.jobId);
 		rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, context.layerConfig.getLayers().get(0));
-		context.viewData.addChunk(chunk);
+		context.getActiveViewData().insertBufferedChunk(chunk);
 		openTasks.get(0).add(rootTask);
 		openChunks++;
 	}
@@ -185,6 +186,9 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				changed = true;
 			if (finishTasks())
 				changed = true;
+			BreadthFirstViewData activeViewData = context.getActiveViewData();
+			if (activeViewData != null)
+				activeViewData.tick();
 		} catch (Exception e) {
 			if (system.getLifeCycleState() != LifeCycleState.STOPPED)
 				throw e;
@@ -239,7 +243,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 					int y = chunk.getChunkY();
 					for (BorderAlignment alignment : BorderAlignment.values()) {
 						BorderAlignment relative = alignment.getAlignmentForNeighbour();
-						Chunk c = context.viewData.getChunk(alignment.getNeighbourX(x), alignment.getNeighbourY(y));
+						Chunk c = context.getActiveViewData().getBufferedChunk(alignment.getNeighbourX(x), alignment.getNeighbourY(y));
 						if (c == null) {
 							neighbourBorderData.put(alignment, new ChunkBorderDataImplNull());
 						} else {
@@ -357,9 +361,10 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		finishedTasks.clear();
 		borderTasks.clear();
 		newQueue.clear();
-		if (context.viewData != null) {
-			context.viewData.dispose();
-			context.viewData = null;
+		ViewData viewData = context.getActiveViewData();
+		if (viewData != null) {
+			viewData.dispose();
+			context.setActiveViewData(null); //TODO does that make sense?
 		}
 		for (TaskProviderAdapter adapter : taskProviders)
 			adapter.cancelTasks();
@@ -367,7 +372,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	
 	public void updatePredictedMidpoint() {
 		ComplexNumber delta = context.midpoint.copy();
-		delta.sub(context.viewData.anchor);
+		delta.sub(context.getActiveViewData().anchor);
 		delta.divNumber(context.chunkZoom);
 		midpointChunkX = delta.realDouble();
 		midpointChunkY = delta.imagDouble();
@@ -426,12 +431,13 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			//add task for chunk at midpoint if not calculated
 			int midpointChunkXFloor = (int)midpointChunkX;
 			int midpointChunkYFloor = (int)midpointChunkY;
-			if (!context.viewData.hasChunk(midpointChunkXFloor, midpointChunkYFloor)){
+			ViewData viewData = context.getActiveViewData();
+			if (!viewData.hasCompressedChunk(midpointChunkXFloor, midpointChunkYFloor)){
 				AbstractArrayChunk chunk = context.chunkFactory.createChunk(midpointChunkXFloor, midpointChunkYFloor);
 				BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getChunkPos(midpointChunkXFloor, midpointChunkYFloor),
 						context.createCalculator(), layers.get(0), context.jobId);
 				rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(0));
-				context.viewData.addChunk(chunk);
+				viewData.insertBufferedChunk(chunk);
 				openTasks.get(0).add(rootTask);
 				openChunks++;
 			}
@@ -522,11 +528,11 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		Integer chunkX = parentTask.getChunk().getChunkX() + dx;
 		Integer chunkY = parentTask.getChunk().getChunkY() + dy;
 		
-		if (context.viewData.hasChunk(chunkX, chunkY)) //already exists
+		if (context.getActiveViewData().hasCompressedChunk(chunkX, chunkY)) //already exists
 			return false;
 		
 		AbstractArrayChunk chunk = null;
-		context.chunkFactory.setViewData(context.viewData);
+		context.chunkFactory.setViewData(context.getActiveViewData());
 		for (int try1 = 0 ; try1 < 10 ; try1++) {//TODO remove
 			try {
 				chunk = context.chunkFactory.createChunk(chunkX, chunkY);
@@ -547,7 +553,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, context.layerConfig.getLayers().get(0));
 		openChunks++;
 		newQueue.add(task);
-		context.viewData.addChunk(chunk);
+		context.getActiveViewData().insertBufferedChunk(chunk);
 		return true;
 	}
 
