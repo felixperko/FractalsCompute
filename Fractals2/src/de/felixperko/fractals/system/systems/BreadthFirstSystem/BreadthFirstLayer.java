@@ -155,5 +155,10 @@ public class BreadthFirstLayer implements Layer {
 			return false;
 		return true;
 	}
+
+	@Override
+	public int getUpsample() {
+		return 1;
+	}
 	
 }

@@ -36,11 +36,15 @@ public class CompressedChunk implements Serializable{
 	Map<BorderAlignment, ChunkBorderData> selfBorderData;
 	Map<BorderAlignment, ChunkBorderData> neighbourBorderData;
 	
-	public CompressedChunk(ReducedNaiveChunk chunk, int upsample, FractalsTask task, double priority, boolean includeBorderData) {
-		this.upsample = upsample;
-		this.priority = priority;
-		this.jobId = task.getJobId();
-		this.taskId = task.getId();
+	public CompressedChunk(ReducedNaiveChunk chunk) {
+		FractalsTask task = chunk.getCurrentTask();
+		this.priority = 2;
+		if (task != null){
+			this.jobId = task.getJobId();
+			this.taskId = task.getId();
+			this.priority = task.getPriority()+2;
+		}
+		this.upsample = chunk.getUpsample();
 		this.chunkX = chunk.chunkX;
 		this.chunkY = chunk.chunkY;
 		this.dimensionSize = chunk.dimensionSize;
@@ -61,17 +65,16 @@ public class CompressedChunk implements Serializable{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		if (includeBorderData) {
-			this.selfBorderData = new HashMap<>();
-			for (Entry<BorderAlignment, ChunkBorderData> e : chunk.getSelfBorderData().entrySet())
-				this.selfBorderData.put(e.getKey(), e.getValue().copy());
+		
+		this.selfBorderData = new HashMap<>();
+		for (Entry<BorderAlignment, ChunkBorderData> e : chunk.getSelfBorderData().entrySet())
+			this.selfBorderData.put(e.getKey(), e.getValue().copy());
 
-			Map<BorderAlignment, ChunkBorderData> nbd = chunk.getNeighbourBorderData();
-			if (nbd != null){
-				this.neighbourBorderData = new HashMap<>();
-				for (Entry<BorderAlignment, ChunkBorderData> e : chunk.getSelfBorderData().entrySet())
-					this.neighbourBorderData.put(e.getKey(), e.getValue().copy());
-			}
+		Map<BorderAlignment, ChunkBorderData> nbd = chunk.getNeighbourBorderData();
+		if (nbd != null){
+			this.neighbourBorderData = new HashMap<>();
+			for (Entry<BorderAlignment, ChunkBorderData> e : chunk.getSelfBorderData().entrySet())
+				this.neighbourBorderData.put(e.getKey(), e.getValue().copy());
 		}
 	}
 	

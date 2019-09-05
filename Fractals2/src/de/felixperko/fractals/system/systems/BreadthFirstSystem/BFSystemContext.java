@@ -188,7 +188,7 @@ public class BFSystemContext implements SystemContext {
 	//		}
 			
 			if (getActiveViewData() == null) {
-				setActiveViewData(new BreadthFirstViewData(anchor));
+				setActiveViewData(new BreadthFirstViewData(anchor).setContext(this));
 			}
 			ParamSupplier jobIdSupplier = parameters.get("view");
 			if (jobIdSupplier == null)

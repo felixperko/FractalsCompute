@@ -11,5 +11,6 @@ public interface Layer extends Serializable{
 	int getSampleCount();
 	boolean cullingEnabled();
 	boolean renderingEnabled();
+	int getUpsample();
 
 }

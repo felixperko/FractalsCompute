@@ -148,7 +148,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getChunkPos(0, 0), 
 				context.createCalculator(), context.layerConfig.getLayers().get(0), context.jobId);
 		rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, context.layerConfig.getLayers().get(0));
-		context.getActiveViewData().insertBufferedChunk(chunk);
+		context.getActiveViewData().insertBufferedChunk(chunk, true);
 		openTasks.get(0).add(rootTask);
 		openChunks++;
 	}
@@ -301,7 +301,10 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 					int upsample = 1;
 					if (layer instanceof BreadthFirstUpsampleLayer)
 						upsample = ((BreadthFirstUpsampleLayer)layer).getUpsample();
-					CompressedChunk compressedChunk = new CompressedChunk((ReducedNaiveChunk) task.chunk, upsample, task, task.getPriority()+2, true);
+					CompressedChunk compressedChunk = new CompressedChunk((ReducedNaiveChunk) task.chunk);
+					
+					context.getActiveViewData().updateBufferedChunk(task.getChunk());
+					context.getActiveViewData().updateCompressedChunk(compressedChunk, false);
 					
 					//send update messages
 					for (ClientConfiguration client : clients) {
@@ -437,7 +440,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getChunkPos(midpointChunkXFloor, midpointChunkYFloor),
 						context.createCalculator(), layers.get(0), context.jobId);
 				rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(0));
-				viewData.insertBufferedChunk(chunk);
+				viewData.insertBufferedChunk(chunk, true);
 				openTasks.get(0).add(rootTask);
 				openChunks++;
 			}
@@ -553,7 +556,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, context.layerConfig.getLayers().get(0));
 		openChunks++;
 		newQueue.add(task);
-		context.getActiveViewData().insertBufferedChunk(chunk);
+		context.getActiveViewData().insertBufferedChunk(chunk, true);
 		return true;
 	}
 

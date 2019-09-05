@@ -75,14 +75,4 @@ public class NaiveChunk extends AbstractArrayChunk{
 	public int getStartIndex() {
 		return 0;
 	}
-
-	@Override
-	public int getDownsampleIncrement() {
-		return 1;
-	}
-
-	@Override
-	public int getDownsample() {
-		return 1;
-	}
 }

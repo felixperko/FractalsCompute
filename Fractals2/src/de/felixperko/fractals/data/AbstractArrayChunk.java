@@ -17,6 +17,7 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 	
 	int dimensionSize;
 	int arrayLength;
+	int upsample;
 	
 	Map<BorderAlignment, ChunkBorderData> selfBorderData = new HashMap<>();
 	Map<BorderAlignment, ChunkBorderData> neighbourBorderData = null;
@@ -26,14 +27,11 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 		
 		this.dimensionSize = dimensionSize;
 		this.arrayLength = dimensionSize*dimensionSize;
+		this.upsample = dimensionSize;
 		
 		for (BorderAlignment alignment : BorderAlignment.values()) {
 			selfBorderData.put(alignment, new ChunkBorderDataImpl(this, alignment));
 		}
-	}
-
-	public int getArrayLength() {
-		return arrayLength;
 	}
 
 	public int getChunkDimensions() {
@@ -44,8 +42,20 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 		this.dimensionSize = dimensionSize;
 	}
 
+	public int getArrayLength() {
+		return arrayLength;
+	}
+
 	public void setArrayLength(int arrayLength) {
 		this.arrayLength = arrayLength;
+	}
+
+	public int getUpsample(){
+		return upsample;
+	}
+	
+	public void setUpsample(int upsample){
+		this.upsample = upsample;
 	}
 	
 	public ChunkBorderData getBorderData(BorderAlignment alignment) {
@@ -192,8 +202,4 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 	protected abstract void removeFlag(int i);
 
 	public abstract int getStartIndex();
-
-	public abstract int getDownsampleIncrement();
-
-	public abstract int getDownsample();
 }

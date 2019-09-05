@@ -12,8 +12,9 @@ import de.felixperko.fractals.util.NumberUtil;
 
 public abstract class AbstractBFViewData implements ViewData{
 	
+	private static final long serialVersionUID = 2638706868007870329L;
 
-//	SystemContext systemContext;
+	//	SystemContext systemContext;
 	ComplexNumber anchor;
 
 	double bufferTimeout = 5;
@@ -24,10 +25,11 @@ public abstract class AbstractBFViewData implements ViewData{
 		this.anchor = anchor;
 	}
 	
-	public void setContext(SystemContext systemContext) {
+	public AbstractBFViewData setContext(SystemContext systemContext) {
 		if (!(systemContext instanceof BFSystemContext))
 			throw new IllegalArgumentException("AbstractBFViewData only works with BFSystemContexts right now");
 		this.systemContext = systemContext;
+		return this;
 	}
 
 	@Override

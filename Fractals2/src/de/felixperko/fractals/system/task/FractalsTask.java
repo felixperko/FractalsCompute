@@ -37,4 +37,6 @@ public interface FractalsTask extends Serializable{
 
 	void applyLocalState(FractalsTask localTask);
 	
+	Double getPriority();
+	
 }

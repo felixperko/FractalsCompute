@@ -7,7 +7,9 @@ import java.util.Map;
 
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.CompressedChunk;
+import de.felixperko.fractals.data.ReducedNaiveChunk;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
+import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.util.Nestable;
 import de.felixperko.fractals.util.NestedMap;
 import de.felixperko.fractals.util.NestedNull;
@@ -26,6 +28,11 @@ public class BreadthFirstViewData extends AbstractBFViewData {
 		super(anchor);
 	}
 	
+	@Override
+	public BreadthFirstViewData setContext(SystemContext systemContext) {
+		return (BreadthFirstViewData) super.setContext(systemContext);
+	}
+	
 	public boolean insertCompressedChunk(CompressedChunk compressedChunk) {
 		return this.chunks_compressed.getOrMakeChild(compressedChunk.getChunkX()).getOrMakeChild(compressedChunk.getChunkY()).setValue(compressedChunk);
 	}
@@ -35,11 +42,15 @@ public class BreadthFirstViewData extends AbstractBFViewData {
 	}
 	
 	@Override
-	public boolean insertBufferedChunk(Chunk chunk) {
+	public boolean insertBufferedChunk(Chunk chunk, boolean insertCompressedChunk) {
 		Map<Integer, Chunk> xMap = getXMap(chunk.getChunkX());
 		boolean overwrite = xMap.containsKey(chunk.getChunkY());
 		xMap.put(chunk.getChunkY(), chunk);
 		lastSeenNow(chunk.getChunkX(), chunk.getChunkY());
+		if (insertCompressedChunk){
+			CompressedChunk compressedChunk = new CompressedChunk((ReducedNaiveChunk)chunk);
+			insertCompressedChunk(compressedChunk, false);
+		}
 		return overwrite;
 	}
 	
@@ -55,7 +66,7 @@ public class BreadthFirstViewData extends AbstractBFViewData {
 		CompressedChunk chunk = getCompressedChunk(chunkX, chunkY);
 		if (chunk != null) {
 			Chunk bufferedChunk = chunk.decompress();
-			insertBufferedChunk(bufferedChunk);
+			insertBufferedChunk(bufferedChunk, false);
 			return bufferedChunk;
 		}
 		return null;
@@ -120,7 +131,7 @@ public class BreadthFirstViewData extends AbstractBFViewData {
 	public boolean insertCompressedChunk(CompressedChunk compressedChunk, boolean insertBuffered) {
 		boolean overwritten = chunks_compressed.getOrMakeChild(compressedChunk.getChunkX()).getOrMakeChild(compressedChunk.getChunkY()).setValue(compressedChunk);
 		if (insertBuffered)
-			insertBufferedChunk(compressedChunk.decompress());
+			insertBufferedChunk(compressedChunk.decompress(), false);
 		return overwritten;
 	}
 

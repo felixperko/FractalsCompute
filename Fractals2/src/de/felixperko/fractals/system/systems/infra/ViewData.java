@@ -9,7 +9,7 @@ import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 
 public interface ViewData extends Serializable{
 	
-	boolean insertBufferedChunk(Chunk chunk);
+	boolean insertBufferedChunk(Chunk chunk, boolean insertCompressedChunk);
 	boolean updateBufferedChunk(Chunk chunk);
 	Chunk getBufferedChunk(Integer chunkX, Integer chunkY);
 	List<Chunk> getBufferedChunks();

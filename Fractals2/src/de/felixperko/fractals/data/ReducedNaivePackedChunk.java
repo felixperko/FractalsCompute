@@ -86,16 +86,6 @@ public class ReducedNaivePackedChunk extends AbstractArrayChunk{
 	}
 	
 	@Override
-	public int getDownsample() {
-		return upsample;
-	}
-	
-	@Override
-	public int getDownsampleIncrement() {
-		return upsample*upsample;
-	}
-	
-	@Override
 	public int getStartIndex() {
 		return ((upsample/2+1) * (dimensionSize+1))*upsample;
 	}

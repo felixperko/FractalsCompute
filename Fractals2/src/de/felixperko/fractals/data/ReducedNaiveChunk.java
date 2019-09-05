@@ -123,12 +123,7 @@ public class ReducedNaiveChunk extends AbstractArrayChunk {
 	}
 
 	@Override
-	public int getDownsampleIncrement() {
-		return 1;
-	}
-
-	@Override
-	public int getDownsample() {
+	public int getUpsample() {
 		return 1;
 	}
 

@@ -44,7 +44,7 @@ public class NestedMap<K, V> implements Nestable<K, V>{
 	@Override
 	public Nestable<K, V> getOrMakeChild(K k) {
 		Nestable<K, V> child = getChild(k);
-		if (child != null)
+		if (child != null && !(child instanceof NestedNull))
 			return child;
 		return makeChild(k);
 	}

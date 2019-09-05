@@ -29,8 +29,8 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	
 	private static final long serialVersionUID = 428442040367400862L;
 
-	Double distance;
-	Double priority;
+	double distance;
+	double priority;
 	
 	transient FractalsThread thread;
 	
@@ -62,9 +62,11 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 				if (e.getValue() instanceof MappedParamSupplier)
 					localParameters.put(e.getKey(), e.getValue().copy());
 			}
+			Layer layer = getStateInfo().getLayer();
 			localParameters.put("chunkpos", new StaticParamSupplier("chunkpos", this.chunk.chunkPos.copy()));
 			localParameters.put("chunksize", new StaticParamSupplier("chunksize", (Integer)chunk.getChunkDimensions()));
-			localParameters.put("layer", new StaticParamSupplier("layer", (Integer)getStateInfo().getLayer().getId()));
+			localParameters.put("layer", new StaticParamSupplier("layer", (Integer)layer.getId()));
+			chunk.setUpsample(layer.getUpsample());
 			calculator.setContext(getContext());
 			calculator.calculate(chunk);
 		} catch (Exception e){
@@ -231,7 +233,7 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		Layer layer = getStateInfo().getLayer();
 		int upsample = layer instanceof BreadthFirstUpsampleLayer ? ((BreadthFirstUpsampleLayer)layer).getUpsample() : 1;
-		compressed_chunk = new CompressedChunk((ReducedNaiveChunk) chunk, upsample, this, priority, true);
+		compressed_chunk = new CompressedChunk((ReducedNaiveChunk) chunk);
 		out.writeObject(compressed_chunk);
 		out.defaultWriteObject();
 	}
