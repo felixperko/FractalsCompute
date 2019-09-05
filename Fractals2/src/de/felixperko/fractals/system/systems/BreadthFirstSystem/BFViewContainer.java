@@ -43,7 +43,8 @@ public class BFViewContainer implements ViewContainer {
 		if (this.activeViewData != null)
 			this.activeViewData.setActive(false);
 		this.activeViewData = viewData;
-		viewData.setActive(true);
+		if (viewData != null)
+			viewData.setActive(true);
 	}
 
 	private void storeCurrentActiveViewData() {

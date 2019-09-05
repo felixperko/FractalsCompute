@@ -42,11 +42,12 @@ public class LayerConfiguration implements Serializable{
 
 	boolean debug = false;
 	
-	transient ComplexNumber[][] offsets;
+	transient ComplexNumber[] offsets;
 	NumberFactory numberFactory;
 	transient boolean prepared = false;
+	
 	transient int[] firstSampleOfLayer;
-	transient int[] layerBySample;
+	transient int[] offsetIndexForSample;
 	
 	
 //	Color[] layerColors = new Color[] {new Color(1f, 0, 0), new Color(0f, 1f, 0f), new Color(0.0f,1f,1f), new Color(1f, 0f, 1f)};
@@ -64,21 +65,21 @@ public class LayerConfiguration implements Serializable{
 		this.seed = seed;
 	}
 	
-	public synchronized ComplexNumber[] getOffsets(int layerId) {
-//		if (!prepared){
-//			long waitingSince = System.nanoTime();
-//			long time = System.nanoTime();
-//			while (!prepared){
-//				time = System.nanoTime();
-//				if (time-waitingSince > preparedTimeout)
-//					break;
-//			}
-//			log.log("waited for prepartion for "+NumberUtil.getTimeInS(time-waitingSince, 6));
-//		}
-		if (!prepared)
-			throw new IllegalStateException("LayerConfiguration has to be prepared first (prepare()).");
-		return offsets[layerId];
-	}
+//	public synchronized ComplexNumber[] getOffsets(int layerId) {
+////		if (!prepared){
+////			long waitingSince = System.nanoTime();
+////			long time = System.nanoTime();
+////			while (!prepared){
+////				time = System.nanoTime();
+////				if (time-waitingSince > preparedTimeout)
+////					break;
+////			}
+////			log.log("waited for prepartion for "+NumberUtil.getTimeInS(time-waitingSince, 6));
+////		}
+//		if (!prepared)
+//			throw new IllegalStateException("LayerConfiguration has to be prepared first (prepare()).");
+//		return offsets[layerId];
+//	}
 	
 	public void setDebug(boolean debug) {
 		this.debug = debug;
@@ -91,14 +92,14 @@ public class LayerConfiguration implements Serializable{
 		for (int i = 0; i < layers.size() ; i++) {
 			layers.get(i).setId(i);
 		}
-		offsets = new ComplexNumber[layers.size()][];
-		double[][] temp = new double[layers.size()][];
 		
 		int totalSamples = 0;
 		for (BreadthFirstLayer layer : layers) {
 			if (layer.getSampleCount() > totalSamples)
 				totalSamples = layer.getSampleCount();
 		}
+		offsets = new ComplexNumber[totalSamples];
+		double[][] temp = new double[layers.size()][];
 		
 		for (int l = 0 ; l < layers.size() ; l++) {
 			generatePoints(layers, temp, l);
@@ -134,38 +135,43 @@ public class LayerConfiguration implements Serializable{
 			totalSamples += sampleCount;
 		}
 		
-		//TODO evaluate:
-//		int samplesSoFar = 0;
-//		int counter = 0;
-//		for (int i = 0; i < firstSampleOfLayer.length; i++) {
-//			int sampleCount = layers.get(i).getSampleCount();
-//			int newSamples = sampleCount-samplesSoFar;
-//			if (newSamples > 0){
-//				samplesSoFar = sampleCount;
-//				counter++;
-//			}
-//			firstSampleOfLayer[i] = counter-1;
-//		}
+////		TODO evaluate:
+////		int samplesSoFar = 0;
+////		int counter = 0;
+////		for (int i = 0; i < firstSampleOfLayer.length; i++) {
+////			int sampleCount = layers.get(i).getSampleCount();
+////			int newSamples = sampleCount-samplesSoFar;
+////			if (newSamples > 0){
+////				samplesSoFar = sampleCount;
+////				counter++;
+////			}
+////			firstSampleOfLayer[i] = counter-1;
+////		}
 
-		this.layerBySample = new int[totalSamples];
-		int layerCounter = 0;
-		int nextLayerSample = firstSampleOfLayer.length > layerCounter ? firstSampleOfLayer[layerCounter+1] : Integer.MAX_VALUE;
-		for (int i = 0; i < layerBySample.length; i++) {
-			if (i == nextLayerSample) {
-				layerCounter++;
-				nextLayerSample = firstSampleOfLayer.length > layerCounter+1 ? firstSampleOfLayer[layerCounter+1] : Integer.MAX_VALUE;
-			}
-			layerBySample[i] = layerCounter;
-		}
+//		this.layerBySample = new int[totalSamples];
+//		int layerCounter = 0;
+//		int nextLayerSample = firstSampleOfLayer.length > layerCounter ? firstSampleOfLayer[layerCounter+1] : Integer.MAX_VALUE;
+//		for (int i = 0; i < layerBySample.length; i++) {
+//			if (i == nextLayerSample) {
+//				layerCounter++;
+//				nextLayerSample = firstSampleOfLayer.length > layerCounter+1 ? firstSampleOfLayer[layerCounter+1] : Integer.MAX_VALUE;
+//			}
+//			layerBySample[i] = layerCounter;
+//		}
 	}
 
 	private void convertToComplex(List<BreadthFirstLayer> layers, NumberFactory numberFactory, double[][] temp) {
+		int counter = 0;
 		for (int l = 0 ; l < layers.size() ; l++) {
 			double[] points = temp[l];
-			ComplexNumber[] compPoints = new ComplexNumber[points.length/2];
-			for (int i = 0 ; i < points.length ; i+=2)
-				compPoints[i/2] = numberFactory.createComplexNumber(points[i], points[i+1]);
-			offsets[l] = compPoints;
+			for (int i = 0 ; i+1 < points.length ; i+=2){
+				offsets[counter++] = numberFactory.createComplexNumber(points[i], points[i+1]);
+			}
+			
+//			ComplexNumber[] compPoints = new ComplexNumber[points.length/2];
+//			for (int i = 0 ; i < points.length ; i+=2)
+//				compPoints[i/2] = numberFactory.createComplexNumber(points[i], points[i+1]);
+//			offsets[l] = compPoints;
 		}
 	}
 
@@ -365,14 +371,15 @@ public class LayerConfiguration implements Serializable{
 	public ComplexNumber getOffsetForSample(int sample) {
 		if (!prepared)
 			throw new IllegalStateException("LayerConfiguration has to be prepared first (prepare()).");
-		int layer = layerBySample[sample];
-		int sampleInLayer = sample - firstSampleOfLayer[layer];
-		
-		ComplexNumber[] layerOffsetArray = offsets[layer];
-		return layerOffsetArray[sampleInLayer];
+		return offsets[sample];
+//		int layer = layerBySample[sample];
+//		int sampleInLayer = sample - firstSampleOfLayer[layer];
+//		
+//		ComplexNumber[] layerOffsetArray = offsets[layer];
+//		return layerOffsetArray[sampleInLayer];
 	}
 	
-	public int getLayerIdForSample(int sample) {
-		return layerBySample[sample];
-	}
+//	public int getLayerIdForSample(int sample) {
+//		return layerBySample[sample];
+//	}
 }

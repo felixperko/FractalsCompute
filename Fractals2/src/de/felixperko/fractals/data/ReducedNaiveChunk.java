@@ -124,7 +124,7 @@ public class ReducedNaiveChunk extends AbstractArrayChunk {
 
 	@Override
 	public int getUpsample() {
-		return 1;
+		return upsample;
 	}
 
 }

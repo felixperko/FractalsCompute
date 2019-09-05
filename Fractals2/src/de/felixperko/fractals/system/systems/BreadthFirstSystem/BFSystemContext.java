@@ -107,9 +107,9 @@ public class BFSystemContext implements SystemContext {
 	@Override
 	public boolean setParameters(ParamContainer paramContainer) {
 		
-		boolean reset = needsReset(paramContainer.getClientParameters(), this.paramContainer.getClientParameters());
+		boolean reset = this.paramContainer != null && needsReset(paramContainer.getClientParameters(), this.paramContainer.getClientParameters());
 		
-		Map<String, ParamSupplier> oldParams = this.paramContainer != null ? this.paramContainer.getClientParameters() : new HashMap<>();
+		Map<String, ParamSupplier> oldParams = this.paramContainer != null ? this.paramContainer.getClientParameters() : null;
 		
 		synchronized (this) {
 			this.paramContainer = paramContainer;
