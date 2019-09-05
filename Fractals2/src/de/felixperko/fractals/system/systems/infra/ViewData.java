@@ -9,6 +9,21 @@ import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 
 public interface ViewData extends Serializable{
 	
+	SystemContext getContext();
+	ViewData setContext(SystemContext systemContext);
+	
+	void tick();
+	
+	void setBufferTimeout(double seconds);
+	ComplexNumber getAnchor();
+	
+	boolean isActive();
+	void setActive(boolean active);
+	
+	void dispose();
+	
+	
+	//buffered chunk operations
 	boolean insertBufferedChunk(Chunk chunk, boolean insertCompressedChunk);
 	boolean updateBufferedChunk(Chunk chunk);
 	Chunk getBufferedChunk(Integer chunkX, Integer chunkY);
@@ -19,11 +34,10 @@ public interface ViewData extends Serializable{
 	boolean removeBufferedChunk(Chunk chunk, boolean removeCompressed);
 	void clearBufferedChunks();
 	
-	void setBufferTimeout(double seconds);
-	void tick();
-	
+	//compressed chunk operations
 	boolean insertCompressedChunk(CompressedChunk compressedChunk, boolean insertBuffered);
 	boolean updateCompressedChunk(CompressedChunk compressedChunk, boolean updateBuffered);
+	CompressedChunk updateBufferedAndCompressedChunk(Chunk chunk);
 	CompressedChunk getCompressedChunk(Integer chunkX, Integer chunkY);
 	List<CompressedChunk> getCompressedChunks();
 	boolean hasCompressedChunk(Integer chunkX, Integer chunkY);
@@ -31,9 +45,4 @@ public interface ViewData extends Serializable{
 	boolean removeCompressedChunk(Integer chunkX, Integer chunkY);
 	boolean removeCompressedChunk(CompressedChunk compressedChunk);
 	void clearCompressedChunks();
-	
-	ComplexNumber getAnchor();
-
-	void dispose();
-
 }

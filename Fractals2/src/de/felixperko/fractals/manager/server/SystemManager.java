@@ -122,7 +122,7 @@ public class SystemManager extends Manager{
 			//search systems if applicable
 			for (CalcSystem system : activeSystems.values()) {
 				if ((system.getLifeCycleState() == LifeCycleState.IDLE || system.getLifeCycleState() == LifeCycleState.RUNNING)
-					&& system.isApplicable(newConfiguration.getConnection(), data.getClientParameters())) {
+					&& system.isApplicable(newConfiguration.getConnection(), data)) {
 					system.addClient(newConfiguration, data);
 					continue requestLoop;
 				}
@@ -130,7 +130,7 @@ public class SystemManager extends Manager{
 			//no existing system applicable -> create new
 			CalcSystem system = initSystem(data);
 			if (system != null) {
-				system.init(data.getClientParameters());
+				system.init(data);
 				system.addClient(newConfiguration, data);
 				system.start();
 			}
@@ -149,7 +149,7 @@ public class SystemManager extends Manager{
 			return null;
 		}
 		
-		CalcSystem system = availableSystems.get(systemName).createSystem(managers);
+		CalcSystem system = availableSystems.get(systemName).createSystem(managers); //TODO system not available -> error handling; reply to client
 		activeSystems.put(system.getId(), system);
 		log.log("initiating system "+systemName);
 		return system;

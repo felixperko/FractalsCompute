@@ -21,6 +21,7 @@ import de.felixperko.fractals.data.ReducedNaiveChunk;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.manager.server.ServerNetworkManager;
 import de.felixperko.fractals.network.ClientConfiguration;
+import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.network.messages.ChunkUpdateMessage;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.Number;
@@ -186,7 +187,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				changed = true;
 			if (finishTasks())
 				changed = true;
-			BreadthFirstViewData activeViewData = context.getActiveViewData();
+			ViewData activeViewData = context.getActiveViewData();
 			if (activeViewData != null)
 				activeViewData.tick();
 		} catch (Exception e) {
@@ -197,11 +198,12 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	}
 
 	@Override
-	public boolean setParameters(Map<String, ParamSupplier> params) {
+	public boolean setParameters(ParamContainer paramContainer) {
 		setLifeCycleState(LifeCycleState.PAUSED);
 		
-		boolean reset = context.setParameters(params);
+		boolean reset = context.setParameters(paramContainer);
 		
+		Map<String, ParamSupplier> params = paramContainer.getClientParameters();
 		if (params.get("midpoint").isChanged() || params.get("width").isChanged() || params.get("height").isChanged() || params.get("zoom").isChanged()) {
 			updatePredictedMidpoint();
 			if (!reset)
@@ -301,10 +303,9 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 					int upsample = 1;
 					if (layer instanceof BreadthFirstUpsampleLayer)
 						upsample = ((BreadthFirstUpsampleLayer)layer).getUpsample();
-					CompressedChunk compressedChunk = new CompressedChunk((ReducedNaiveChunk) task.chunk);
 					
-					context.getActiveViewData().updateBufferedChunk(task.getChunk());
-					context.getActiveViewData().updateCompressedChunk(compressedChunk, false);
+
+					CompressedChunk compressedChunk = context.getActiveViewData().updateBufferedAndCompressedChunk(task.getChunk());
 					
 					//send update messages
 					for (ClientConfiguration client : clients) {

@@ -15,6 +15,7 @@ import de.felixperko.fractals.util.NestedMap;
 import de.felixperko.fractals.util.NestedNull;
 
 public class BreadthFirstViewData extends AbstractBFViewData {
+	
 	private static final long serialVersionUID = -6980552871281336220L;
 
 //	CategoryLogger log = CategoryLogger.WARNING.createSubLogger("calc/taskmanager/bf_data");
@@ -30,10 +31,11 @@ public class BreadthFirstViewData extends AbstractBFViewData {
 	
 	@Override
 	public BreadthFirstViewData setContext(SystemContext systemContext) {
-		return (BreadthFirstViewData) super.setContext(systemContext);
+		super.setContext(systemContext);
+		return this;
 	}
 	
-	public boolean insertCompressedChunk(CompressedChunk compressedChunk) {
+	public boolean insertCompressedChunkImpl(CompressedChunk compressedChunk) {
 		return this.chunks_compressed.getOrMakeChild(compressedChunk.getChunkX()).getOrMakeChild(compressedChunk.getChunkY()).setValue(compressedChunk);
 	}
 	
@@ -42,7 +44,7 @@ public class BreadthFirstViewData extends AbstractBFViewData {
 	}
 	
 	@Override
-	public boolean insertBufferedChunk(Chunk chunk, boolean insertCompressedChunk) {
+	public boolean insertBufferedChunkImpl(Chunk chunk, boolean insertCompressedChunk) {
 		Map<Integer, Chunk> xMap = getXMap(chunk.getChunkX());
 		boolean overwrite = xMap.containsKey(chunk.getChunkY());
 		xMap.put(chunk.getChunkY(), chunk);
@@ -82,7 +84,7 @@ public class BreadthFirstViewData extends AbstractBFViewData {
 	}
 
 	@Override
-	public boolean updateBufferedChunk(Chunk chunk) {
+	public boolean updateBufferedChunkImpl(Chunk chunk) {
 		boolean overwrite = hasBufferedChunk(chunk);
 		getXMap(chunk.getChunkX()).put(chunk.getChunkY(), chunk);
 		return overwrite;
@@ -105,7 +107,7 @@ public class BreadthFirstViewData extends AbstractBFViewData {
 	}
 
 	@Override
-	public boolean removeBufferedChunk(Integer chunkX, Integer chunkY, boolean removeCompressed) {
+	public boolean removeBufferedChunkImpl(Integer chunkX, Integer chunkY, boolean removeCompressed) {
 		boolean hasBuffered = !hasBufferedChunk(chunkX, chunkY);
 		if (removeCompressed) {
 			removeCompressedChunk(chunkX, chunkY);
@@ -123,12 +125,12 @@ public class BreadthFirstViewData extends AbstractBFViewData {
 	}
 
 	@Override
-	public void clearBufferedChunks() {
+	public void clearBufferedChunksImpl() {
 		chunks_buffered.clear();
 	}
 
 	@Override
-	public boolean insertCompressedChunk(CompressedChunk compressedChunk, boolean insertBuffered) {
+	public boolean insertCompressedChunkImpl(CompressedChunk compressedChunk, boolean insertBuffered) {
 		boolean overwritten = chunks_compressed.getOrMakeChild(compressedChunk.getChunkX()).getOrMakeChild(compressedChunk.getChunkY()).setValue(compressedChunk);
 		if (insertBuffered)
 			insertBufferedChunk(compressedChunk.decompress(), false);
@@ -136,7 +138,7 @@ public class BreadthFirstViewData extends AbstractBFViewData {
 	}
 
 	@Override
-	public boolean updateCompressedChunk(CompressedChunk compressedChunk, boolean updateBuffered) {
+	public boolean updateCompressedChunkImpl(CompressedChunk compressedChunk, boolean updateBuffered) {
 		return insertCompressedChunk(compressedChunk, updateBuffered);
 	}
 
@@ -161,7 +163,7 @@ public class BreadthFirstViewData extends AbstractBFViewData {
 	}
 
 	@Override
-	public boolean removeCompressedChunk(Integer chunkX, Integer chunkY) {
+	public boolean removeCompressedChunkImpl(Integer chunkX, Integer chunkY) {
 		
 		Nestable<Integer, CompressedChunk> nestable1 = chunks_compressed.getChild(chunkX);
 		if (nestable1 instanceof NestedNull)
@@ -179,7 +181,7 @@ public class BreadthFirstViewData extends AbstractBFViewData {
 	}
 
 	@Override
-	public void clearCompressedChunks() {
+	public void clearCompressedChunksImpl() {
 		chunks_compressed.clear();
 	}
 }

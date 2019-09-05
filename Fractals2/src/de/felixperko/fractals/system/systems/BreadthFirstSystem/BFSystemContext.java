@@ -12,6 +12,7 @@ import de.felixperko.fractals.data.ArrayChunkFactory;
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.shareddata.MappedSharedData;
 import de.felixperko.fractals.data.shareddata.MappedSharedDataUpdate;
+import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.network.messages.task.TaskStateChangedMessage;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
@@ -25,6 +26,7 @@ import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
+import de.felixperko.fractals.system.systems.infra.ViewContainer;
 import de.felixperko.fractals.system.systems.infra.ViewData;
 import de.felixperko.fractals.system.systems.stateinfo.SystemStateInfo;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
@@ -47,7 +49,7 @@ public class BFSystemContext implements SystemContext {
 	
 	transient TaskManager<?> taskManager;
 	
-	public transient Map<String, ParamSupplier> parameters;
+	public transient ParamContainer paramContainer;
 	public transient Class<? extends FractalsCalculator> calculatorClass;
 	
 	public transient NumberFactory numberFactory;
@@ -58,7 +60,6 @@ public class BFSystemContext implements SystemContext {
 	public transient Number zoom;
 	public transient Number chunkZoom;
 	
-	
 	public transient Integer width;
 	public transient Integer height;
 	
@@ -66,7 +67,7 @@ public class BFSystemContext implements SystemContext {
 	public transient double border_generation = 0d;
 	public transient double border_dispose = 5d;
 	
-	private transient BFViewContainer viewContainer = new BFViewContainer(1); //TODO multiple
+	private transient ViewContainer viewContainer = new BFViewContainer(1); //TODO multiple
 	
 	public transient int chunksWidth;
 	public transient int chunksHeight;
@@ -104,14 +105,15 @@ public class BFSystemContext implements SystemContext {
 	}
 
 	@Override
-	public boolean setParameters(Map<String, ParamSupplier> params) {
+	public boolean setParameters(ParamContainer paramContainer) {
 		
-		boolean reset = needsReset(params, this.parameters);
+		boolean reset = needsReset(paramContainer.getClientParameters(), this.paramContainer.getClientParameters());
 		
-		Map<String, ParamSupplier> oldParams = this.parameters;
+		Map<String, ParamSupplier> oldParams = this.paramContainer != null ? this.paramContainer.getClientParameters() : new HashMap<>();
 		
 		synchronized (this) {
-			this.parameters = params;
+			this.paramContainer = paramContainer;
+			Map<String, ParamSupplier> parameters = paramContainer.getClientParameters();
 			
 			calculatorClass = availableCalculators.get(getParamValue("calculator", String.class));
 			if (calculatorClass == null)
@@ -127,7 +129,7 @@ public class BFSystemContext implements SystemContext {
 			LayerConfiguration oldLayerConfig = null;
 			if (oldParams != null)
 				oldLayerConfig = oldParams.get("layerConfiguration").getGeneral(LayerConfiguration.class);
-			ParamSupplier newLayerConfigSupplier = params.get("layerConfiguration");
+			ParamSupplier newLayerConfigSupplier = paramContainer.getClientParameter("layerConfiguration");
 			LayerConfiguration newLayerConfig = newLayerConfigSupplier.getGeneral(LayerConfiguration.class);
 			if (oldLayerConfig == null || newLayerConfigSupplier.isChanged()) {
 				layerConfig = newLayerConfig;
@@ -151,7 +153,7 @@ public class BFSystemContext implements SystemContext {
 			
 			Number pixelzoom = numberFactory.createNumber(width >= height ? 1./height : 1./width);
 			pixelzoom.mult(zoom);
-			params.put("pixelzoom", new StaticParamSupplier("pixelzoom", pixelzoom));
+			paramContainer.addClientParameter(new StaticParamSupplier("pixelzoom", pixelzoom));
 			chunkZoom = pixelzoom.copy();
 			chunkZoom.mult(numberFactory.createNumber(chunkSize));
 			
@@ -312,35 +314,40 @@ public class BFSystemContext implements SystemContext {
 	public void setServerConnection(ServerConnection serverConnection) {
 		this.serverConnection = serverConnection;
 	}
-	
-	private void writeObject(ObjectOutputStream oos) throws IOException{
-		oos.defaultWriteObject();
-		oos.writeObject(parameters);
-	}
-	
-	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
-		ois.defaultReadObject();
-		Map<String, ParamSupplier> parameters = (Map<String, ParamSupplier>) ois.readObject();
-		setParameters(parameters);
+
+	@Override
+	public ViewContainer getViewContainer() {
+		return viewContainer;
 	}
 
 	@Override
 	public synchronized Map<String, ParamSupplier> getParameters() {
-		return parameters;
+		return paramContainer.getClientParameters();
 	}
 
 	@Override
 	public synchronized <T> T getParamValue(String parameterKey, Class<T> valueCls) {
-		return parameters.get(parameterKey).get(this, valueCls, null, 0, 0);
+		return paramContainer.getClientParameter(parameterKey).get(this, valueCls, null, 0, 0);
 	}
 	
 	@Override
 	public synchronized Object getParamValue(String parameterKey) {
-		return parameters.get(parameterKey).get(this, null, 0, 0);
+		return paramContainer.getClientParameter(parameterKey).get(this, null, 0, 0);
 	}
 
 	@Override
 	public synchronized <T> T getParamValue(String parameterKey, Class<T> valueCls, ComplexNumber chunkPos, int pixel, int sample) {
-		return parameters.get(parameterKey).get(this, valueCls, chunkPos, pixel, sample);
+		return paramContainer.getClientParameter(parameterKey).get(this, valueCls, chunkPos, pixel, sample);
+	}
+	
+	private void writeObject(ObjectOutputStream oos) throws IOException{
+		oos.defaultWriteObject();
+		oos.writeObject(paramContainer);
+	}
+	
+	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
+		ois.defaultReadObject();
+		ParamContainer paramContainer = (ParamContainer) ois.readObject();
+		setParameters(paramContainer);
 	}
 }

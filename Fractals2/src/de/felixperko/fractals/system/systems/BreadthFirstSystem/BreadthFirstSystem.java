@@ -7,6 +7,7 @@ import java.util.Map;
 import de.felixperko.fractals.data.ReducedNaiveChunk;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.ClientConfiguration;
+import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.network.SystemClientData;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.network.messages.SystemConnectedMessage;
@@ -130,11 +131,11 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 	}
 
 	@Override
-	public boolean onInit(Map<String, ParamSupplier> params) {
+	public boolean onInit(ParamContainer paramContainer) {
 		
 		log.log("initializing");
 		taskManager = new BreadthFirstTaskManager(managers, this);
-		taskManager.setParameters(params);
+		taskManager.setParameters(paramContainer);
 		
 		return true;
 	}
@@ -170,12 +171,12 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 
 	@Override
 	public void addedClient(ClientConfiguration newConfiguration, SystemClientData systemClientData) {
-		taskManager.setParameters(systemClientData.getClientParameters());
+		taskManager.setParameters(systemClientData);
 	}
 
 	@Override
-	public void changedClient(Map<String, ParamSupplier> newParameters) {
-		taskManager.setParameters(newParameters);
+	public void changedClient(ParamContainer paramContainer) {
+		taskManager.setParameters(paramContainer);
 	}
 
 	@Override

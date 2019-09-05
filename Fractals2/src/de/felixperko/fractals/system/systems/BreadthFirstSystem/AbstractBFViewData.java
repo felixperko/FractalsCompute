@@ -4,32 +4,45 @@ import java.util.List;
 
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.CompressedChunk;
+import de.felixperko.fractals.data.ReducedNaiveChunk;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
+import de.felixperko.fractals.system.systems.infra.ViewContainer;
 import de.felixperko.fractals.system.systems.infra.ViewData;
 import de.felixperko.fractals.util.NestedMap;
 import de.felixperko.fractals.util.NumberUtil;
 
+/**
+ * Provides general functionality for ViewData implementations, keeping data management to subclasses
+ */
 public abstract class AbstractBFViewData implements ViewData{
 	
 	private static final long serialVersionUID = 2638706868007870329L;
 
-	//	SystemContext systemContext;
+	SystemContext systemContext;
+	
+	boolean active = false;
+	
 	ComplexNumber anchor;
 
 	double bufferTimeout = 5;
 	transient NestedMap<Integer, Long> lastSeen = new NestedMap<>();
-	SystemContext systemContext;
 	
 	public AbstractBFViewData(ComplexNumber anchor) {
 		this.anchor = anchor;
 	}
 	
-	public AbstractBFViewData setContext(SystemContext systemContext) {
+	@Override
+	public ViewData setContext(SystemContext systemContext) {
 		if (!(systemContext instanceof BFSystemContext))
 			throw new IllegalArgumentException("AbstractBFViewData only works with BFSystemContexts right now");
 		this.systemContext = systemContext;
 		return this;
+	}
+	
+	@Override
+	public SystemContext getContext() {
+		return systemContext;
 	}
 
 	@Override
@@ -95,4 +108,103 @@ public abstract class AbstractBFViewData implements ViewData{
 	protected void lastSeenNow(Integer chunkX, Integer chunkY) {
 		lastSeen.getOrMakeChild(chunkX).getOrMakeChild(chunkY).setValue(System.nanoTime());
 	}
+
+	@Override
+	public CompressedChunk updateBufferedAndCompressedChunk(Chunk chunk) {
+		updateBufferedChunk(chunk);
+		
+		getViewContainer().updatedBufferedChunk(chunk, this);
+		
+		CompressedChunk compressedChunk = new CompressedChunk((ReducedNaiveChunk) chunk);
+		updateCompressedChunk(compressedChunk, false);
+		
+		getViewContainer().updatedCompressedChunk(compressedChunk, this);
+		
+		return compressedChunk;
+	}
+	
+	@Override
+	public boolean isActive() {
+		return active;
+	}
+	
+	@Override
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+	
+	private ViewContainer getViewContainer() {
+		return systemContext.getViewContainer();
+	}
+	
+	//buffered chunk operation delegates
+	@Override
+	public boolean insertBufferedChunk(Chunk chunk, boolean insertCompressedChunk) {
+		boolean result = insertBufferedChunkImpl(chunk, insertCompressedChunk);
+		getViewContainer().insertedBufferedChunk(chunk, this);
+		return result;
+	}
+	
+	@Override
+	public boolean updateBufferedChunk(Chunk chunk) {
+		boolean result = updateBufferedChunkImpl(chunk);
+		getViewContainer().updatedBufferedChunk(chunk, this);
+		return result;
+	}
+	
+	@Override
+	public boolean removeBufferedChunk(Integer chunkX, Integer chunkY, boolean removeCompressed) {
+		boolean result = removeBufferedChunkImpl(chunkX, chunkY, removeCompressed);
+		if (result)
+			getViewContainer().removedBufferedChunk(chunkX, chunkY, this);
+		return result;
+	}
+	
+	@Override
+	public void clearBufferedChunks() {
+		clearBufferedChunksImpl();
+		getViewContainer().clearedBufferedChunks(this);
+	}
+	
+	//buffered chunk operation submethods
+	abstract boolean insertBufferedChunkImpl(Chunk chunk, boolean insertCompressedChunk);
+	abstract boolean updateBufferedChunkImpl(Chunk chunk);
+	abstract boolean removeBufferedChunkImpl(Integer chunkX, Integer chunkY, boolean removeCompressed);
+	abstract void clearBufferedChunksImpl();
+	
+	//compressed chunk operation delegates
+	@Override
+	public boolean insertCompressedChunk(CompressedChunk compressedChunk, boolean insertBuffered) {
+		boolean result = insertCompressedChunkImpl(compressedChunk, insertBuffered);
+		getViewContainer().insertedCompressedChunk(compressedChunk, this);
+		return result;
+	}
+	
+	@Override
+	public boolean updateCompressedChunk(CompressedChunk compressedChunk, boolean updateBuffered) {
+		boolean result = updateCompressedChunkImpl(compressedChunk, updateBuffered);
+		getViewContainer().updatedCompressedChunk(compressedChunk, this);
+		return result;
+	}
+	
+	@Override
+	public boolean removeCompressedChunk(Integer chunkX, Integer chunkY) {
+		boolean result = removeCompressedChunkImpl(chunkX, chunkY);
+		if (result)
+			getViewContainer().removedCompressedChunk(chunkX, chunkY, this);
+		return result;
+	}
+	
+	@Override
+	public void clearCompressedChunks() {
+		clearCompressedChunksImpl();
+		getViewContainer().clearedCompressedChunks(this);
+	}
+
+	
+	//compressed chunk operation submethods
+	abstract boolean insertCompressedChunkImpl(CompressedChunk compressedChunk, boolean insertBuffered);
+	abstract boolean updateCompressedChunkImpl(CompressedChunk compressedChunk, boolean updateBuffered);
+	abstract boolean removeCompressedChunkImpl(Integer chunkX, Integer chunkY);
+	abstract void clearCompressedChunksImpl();
 }

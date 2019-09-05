@@ -15,6 +15,7 @@ import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskManager;
 import de.felixperko.fractals.system.thread.FractalsThread;
 
+@Deprecated
 public class BasicTask extends AbstractFractalsTask<BasicTask> {
 	
 	private static final long serialVersionUID = -5097907338004813946L;

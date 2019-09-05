@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.ClientConfiguration;
+import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.network.SystemClientData;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.network.messages.SystemConnectedMessage;
@@ -42,8 +43,8 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	}
 	
 	@Override
-	public void init(Map<String, ParamSupplier> parameters) {
-		if (onInit(parameters))
+	public void init(ParamContainer paramContainer) {
+		if (onInit(paramContainer))
 			state = LifeCycleState.INITIALIZED;
 	}
 
@@ -77,7 +78,7 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 		threads.add(thread);
 	}
 	
-	public abstract boolean onInit(Map<String, ParamSupplier> params);
+	public abstract boolean onInit(ParamContainer paramContainer);
 	public abstract boolean onStart();
 	public abstract boolean onPause();
 	public abstract boolean onStop();
@@ -96,7 +97,8 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	@Override
 	public void changeClient(ClientConfiguration newConfiguration, ClientConfiguration oldConfiguration) {
 		
-		Map<String, ParamSupplier> newParameters = newConfiguration.getSystemClientData(getId()).getClientParameters();
+		
+		ParamContainer newParameters = newConfiguration.getSystemClientData(getId());
 		
 		boolean applicable = isApplicable(newConfiguration.getConnection(), newParameters);
 		synchronized(clients) {
@@ -121,11 +123,11 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	}
 	
 	public abstract void addedClient(ClientConfiguration newConfiguration, SystemClientData systemClientData);
-	public abstract void changedClient(Map<String, ParamSupplier> newParameters);
+	public abstract void changedClient(ParamContainer paramContainer);
 	public abstract void removedClient(ClientConfiguration oldConfiguration);
 	
 	@Override
-	public boolean isApplicable(ClientConnection connection, Map<String, ParamSupplier> parameters) {
+	public boolean isApplicable(ClientConnection connection, ParamContainer paramContainer) {
 		boolean hasClient = false;
 		for (ClientConfiguration conf : clients) {
 			if (conf.getConnection() == connection) {
@@ -135,7 +137,7 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 		}
 		if (hasClient && clients.size() == 1)
 			return true;
-		for (ParamSupplier param : parameters.values()) {
+		for (ParamSupplier param : paramContainer.getClientParameters().values()) {
 			if (param.isSystemRelevant() || param.isLayerRelevant() || param.isViewRelevant()) {
 				return false;
 			}

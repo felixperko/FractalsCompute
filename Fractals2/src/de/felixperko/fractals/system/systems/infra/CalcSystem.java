@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import de.felixperko.fractals.network.ClientConfiguration;
+import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.network.SystemClientData;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.system.parameters.ParameterConfiguration;
@@ -14,7 +15,7 @@ import de.felixperko.fractals.system.systems.stateinfo.SystemStateInfo;
 public interface CalcSystem extends LifeCycleComponent{
 	public UUID getId();
 	
-	public void init(Map<String, ParamSupplier> parameters);
+	public void init(ParamContainer paramContainer);
 	public void start();
 	public void pause();
 	public void stop();
@@ -29,7 +30,7 @@ public interface CalcSystem extends LifeCycleComponent{
 
 	public ParameterConfiguration getParameterConfiguration();
 	public ParameterConfiguration createParameterConfiguration();
-	public boolean isApplicable(ClientConnection connection, Map<String, ParamSupplier> parameters);
+	public boolean isApplicable(ClientConnection connection, ParamContainer paramContainer);
 	
 	public SystemStateInfo getSystemStateInfo();
 }

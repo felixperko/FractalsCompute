@@ -1,26 +1,49 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class BFViewContainer {
-	
+import de.felixperko.fractals.data.Chunk;
+import de.felixperko.fractals.data.CompressedChunk;
+import de.felixperko.fractals.system.systems.infra.ViewContainer;
+import de.felixperko.fractals.system.systems.infra.ViewContainerListener;
+import de.felixperko.fractals.system.systems.infra.ViewData;
+
+public class BFViewContainer implements ViewContainer {
+
+	BreadthFirstViewData activeViewData;
+	LinkedList<BreadthFirstViewData> oldViewData = new LinkedList<>();
 	int oldViewBufferSize;
+	
+	List<ViewContainerListener> listeners = new ArrayList<>();
 	
 	public BFViewContainer(int oldViewBufferSize) {
 		this.oldViewBufferSize = oldViewBufferSize;
 	}
 	
-	BreadthFirstViewData activeViewData;
-	LinkedList<BreadthFirstViewData> oldViewData = new LinkedList<>();
+	@Override
+	public void registerViewContainerListener(ViewContainerListener listener) {
+		listeners.add(listener);
+	}
 	
+	@Override
+	public boolean unregisterViewContainerListener(ViewContainerListener listener) {
+		return listeners.remove(listener);
+	}
+	
+	@Override
 	public BreadthFirstViewData getActiveViewData() {
 		return activeViewData;
 	}
 	
+	@Override
 	public void setActiveViewData(BreadthFirstViewData viewData) {
 		storeCurrentActiveViewData();
+		if (this.activeViewData != null)
+			this.activeViewData.setActive(false);
 		this.activeViewData = viewData;
+		viewData.setActive(true);
 	}
 
 	private void storeCurrentActiveViewData() {
@@ -37,12 +60,74 @@ public class BFViewContainer {
 	}
 
 	private void disposeLastOldViewData() {
-		BreadthFirstViewData old = oldViewData.removeLast();
+		ViewData old = oldViewData.removeLast();
 		old.dispose();
 	}
 	
+	@Override
 	public void setOldViewBufferSize(int oldViewBufferSize) {
 		this.oldViewBufferSize = oldViewBufferSize;
 		enforceBufferSize();
+	}
+
+	@Override
+	public void activeViewChanged(ViewData activeView) {
+		for (ViewContainerListener listener : listeners)
+			listener.activeViewChanged(activeView);
+	}
+
+	@Override
+	public void insertedBufferedChunk(Chunk chunk, ViewData viewData) {
+		for (ViewContainerListener listener : listeners)
+			listener.insertedBufferedChunk(chunk, viewData);
+	}
+
+	@Override
+	public void updatedBufferedChunk(Chunk chunk, ViewData viewData) {
+		for (ViewContainerListener listener : listeners)
+			listener.updatedBufferedChunk(chunk, viewData);
+	}
+
+	@Override
+	public void removedBufferedChunk(Integer chunkX, Integer chunkY, ViewData viewData) {
+		for (ViewContainerListener listener : listeners)
+			listener.removedBufferedChunk(chunkX, chunkY, viewData);
+	}
+
+	@Override
+	public void clearedBufferedChunks(ViewData viewData) {
+		for (ViewContainerListener listener : listeners)
+			listener.clearedBufferedChunks(viewData);
+	}
+
+	@Override
+	public void insertedCompressedChunk(CompressedChunk chunk, ViewData viewData) {
+		for (ViewContainerListener listener : listeners)
+			listener.insertedCompressedChunk(chunk, viewData);
+	}
+
+	@Override
+	public void updatedCompressedChunk(CompressedChunk chunk, ViewData viewData) {
+
+		for (ViewContainerListener listener : listeners)
+			listener.updatedCompressedChunk(chunk, viewData);
+	}
+
+	@Override
+	public void removedCompressedChunk(Integer chunkX, Integer chunkY, ViewData viewData) {
+		for (ViewContainerListener listener : listeners)
+			listener.removedCompressedChunk(chunkX, chunkY, viewData);
+	}
+
+	@Override
+	public void clearedCompressedChunks(ViewData viewData) {
+		for (ViewContainerListener listener : listeners)
+			listener.clearedCompressedChunks(viewData);
+	}
+
+	@Override
+	public void disposedViewData() {
+		for (ViewContainerListener listener : listeners)
+			listener.disposedViewData();
 	}
 }

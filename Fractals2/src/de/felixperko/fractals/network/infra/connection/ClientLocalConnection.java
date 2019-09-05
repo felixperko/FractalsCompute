@@ -32,7 +32,7 @@ public class ClientLocalConnection extends AbstractConnection<ServerNetworkManag
 	@Override
 	public void writeMessage(Message msg) {
 		msg.setSentTime();
-		msg.received(this, log);
+		//TODO receive local message
 	}
 
 	@Override

@@ -3,8 +3,8 @@ package de.felixperko.fractals.system.systems.infra;
 import java.io.Serializable;
 import java.util.Map;
 
+import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
-import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
@@ -15,7 +15,7 @@ import de.felixperko.fractals.system.task.Layer;
 
 public interface SystemContext extends Serializable{
 
-	boolean setParameters(Map<String, ParamSupplier> params);
+	boolean setParameters(ParamContainer paramContainer);
 
 	Layer getLayer(int layerId);
 	NumberFactory getNumberFactory();
@@ -31,4 +31,6 @@ public interface SystemContext extends Serializable{
 	Object getParamValue(String parameterKey);
 	<T> T getParamValue(String parameterKey, Class<T> valueCls);
 	<T> T getParamValue(String parameterKey, Class<T> valueCls, ComplexNumber chunkPos, int pixel, int sample);
+
+	ViewContainer getViewContainer();
 }
