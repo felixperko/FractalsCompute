@@ -1,6 +1,9 @@
 package de.felixperko.fractals;
 
 import de.felixperko.fractals.manager.server.ServerManagers;
+import de.felixperko.fractals.network.infra.connection.ClientLocalConnection;
+import de.felixperko.fractals.network.interfaces.Messageable;
+import de.felixperko.fractals.network.interfaces.ServerLocalMessageable;
 
 public class FractalsMain {
 	
@@ -19,5 +22,10 @@ public class FractalsMain {
 		managers.getServerNetworkManager().startServerConnectThread();
 		
 		managers.getThreadManager().startInputScannerThread();
+	}
+	
+	public static Messageable registerLocalClient(Messageable clientMessageable) {
+		ClientLocalConnection clientConnection = managers.getNetworkManager().createNewLocalClient(clientMessageable);
+		return new ServerLocalMessageable();
 	}
 }

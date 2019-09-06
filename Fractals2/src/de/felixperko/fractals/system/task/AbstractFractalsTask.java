@@ -1,7 +1,11 @@
 package de.felixperko.fractals.system.task;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.UUID;
 
+import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
@@ -11,8 +15,9 @@ import de.felixperko.fractals.system.task.statistics.TaskStatsEmpty;
 public abstract class AbstractFractalsTask<T> implements FractalsTask{
 	
 	private static final long serialVersionUID = -3755610537350804691L;
-
-	SystemContext context;
+	
+	private ParamContainer context_params; //to serialize parameters without the whole context
+	transient SystemContext context;
 	transient TaskManager<T> taskManager;
 	
 	int jobId;
@@ -33,6 +38,12 @@ public abstract class AbstractFractalsTask<T> implements FractalsTask{
 	@Override
 	public SystemContext getContext() {
 		return context;
+	}
+	
+	public ParamContainer getContextParams(boolean beforeSerialization) {
+		if (beforeSerialization && context != null)
+			return context.getParamContainer();
+		return context_params;
 	}
 	
 	public void setContext(SystemContext context) {
@@ -94,5 +105,15 @@ public abstract class AbstractFractalsTask<T> implements FractalsTask{
 	@Override
 	public void applyLocalState(FractalsTask localTask) {
 		setContext(localTask.getContext());
+	}
+	
+	private void writeObject(ObjectOutputStream oos) throws IOException{
+		if (context != null)
+			context_params = context.getParamContainer();
+		oos.defaultWriteObject();
+	}
+	
+	private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException{
+		ois.defaultReadObject();
 	}
 }

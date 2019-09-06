@@ -26,6 +26,7 @@ public interface SystemContext extends Serializable{
 
 	FractalsCalculator createCalculator();
 
+	ParamContainer getParamContainer();
 	Map<String, ParamSupplier> getParameters();
 
 	Object getParamValue(String parameterKey);
@@ -33,4 +34,5 @@ public interface SystemContext extends Serializable{
 	<T> T getParamValue(String parameterKey, Class<T> valueCls, ComplexNumber chunkPos, int pixel, int sample);
 
 	ViewContainer getViewContainer();
+
 }

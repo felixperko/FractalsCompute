@@ -18,6 +18,9 @@ import de.felixperko.fractals.system.systems.stateinfo.TaskStateUpdate;
 import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.system.task.RemoteTaskProvider;
 
+/**
+ * The ClientMessageInterface in case the client is a server as well
+ */
 public class ServerMessageInterface extends ClientMessageInterface {
 	
 	public ServerMessageInterface(ServerConnection serverConnection) {

@@ -1,6 +1,7 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,12 +40,23 @@ public class BFViewContainer implements ViewContainer {
 	
 	@Override
 	public void setActiveViewData(BreadthFirstViewData viewData) {
+		if (viewData == this.activeViewData)
+			return;
 		storeCurrentActiveViewData();
 		if (this.activeViewData != null)
 			this.activeViewData.setActive(false);
 		this.activeViewData = viewData;
 		if (viewData != null)
 			viewData.setActive(true);
+		activeViewChanged(viewData);
+	}
+	
+	@Override
+	public void reactivateViewData(BreadthFirstViewData oldViewData) {
+		boolean removed = this.oldViewData.remove(oldViewData);
+		if (!removed)
+			throw new IllegalArgumentException("tried to reactivate a ViewData that isn't in the deactivated list");
+		setActiveViewData(oldViewData);
 	}
 
 	private void storeCurrentActiveViewData() {
@@ -131,4 +143,10 @@ public class BFViewContainer implements ViewContainer {
 		for (ViewContainerListener listener : listeners)
 			listener.disposedViewData();
 	}
+
+	@Override
+	public Collection<BreadthFirstViewData> getInactiveViews() {
+		return oldViewData;
+	}
+
 }

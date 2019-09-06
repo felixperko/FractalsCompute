@@ -8,6 +8,7 @@ import java.util.Map;
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.data.ReducedNaiveChunk;
+import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.util.Nestable;
@@ -20,7 +21,7 @@ public class BreadthFirstViewData extends AbstractBFViewData {
 
 //	CategoryLogger log = CategoryLogger.WARNING.createSubLogger("calc/taskmanager/bf_data");
 	
-//	SystemContext systemContext;
+	ParamContainer paramContainer;
 	
 	transient Map<Integer, Map<Integer, Chunk>> chunks_buffered = new HashMap<>(); //key1 = chunkX, key2 = chunkY, value = chunk
 	Nestable<Integer, CompressedChunk> chunks_compressed = new NestedMap<>(); //key1 = chunkX, key2 = chunkY, value = compressedChunk
@@ -183,5 +184,14 @@ public class BreadthFirstViewData extends AbstractBFViewData {
 	@Override
 	public void clearCompressedChunksImpl() {
 		chunks_compressed.clear();
+	}
+
+	
+	public void setParams(ParamContainer paramContainer) {
+		this.paramContainer = paramContainer;
+	}
+	
+	public ParamContainer getParams() {
+		return this.paramContainer;
 	}
 }

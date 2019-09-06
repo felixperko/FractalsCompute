@@ -3,6 +3,7 @@ package de.felixperko.fractals.network.infra.connection;
 import de.felixperko.fractals.manager.server.ServerNetworkManager;
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.Message;
+import de.felixperko.fractals.network.interfaces.Messageable;
 import de.felixperko.fractals.util.CategoryLogger;
 import de.felixperko.fractals.util.ColorContainer;
 
@@ -14,9 +15,14 @@ public class ClientLocalConnection extends AbstractConnection<ServerNetworkManag
 	
 	ServerNetworkManager networkManager;
 	
-	public ClientLocalConnection(ServerNetworkManager networkManager, SenderInfo localSenderInfo) {
+	ServerConnection serverConnection;
+	
+	Messageable clientMessageable;
+	
+	public ClientLocalConnection(ServerNetworkManager networkManager, SenderInfo localSenderInfo, Messageable clientMessageable) {
 		this.networkManager = networkManager;
 		this.senderInfo = localSenderInfo;
+		this.clientMessageable = clientMessageable;
 	}
 
 	@Override
@@ -32,7 +38,7 @@ public class ClientLocalConnection extends AbstractConnection<ServerNetworkManag
 	@Override
 	public void writeMessage(Message msg) {
 		msg.setSentTime();
-		//TODO receive local message
+		clientMessageable.writeMessage(msg);
 	}
 
 	@Override

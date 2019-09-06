@@ -161,9 +161,6 @@ public abstract class WriteThread extends AbstractFractalsThread implements Mess
 		sharedDataController.sendMessageIfUpdatesAvailable(getConnection());
 	}
 
-	/* (non-Javadoc)
-	 * @see de.felixperko.fractals.network.threads.ComAdapter#writeMessage(de.felixperko.fractals.network.infra.Message)
-	 */
 	@Override
 	public void writeMessage(Message msg) {
 		synchronized (newMessages) {

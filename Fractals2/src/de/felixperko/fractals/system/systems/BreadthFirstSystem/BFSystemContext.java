@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -47,9 +48,10 @@ public class BFSystemContext implements SystemContext {
 		availableCalculators.put("NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator", NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator.class);
 	}
 	
-	transient TaskManager<?> taskManager;
+	transient TaskManager<?> taskManager; //is null unless at origin server
 	
 	public transient ParamContainer paramContainer;
+	
 	public transient Class<? extends FractalsCalculator> calculatorClass;
 	
 	public transient NumberFactory numberFactory;
@@ -108,6 +110,22 @@ public class BFSystemContext implements SystemContext {
 	public boolean setParameters(ParamContainer paramContainer) {
 		
 		boolean reset = this.paramContainer != null && needsReset(paramContainer.getClientParameters(), this.paramContainer.getClientParameters());
+		
+		//if params aren't applicable to current ViewData, search inactive ViewDatas
+		if (reset) {
+			Collection<BreadthFirstViewData> oldViews = viewContainer.getInactiveViews();
+			if (!oldViews.isEmpty()) {
+				ParamContainer temp = new ParamContainer(new HashMap<>(paramContainer.getClientParameters()));
+				for (BreadthFirstViewData oldViewData : oldViews) {
+					if (!needsReset(temp.getClientParameters(), oldViewData.getParams().getClientParameters())) {
+						reset = false;
+						viewContainer.reactivateViewData(oldViewData);
+						this.paramContainer = oldViewData.getParams(); //TODO correct?
+						break;
+					}
+				}
+			}
+		}
 		
 		Map<String, ParamSupplier> oldParams = this.paramContainer != null ? this.paramContainer.getClientParameters() : null;
 		
@@ -189,8 +207,11 @@ public class BFSystemContext implements SystemContext {
 	//				throw new IllegalStateException("no layers configured");
 	//		}
 			
-			if (getActiveViewData() == null) {
+			BreadthFirstViewData activeViewData = getActiveViewData();
+			if (activeViewData == null) {
 				setActiveViewData(new BreadthFirstViewData(anchor).setContext(this));
+			} else {
+				activeViewData.setParams(paramContainer);
 			}
 			ParamSupplier jobIdSupplier = parameters.get("view");
 			if (jobIdSupplier == null)
@@ -319,7 +340,12 @@ public class BFSystemContext implements SystemContext {
 	public ViewContainer getViewContainer() {
 		return viewContainer;
 	}
-
+	
+	@Override
+	public ParamContainer getParamContainer() {
+		return paramContainer;
+	}
+	
 	@Override
 	public synchronized Map<String, ParamSupplier> getParameters() {
 		return paramContainer.getClientParameters();

@@ -16,6 +16,7 @@ import de.felixperko.fractals.network.infra.connection.ClientRemoteConnection;
 import de.felixperko.fractals.network.infra.connection.Connection;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.network.interfaces.ClientMessageInterface;
+import de.felixperko.fractals.network.interfaces.Messageable;
 import de.felixperko.fractals.network.interfaces.NetworkInterfaceFactory;
 import de.felixperko.fractals.network.messages.ChunkUpdateMessage;
 import de.felixperko.fractals.network.threads.ClientWriteThread;
@@ -62,6 +63,15 @@ public class ServerNetworkManager extends NetworkManager implements INetworkMana
 		return clientConnection;
 	}
 	
+	public ClientLocalConnection createNewLocalClient(Messageable clientMessageable) {
+		SenderInfo info = new SenderInfo(ID_COUNTER++);
+		ClientLocalConnection clientConnection = new ClientLocalConnection(this, info, clientMessageable);
+		ClientConfiguration configuration = new ClientConfiguration();
+		configuration.setConnection(clientConnection);
+		clients.put((Integer)clientConnection.getClientInfo().getClientId(), configuration);
+		return clientConnection;
+	}
+	
 	public void updateClientConfiguration(SenderInfo senderInfo, ClientConfiguration newConfiguration) {
 		ClientConfiguration oldConfiguration = clients.get(senderInfo.getClientId());
 		if (newConfiguration.getConnection() == null) {
@@ -72,15 +82,6 @@ public class ServerNetworkManager extends NetworkManager implements INetworkMana
 		}
 		clients.put(senderInfo.getClientId(), newConfiguration);
 		((ServerManagers)managers).getSystemManager().changedClientConfiguration(oldConfiguration, newConfiguration);
-	}
-	
-	public ClientLocalConnection createNewLocalClient() {
-		SenderInfo info = new SenderInfo(ID_COUNTER++);
-		ClientLocalConnection clientConnection = new ClientLocalConnection(this, info);
-		ClientConfiguration configuration = new ClientConfiguration();
-		configuration.setConnection(clientConnection);
-		clients.put((Integer)clientConnection.getClientInfo().getClientId(), configuration);
-		return clientConnection;
 	}
 	
 	public ClientConfiguration getClientConfiguration(Integer clientId) {

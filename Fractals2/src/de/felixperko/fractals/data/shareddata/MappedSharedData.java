@@ -2,12 +2,15 @@ package de.felixperko.fractals.data.shareddata;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import de.felixperko.fractals.network.infra.connection.Connection;
 import de.felixperko.fractals.network.infra.connection.ConnectionListener;
+import de.felixperko.fractals.util.NestedMap;
+import de.felixperko.fractals.util.NumberUtil;
 
 /**
  * Shares the current state between clients
@@ -17,16 +20,49 @@ public class MappedSharedData<T> extends SharedData<MappedSharedDataUpdate<T>> {
 	int versionCounter = 0;
 	Map<String, T> map = new HashMap<>();
 	Map<String, Long> updateTimes = new HashMap<>();
+	Map<String, Long> notifiedUpdateTimes = new HashMap<>();
+	Set<String> remainingNotifications = new HashSet<>();
 	Map<Connection<?>, Set<String>> pendingConnectionUpdates = new HashMap<>();
 	boolean disposeDistributed;
+	double cooldownInS;
+	long cooldownInNs;
 	
 	public MappedSharedData(String dataIdentifier, boolean disposeDistributed) {
 		super(dataIdentifier);
 		this.disposeDistributed = disposeDistributed;
 	}
 	
+	public MappedSharedData(String dataIdentifier, double cooldownInS, boolean disposeDistributed) {
+		super(dataIdentifier);
+		this.disposeDistributed = disposeDistributed;
+		setCooldown(cooldownInS);
+	}
+	
+	public void setCooldown(double cooldownInS) {
+		this.cooldownInS = cooldownInS;
+		this.cooldownInNs = (long) (cooldownInS*NumberUtil.S_TO_NS);
+	}
+	
+	private long getRemainingCooldownTime(String key) {
+		if (cooldownInNs == 0)
+			return 0;
+		Long updated = updateTimes.get(key);
+		if (updated == null)
+			return 0;
+		return System.nanoTime() - updated;
+	}
+	
 	@Override
 	public synchronized DataContainer getUpdates(Connection<?> connection) {
+		
+		Iterator<String> it = remainingNotifications.iterator();
+		while (it.hasNext()) {
+			String key = it.next();
+			if (getRemainingCooldownTime(key) == 0) {
+				it.remove();
+				notifyClients(key);
+			}
+		}
 		
 		Set<String> pendingUpdates = pendingConnectionUpdates.get(connection);
 		MappedSharedDataUpdate<T> update = null;
@@ -131,11 +167,21 @@ public class MappedSharedData<T> extends SharedData<MappedSharedDataUpdate<T>> {
 		if (lastTime == null || lastTime < thisTime) {
 			map.put(key, value);
 			updateTimes.put(key, thisTime);
-			for (Connection<?> conn : pendingConnectionUpdates.keySet())
-				pendingConnectionUpdates.get(conn).add(key);
+			long cooldown = getRemainingCooldownTime(key);
+			if (cooldown == 0) {
+				notifyClients(key);
+			} else {
+				remainingNotifications.add(key);
+			}
 			return true;
 		}
 		return false;
+	}
+
+	private void notifyClients(String key) {
+		notifiedUpdateTimes.put(key, System.nanoTime());
+		for (Connection<?> conn : pendingConnectionUpdates.keySet())
+			pendingConnectionUpdates.get(conn).add(key);
 	}
 	
 	@Override

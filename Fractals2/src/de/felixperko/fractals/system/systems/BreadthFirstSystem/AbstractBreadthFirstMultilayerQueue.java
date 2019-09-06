@@ -77,7 +77,7 @@ public abstract class AbstractBreadthFirstMultilayerQueue<O extends BreadthFirst
 		List<O> polled = new ArrayList<>();
 		for (int i = 0 ; i < count ; i++) {
 			O obj = null;
-			for (int try1 = 0 ; try1 < 3 ; try1++){
+			for (int try1 = 0 ; try1 < 3 ; try1++){ //TODO remove/change try?
 				try {
 					obj = nextBufferedTasks.poll();
 					if (obj != null)
