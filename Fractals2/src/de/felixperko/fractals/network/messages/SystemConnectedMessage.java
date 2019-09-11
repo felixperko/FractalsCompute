@@ -15,7 +15,7 @@ public class SystemConnectedMessage extends SystemServerMessage {
 	
 	public SystemConnectedMessage(UUID systemId, ClientConfiguration clientConfiguration, ParameterConfiguration parameterConfiguration) {
 		super(systemId);
-		this.clientConfiguration = clientConfiguration;
+		this.clientConfiguration = new ClientConfiguration(clientConfiguration);
 		this.parameterConfiguration = parameterConfiguration;
 	}
 

@@ -3,6 +3,8 @@ package de.felixperko.fractals.manager.common;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import de.felixperko.fractals.FractalsMain;
+import de.felixperko.fractals.network.threads.LocalServerThread;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 import de.felixperko.fractals.system.thread.FractalsThread;
 
@@ -33,6 +35,11 @@ public abstract class ThreadManager extends Manager {
 			}
 		}
 		return null;
+	}
+
+	public void startLocalServer() {
+		LocalServerThread lst = new LocalServerThread(managers, "SERVER_LOCAL_MAIN", 100);
+		lst.start();
 	}
 
 }

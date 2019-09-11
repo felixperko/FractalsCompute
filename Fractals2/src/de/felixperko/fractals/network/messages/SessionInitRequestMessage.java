@@ -13,7 +13,7 @@ public class SessionInitRequestMessage extends ClientMessage{
 	ClientConfiguration configuration;
 	
 	public SessionInitRequestMessage(ClientConfiguration clientConfiguration) {
-		this.configuration = clientConfiguration;
+		this.configuration = new ClientConfiguration(clientConfiguration);
 	}
 	
 	@Override

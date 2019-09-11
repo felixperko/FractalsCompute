@@ -16,6 +16,11 @@ public class SystemClientData extends ParamContainer implements Serializable{
 		super(clientParameters);
 		this.grantThreads = grantThreads;
 	}
+
+	public SystemClientData(SystemClientData cloneSystemClientData) {
+		super(cloneSystemClientData.clientParameters, true);
+		this.grantThreads = cloneSystemClientData.grantThreads;
+	}
 	
 	public SystemClientData() {
 		

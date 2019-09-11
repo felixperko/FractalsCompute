@@ -7,6 +7,7 @@ import java.net.UnknownHostException;
 import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.Message;
+import de.felixperko.fractals.network.infra.connection.Connection;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.util.CategoryLogger;
 import de.felixperko.fractals.util.ColorContainer;
@@ -19,10 +20,9 @@ public class ClientWriteThread extends WriteThread{
 	
 	public ClientWriteThread(Managers managers, Socket socket, ServerConnection serverConnection) throws UnknownHostException, IOException {
 		super(managers, socket);
-		this.serverConnection = serverConnection;
-		this.serverConnection.setWriteToServer(this);
 		log = superLogger.createSubLogger("out");
 		setListenLogger(new CategoryLogger("com/client/in", ColorContainer.MAGENTA));
+		setConnection(serverConnection);
 	}
 	
 	@Override
@@ -39,5 +39,13 @@ public class ClientWriteThread extends WriteThread{
 	@Override
 	public ServerConnection getConnection() {
 		return serverConnection;
+	}
+	
+	@Override
+	public void setConnection(Connection<?> serverConnection) {
+		if (!(serverConnection instanceof ServerConnection))
+			throw new IllegalArgumentException("ClientWriteThread.setConnection() only accepts Server connections");
+		this.serverConnection = (ServerConnection) serverConnection;
+		this.serverConnection.setWriteToServer(this);
 	}
 }

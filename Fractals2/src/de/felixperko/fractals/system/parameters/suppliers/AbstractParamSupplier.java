@@ -41,15 +41,6 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 		this.layerRelevant = layerRelevant;
 		return this;
 	}
-
-	public boolean isViewRelevant() {
-		return viewRelevant;
-	}
-
-	public AbstractParamSupplier setViewRelevant(boolean viewRelevant) {
-		this.viewRelevant = viewRelevant;
-		return this;
-	}
 	
 	@Override
 	public void updateChanged(ParamSupplier old) {

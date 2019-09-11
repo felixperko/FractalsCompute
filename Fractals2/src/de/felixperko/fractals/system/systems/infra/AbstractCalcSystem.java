@@ -138,7 +138,7 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 		if (hasClient && clients.size() == 1)
 			return true;
 		for (ParamSupplier param : paramContainer.getClientParameters().values()) {
-			if (param.isSystemRelevant() || param.isLayerRelevant() || param.isViewRelevant()) {
+			if (param.isSystemRelevant() || param.isLayerRelevant()) {
 				return false;
 			}
 		}

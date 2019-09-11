@@ -1,7 +1,9 @@
 package de.felixperko.fractals.network;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 
@@ -16,6 +18,17 @@ public class ParamContainer implements Serializable{
 
 	public ParamContainer(Map<String, ParamSupplier> clientParameters) {
 		this.clientParameters = clientParameters;
+	}
+
+	public ParamContainer(Map<String, ParamSupplier> clientParameters, boolean newInstances) {
+		if (!newInstances)
+			this.clientParameters = clientParameters;
+		else {
+			this.clientParameters = new HashMap<String, ParamSupplier>();
+			for (Entry<String, ParamSupplier> e : clientParameters.entrySet()){
+				this.clientParameters.put(e.getKey(), e.getValue().copy());
+			}
+		}
 	}
 
 	public void addClientParameter(ParamSupplier paramSupplier) {

@@ -1,8 +1,14 @@
 package de.felixperko.fractals.network.interfaces;
 
+import de.felixperko.fractals.data.shareddata.SharedDataController;
+import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.network.infra.Message;
+import de.felixperko.fractals.network.infra.connection.ClientLocalConnection;
 import de.felixperko.fractals.network.infra.connection.Connection;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
+import de.felixperko.fractals.network.messages.ConnectedMessage;
+import de.felixperko.fractals.system.systems.infra.LifeCycleState;
+import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.util.CategoryLogger;
 import de.felixperko.fractals.util.ColorContainer;
 
@@ -10,20 +16,34 @@ import de.felixperko.fractals.util.ColorContainer;
  * Interface to server for local connections.
  * setServerConnection() has to be called before writing any messages.
  */
-public class ServerLocalMessageable implements Messageable{
+public class ServerLocalMessageable extends AbstractFractalsThread implements Messageable{
 	
+	public ServerLocalMessageable(Managers managers, String name) {
+		super(managers, name);
+	}
+
 	CategoryLogger log = new CategoryLogger("com/toLocalServer", new ColorContainer(1f, 0, 1));
 	
 	ServerConnection serverConnection;
+	ClientLocalConnection clientLocalConnection;
 	boolean closeConnection;
 	
-	public void setServerConnection(ServerConnection serverConnection) {
-		this.serverConnection = serverConnection;
+	SharedDataController sharedDataController = new SharedDataController();
+	
+	public void setClientLocalConnection(ClientLocalConnection clientLocalConnection) {
+		this.clientLocalConnection = clientLocalConnection;
 	}
 	
 	@Override
 	public Connection<?> getConnection() {
 		return serverConnection;
+	}
+
+	@Override
+	public void setConnection(Connection<?> serverConnection) {
+		if (!(serverConnection instanceof ServerConnection))
+			throw new IllegalArgumentException("ServerLocalMessageable.setConnection() only accepts ServerConnections");
+		this.serverConnection = (ServerConnection) serverConnection;
 	}
 
 	@Override
@@ -40,10 +60,36 @@ public class ServerLocalMessageable implements Messageable{
 	@Override
 	public void prepareMessage(Message msg) {
 		msg.setSentTime(System.nanoTime());
+		msg.setSender(clientLocalConnection.getClientInfo());
 	}
 
 	@Override
 	public void writeMessage(Message msg) {
-		msg.received(serverConnection, log);
+		prepareMessage(msg);
+		msg.received(clientLocalConnection, log);
+	}
+	
+	@Override
+	public void run() {
+
+
+		setLifeCycleState(LifeCycleState.RUNNING);
+		while (!Thread.interrupted()) {
+			tick();
+			try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				if (!closeConnection)
+					e.printStackTrace();
+			}
+			if (closeConnection)
+				break;
+		}
+		
+		setLifeCycleState(LifeCycleState.STOPPED);
+	}
+	
+	protected void tick(){
+		sharedDataController.sendMessageIfUpdatesAvailable(getConnection());
 	}
 }

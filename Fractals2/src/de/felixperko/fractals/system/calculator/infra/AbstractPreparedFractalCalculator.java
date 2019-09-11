@@ -39,11 +39,18 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 	
 	CalculatePhase phase = null;
 	
+	ParamSupplier p_current;
+	ParamSupplier p_pow;
+	ParamSupplier p_c;
+	
 	@Override
 	public void calculate(AbstractArrayChunk chunk) {
 		this.chunk = chunk;
 		limit = systemContext.getParamValue("limit", Double.class);
 		iterations = systemContext.getParamValue("iterations", Integer.class);
+		p_current = systemContext.getParameters().get("start");
+		p_pow = systemContext.getParameters().get("pow");
+		p_c = systemContext.getParameters().get("c");
 		Layer layer = chunk.getCurrentTask().getStateInfo().getLayer();
 		upsample = (layer instanceof BreadthFirstUpsampleLayer) ? ((BreadthFirstUpsampleLayer)layer).getUpsample()/2 : 0;
 		int samples = layer.getSampleCount();
@@ -102,9 +109,9 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 	
 	private void calculateSample(int pixel, int sample) {
 		double res = -1;
-		ComplexNumber<?, ?> current = systemContext.getParamValue("start", ComplexNumber.class, chunk.chunkPos, pixel, sample).copy();
-		ComplexNumber<?, ?> c = systemContext.getParamValue("c", ComplexNumber.class, chunk.chunkPos, pixel, sample);
-		ComplexNumber<?, ?> pow = systemContext.getParamValue("pow", ComplexNumber.class, chunk.chunkPos, pixel, sample);
+		ComplexNumber<?, ?> current = ((ComplexNumber)p_current.get(systemContext, chunk.chunkPos, pixel, sample)).copy();
+		ComplexNumber<?, ?> c = ((ComplexNumber)p_c.get(systemContext, chunk.chunkPos, pixel, sample));
+		ComplexNumber<?, ?> pow = ((ComplexNumber)p_pow.get(systemContext, chunk.chunkPos, pixel, sample));
 		double logPow = Math.log(pow.absDouble());
 //		long t1 = System.nanoTime();
 		for (int k = 0 ; k < iterations ; k++) {

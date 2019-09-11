@@ -1,7 +1,8 @@
 package de.felixperko.fractals.system.Numbers;
 import de.felixperko.fractals.system.Numbers.infra.Number;
+import de.felixperko.fractals.system.parameters.suppliers.Copyable;
 
-public class DoubleNumber implements Number<DoubleNumber> {
+public class DoubleNumber implements Number<DoubleNumber>, Copyable<DoubleNumber> {
 
 	private static final long serialVersionUID = -7389627450068792267L;
 	

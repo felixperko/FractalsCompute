@@ -89,6 +89,8 @@ public class BFSystemContext implements SystemContext {
 	
 	transient SystemStateInfo systemStateInfo = null;
 	transient ServerConnection serverConnection;
+
+	private transient Number pixelzoom;
 	
 	public BFSystemContext(TaskManager<?> taskManager) {
 		this.taskManager = taskManager;
@@ -117,11 +119,14 @@ public class BFSystemContext implements SystemContext {
 			if (!oldViews.isEmpty()) {
 				ParamContainer temp = new ParamContainer(new HashMap<>(paramContainer.getClientParameters()));
 				for (BreadthFirstViewData oldViewData : oldViews) {
-					if (!needsReset(temp.getClientParameters(), oldViewData.getParams().getClientParameters())) {
-						reset = false;
-						viewContainer.reactivateViewData(oldViewData);
-						this.paramContainer = oldViewData.getParams(); //TODO correct?
-						break;
+					ParamContainer oldParams = oldViewData.getParams();
+					if (oldParams != null){ //TODO should these be buffered at all? shouldn't contain chunks anyways
+						if (!needsReset(temp.getClientParameters(), oldParams.getClientParameters())) {
+							reset = false;
+							viewContainer.reactivateViewData(oldViewData);
+							this.paramContainer = oldParams; //TODO correct?
+							break;
+						}
 					}
 				}
 			}
@@ -166,10 +171,11 @@ public class BFSystemContext implements SystemContext {
 			if (getActiveViewData() == null || reset) {
 				chunksWidth = (int)Math.ceil(width/(double)chunkSize);
 				chunksHeight = (int)Math.ceil(height/(double)chunkSize);
-				relativeStartShift = numberFactory.createComplexNumber((chunksWidth%2 == 0 ? -0.5 : 0), chunksHeight%2 == 0 ? -0.5 : 0);
+				relativeStartShift = numberFactory.createComplexNumber(0, 0);
+//				relativeStartShift = numberFactory.createComplexNumber((chunksWidth%2 == 0 ? -0.5 : 0), chunksHeight%2 == 0 ? -0.5 : 0);
 			}
 			
-			Number pixelzoom = numberFactory.createNumber(width >= height ? 1./height : 1./width);
+			pixelzoom = numberFactory.createNumber(width >= height ? 1./height : 1./width);
 			pixelzoom.mult(zoom);
 			paramContainer.addClientParameter(new StaticParamSupplier("pixelzoom", pixelzoom));
 			chunkZoom = pixelzoom.copy();
@@ -375,5 +381,20 @@ public class BFSystemContext implements SystemContext {
 		ois.defaultReadObject();
 		ParamContainer paramContainer = (ParamContainer) ois.readObject();
 		setParameters(paramContainer);
+	}
+
+	@Override
+	public LayerConfiguration getLayerConfiguration() {
+		return layerConfig;
+	}
+
+	@Override
+	public Number getPixelzoom() {
+		return pixelzoom;
+	}
+
+	@Override
+	public int getChunkSize() {
+		return chunkSize;
 	}
 }

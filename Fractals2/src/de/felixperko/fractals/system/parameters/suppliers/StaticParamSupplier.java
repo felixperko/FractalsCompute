@@ -21,7 +21,13 @@ public class StaticParamSupplier extends AbstractParamSupplier {
 
 	@Override
 	public ParamSupplier copy() {
-		return new StaticParamSupplier(name, obj);
+		ParamSupplier other = null;
+		if (obj instanceof Copyable<?>)
+			other =  new StaticParamSupplier(name, ((Copyable) obj).copy());
+		else
+			other = new StaticParamSupplier(name, obj);
+		other.setLayerRelevant(layerRelevant).setSystemRelevant(systemRelevant);
+		return other;
 	}
 
 	@Override

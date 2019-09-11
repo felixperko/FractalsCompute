@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
@@ -19,6 +20,16 @@ public class ClientConfiguration implements Serializable{
 	transient ClientConnection connectionToClient;
 	
 	public ClientConfiguration() {
+	}
+	
+	public ClientConfiguration(ClientConfiguration cloneConfig){
+		for (Entry<UUID, SystemClientData> e : cloneConfig.instances.entrySet()){
+			this.instances.put(e.getKey(), new SystemClientData(e.getValue()));
+		}
+		for (SystemClientData scd : cloneConfig.systemRequests){
+			this.systemRequests.add(new SystemClientData(scd));
+		}
+		this.connectionToClient = cloneConfig.connectionToClient;
 	}
 	
 	public ClientConnection getConnection() {

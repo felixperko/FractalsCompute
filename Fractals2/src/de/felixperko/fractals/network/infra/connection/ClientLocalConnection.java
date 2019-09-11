@@ -23,6 +23,7 @@ public class ClientLocalConnection extends AbstractConnection<ServerNetworkManag
 		this.networkManager = networkManager;
 		this.senderInfo = localSenderInfo;
 		this.clientMessageable = clientMessageable;
+		this.clientMessageable.setConnection(this);
 	}
 
 	@Override

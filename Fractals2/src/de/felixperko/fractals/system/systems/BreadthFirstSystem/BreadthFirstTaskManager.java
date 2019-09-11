@@ -100,6 +100,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	List<BreadthFirstTask> borderTasks = new ArrayList<>();
 	Queue<BreadthFirstTask> newQueue = new LinkedList<>(); //for generation
 	List<BreadthFirstTask> finishedTasks = new ArrayList<>();
+	
+	boolean updatedPredictedMidpoint = false;
 
 	BFSystemContext context = new BFSystemContext(this);
 	
@@ -122,11 +124,6 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 
 	@Override
 	public void startTasks() {
-//		if (layers.isEmpty()) {
-//			layers.add(new BreadthFirstUpsampleLayer(0, 2, chunkSize));
-			//layers.add(new BreadthFirstLayer(1).with_priority_shift(5).with_priority_multiplier(2));
-			//layers.add(new BreadthFirstLayer(2).with_priority_shift(10).with_priority_multiplier(3).with_samples(4));
-//		}
 		
 		
 		//TODO readd when layerConfig changes?!
@@ -136,16 +133,10 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		}
 
 		generateRootTask();
-//		nextOpenTasks.add(rootTask);
-//		
-//		generateNeighbours(rootTask);
 	}
 	
 	protected void generateRootTask() {
 		AbstractArrayChunk chunk = context.chunkFactory.createChunk(0, 0);
-//		ComplexNumber pos = numberFactory.createComplexNumber(chunkZoom, chunkZoom);
-//		pos.multValues(relativeStartShift);
-//		pos.add(midpoint);
 		BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getChunkPos(0, 0), 
 				context.createCalculator(), context.layerConfig.getLayers().get(0), context.jobId);
 		rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, context.layerConfig.getLayers().get(0));
@@ -187,6 +178,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				changed = true;
 			if (finishTasks())
 				changed = true;
+			if (predictedMidpointUpdated())
+				changed = true;
 			ViewData activeViewData = context.getActiveViewData();
 			if (activeViewData != null)
 				activeViewData.tick();
@@ -207,7 +200,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		if (params.get("midpoint").isChanged() || params.get("width").isChanged() || params.get("height").isChanged() || params.get("zoom").isChanged()) {
 			updatePredictedMidpoint();
 			if (!reset)
-				predictedMidpointUpdated();
+				updatedPredictedMidpoint = true;
 		}
 		
 		setLifeCycleState(LifeCycleState.RUNNING);
@@ -271,20 +264,6 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	}
 	
 	int openChunks;
-	
-//	private List<ChunkUpdateMessage> getPendingMessagesList(int taskId, ClientConfiguration clientConfiguration){
-//		Map<ClientConfiguration, List<ChunkUpdateMessage>> map = pendingUpdateMessages.get(taskId);
-//		if (map == null){
-//			map = new HashMap<ClientConfiguration, List<ChunkUpdateMessage>>();
-//			pendingUpdateMessages.put(taskId, map);
-//		}
-//		List<ChunkUpdateMessage> list = map.get(clientConfiguration);
-//		if (list == null) {
-//			list = new ArrayList<>();
-//			map.put(clientConfiguration, list);
-//		}
-//		return list;
-//	}
 	
 	private boolean finishTasks() {
 		if (finishedTasks.isEmpty())
@@ -382,7 +361,10 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		midpointChunkY = delta.imagDouble();
 	}
 
-	public void predictedMidpointUpdated() {
+	public boolean predictedMidpointUpdated() {
+		if (!updatedPredictedMidpoint)
+			return false;
+		updatedPredictedMidpoint = false;
 		//clear queues to update sorting
 		synchronized (this) {
 			List<BreadthFirstLayer> layers = context.layerConfig.getLayers();
@@ -452,7 +434,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			//re-fill
 //			fillQueues();//TODO sync?
 		}
-		
+		return true;
 	}
 	
 	private synchronized boolean fillQueues() {

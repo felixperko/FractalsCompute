@@ -4,8 +4,9 @@ import java.io.Serializable;
 
 import de.felixperko.fractals.system.Numbers.infra.AbstractComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
+import de.felixperko.fractals.system.parameters.suppliers.Copyable;
 
-public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, DoubleComplexNumber>{
+public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, DoubleComplexNumber> implements Copyable<DoubleComplexNumber>{
 	
 	private static final long serialVersionUID = -6625226042922366712L;
 	

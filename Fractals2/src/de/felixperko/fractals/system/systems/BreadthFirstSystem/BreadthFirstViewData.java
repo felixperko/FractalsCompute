@@ -94,7 +94,7 @@ public class BreadthFirstViewData extends AbstractBFViewData {
 	@Override
 	public List<Chunk> getBufferedChunks() {
 		List<Chunk> chunks = new ArrayList<>();
-		for (Map<Integer, Chunk> xMap : chunks_buffered.values())
+		for (Map<Integer, Chunk> xMap : new ArrayList<>(chunks_buffered.values()))
 			chunks.addAll(xMap.values());
 		return chunks;
 	}
