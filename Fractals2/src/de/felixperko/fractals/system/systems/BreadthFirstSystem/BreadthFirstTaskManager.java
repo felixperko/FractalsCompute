@@ -37,6 +37,7 @@ import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.systems.infra.ViewData;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
+import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
 import de.felixperko.fractals.system.task.AbstractTaskManager;
 import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.system.task.Layer;
@@ -215,20 +216,20 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	public List<? extends FractalsTask> getTasks(int count) {
 		List<BreadthFirstTask> tasks = new ArrayList<>();
 		for (int i = 0 ; i < count ; i++) {
-			BreadthFirstTask task = null;
-			for (int try1 = 0 ; try1 < 3 ; try1++){//TODO remove
-				try {
-					task = nextBufferedTasks.poll();
-					if (task != null)
-						break;
-				} catch (NullPointerException e) {
-					e.printStackTrace();
-				}
-			}
-			if (task == null)
-				break;
-
 			synchronized (this){
+				BreadthFirstTask task = null;
+				for (int try1 = 0 ; try1 < 3 ; try1++){//TODO remove
+					try {
+						task = nextBufferedTasks.poll();
+						if (task != null)
+							break;
+					} catch (NullPointerException e) {
+						e.printStackTrace();
+					}
+				}
+				if (task == null)
+					break;
+
 				
 				//Prepare culling
 				if (task.isPreviousLayerCullingEnabled()) {
@@ -337,8 +338,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		pendingUpdateMessages.clear();
 		for (Queue<BreadthFirstTask> openQueue : openTasks)
 			openQueue.clear();
-		for (List<BreadthFirstTask> temp : tempList)
-			temp.clear();
+//		for (List<BreadthFirstTask> temp : tempList)
+//			temp.clear();
 		nextOpenTasks.clear();
 		nextBufferedTasks.clear();
 		finishedTasks.clear();
@@ -346,11 +347,11 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		newQueue.clear();
 		ViewData viewData = context.getActiveViewData();
 		if (viewData != null) {
-			viewData.dispose();
+//			viewData.dispose();
 			context.setActiveViewData(null); //TODO does that make sense?
 		}
-		for (TaskProviderAdapter adapter : taskProviders)
-			adapter.cancelTasks();
+//		for (TaskProviderAdapter adapter : taskProviders)
+//			adapter.cancelTasks();
 	}
 	
 	public void updatePredictedMidpoint() {
@@ -377,7 +378,10 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			}
 			nextOpenTasks.clear();
 			for (BreadthFirstTask task : nextBufferedTasks) {
-				tempList.get(task.getStateInfo().getLayer().getId()).add(task);
+				TaskStateInfo stateInfo = task.getStateInfo();
+				Layer layer = stateInfo.getLayer();
+				Integer id = layer.getId();
+				tempList.get(id).add(task);
 			}
 			nextBufferedTasks.clear();
 			
