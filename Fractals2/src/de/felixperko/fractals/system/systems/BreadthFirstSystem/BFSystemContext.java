@@ -78,8 +78,6 @@ public class BFSystemContext implements SystemContext {
 	
 	public transient LayerConfiguration layerConfig;
 	
-	public transient int jobId;
-	
 	public transient ComplexNumber leftLowerCorner;
 	public transient double leftLowerCornerChunkX;
 	public transient double leftLowerCornerChunkY;
@@ -91,6 +89,8 @@ public class BFSystemContext implements SystemContext {
 	transient ServerConnection serverConnection;
 
 	private transient Number pixelzoom;
+	
+	private transient Integer viewId;
 	
 	public BFSystemContext(TaskManager<?> taskManager) {
 		this.taskManager = taskManager;
@@ -221,9 +221,9 @@ public class BFSystemContext implements SystemContext {
 			}
 			ParamSupplier jobIdSupplier = parameters.get("view");
 			if (jobIdSupplier == null)
-				jobId = 0;
+				viewId = 0;
 			else
-				jobId = jobIdSupplier.getGeneral(Integer.class);
+				viewId = jobIdSupplier.getGeneral(Integer.class);
 			chunkFactory.setViewData(getActiveViewData());
 	
 			leftLowerCorner = midpoint.copy();
@@ -396,5 +396,40 @@ public class BFSystemContext implements SystemContext {
 	@Override
 	public int getChunkSize() {
 		return chunkSize;
+	}
+	
+	@Override
+	public ComplexNumber getMidpoint() {
+		return midpoint;
+	}
+	
+	@Override
+	public void setMidpoint(ComplexNumber midpoint) {
+		this.midpoint = midpoint;
+		paramContainer.addClientParameter(new StaticParamSupplier("midpoint", midpoint));
+	}
+	
+	@Override
+	public Number getZoom() {
+		return zoom;
+	}
+	
+	@Override
+	public void setZoom(Number zoom) {
+		this.zoom = zoom;
+		StaticParamSupplier supplier = new StaticParamSupplier("zoom", zoom);
+		supplier.setLayerRelevant(true);
+		paramContainer.addClientParameter(supplier);	
+	}
+	
+	@Override
+	public void incrementViewId() {
+		viewId++;
+		paramContainer.addClientParameter(new StaticParamSupplier("view", viewId));
+	}
+	
+	@Override
+	public int getViewId() {
+		return viewId;
 	}
 }

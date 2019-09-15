@@ -41,4 +41,16 @@ public interface SystemContext extends Serializable{
 	Number getPixelzoom();
 	int getChunkSize();
 
+	void incrementViewId();
+
+	void setZoom(Number zoom);
+
+	Number getZoom();
+
+	void setMidpoint(ComplexNumber midpoint);
+
+	ComplexNumber getMidpoint();
+
+	int getViewId();
+
 }

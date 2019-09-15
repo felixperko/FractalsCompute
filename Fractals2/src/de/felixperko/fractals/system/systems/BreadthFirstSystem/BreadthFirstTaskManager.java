@@ -139,7 +139,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	protected void generateRootTask() {
 		AbstractArrayChunk chunk = context.chunkFactory.createChunk(0, 0);
 		BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getChunkPos(0, 0), 
-				context.createCalculator(), context.layerConfig.getLayers().get(0), context.jobId);
+				context.createCalculator(), context.layerConfig.getLayers().get(0), context.getViewId());
 		rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, context.layerConfig.getLayers().get(0));
 		context.getActiveViewData().insertBufferedChunk(chunk, true);
 		openTasks.get(0).add(rootTask);
@@ -260,6 +260,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 
 	@Override
 	public synchronized void taskFinished(FractalsTask task) {
+		if (context.getViewId() != task.getJobId())
+			return;
 		finishedTasks.add((BreadthFirstTask)task);
 		task.getStateInfo().setState(TaskState.FINISHED);
 	}
@@ -338,8 +340,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		pendingUpdateMessages.clear();
 		for (Queue<BreadthFirstTask> openQueue : openTasks)
 			openQueue.clear();
-//		for (List<BreadthFirstTask> temp : tempList)
-//			temp.clear();
+		for (List<BreadthFirstTask> temp : tempList)
+			temp.clear();
 		nextOpenTasks.clear();
 		nextBufferedTasks.clear();
 		finishedTasks.clear();
@@ -350,8 +352,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 //			viewData.dispose();
 			context.setActiveViewData(null); //TODO does that make sense?
 		}
-//		for (TaskProviderAdapter adapter : taskProviders)
-//			adapter.cancelTasks();
+		for (TaskProviderAdapter adapter : taskProviders)
+			adapter.cancelTasks();
 	}
 	
 	public void updatePredictedMidpoint() {
@@ -425,7 +427,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			if (!viewData.hasCompressedChunk(midpointChunkXFloor, midpointChunkYFloor)){
 				AbstractArrayChunk chunk = context.chunkFactory.createChunk(midpointChunkXFloor, midpointChunkYFloor);
 				BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getChunkPos(midpointChunkXFloor, midpointChunkYFloor),
-						context.createCalculator(), layers.get(0), context.jobId);
+						context.createCalculator(), layers.get(0), context.getViewId());
 				rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(0));
 				viewData.insertBufferedChunk(chunk, true);
 				openTasks.get(0).add(rootTask);
@@ -528,7 +530,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				chunk = context.chunkFactory.createChunk(chunkX, chunkY);
 				break;
 			} catch (Exception e) {
-				if (try1 == 9 && parentTask.getJobId() == context.jobId)
+				if (try1 == 9 && parentTask.getJobId() == context.getViewId())
 					throw e;
 				else
 					try {
@@ -539,7 +541,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			}
 		}
 		BreadthFirstTask task = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getChunkPos(chunkX, chunkY),
-				context.createCalculator(), context.layerConfig.getLayers().get(0), context.jobId);
+				context.createCalculator(), context.layerConfig.getLayers().get(0), context.getViewId());
 		task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, context.layerConfig.getLayers().get(0));
 		openChunks++;
 		newQueue.add(task);
