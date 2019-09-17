@@ -107,16 +107,18 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		
 		parameterConfiguration.addCalculatorParameters("MandelbrotCalculator", mandelbrot_calculator_defs);
 		parameterConfiguration.addCalculatorParameters("BurningShipCalculator", mandelbrot_calculator_defs);
+		parameterConfiguration.addCalculatorParameters("TricornCalculator", mandelbrot_calculator_defs);
 		
 		List<ParameterDefinition> newton_calculator_defs = new ArrayList<>();
 		newton_calculator_defs.add(new ParameterDefinition("start", CoordinateBasicShiftParamSupplier.class, complexnumberType));
 		
-		parameterConfiguration.addCalculatorParameters("NewtonThridPowerMinusOneCalculator", mandelbrot_calculator_defs);									//TODO test -> newton_calculator_defs!
-		parameterConfiguration.addCalculatorParameters("NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator", mandelbrot_calculator_defs);	//
+		parameterConfiguration.addCalculatorParameters("NewtonThridPowerMinusOneCalculator", newton_calculator_defs);									//TODO test -> newton_calculator_defs!
+		parameterConfiguration.addCalculatorParameters("NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator", newton_calculator_defs);	//
 		
 		Selection<String> calculatorSelection = new Selection<>("calculator");
 		calculatorSelection.addOption("Mandelbrot", "MandelbrotCalculator");
 		calculatorSelection.addOption("BurningShip", "BurningShipCalculator");
+		calculatorSelection.addOption("Tricorn", "TricornCalculator");
 		calculatorSelection.addOption("Newton x^3 - 1", "NewtonThridPowerMinusOneCalculator");
 		calculatorSelection.addOption("Newton x^8 + 15x^4 - 16", "NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator");
 		parameterConfiguration.addSelection(calculatorSelection);

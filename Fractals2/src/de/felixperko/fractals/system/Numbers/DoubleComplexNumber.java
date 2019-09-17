@@ -196,4 +196,10 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 		DoubleComplexNumber other = (DoubleComplexNumber)obj;
 		return real == other.real && imag == other.imag;
 	}
+
+	
+	@Override
+	public void complexConjugate() {
+		imag = imag < 0 ? -imag : imag;
+	}
 }

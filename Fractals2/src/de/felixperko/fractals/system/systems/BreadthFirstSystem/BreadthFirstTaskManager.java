@@ -113,7 +113,6 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	double midpointChunkX;
 	double midpointChunkY;
 
-	List<TaskProviderAdapter> taskProviders = new ArrayList<>();
 	Map<Integer, CalculateThreadReference> calculateThreadReferences = new HashMap<>(); //TODO remove?
 
 	int id_counter_tasks = 0;
@@ -550,13 +549,5 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		newQueue.add(task);
 		context.getActiveViewData().insertBufferedChunk(chunk, true);
 		return true;
-	}
-
-	public void addTaskProviderAdapter(TaskProviderAdapter taskProviderAdapter) {
-		taskProviders.add(taskProviderAdapter);
-	}
-	
-	public void removeTaskProviderAdapter(TaskProviderAdapter taskProviderAdapter) {
-		taskProviders.remove(taskProviderAdapter);
 	}
 }

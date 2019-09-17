@@ -12,6 +12,7 @@ public interface ComplexNumber<T extends Number<T>, N extends ComplexNumber<T, N
 	//void mult(DoubleNumber number);
 	public N copy();
 	public void toPositive();
+	public void complexConjugate();
 	public void add(N otherComplex);
 	public void mult(N otherComplex);
 	public void sub(N otherComplex);

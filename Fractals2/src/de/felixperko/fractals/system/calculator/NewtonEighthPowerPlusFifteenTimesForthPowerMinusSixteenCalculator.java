@@ -42,10 +42,10 @@ public class NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator e
 
 	@Override
 	public void executeFunctionKernel(ComplexNumber z_copy) {
-		if (!(z_copy instanceof DoubleComplexNumber))
-			throw new IllegalArgumentException("only supports DoubleComplexNumbers for now.");
-		DoubleComplexNumber z = (DoubleComplexNumber)z_copy;
-		DoubleComplexNumber z2 = (DoubleComplexNumber)z.copy();
+//		if (!(z_copy instanceof DoubleComplexNumber))
+//			throw new IllegalArgumentException("only supports DoubleComplexNumbers for now.");
+		ComplexNumber z = z_copy;
+		ComplexNumber z2 = z.copy();
 		//x^8 + 15*x^4 - 16
 		z.pow(pow11);
 		z2.pow(pow12);
@@ -60,7 +60,7 @@ public class NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator e
 			throw new IllegalArgumentException("only supports DoubleComplexNumbers for now.");
 		DoubleComplexNumber z = (DoubleComplexNumber)z_copy;
 		DoubleComplexNumber z2 = (DoubleComplexNumber)z.copy();
-		//8x^7 + 60 x^3
+		//8x^7 + 60*x^3
 		z.pow(pow21);
 		z2.mult(mult21);
 		z2.pow(pow22);

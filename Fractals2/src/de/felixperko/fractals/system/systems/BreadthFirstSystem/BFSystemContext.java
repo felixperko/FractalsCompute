@@ -23,6 +23,7 @@ import de.felixperko.fractals.system.calculator.BurningShipCalculator;
 import de.felixperko.fractals.system.calculator.MandelbrotCalculator;
 import de.felixperko.fractals.system.calculator.NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator;
 import de.felixperko.fractals.system.calculator.NewtonThridPowerMinusOneCalculator;
+import de.felixperko.fractals.system.calculator.TricornCalculator;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
@@ -44,6 +45,7 @@ public class BFSystemContext implements SystemContext {
 	static {
 		availableCalculators.put("MandelbrotCalculator", MandelbrotCalculator.class);
 		availableCalculators.put("BurningShipCalculator", BurningShipCalculator.class);
+		availableCalculators.put("TricornCalculator", TricornCalculator.class);
 		availableCalculators.put("NewtonThridPowerMinusOneCalculator", NewtonThridPowerMinusOneCalculator.class);
 		availableCalculators.put("NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator", NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator.class);
 	}
