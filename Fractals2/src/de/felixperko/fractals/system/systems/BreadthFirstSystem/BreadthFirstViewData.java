@@ -86,16 +86,21 @@ public class BreadthFirstViewData extends AbstractBFViewData {
 
 	@Override
 	public boolean updateBufferedChunkImpl(Chunk chunk) {
-		boolean overwrite = hasBufferedChunk(chunk);
-		getXMap(chunk.getChunkX()).put(chunk.getChunkY(), chunk);
+		boolean overwrite;
+		synchronized (chunks_buffered) {
+			overwrite = hasBufferedChunk(chunk);
+			getXMap(chunk.getChunkX()).put(chunk.getChunkY(), chunk);
+		}
 		return overwrite;
 	}
 
 	@Override
 	public List<Chunk> getBufferedChunks() {
 		List<Chunk> chunks = new ArrayList<>();
-		for (Map<Integer, Chunk> xMap : new ArrayList<>(chunks_buffered.values()))
-			chunks.addAll(xMap.values());
+		synchronized (chunks_buffered) {
+			for (Map<Integer, Chunk> xMap : new ArrayList<>(chunks_buffered.values()))
+				chunks.addAll(xMap.values());
+		}
 		return chunks;
 	}
 
@@ -117,10 +122,12 @@ public class BreadthFirstViewData extends AbstractBFViewData {
 		else {
 			if (!hasBuffered)
 				return false;
-			Map<Integer, Chunk> xMap = getXMap(chunkX);
-			xMap.remove(chunkY);
-			if (xMap.isEmpty())
-				chunks_buffered.remove(chunkX);
+			synchronized (chunks_buffered) {
+				Map<Integer, Chunk> xMap = getXMap(chunkX);
+				xMap.remove(chunkY);
+				if (xMap.isEmpty())
+					chunks_buffered.remove(chunkX);
+			}
 			return true;
 		}
 	}

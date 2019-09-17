@@ -69,7 +69,7 @@ public class BFSystemContext implements SystemContext {
 	public transient double border_generation = 0d;
 	public transient double border_dispose = 5d;
 	
-	private transient ViewContainer viewContainer = new BFViewContainer(1); //TODO multiple
+	private transient ViewContainer viewContainer = new BFViewContainer(0); //TODO multiple
 	
 	public transient int chunksWidth;
 	public transient int chunksHeight;

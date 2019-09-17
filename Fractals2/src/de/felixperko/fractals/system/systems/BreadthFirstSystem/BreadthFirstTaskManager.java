@@ -275,6 +275,9 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		synchronized (this) {
 			List<ClientConfiguration> clients = new ArrayList<>(system.getClients());
 			for (BreadthFirstTask task : finishedTasks) {
+
+				if (context.getViewId() != task.getJobId())
+					continue;
 				
 				final Integer taskId = task.getId();
 				
@@ -287,7 +290,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 						upsample = ((BreadthFirstUpsampleLayer)layer).getUpsample();
 					
 
-					CompressedChunk compressedChunk = context.getActiveViewData().updateBufferedAndCompressedChunk(task.getChunk());
+					CompressedChunk compressedChunk = context.getActiveViewData().updateBufferedAndCompressedChunk(task.getChunk()); //TODO occasional npe! (2x (1x view 252))
 					
 					//send update messages
 					for (ClientConfiguration client : clients) {
