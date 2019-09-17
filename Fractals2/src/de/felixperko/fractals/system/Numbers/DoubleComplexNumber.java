@@ -200,6 +200,6 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 	
 	@Override
 	public void complexConjugate() {
-		imag = imag < 0 ? -imag : imag;
+		imag = -imag;
 	}
 }

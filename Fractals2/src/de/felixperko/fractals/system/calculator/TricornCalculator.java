@@ -7,9 +7,9 @@ public class TricornCalculator extends AbstractPreparedFractalCalculator {
 	
 	@Override
 	public void executeKernel(ComplexNumber current, ComplexNumber exp, ComplexNumber c) {
-		current.complexConjugate();
 		current.pow(exp);
 		current.add(c);
+		current.complexConjugate();
 	}
 
 }
