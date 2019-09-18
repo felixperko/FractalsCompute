@@ -426,7 +426,13 @@ public class BFSystemContext implements SystemContext {
 	
 	@Override
 	public void incrementViewId() {
-		viewId++;
+		viewId = getParamValue("view", Integer.class) + 1;
+		paramContainer.addClientParameter(new StaticParamSupplier("view", viewId));
+	}
+	
+	@Override
+	public void setViewId(Integer viewId){
+		this.viewId = viewId;
 		paramContainer.addClientParameter(new StaticParamSupplier("view", viewId));
 	}
 	

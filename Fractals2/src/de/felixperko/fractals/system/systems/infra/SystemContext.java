@@ -53,4 +53,6 @@ public interface SystemContext extends Serializable{
 
 	int getViewId();
 
+	void setViewId(Integer viewId);
+
 }
