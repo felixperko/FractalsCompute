@@ -12,6 +12,7 @@ import de.felixperko.fractals.network.SystemClientData;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.parameters.ParameterConfiguration;
 import de.felixperko.fractals.system.systems.infra.AbstractCalcSystem;
+import de.felixperko.fractals.system.systems.infra.SystemContext;
 
 public class OrbitSystem extends AbstractCalcSystem {
 	
@@ -75,6 +76,14 @@ public class OrbitSystem extends AbstractCalcSystem {
 	public void removedClient(ClientConfiguration oldConfiguration) {
 		// TODO Auto-generated method stub
 
+	}
+
+	
+	@Override
+	public SystemContext getContext() {
+		if (taskManager == null)
+			return null;
+		return taskManager.context;
 	}
 
 }

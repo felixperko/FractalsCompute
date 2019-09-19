@@ -26,8 +26,10 @@ public class BreadthFirstViewData extends AbstractBFViewData {
 	transient Map<Integer, Map<Integer, Chunk>> chunks_buffered = new HashMap<>(); //key1 = chunkX, key2 = chunkY, value = chunk
 	Nestable<Integer, CompressedChunk> chunks_compressed = new NestedMap<>(); //key1 = chunkX, key2 = chunkY, value = compressedChunk
 	
+	ComplexNumber anchor;
+	
 	public BreadthFirstViewData(ComplexNumber anchor) {
-		super(anchor);
+		this.anchor = anchor;
 	}
 	
 	@Override
@@ -200,5 +202,9 @@ public class BreadthFirstViewData extends AbstractBFViewData {
 	
 	public ParamContainer getParams() {
 		return this.paramContainer;
+	}
+	
+	public ComplexNumber getAnchor() {
+		return anchor;
 	}
 }

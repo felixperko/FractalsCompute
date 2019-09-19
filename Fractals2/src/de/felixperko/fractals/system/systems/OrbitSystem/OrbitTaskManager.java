@@ -29,8 +29,9 @@ public class OrbitTaskManager extends AbstractTaskManager<OrbitTask> {
 
 	public OrbitTaskManager(ServerManagers managers, CalcSystem system) {
 		super(managers, system);
-		context = new OrbitContext();
-		task = new OrbitTask(context, 0, this, context.getViewId(), context.getLayer(0));
+		context = new OrbitSystemContext(this);
+		
+		task = new OrbitTask(context, 0, this, context.getViewId(), context.getLayer(0), context.createCalculator(), context.createChunk(0,0));
 	}
 
 	@Override
@@ -51,7 +52,7 @@ public class OrbitTaskManager extends AbstractTaskManager<OrbitTask> {
 
 	@Override
 	public void reset() {
-		task = new OrbitTask(context, 0, this, context.getViewId(), context.getLayer(0));
+		task = new OrbitTask(context, 0, this, context.getViewId(), context.getLayer(0), context.createCalculator(), context.createChunk(0, 0));
 		sentIndices.clear();
 	}
 

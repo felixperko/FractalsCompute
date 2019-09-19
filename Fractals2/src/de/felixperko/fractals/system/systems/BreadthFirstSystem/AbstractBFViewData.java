@@ -22,15 +22,9 @@ public abstract class AbstractBFViewData implements ViewData{
 	SystemContext systemContext;
 	
 	boolean active = false;
-	
-	ComplexNumber anchor;
 
 	double bufferTimeout = 5;
 	transient NestedMap<Integer, Long> lastSeen = new NestedMap<>();
-	
-	public AbstractBFViewData(ComplexNumber anchor) {
-		this.anchor = anchor;
-	}
 	
 	@Override
 	public ViewData setContext(SystemContext systemContext) {
@@ -72,11 +66,6 @@ public abstract class AbstractBFViewData implements ViewData{
 	private boolean isSeeable(Integer chunkX, Integer chunkY) {
 		//TODO generalize AbstractBFViewData.isSeeable()
 		return ((BFSystemContext)systemContext).getScreenDistance(chunkX, chunkY) <= ((BFSystemContext)systemContext).border_dispose;
-	}
-
-	@Override
-	public ComplexNumber getAnchor() {
-		return anchor;
 	}
 	
 	@Override
@@ -167,10 +156,10 @@ public abstract class AbstractBFViewData implements ViewData{
 	}
 	
 	//buffered chunk operation submethods
-	abstract boolean insertBufferedChunkImpl(Chunk chunk, boolean insertCompressedChunk);
-	abstract boolean updateBufferedChunkImpl(Chunk chunk);
-	abstract boolean removeBufferedChunkImpl(Integer chunkX, Integer chunkY, boolean removeCompressed);
-	abstract void clearBufferedChunksImpl();
+	protected abstract boolean insertBufferedChunkImpl(Chunk chunk, boolean insertCompressedChunk);
+	protected abstract boolean updateBufferedChunkImpl(Chunk chunk);
+	protected abstract boolean removeBufferedChunkImpl(Integer chunkX, Integer chunkY, boolean removeCompressed);
+	protected abstract void clearBufferedChunksImpl();
 	
 	//compressed chunk operation delegates
 	@Override
@@ -203,8 +192,8 @@ public abstract class AbstractBFViewData implements ViewData{
 
 	
 	//compressed chunk operation submethods
-	abstract boolean insertCompressedChunkImpl(CompressedChunk compressedChunk, boolean insertBuffered);
-	abstract boolean updateCompressedChunkImpl(CompressedChunk compressedChunk, boolean updateBuffered);
-	abstract boolean removeCompressedChunkImpl(Integer chunkX, Integer chunkY);
-	abstract void clearCompressedChunksImpl();
+	protected abstract boolean insertCompressedChunkImpl(CompressedChunk compressedChunk, boolean insertBuffered);
+	protected abstract boolean updateCompressedChunkImpl(CompressedChunk compressedChunk, boolean updateBuffered);
+	protected abstract boolean removeCompressedChunkImpl(Integer chunkX, Integer chunkY);
+	protected abstract void clearCompressedChunksImpl();
 }

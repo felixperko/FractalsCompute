@@ -15,7 +15,6 @@ public interface ViewData extends Serializable{
 	void tick();
 	
 	void setBufferTimeout(double seconds);
-	ComplexNumber getAnchor();
 	
 	boolean isActive();
 	void setActive(boolean active);

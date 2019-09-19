@@ -3,6 +3,7 @@ package de.felixperko.fractals.system.systems.infra;
 import java.io.Serializable;
 import java.util.Map;
 
+import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
@@ -27,6 +28,7 @@ public interface SystemContext extends Serializable{
 	void setServerConnection(ServerConnection serverConnection);
 
 	FractalsCalculator createCalculator();
+	AbstractArrayChunk createChunk(int chunkX, int chunkY);
 
 	ParamContainer getParamContainer();
 	Map<String, ParamSupplier> getParameters();

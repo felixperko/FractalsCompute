@@ -16,6 +16,8 @@ import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstSyst
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.ClassSystemFactory;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
+import de.felixperko.fractals.system.systems.infra.SystemContext;
+import de.felixperko.fractals.system.systems.infra.ViewContainerListener;
 import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateUpdate;
@@ -35,7 +37,7 @@ public class SystemManager extends Manager{
 	
 	Map<String, ClassSystemFactory> availableSystems = new HashMap<>();
 	
-	public String defaultSystem = "BasicSystem";
+	public String defaultSystem = "BreadthFirstSystem";
 //	CalcSystemFactory systemFactory;
 	
 	public SystemManager(ServerManagers managers) {
@@ -206,6 +208,26 @@ public class SystemManager extends Manager{
 		return false;
 	}
 
+	public boolean registerViewContainerListener(UUID systemId, ViewContainerListener viewContainerListener) {
+		SystemContext context = getContextForId(systemId);
+		if (context == null)
+			return false;
+		return context.getViewContainer().registerViewContainerListener(viewContainerListener);
+	}
+	
+	public boolean unregisterViewContainerListener(UUID systemId,  ViewContainerListener viewContainerListener) {
+		SystemContext context = getContextForId(systemId);
+		if (context == null)
+			return false;
+		return context.getViewContainer().unregisterViewContainerListener(viewContainerListener);
+	}
+	
+	private SystemContext getContextForId(UUID systemId) {
+		CalcSystem sys = activeSystems.get(systemId);
+		if (sys == null)
+			return null;
+		return sys.getContext();
+	}
 //	public CalcSystem initSystem(String systemName) {
 //		if (!availableSystems.containsKey(systemName)) {
 //			System.err.println("[main] system not available: '"+systemName+"'");

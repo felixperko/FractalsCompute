@@ -21,6 +21,7 @@ import de.felixperko.fractals.system.parameters.suppliers.CoordinateBasicShiftPa
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.infra.AbstractCalcSystem;
+import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.task.ClassTaskFactory;
 import de.felixperko.fractals.system.task.TaskFactory;
 import de.felixperko.fractals.util.CategoryLogger;
@@ -198,6 +199,14 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 	
 	public CategoryLogger getLogger(){
 		return log;
+	}
+
+	
+	@Override
+	public SystemContext getContext() {
+		if (taskManager == null)
+			return null;
+		return taskManager.context;
 	}
 
 }

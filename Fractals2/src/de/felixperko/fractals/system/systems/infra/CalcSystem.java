@@ -33,4 +33,6 @@ public interface CalcSystem extends LifeCycleComponent{
 	public boolean isApplicable(ClientConnection connection, ParamContainer paramContainer);
 	
 	public SystemStateInfo getSystemStateInfo();
+
+	public SystemContext getContext();
 }
