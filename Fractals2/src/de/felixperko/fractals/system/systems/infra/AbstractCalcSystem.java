@@ -84,13 +84,13 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	public abstract boolean onStop();
 	
 	@Override
-	public void addClient(ClientConfiguration newConfiguration, SystemClientData systemClientData) {
+	public void addClient(ClientConfiguration newConfiguration, ParamContainer paramContainer) {
 		synchronized (clients) {
 			clients.add(newConfiguration);
-			newConfiguration.getSystemRequests().remove(systemClientData);
-			newConfiguration.getSystemClientData().put(id, systemClientData);
+			newConfiguration.getSystemRequests().remove(paramContainer);
+			newConfiguration.getSystemClientData().put(id, paramContainer);
 			newConfiguration.getConnection().writeMessage(new SystemConnectedMessage(id, newConfiguration, getParameterConfiguration()));
-			addedClient(newConfiguration, systemClientData);
+			addedClient(newConfiguration, paramContainer);
 		}
 	}
 	
@@ -98,7 +98,7 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	public void changeClient(ClientConfiguration newConfiguration, ClientConfiguration oldConfiguration) {
 		
 		
-		ParamContainer newParameters = newConfiguration.getSystemClientData(getId());
+		ParamContainer newParameters = newConfiguration.getParamContainer(getId());
 		
 		boolean applicable = isApplicable(newConfiguration.getConnection(), newParameters);
 		synchronized(clients) {
@@ -122,7 +122,7 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 		}
 	}
 	
-	public abstract void addedClient(ClientConfiguration newConfiguration, SystemClientData systemClientData);
+	public abstract void addedClient(ClientConfiguration newConfiguration, ParamContainer paramContainer);
 	public abstract void changedClient(ParamContainer paramContainer);
 	public abstract void removedClient(ClientConfiguration oldConfiguration);
 	

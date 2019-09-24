@@ -360,7 +360,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	
 	public void updatePredictedMidpoint() {
 		ComplexNumber delta = context.midpoint.copy();
-		delta.sub(context.getActiveViewData().anchor);
+		delta.sub(((BreadthFirstViewData)context.getActiveViewData()).anchor);
 		delta.divNumber(context.chunkZoom);
 		midpointChunkX = delta.realDouble();
 		midpointChunkY = delta.imagDouble();

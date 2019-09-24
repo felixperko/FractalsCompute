@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.ArrayChunkFactory;
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.shareddata.MappedSharedData;
@@ -41,7 +42,7 @@ public class BFSystemContext implements SystemContext {
 	
 	private static final long serialVersionUID = -6082120140942989559L;
 
-	transient static Map<String, Class<? extends FractalsCalculator>> availableCalculators = new HashMap<>();
+	protected transient static Map<String, Class<? extends FractalsCalculator>> availableCalculators = new HashMap<>();
 	static {
 		availableCalculators.put("MandelbrotCalculator", MandelbrotCalculator.class);
 		availableCalculators.put("BurningShipCalculator", BurningShipCalculator.class);
@@ -50,7 +51,7 @@ public class BFSystemContext implements SystemContext {
 		availableCalculators.put("NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator", NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator.class);
 	}
 	
-	transient TaskManager<?> taskManager; //is null unless at origin server
+	protected transient TaskManager<?> taskManager; //is null unless at origin server
 	
 	public transient ParamContainer paramContainer;
 	
@@ -92,7 +93,7 @@ public class BFSystemContext implements SystemContext {
 
 	private transient Number pixelzoom;
 	
-	private transient Integer viewId;
+	protected transient Integer viewId;
 	
 	public BFSystemContext(TaskManager<?> taskManager) {
 		this.taskManager = taskManager;
@@ -215,7 +216,7 @@ public class BFSystemContext implements SystemContext {
 	//				throw new IllegalStateException("no layers configured");
 	//		}
 			
-			BreadthFirstViewData activeViewData = getActiveViewData();
+			BreadthFirstViewData activeViewData = (BreadthFirstViewData)getActiveViewData();
 			if (activeViewData == null) {
 				setActiveViewData(new BreadthFirstViewData(anchor).setContext(this));
 			} else {
@@ -258,14 +259,14 @@ public class BFSystemContext implements SystemContext {
 	
 	public double getChunkX(ComplexNumber pos) {
 		Number value = pos.getReal();
-		value.sub(getActiveViewData().anchor.getReal());
+		value.sub(getCurrentAnchor().getReal());
 		value.div(chunkZoom);
 		return value.toDouble();
 	}
 	
 	public double getChunkY(ComplexNumber pos) {
 		Number value = pos.getImag();
-		value.sub(getActiveViewData().anchor.getImag());
+		value.sub(((BreadthFirstViewData)getActiveViewData()).anchor.getImag());
 		value.div(chunkZoom);
 		return value.toDouble();
 	}
@@ -274,16 +275,20 @@ public class BFSystemContext implements SystemContext {
 		ComplexNumber chunkPos = numberFactory.createComplexNumber(chunkX, chunkY);
 		chunkPos.add(relativeStartShift);
 		chunkPos.multNumber(chunkZoom);
-		chunkPos.add(getActiveViewData().anchor);
+		chunkPos.add(((BreadthFirstViewData)getActiveViewData()).anchor);
 		return chunkPos;
 	}
 	
-	public BreadthFirstViewData getActiveViewData() {
+	public ViewData getActiveViewData() {
 		return viewContainer.getActiveViewData();
 	}
 	
-	public void setActiveViewData(BreadthFirstViewData viewData) {
-		viewContainer.setActiveViewData(viewData);
+	private ComplexNumber getCurrentAnchor() {
+		return ((BreadthFirstViewData)getActiveViewData()).anchor;
+	}
+	
+	public void setActiveViewData(ViewData viewData) {
+		viewContainer.setActiveViewData((BreadthFirstViewData)viewData);
 	}
 
 	public double getScreenDistance(long chunkX, long chunkY) {
@@ -439,5 +444,10 @@ public class BFSystemContext implements SystemContext {
 	@Override
 	public int getViewId() {
 		return viewId;
+	}
+
+	@Override
+	public AbstractArrayChunk createChunk(int chunkX, int chunkY) {
+		return chunkFactory.createChunk(chunkX, chunkY);
 	}
 }

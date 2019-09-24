@@ -24,8 +24,11 @@ public class BFViewContainer implements ViewContainer {
 	}
 	
 	@Override
-	public void registerViewContainerListener(ViewContainerListener listener) {
+	public boolean registerViewContainerListener(ViewContainerListener listener) {
+		if (listeners.contains(listener))
+			return false;
 		listeners.add(listener);
+		return true;
 	}
 	
 	@Override

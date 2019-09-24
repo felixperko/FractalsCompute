@@ -10,12 +10,14 @@ import java.util.WeakHashMap;
 
 import de.felixperko.fractals.manager.common.Manager;
 import de.felixperko.fractals.network.ClientConfiguration;
-import de.felixperko.fractals.network.SystemClientData;
+import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstSystem;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.ClassSystemFactory;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
+import de.felixperko.fractals.system.systems.infra.SystemContext;
+import de.felixperko.fractals.system.systems.infra.ViewContainerListener;
 import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateUpdate;
@@ -35,7 +37,7 @@ public class SystemManager extends Manager{
 	
 	Map<String, ClassSystemFactory> availableSystems = new HashMap<>();
 	
-	public String defaultSystem = "BasicSystem";
+	public String defaultSystem = "BreadthFirstSystem";
 //	CalcSystemFactory systemFactory;
 	
 	public SystemManager(ServerManagers managers) {
@@ -51,31 +53,31 @@ public class SystemManager extends Manager{
 	
 	public void changedClientConfiguration(ClientConfiguration oldConfiguration, ClientConfiguration newConfiguration) {
 		
-		Map<UUID, SystemClientData> oldDataMap;
+		Map<UUID, ParamContainer> oldDataMap;
 		if (oldConfiguration != null)
 			oldDataMap = oldConfiguration.getSystemClientData();
 		else
 			oldDataMap = new HashMap<>();
 		
-		Map<UUID, SystemClientData> newDataMap = newConfiguration.getSystemClientData();
+		Map<UUID, ParamContainer> newDataMap = newConfiguration.getSystemClientData();
 		
 		//evaluate parameter changes for existing systems
-		for (Entry<UUID, SystemClientData> e : newDataMap.entrySet()) {
+		for (Entry<UUID, ParamContainer> e : newDataMap.entrySet()) {
 			
 			UUID systemId = e.getKey();
-			SystemClientData systemClientData = e.getValue();
+			ParamContainer paramContainer = e.getValue();
 			
 			if (!oldDataMap.containsKey(systemId)) {//new parameter (didn't exist in oldDataMap)
 				CalcSystem system = activeSystems.get(systemId);
 				if (system == null)
 					continue;
-				system.addClient(newConfiguration, systemClientData);
+				system.addClient(newConfiguration, paramContainer);
 			} else {//parameter was changed
 				boolean changed = false;
-				SystemClientData oldData = null;
+				ParamContainer oldData = null;
 				if (oldConfiguration != null) {
-					oldData = oldConfiguration.getSystemClientData(e.getKey());
-					for (Entry<String, ParamSupplier> param : systemClientData.getClientParameters().entrySet()) {
+					oldData = oldConfiguration.getParamContainer(e.getKey());
+					for (Entry<String, ParamSupplier> param : paramContainer.getClientParameters().entrySet()) {
 						String paramName = param.getKey();
 						ParamSupplier newParam = param.getValue();
 						ParamSupplier oldParam = oldData.getClientParameter(paramName);
@@ -85,10 +87,7 @@ public class SystemManager extends Manager{
 					}
 				}
 				
-				int oldGranted = oldData != null ? oldData.getGrantedThreads() : 0;
-				int newGranted = systemClientData.getGrantedThreads();
-				
-				if (!changed && oldGranted == newGranted) {
+				if (!changed) {
 					continue;
 				}
 				
@@ -98,10 +97,6 @@ public class SystemManager extends Manager{
 
 				if (changed)
 					system.changeClient(newConfiguration, oldConfiguration);
-				
-				if (oldGranted != newGranted) {
-					system.changeClientMaxThreadCount(newGranted, oldGranted);
-				}
 			}
 		}
 		
@@ -116,9 +111,9 @@ public class SystemManager extends Manager{
 		}
 		
 		//process system requests
-		List<SystemClientData> requests = new ArrayList<>(newConfiguration.getSystemRequests());
+		List<ParamContainer> requests = new ArrayList<>(newConfiguration.getSystemRequests());
 		requestLoop :
-		for (SystemClientData data : requests) {
+		for (ParamContainer data : requests) {
 			//search systems if applicable
 			for (CalcSystem system : activeSystems.values()) {
 				if ((system.getLifeCycleState() == LifeCycleState.IDLE || system.getLifeCycleState() == LifeCycleState.RUNNING)
@@ -137,7 +132,7 @@ public class SystemManager extends Manager{
 		}
 	}
 
-	private CalcSystem initSystem(SystemClientData data) {
+	private CalcSystem initSystem(ParamContainer data) {
 		ParamSupplier systemNameParam = data.getClientParameter("systemName");
 		if (systemNameParam == null) {
 			System.err.println("Invalid system request: systemName parameters not set.");
@@ -206,6 +201,26 @@ public class SystemManager extends Manager{
 		return false;
 	}
 
+	public boolean registerViewContainerListener(UUID systemId, ViewContainerListener viewContainerListener) {
+		SystemContext context = getContextForId(systemId);
+		if (context == null)
+			return false;
+		return context.getViewContainer().registerViewContainerListener(viewContainerListener);
+	}
+	
+	public boolean unregisterViewContainerListener(UUID systemId,  ViewContainerListener viewContainerListener) {
+		SystemContext context = getContextForId(systemId);
+		if (context == null)
+			return false;
+		return context.getViewContainer().unregisterViewContainerListener(viewContainerListener);
+	}
+	
+	private SystemContext getContextForId(UUID systemId) {
+		CalcSystem sys = activeSystems.get(systemId);
+		if (sys == null)
+			return null;
+		return sys.getContext();
+	}
 //	public CalcSystem initSystem(String systemName) {
 //		if (!availableSystems.containsKey(systemName)) {
 //			System.err.println("[main] system not available: '"+systemName+"'");

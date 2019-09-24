@@ -49,7 +49,6 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 		this.chunk = chunk;
 		this.chunk.chunkPos = chunkPos.copy();
 		chunk.setCurrentTask(this);
-			
 	}
 	
 	@Override

@@ -24,7 +24,7 @@ public class FractalsMain {
 		managers.getThreadManager().startInputScannerThread();
 	}
 	
-	public static Messageable registerLocalClient(Messageable clientMessageable) {
+	public static ServerLocalMessageable registerLocalClient(Messageable clientMessageable) {
 		ClientLocalConnection clientConnection = managers.getNetworkManager().createNewLocalClient(clientMessageable);
 		clientMessageable.setConnection(clientConnection);
 		ServerLocalMessageable slm = new ServerLocalMessageable(managers, "IN_LOCAL");

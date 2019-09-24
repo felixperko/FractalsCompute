@@ -20,15 +20,43 @@ public class ParamContainer implements Serializable{
 		this.clientParameters = clientParameters;
 	}
 
-	public ParamContainer(Map<String, ParamSupplier> clientParameters, boolean newInstances) {
+	public ParamContainer(ParamContainer parent, boolean newInstances) {
 		if (!newInstances)
-			this.clientParameters = clientParameters;
+			this.clientParameters = parent.getClientParameters();
 		else {
 			this.clientParameters = new HashMap<String, ParamSupplier>();
-			for (Entry<String, ParamSupplier> e : clientParameters.entrySet()){
+			for (Entry<String, ParamSupplier> e : parent.getClientParameters().entrySet()){
 				this.clientParameters.put(e.getKey(), e.getValue().copy());
 			}
 		}
+	}
+
+	public boolean needsReset(Map<String, ParamSupplier> oldParams){
+		boolean reset = false;
+		if (oldParams != null) {
+			for (ParamSupplier supplier : clientParameters.values()) {
+				supplier.updateChanged(oldParams.get(supplier.getName()));
+				if (supplier.isChanged()) {
+					if (supplier.isSystemRelevant() || supplier.isLayerRelevant())
+						reset = true;
+				}
+			}
+		}
+		return reset;
+	}
+	
+	public void applyParams(ParamContainer paramContainer) {
+		Map<String, ParamSupplier> old = getClientParameters();
+		this.clientParameters = new HashMap<>(paramContainer.getClientParameters());
+		for (String key : old.keySet())
+			if (!this.clientParameters.containsKey(key))
+				this.clientParameters.put(key, old.get(key).copy());
+	}
+	
+	public boolean applyParamsAndNeedsReset(ParamContainer paramContainer) {
+		Map<String, ParamSupplier> old = getClientParameters();
+		applyParams(paramContainer);
+		return needsReset(old);
 	}
 
 	public void addClientParameter(ParamSupplier paramSupplier) {

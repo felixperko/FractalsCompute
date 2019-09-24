@@ -1,13 +1,17 @@
 package de.felixperko.fractals.network.interfaces;
 
+import java.util.UUID;
+
 import de.felixperko.fractals.data.shareddata.SharedDataController;
 import de.felixperko.fractals.manager.common.Managers;
+import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.network.infra.connection.ClientLocalConnection;
 import de.felixperko.fractals.network.infra.connection.Connection;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.network.messages.ConnectedMessage;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
+import de.felixperko.fractals.system.systems.infra.ViewContainerListener;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 import de.felixperko.fractals.util.CategoryLogger;
 import de.felixperko.fractals.util.ColorContainer;
@@ -91,5 +95,13 @@ public class ServerLocalMessageable extends AbstractFractalsThread implements Me
 	
 	protected void tick(){
 		sharedDataController.sendMessageIfUpdatesAvailable(getConnection());
+	}
+	
+	public boolean registerViewContainerListener(UUID systemId, ViewContainerListener listener) {
+		return ((ServerManagers)managers).getSystemManager().registerViewContainerListener(systemId, listener);
+	}
+	
+	public boolean unregisterViewContainerListener(UUID systemId, ViewContainerListener listener) {
+		return ((ServerManagers)managers).getSystemManager().unregisterViewContainerListener(systemId, listener);
 	}
 }

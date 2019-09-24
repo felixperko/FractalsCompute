@@ -21,16 +21,16 @@ public interface CalcSystem extends LifeCycleComponent{
 	public void stop();
 	public void reset();
 	
-	public void addClient(ClientConfiguration newConfiguration, SystemClientData systemClientData);
+	public void addClient(ClientConfiguration newConfiguration, ParamContainer paramContainer);
 	public void changeClient(ClientConfiguration newConfiguration, ClientConfiguration oldConfiguration);
 	public void removeClient(ClientConfiguration oldConfiguration);
 	public List<ClientConfiguration> getClients();
-	
-	public void changeClientMaxThreadCount(int newGranted, int oldGranted);
 
 	public ParameterConfiguration getParameterConfiguration();
 	public ParameterConfiguration createParameterConfiguration();
 	public boolean isApplicable(ClientConnection connection, ParamContainer paramContainer);
 	
 	public SystemStateInfo getSystemStateInfo();
+
+	public SystemContext getContext();
 }

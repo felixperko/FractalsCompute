@@ -6,7 +6,7 @@ import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstView
 
 public interface ViewContainer extends ViewContainerListener {
 
-	void registerViewContainerListener(ViewContainerListener listener);
+	boolean registerViewContainerListener(ViewContainerListener listener);
 
 	boolean unregisterViewContainerListener(ViewContainerListener listener);
 

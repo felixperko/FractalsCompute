@@ -10,7 +10,7 @@ public class UpdateConfigurationMessage extends ClientMessage {
 	ClientConfiguration configuration;
 
 	public UpdateConfigurationMessage(ClientConfiguration configuration) {
-		this.configuration = configuration;
+		this.configuration = new ClientConfiguration(configuration, true);
 	}
 	
 	@Override
