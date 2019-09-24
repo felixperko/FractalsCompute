@@ -1,15 +1,9 @@
 package de.felixperko.fractals.system.systems.OrbitSystem;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.network.SystemClientData;
-import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.parameters.ParameterConfiguration;
 import de.felixperko.fractals.system.systems.infra.AbstractCalcSystem;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
@@ -29,11 +23,6 @@ public class OrbitSystem extends AbstractCalcSystem {
 	}
 
 	@Override
-	public void changeClientMaxThreadCount(int newGranted, int oldGranted) {
-		
-	}
-
-	@Override
 	public ParameterConfiguration createParameterConfiguration() {
 		// TODO Auto-generated method stub
 		return null;
@@ -41,8 +30,9 @@ public class OrbitSystem extends AbstractCalcSystem {
 
 	@Override
 	public boolean onInit(ParamContainer paramContainer) {
-		// TODO Auto-generated method stub
-		return false;
+		taskManager = new OrbitTaskManager(managers, this);
+		taskManager.setParameters(paramContainer);
+		return true;
 	}
 
 	@Override
@@ -61,21 +51,17 @@ public class OrbitSystem extends AbstractCalcSystem {
 	}
 
 	@Override
-	public void addedClient(ClientConfiguration newConfiguration, SystemClientData systemClientData) {
-		// TODO Auto-generated method stub
-
+	public void addedClient(ClientConfiguration newConfiguration, ParamContainer paramContainer) {
+		taskManager.setParameters(paramContainer);
 	}
 
 	@Override
 	public void changedClient(ParamContainer paramContainer) {
-		// TODO Auto-generated method stub
-
+		taskManager.setParameters(paramContainer);
 	}
 
 	@Override
 	public void removedClient(ClientConfiguration oldConfiguration) {
-		// TODO Auto-generated method stub
-
 	}
 
 	

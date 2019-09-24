@@ -35,7 +35,7 @@ public abstract class ClientMessageInterface {
 	public void createdSystem(UUID systemId, ClientConfiguration clientConfiguration, ParameterConfiguration parameterConfiguration) {
 		ClientSystemInterface systemInterface = createSystemInterface(clientConfiguration);
 		addSystemInterface(systemId, systemInterface);
-		systemInterface.updateParameterConfiguration(clientConfiguration.getSystemClientData(systemId), parameterConfiguration);
+		systemInterface.updateParameterConfiguration(clientConfiguration.getParamContainer(systemId), parameterConfiguration);
 	}
 	
 	public void removedSystem(UUID systemId) {

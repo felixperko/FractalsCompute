@@ -15,27 +15,33 @@ public class ParameterDefinition implements Serializable{
 	
 	String name;
 	String description;
+	List<String> hints = new ArrayList<>();
+	
+	String category;
 	
 	List<Class<? extends ParamSupplier>> possibleClasses;
 	List<ParamValueType> possibleValueTypes;
 	
 	Object defaultValue = null;
 	
-	public ParameterDefinition(String name, Class<? extends ParamSupplier> cls, ParamValueType... possibleValueTypes) {
+	public ParameterDefinition(String name, String category, Class<? extends ParamSupplier> cls, ParamValueType... possibleValueTypes) {
 		this.name = name;
+		this.category = category;
 		this.possibleClasses = new ArrayList<>();
 		this.possibleValueTypes = Arrays.asList(possibleValueTypes);
 		this.possibleClasses.add(cls);
 	}
 	
-	public ParameterDefinition(String name, List<Class<? extends ParamSupplier>> classes, ParamValueType... possibleValueTypes) {
+	public ParameterDefinition(String name, String category, List<Class<? extends ParamSupplier>> classes, ParamValueType... possibleValueTypes) {
 		this.name = name;
+		this.category = category;
 		this.possibleClasses = classes;
 		this.possibleValueTypes = Arrays.asList(possibleValueTypes);
 	}
 	
-	public ParameterDefinition(String name, ParamValueType possibleValue, Class<? extends ParamSupplier>... classes) {
+	public ParameterDefinition(String name, String category, ParamValueType possibleValue, Class<? extends ParamSupplier>... classes) {
 		this.name = name;
+		this.category = category;
 		this.possibleClasses = Arrays.asList(classes);
 		this.possibleValueTypes = new ArrayList<>();
 		this.possibleValueTypes.add(possibleValue);
@@ -69,8 +75,22 @@ public class ParameterDefinition implements Serializable{
 		this.description = description;
 		return this;
 	}
+	
+	public ParameterDefinition withHints(String... hints) {
+		for (String hint : hints)
+			this.hints.add(hint);
+		return this;
+	}
 
 	public Object getDefaultValue() {
 		return defaultValue;
+	}
+	
+	public String getCategory() {
+		return category;
+	}
+	
+	public List<String> getHints() {
+		return hints;
 	}
 }

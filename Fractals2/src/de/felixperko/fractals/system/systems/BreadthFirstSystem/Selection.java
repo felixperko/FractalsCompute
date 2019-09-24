@@ -12,14 +12,16 @@ public class Selection<T> implements Serializable{
 	
 	String name;
 	Map<String, T> options = new HashMap<>();
+	Map<String, String> descriptions = new HashMap<>();
 	List<String> nameList = new ArrayList<>();
 	
 	public Selection(String name){
 		this.name = name;
 	}
 	
-	public void addOption(String name, T option) {
+	public void addOption(String name, T option, String description) {
 		options.put(name, option);
+		descriptions.put(name, description);
 		nameList.add(name);
 	}
 	
@@ -29,6 +31,10 @@ public class Selection<T> implements Serializable{
 	
 	public List<String> getOptionNames(){
 		return nameList;
+	}
+	
+	public String getDescription(String name){
+		return descriptions.get(name);
 	}
 
 	public String getName() {

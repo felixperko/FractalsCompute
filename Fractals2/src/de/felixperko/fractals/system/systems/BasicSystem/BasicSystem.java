@@ -78,7 +78,7 @@ public class BasicSystem extends AbstractCalcSystem {
 	@Override
 	public void changedClient(ClientConfiguration newConfiguration, ClientConfiguration oldConfiguration) {
 		
-		Map<String, ParamSupplier> newParameters = newConfiguration.getSystemClientData(getId()).getClientParameters();
+		Map<String, ParamSupplier> newParameters = newConfiguration.getParamContainer(getId()).getClientParameters();
 		
 		boolean applicable = isApplicable(newConfiguration.getConnection(), newParameters);
 		

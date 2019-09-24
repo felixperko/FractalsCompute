@@ -15,19 +15,19 @@ public class ClientConfiguration implements Serializable{
 	
 	private static final long serialVersionUID = -5403520207176226669L;
 	
-	Map<UUID, SystemClientData> instances = new HashMap<>();
-	List<SystemClientData> systemRequests = new ArrayList<>();
+	Map<UUID, ParamContainer> instances = new HashMap<>();
+	List<ParamContainer> systemRequests = new ArrayList<>();
 	transient ClientConnection connectionToClient;
 	
 	public ClientConfiguration() {
 	}
 	
-	public ClientConfiguration(ClientConfiguration cloneConfig){
-		for (Entry<UUID, SystemClientData> e : cloneConfig.instances.entrySet()){
-			this.instances.put(e.getKey(), new SystemClientData(e.getValue()));
+	public ClientConfiguration(ClientConfiguration cloneConfig, boolean newInstances){
+		for (Entry<UUID, ParamContainer> e : cloneConfig.instances.entrySet()){
+			this.instances.put(e.getKey(), new ParamContainer(e.getValue(), newInstances));
 		}
-		for (SystemClientData scd : cloneConfig.systemRequests){
-			this.systemRequests.add(new SystemClientData(scd));
+		for (ParamContainer scd : cloneConfig.systemRequests){
+			this.systemRequests.add(new ParamContainer(scd, newInstances));
 		}
 		this.connectionToClient = cloneConfig.connectionToClient;
 	}
@@ -40,11 +40,11 @@ public class ClientConfiguration implements Serializable{
 		this.connectionToClient = connectionToClient;
 	}
 	
-	public Map<UUID, SystemClientData> getSystemClientData() {
+	public Map<UUID, ParamContainer> getSystemClientData() {
 		return instances;
 	}
 	
-	public SystemClientData getSystemClientData(UUID systemId) {
+	public ParamContainer getParamContainer(UUID systemId) {
 		return instances.get(systemId);
 	}
 	
@@ -57,11 +57,11 @@ public class ClientConfiguration implements Serializable{
 		return getParameter(systemId, name).get(null, cls, null, 0, 0);
 	}
 	
-	public List<SystemClientData> getSystemRequests(){
+	public List<ParamContainer> getSystemRequests(){
 		return systemRequests;
 	}
 
-	public void addRequest(SystemClientData systemClientData) {
+	public void addRequest(ParamContainer systemClientData) {
 		systemRequests.add(systemClientData);
 	}
 
