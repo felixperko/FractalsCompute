@@ -1,11 +1,14 @@
 package de.felixperko.fractals.network.interfaces;
 
+import java.util.UUID;
+
 import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.network.SystemClientData;
 import de.felixperko.fractals.system.parameters.ParameterConfiguration;
 
 public interface ClientSystemInterface {
+	public UUID getSystemId();
 	public void chunkUpdated(CompressedChunk chunk);
 	public void chunksCleared();
 	public ParameterConfiguration getParamConfiguration();

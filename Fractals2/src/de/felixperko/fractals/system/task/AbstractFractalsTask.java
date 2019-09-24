@@ -28,6 +28,7 @@ public abstract class AbstractFractalsTask<T> implements FractalsTask{
 	
 	public AbstractFractalsTask(SystemContext context, Integer id, TaskManager<T> taskManager, int jobId, Layer layer) {
 		this.jobId = jobId;
+		System.out.println("Created Task with jobid "+jobId);
 		this.taskManager = taskManager;
 		this.context = context;
 		this.stateInfo = new TaskStateInfo(id, taskManager.getSystem().getId(), context);

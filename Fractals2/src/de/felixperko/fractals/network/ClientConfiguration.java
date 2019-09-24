@@ -48,6 +48,10 @@ public class ClientConfiguration implements Serializable{
 		return instances.get(systemId);
 	}
 	
+	public void setSystemClientData(UUID systemId, SystemClientData clientData){
+		this.instances.put(systemId, clientData);
+	}
+	
 	public ParamSupplier getParameter(UUID systemId, String name) {
 		ParamContainer data = instances.get(systemId);
 		return data.getClientParameter(name);

@@ -12,8 +12,8 @@ public class SystemClientData extends ParamContainer implements Serializable{
 	
 	int grantThreads;
 	
-	public SystemClientData(Map<String, ParamSupplier> clientParameters, int grantThreads) {
-		super(clientParameters);
+	public SystemClientData(Map<String, ParamSupplier> clientParameters, int grantThreads, boolean newInstances) {
+		super(clientParameters, newInstances);
 		this.grantThreads = grantThreads;
 	}
 

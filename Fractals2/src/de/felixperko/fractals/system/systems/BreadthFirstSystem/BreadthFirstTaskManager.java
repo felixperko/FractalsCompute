@@ -289,7 +289,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 						upsample = ((BreadthFirstUpsampleLayer)layer).getUpsample();
 					
 
-					CompressedChunk compressedChunk = context.getActiveViewData().updateBufferedAndCompressedChunk(task.getChunk()); //TODO occasional npe! (2x (1x view 252))
+					CompressedChunk compressedChunk = context.getActiveViewData().updateBufferedAndCompressedChunk(task.getChunk());
 					
 					//send update messages
 					for (ClientConfiguration client : clients) {
