@@ -88,7 +88,7 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 		synchronized (clients) {
 			clients.add(newConfiguration);
 			newConfiguration.getSystemRequests().remove(paramContainer);
-			newConfiguration.getSystemClientData().put(id, paramContainer);
+			newConfiguration.getParamContainers().put(id, paramContainer);
 			newConfiguration.getConnection().writeMessage(new SystemConnectedMessage(id, newConfiguration, getParameterConfiguration()));
 			addedClient(newConfiguration, paramContainer);
 		}

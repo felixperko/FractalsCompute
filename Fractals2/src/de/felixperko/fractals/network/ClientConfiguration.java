@@ -40,7 +40,7 @@ public class ClientConfiguration implements Serializable{
 		this.connectionToClient = connectionToClient;
 	}
 	
-	public Map<UUID, ParamContainer> getSystemClientData() {
+	public Map<UUID, ParamContainer> getParamContainers() {
 		return instances;
 	}
 	
@@ -48,8 +48,8 @@ public class ClientConfiguration implements Serializable{
 		return instances.get(systemId);
 	}
 	
-	public void setSystemClientData(UUID systemId, SystemClientData clientData){
-		this.instances.put(systemId, clientData);
+	public void setParamContainer(UUID systemId, ParamContainer paramContainer){
+		this.instances.put(systemId, paramContainer);
 	}
 	
 	public ParamSupplier getParameter(UUID systemId, String name) {

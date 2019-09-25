@@ -55,11 +55,11 @@ public class SystemManager extends Manager{
 		
 		Map<UUID, ParamContainer> oldDataMap;
 		if (oldConfiguration != null)
-			oldDataMap = oldConfiguration.getSystemClientData();
+			oldDataMap = oldConfiguration.getParamContainers();
 		else
 			oldDataMap = new HashMap<>();
 		
-		Map<UUID, ParamContainer> newDataMap = newConfiguration.getSystemClientData();
+		Map<UUID, ParamContainer> newDataMap = newConfiguration.getParamContainers();
 		
 		//evaluate parameter changes for existing systems
 		for (Entry<UUID, ParamContainer> e : newDataMap.entrySet()) {
@@ -160,7 +160,7 @@ public class SystemManager extends Manager{
 
 
 	public void clientRemoved(ClientConfiguration conf) {
-		for (UUID systemId : conf.getSystemClientData().keySet()) {
+		for (UUID systemId : conf.getParamContainers().keySet()) {
 			CalcSystem system = activeSystems.get(systemId);
 			system.removeClient(conf);
 			//TODO stop connection (i/o!)		

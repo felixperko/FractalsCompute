@@ -1,12 +1,7 @@
 package de.felixperko.fractals.network;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
-import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
-
-@Deprecated
 public class SystemClientData implements Serializable{
 	
 	private static final long serialVersionUID = -6322484739454792244L;
@@ -20,11 +15,6 @@ public class SystemClientData implements Serializable{
 		else {
 			this.paramContainer = new ParamContainer(paramContainer, true);
 		}
-	}
-
-	public SystemClientData(SystemClientData cloneSystemClientData) {
-		super(cloneSystemClientData.clientParameters, true);
-		this.grantThreads = cloneSystemClientData.grantThreads;
 	}
 	
 	public SystemClientData() {
