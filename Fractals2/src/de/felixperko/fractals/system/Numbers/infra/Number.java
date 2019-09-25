@@ -2,7 +2,7 @@ package de.felixperko.fractals.system.Numbers.infra;
 
 import java.io.Serializable;
 
-public interface Number<N extends Number> extends Serializable{
+public interface Number<N extends Number<N>> extends Serializable{
 	
 	public void add(N other);
 	public void sub(N other);

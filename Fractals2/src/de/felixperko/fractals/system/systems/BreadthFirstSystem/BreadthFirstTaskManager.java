@@ -313,7 +313,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 					task.getStateInfo().setState(TaskState.DONE);
 				} else {
 					currentLayerId++;
-					BreadthFirstLayer layer = context.layerConfig.getLayers().get(currentLayerId);
+					Layer layer = context.layerConfig.getLayers().get(currentLayerId);
 					task.getStateInfo().setLayer(layer);
 					task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layer);
 					openTasks.get(currentLayerId).add(task);
@@ -349,7 +349,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		finishedTasks.clear();
 		borderTasks.clear();
 		newQueue.clear();
-		ViewData viewData = context.getActiveViewData();
+		BreadthFirstViewData viewData = context.getActiveViewData();
 		if (viewData != null) {
 //			viewData.dispose();
 			context.setActiveViewData(null); //TODO does that make sense?
@@ -372,7 +372,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		updatedPredictedMidpoint = false;
 		//clear queues to update sorting
 		synchronized (this) {
-			List<BreadthFirstLayer> layers = context.layerConfig.getLayers();
+			List<Layer> layers = context.layerConfig.getLayers();
 			for (int l = 0 ; l < layers.size() ; l++) {
 				tempList.get(l).addAll(openTasks.get(l));
 				openTasks.get(l).clear();
@@ -425,7 +425,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			//add task for chunk at midpoint if not calculated
 			int midpointChunkXFloor = (int)midpointChunkX;
 			int midpointChunkYFloor = (int)midpointChunkY;
-			ViewData viewData = context.getActiveViewData();
+			BreadthFirstViewData viewData = context.getActiveViewData();
 			if (!viewData.hasCompressedChunk(midpointChunkXFloor, midpointChunkYFloor)){
 				AbstractArrayChunk chunk = context.chunkFactory.createChunk(midpointChunkXFloor, midpointChunkYFloor);
 				BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getChunkPos(midpointChunkXFloor, midpointChunkYFloor),
@@ -447,7 +447,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	
 	private synchronized boolean fillQueues() {
 		boolean changed = false;
-		List<BreadthFirstLayer> layers = context.layerConfig.getLayers();
+		List<Layer> layers = context.layerConfig.getLayers();
 		
 		//buffer not filled -> fill if pending tasks are available
 		while (nextBufferedTasks.size() < context.buffer) {

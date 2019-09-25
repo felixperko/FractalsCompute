@@ -1,25 +1,20 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
-import java.util.List;
-
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.data.ReducedNaiveChunk;
-import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
-import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.systems.infra.ViewContainer;
-import de.felixperko.fractals.system.systems.infra.ViewData;
 import de.felixperko.fractals.util.NestedMap;
 import de.felixperko.fractals.util.NumberUtil;
 
 /**
  * Provides general functionality for ViewData implementations, keeping data management to subclasses
  */
-public abstract class AbstractBFViewData implements ViewData{
+public abstract class AbstractBFViewData<VIEWDATA extends AbstractBFViewData<VIEWDATA>> implements ChunkedViewData<BFSystemContext>{
 	
 	private static final long serialVersionUID = 2638706868007870329L;
 
-	SystemContext systemContext;
+	BFSystemContext systemContext;
 	
 	boolean active = false;
 
@@ -27,15 +22,13 @@ public abstract class AbstractBFViewData implements ViewData{
 	transient NestedMap<Integer, Long> lastSeen = new NestedMap<>();
 	
 	@Override
-	public ViewData setContext(SystemContext systemContext) {
-		if (!(systemContext instanceof BFSystemContext))
-			throw new IllegalArgumentException("AbstractBFViewData only works with BFSystemContexts right now");
+	public VIEWDATA setContext(BFSystemContext systemContext) {
 		this.systemContext = systemContext;
-		return this;
+		return (VIEWDATA) this;
 	}
 	
 	@Override
-	public SystemContext getContext() {
+	public BFSystemContext getContext() {
 		return systemContext;
 	}
 

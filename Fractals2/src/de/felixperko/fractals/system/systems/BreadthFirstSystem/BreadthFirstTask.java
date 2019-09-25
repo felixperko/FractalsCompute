@@ -204,7 +204,7 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	}
 	
 	@Override
-	public void updatePriorityAndDistance(double midpointChunkX, double midpointChunkY, BreadthFirstLayer layer) {
+	public void updatePriorityAndDistance(double midpointChunkX, double midpointChunkY, Layer layer) {
 		updateDistance(midpointChunkX, midpointChunkX);
 		priority = distance * layer.getPriorityMultiplier() + layer.getPriorityShift();
 	}

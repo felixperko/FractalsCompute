@@ -1,22 +1,16 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.ArrayChunkFactory;
 import de.felixperko.fractals.data.Chunk;
-import de.felixperko.fractals.data.shareddata.MappedSharedData;
 import de.felixperko.fractals.data.shareddata.MappedSharedDataUpdate;
 import de.felixperko.fractals.network.ParamContainer;
-import de.felixperko.fractals.network.infra.connection.ServerConnection;
-import de.felixperko.fractals.network.messages.task.TaskStateChangedMessage;
+import de.felixperko.fractals.system.AbstractSystemContext;
+import de.felixperko.fractals.system.LayerConfiguration;
+import de.felixperko.fractals.system.ZoomableSystemContext;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.Number;
 import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
@@ -29,16 +23,13 @@ import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
-import de.felixperko.fractals.system.systems.infra.ViewContainer;
 import de.felixperko.fractals.system.systems.infra.ViewData;
-import de.felixperko.fractals.system.systems.stateinfo.SystemStateInfo;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateUpdate;
-import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskManager;
 
-public class BFSystemContext implements SystemContext {
+public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData, BFViewContainer> implements ZoomableSystemContext<BFViewContainer> {
 	
 	private static final long serialVersionUID = -6082120140942989559L;
 
@@ -51,17 +42,6 @@ public class BFSystemContext implements SystemContext {
 		availableCalculators.put("NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator", NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator.class);
 	}
 	
-	protected transient TaskManager<?> taskManager; //is null unless at origin server
-	
-	public transient ParamContainer paramContainer;
-	
-	public transient Class<? extends FractalsCalculator> calculatorClass;
-	
-	public transient NumberFactory numberFactory;
-	public transient ArrayChunkFactory chunkFactory;
-	
-	public transient ComplexNumber midpoint;
-	public transient int chunkSize;
 	public transient Number zoom;
 	public transient Number chunkZoom;
 	
@@ -72,14 +52,10 @@ public class BFSystemContext implements SystemContext {
 	public transient double border_generation = 0d;
 	public transient double border_dispose = 5d;
 	
-	private transient ViewContainer viewContainer = new BFViewContainer(0); //TODO multiple
-	
 	public transient int chunksWidth;
 	public transient int chunksHeight;
 	
 	public transient ComplexNumber relativeStartShift;
-	
-	public transient LayerConfiguration layerConfig;
 	
 	public transient ComplexNumber leftLowerCorner;
 	public transient double leftLowerCornerChunkX;
@@ -88,29 +64,14 @@ public class BFSystemContext implements SystemContext {
 	public transient double rightUpperCornerChunkX;
 	public transient double rightUpperCornerChunkY;
 	
-	transient SystemStateInfo systemStateInfo = null;
-	transient ServerConnection serverConnection;
-
 	private transient Number pixelzoom;
 	
-	protected transient Integer viewId;
-	
 	public BFSystemContext(TaskManager<?> taskManager) {
-		this.taskManager = taskManager;
+		super(taskManager, new BFViewContainer(0));
 		if (taskManager != null)
 			systemStateInfo = taskManager.getSystem().getSystemStateInfo();
 	}
 	
-	@Override
-	public Layer getLayer(int layerId) {
-		return layerConfig.getLayer(layerId);
-	}
-	
-	@Override
-	public NumberFactory getNumberFactory() {
-		return numberFactory;
-	}
-
 	@Override
 	public boolean setParameters(ParamContainer paramContainer) {
 		
@@ -199,23 +160,6 @@ public class BFSystemContext implements SystemContext {
 			if (reset && taskManager != null)
 				taskManager.reset();
 			
-			
-	//		ParamSupplier layersParam = parameters.get("layers");
-	//		List<?> layers2 = layersParam.getGeneral(List.class);
-	//		if (layers.isEmpty() || layersParam.isChanged()) {
-	//			layers.clear();
-	//			for (Object obj : layers2) {
-	//				if (!(obj instanceof BreadthFirstLayer))
-	//					throw new IllegalStateException("content in layers isn't compartible with BreadthFirstLayer");
-	//				layers.add((BreadthFirstLayer)obj);
-	//				
-	//				openTasks.add(new PriorityQueue<>(comparator_distance));
-	//				tempList.add(new ArrayList<>());
-	//			}
-	//			if (layers.isEmpty())
-	//				throw new IllegalStateException("no layers configured");
-	//		}
-			
 			BreadthFirstViewData activeViewData = (BreadthFirstViewData)getActiveViewData();
 			if (activeViewData == null) {
 				setActiveViewData(new BreadthFirstViewData(anchor).setContext(this));
@@ -279,18 +223,10 @@ public class BFSystemContext implements SystemContext {
 		return chunkPos;
 	}
 	
-	public ViewData getActiveViewData() {
-		return viewContainer.getActiveViewData();
-	}
-	
 	private ComplexNumber getCurrentAnchor() {
 		return ((BreadthFirstViewData)getActiveViewData()).anchor;
 	}
 	
-	public void setActiveViewData(ViewData viewData) {
-		viewContainer.setActiveViewData((BreadthFirstViewData)viewData);
-	}
-
 	public double getScreenDistance(long chunkX, long chunkY) {
 		if (chunkX+1 >= leftLowerCornerChunkX && chunkY+1 >= leftLowerCornerChunkY) {
 			if (chunkX <= rightUpperCornerChunkX && chunkY <= rightUpperCornerChunkY) {
@@ -310,112 +246,12 @@ public class BFSystemContext implements SystemContext {
 	public double getScreenDistance(Chunk chunk) {
 		return getScreenDistance(chunk.getChunkX(), chunk.getChunkY());
 	}
-
-	@Override
-	public void taskStateUpdated(TaskStateInfo taskStateInfo, TaskState oldState) {
-		if (systemStateInfo != null) { //TODO local
-			TaskStateUpdate updateMessage = taskStateInfo.getUpdateMessage();
-			if (updateMessage == null || updateMessage.isSent())
-				taskStateInfo.setUpdateMessage(systemStateInfo.taskStateChanged(taskStateInfo.getTaskId(), oldState, taskStateInfo));
-			else {
-				synchronized (updateMessage) {
-					updateMessage.refresh(taskStateInfo.getState(), taskStateInfo.getLayerId(), taskStateInfo.getProgress());
-					systemStateInfo.taskStateUpdated(updateMessage);
-				}
-			}
-		} else {
-			
-			MappedSharedDataUpdate<TaskStateUpdate> update = new MappedSharedDataUpdate<>();
-			update.setValue(taskStateInfo.getSystemId()+""+taskStateInfo.getTaskId(), new TaskStateUpdate(taskStateInfo));
-			serverConnection.stateUpdates.update(update);
-			
-//			TaskStateChangedMessage msg = new TaskStateChangedMessage(taskStateInfo);
-//			serverConnection.writeMessage(msg);
-		}
-	}
 	
-	@Override
-	public FractalsCalculator createCalculator() {
-		try {
-			return calculatorClass.getDeclaredConstructor().newInstance();
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
-			throw new IllegalStateException("Failed to create calculator for class: "+calculatorClass.getName());
-		}
-	}
-
-	@Override
-	public void setServerConnection(ServerConnection serverConnection) {
-		this.serverConnection = serverConnection;
-	}
-
-	@Override
-	public ViewContainer getViewContainer() {
-		return viewContainer;
-	}
-	
-	@Override
-	public ParamContainer getParamContainer() {
-		return paramContainer;
-	}
-	
-	@Override
-	public synchronized Map<String, ParamSupplier> getParameters() {
-		return paramContainer.getClientParameters();
-	}
-
-	@Override
-	public synchronized <T> T getParamValue(String parameterKey, Class<T> valueCls) {
-		return paramContainer.getClientParameter(parameterKey).get(this, valueCls, null, 0, 0);
-	}
-	
-	@Override
-	public synchronized Object getParamValue(String parameterKey) {
-		return paramContainer.getClientParameter(parameterKey).get(this, null, 0, 0);
-	}
-
-	@Override
-	public synchronized <T> T getParamValue(String parameterKey, Class<T> valueCls, ComplexNumber chunkPos, int pixel, int sample) {
-		return paramContainer.getClientParameter(parameterKey).get(this, valueCls, chunkPos, pixel, sample);
-	}
-	
-	private void writeObject(ObjectOutputStream oos) throws IOException{
-		oos.defaultWriteObject();
-		oos.writeObject(paramContainer);
-	}
-	
-	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
-		ois.defaultReadObject();
-		ParamContainer paramContainer = (ParamContainer) ois.readObject();
-		setParameters(paramContainer);
-	}
-
-	@Override
-	public LayerConfiguration getLayerConfiguration() {
-		return layerConfig;
-	}
-
 	@Override
 	public Number getPixelzoom() {
 		return pixelzoom;
 	}
 
-	@Override
-	public int getChunkSize() {
-		return chunkSize;
-	}
-	
-	@Override
-	public ComplexNumber getMidpoint() {
-		return midpoint;
-	}
-	
-	@Override
-	public void setMidpoint(ComplexNumber midpoint) {
-		this.midpoint = midpoint;
-		paramContainer.addClientParameter(new StaticParamSupplier("midpoint", midpoint));
-	}
-	
 	@Override
 	public Number getZoom() {
 		return zoom;
@@ -429,23 +265,6 @@ public class BFSystemContext implements SystemContext {
 		paramContainer.addClientParameter(supplier);	
 	}
 	
-	@Override
-	public void incrementViewId() {
-		viewId = getParamValue("view", Integer.class) + 1;
-		paramContainer.addClientParameter(new StaticParamSupplier("view", viewId));
-	}
-	
-	@Override
-	public void setViewId(Integer viewId){
-		this.viewId = viewId;
-		paramContainer.addClientParameter(new StaticParamSupplier("view", viewId));
-	}
-	
-	@Override
-	public int getViewId() {
-		return viewId;
-	}
-
 	@Override
 	public AbstractArrayChunk createChunk(int chunkX, int chunkY) {
 		return chunkFactory.createChunk(chunkX, chunkY);

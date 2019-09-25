@@ -5,12 +5,15 @@ import java.util.List;
 
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.CompressedChunk;
+import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 
-public interface ViewData extends Serializable{
+public interface ViewData<CONTEXT> extends Serializable{
 	
-	SystemContext getContext();
-	ViewData setContext(SystemContext systemContext);
+	CONTEXT getContext();
+	ViewData<CONTEXT> setContext(CONTEXT systemContext);
+	
+	ParamContainer getParams();
 	
 	void tick();
 	
@@ -20,28 +23,4 @@ public interface ViewData extends Serializable{
 	void setActive(boolean active);
 	
 	void dispose();
-	
-	
-	//buffered chunk operations
-	boolean insertBufferedChunk(Chunk chunk, boolean insertCompressedChunk);
-	boolean updateBufferedChunk(Chunk chunk);
-	Chunk getBufferedChunk(Integer chunkX, Integer chunkY);
-	List<Chunk> getBufferedChunks();
-	boolean hasBufferedChunk(Integer chunkX, Integer chunkY);
-	boolean hasBufferedChunk(Chunk chunk);
-	boolean removeBufferedChunk(Integer chunkX, Integer chunkY, boolean removeCompressed);
-	boolean removeBufferedChunk(Chunk chunk, boolean removeCompressed);
-	void clearBufferedChunks();
-	
-	//compressed chunk operations
-	boolean insertCompressedChunk(CompressedChunk compressedChunk, boolean insertBuffered);
-	boolean updateCompressedChunk(CompressedChunk compressedChunk, boolean updateBuffered);
-	CompressedChunk updateBufferedAndCompressedChunk(Chunk chunk);
-	CompressedChunk getCompressedChunk(Integer chunkX, Integer chunkY);
-	List<CompressedChunk> getCompressedChunks();
-	boolean hasCompressedChunk(Integer chunkX, Integer chunkY);
-	boolean hasCompressedChunk(CompressedChunk compressedChunk);
-	boolean removeCompressedChunk(Integer chunkX, Integer chunkY);
-	boolean removeCompressedChunk(CompressedChunk compressedChunk);
-	void clearCompressedChunks();
 }

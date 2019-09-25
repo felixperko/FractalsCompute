@@ -2,25 +2,25 @@ package de.felixperko.fractals.system.Numbers.infra;
 
 import java.io.Serializable;
 
-public interface ComplexNumber<T extends Number<T>, N extends ComplexNumber<T, N>> extends Serializable{
-	public T abs();
+public interface ComplexNumber<NUMBER extends Number<NUMBER>, COMPLEX extends ComplexNumber<NUMBER, COMPLEX>> extends Serializable{
+	public NUMBER abs();
 	public double absDouble();
 	public double absSqDouble();
-	public void multNumber(T number);
-	public void multValues(N otherComplex);
-	public void divNumber(T number);
+	public void multNumber(NUMBER number);
+	public void multValues(COMPLEX otherComplex);
+	public void divNumber(NUMBER number);
 	//void mult(DoubleNumber number);
-	public N copy();
+	public COMPLEX copy();
 	public void toPositive();
 	public void complexConjugate();
-	public void add(N otherComplex);
-	public void mult(N otherComplex);
-	public void sub(N otherComplex);
-	public void div(N otherComplex);
-	public void pow(N otherComplex);
+	public void add(COMPLEX otherComplex);
+	public void mult(COMPLEX otherComplex);
+	public void sub(COMPLEX otherComplex);
+	public void div(COMPLEX otherComplex);
+	public void pow(COMPLEX otherComplex);
 	public double realDouble();
 	public double imagDouble();
-	public T getReal();
-	public T getImag();
+	public NUMBER getReal();
+	public NUMBER getImag();
 	public void square();
 }

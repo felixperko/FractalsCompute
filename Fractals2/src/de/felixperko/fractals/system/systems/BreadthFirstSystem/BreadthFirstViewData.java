@@ -15,7 +15,7 @@ import de.felixperko.fractals.util.Nestable;
 import de.felixperko.fractals.util.NestedMap;
 import de.felixperko.fractals.util.NestedNull;
 
-public class BreadthFirstViewData extends AbstractBFViewData {
+public class BreadthFirstViewData extends AbstractBFViewData<BreadthFirstViewData> {
 	
 	private static final long serialVersionUID = -6980552871281336220L;
 
@@ -30,12 +30,6 @@ public class BreadthFirstViewData extends AbstractBFViewData {
 	
 	public BreadthFirstViewData(ComplexNumber anchor) {
 		this.anchor = anchor;
-	}
-	
-	@Override
-	public BreadthFirstViewData setContext(SystemContext systemContext) {
-		super.setContext(systemContext);
-		return this;
 	}
 	
 	public boolean insertCompressedChunkImpl(CompressedChunk compressedChunk) {

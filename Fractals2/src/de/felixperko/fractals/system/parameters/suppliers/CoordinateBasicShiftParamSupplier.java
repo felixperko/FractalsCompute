@@ -1,9 +1,9 @@
 package de.felixperko.fractals.system.parameters.suppliers;
 
+import de.felixperko.fractals.system.LayerConfiguration;
 import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.Numbers.infra.Number;
 import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
-import de.felixperko.fractals.system.systems.BreadthFirstSystem.LayerConfiguration;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 
 public class CoordinateBasicShiftParamSupplier extends MappedParamSupplier {

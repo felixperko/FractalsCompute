@@ -1,13 +1,9 @@
 package de.felixperko.fractals.system.calculator.infra;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-
-import de.felixperko.fractals.system.parameters.suppliers.MappedParamSupplier;
-import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
+import de.felixperko.fractals.system.systems.infra.ViewContainer;
 
 public abstract class AbstractFractalsCalculator implements FractalsCalculator {
 
@@ -15,7 +11,7 @@ public abstract class AbstractFractalsCalculator implements FractalsCalculator {
 
 	transient Map<String, Field> fields = null;
 	
-	SystemContext systemContext;
+	SystemContext<? extends ViewContainer<?>> systemContext;
 	
 	Class<? extends AbstractFractalsCalculator> fieldClass;
 	
@@ -26,7 +22,7 @@ public abstract class AbstractFractalsCalculator implements FractalsCalculator {
 	}
 	
 	@Override
-	public void setContext(SystemContext systemContext) {
+	public void setContext(SystemContext<? extends ViewContainer<?>> systemContext) {
 		this.systemContext = systemContext;
 	}
 	

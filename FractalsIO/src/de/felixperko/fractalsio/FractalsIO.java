@@ -14,6 +14,7 @@ import de.felixperko.fractals.network.SystemClientData;
 import de.felixperko.fractals.network.interfaces.ClientMessageInterface;
 import de.felixperko.fractals.network.messages.SessionInitRequestMessage;
 import de.felixperko.fractals.network.messages.UpdateConfigurationMessage;
+import de.felixperko.fractals.system.LayerConfiguration;
 import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
 import de.felixperko.fractals.system.Numbers.DoubleNumber;
 import de.felixperko.fractals.system.Numbers.infra.Number;
@@ -23,7 +24,6 @@ import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstLayer;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
-import de.felixperko.fractals.system.systems.BreadthFirstSystem.LayerConfiguration;
 
 public class FractalsIO {
 	
