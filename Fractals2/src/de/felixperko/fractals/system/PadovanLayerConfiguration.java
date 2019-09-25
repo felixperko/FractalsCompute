@@ -38,6 +38,9 @@ public class PadovanLayerConfiguration extends LayerConfiguration {
 	
 	@Override
 	public synchronized void prepare(NumberFactory numberFactory) {
+		for (int i = 0; i < layers.size() ; i++) {
+			layers.get(i).setId(i);
+		}
 		int totalSampleCount = layers.get(layers.size()-1).getSampleCount();
 		offsets = new ComplexNumber[totalSampleCount];
 		double g = 1.32471795724474602596;
@@ -77,5 +80,6 @@ public class PadovanLayerConfiguration extends LayerConfiguration {
 				testDraw(temp, layers.size(), i);
 			}
 		}
+		prepared = true;
 	}
 }

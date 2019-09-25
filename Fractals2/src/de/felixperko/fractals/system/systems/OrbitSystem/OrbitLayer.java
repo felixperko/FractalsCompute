@@ -13,7 +13,7 @@ public class OrbitLayer implements Layer {
 
 	@Override
 	public boolean isActive(int pixel) {
-		return pixel == 0;
+		return true;
 	}
 
 	@Override
