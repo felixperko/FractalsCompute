@@ -3,7 +3,7 @@ package de.felixperko.fractals.system.systems.stateinfo;
 import java.util.UUID;
 
 import de.felixperko.fractals.data.shareddata.SharedStateUpdate;
-import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
+import de.felixperko.fractals.system.numbers.ComplexNumber;
 
 public class ComplexNumberUpdate extends AbstractSharedDataUpdate implements SharedStateUpdate {
 	

@@ -2,6 +2,7 @@ package de.felixperko.fractals.system.calculator.infra;
 
 import java.lang.reflect.Field;
 import java.util.Map;
+
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.systems.infra.ViewContainer;
 

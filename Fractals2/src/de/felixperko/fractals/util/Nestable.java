@@ -2,8 +2,6 @@ package de.felixperko.fractals.util;
 
 import java.util.Collection;
 
-import de.felixperko.fractals.data.CompressedChunk;
-
 public interface Nestable<K, V> {
 
 	boolean hasChild(K k);

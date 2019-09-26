@@ -1,13 +1,6 @@
 package de.felixperko.fractals.system.systems.OrbitSystem;
 
-import java.util.List;
-
-import de.felixperko.fractals.data.Chunk;
-import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.network.ParamContainer;
-import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
-import de.felixperko.fractals.system.systems.BreadthFirstSystem.AbstractBFViewData;
-import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.systems.infra.ViewData;
 
 public class OrbitViewData implements ViewData<OrbitSystemContext> {

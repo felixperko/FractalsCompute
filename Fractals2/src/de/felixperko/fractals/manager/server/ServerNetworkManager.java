@@ -1,7 +1,5 @@
 package de.felixperko.fractals.manager.server;
 
-import java.io.IOException;
-import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,12 +12,9 @@ import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.network.infra.connection.ClientLocalConnection;
 import de.felixperko.fractals.network.infra.connection.ClientRemoteConnection;
 import de.felixperko.fractals.network.infra.connection.Connection;
-import de.felixperko.fractals.network.infra.connection.ServerConnection;
-import de.felixperko.fractals.network.interfaces.ClientMessageInterface;
 import de.felixperko.fractals.network.interfaces.Messageable;
 import de.felixperko.fractals.network.interfaces.NetworkInterfaceFactory;
 import de.felixperko.fractals.network.messages.ChunkUpdateMessage;
-import de.felixperko.fractals.network.threads.ClientWriteThread;
 import de.felixperko.fractals.network.threads.ServerConnectThread;
 import de.felixperko.fractals.network.threads.ServerWriteThread;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;

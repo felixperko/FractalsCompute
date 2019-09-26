@@ -4,10 +4,10 @@ import java.io.Serializable;
 import java.util.UUID;
 
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
+import de.felixperko.fractals.system.statistics.IStats;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
-import de.felixperko.fractals.system.task.statistics.TaskStats;
 import de.felixperko.fractals.system.thread.FractalsThread;
 
 public interface FractalsTask extends Serializable{
@@ -28,8 +28,8 @@ public interface FractalsTask extends Serializable{
 	public void run() throws InterruptedException;
 
 	
-	public TaskStats getTaskStats();
-	public void setTaskStats(TaskStats taskStats);
+	public IStats getTaskStats();
+	public void setTaskStats(IStats taskStats);
 
 	void setStateInfo(TaskStateInfo taskStateInfo);
 

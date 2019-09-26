@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.felixperko.fractals.data.ReducedNaiveChunk;
-import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
-import de.felixperko.fractals.system.Numbers.DoubleNumber;
-import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
-import de.felixperko.fractals.system.Numbers.infra.Number;
+import de.felixperko.fractals.system.numbers.ComplexNumber;
+import de.felixperko.fractals.system.numbers.Number;
+import de.felixperko.fractals.system.numbers.impl.DoubleComplexNumber;
+import de.felixperko.fractals.system.numbers.impl.DoubleNumber;
 import de.felixperko.fractals.system.parameters.ParamValueField;
 import de.felixperko.fractals.system.parameters.ParamValueType;
 import de.felixperko.fractals.system.parameters.ParameterConfiguration;

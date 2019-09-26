@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 import org.xerial.snappy.BitShuffle;
 import org.xerial.snappy.Snappy;
 
-import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
+import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.util.NumberUtil;
 

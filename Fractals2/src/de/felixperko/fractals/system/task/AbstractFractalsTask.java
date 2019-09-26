@@ -6,27 +6,27 @@ import java.io.ObjectOutputStream;
 import java.util.UUID;
 
 import de.felixperko.fractals.network.ParamContainer;
+import de.felixperko.fractals.system.statistics.EmptyStats;
+import de.felixperko.fractals.system.statistics.IStats;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
-import de.felixperko.fractals.system.task.statistics.TaskStats;
-import de.felixperko.fractals.system.task.statistics.TaskStatsEmpty;
 
 public abstract class AbstractFractalsTask<T> implements FractalsTask{
 	
 	private static final long serialVersionUID = -3755610537350804691L;
 	
 	private ParamContainer context_params; //to serialize parameters without the whole context
-	transient SystemContext context;
+	transient SystemContext<?> context;
 	transient TaskManager<T> taskManager;
 	
 	int jobId;
 	
 	TaskStateInfo stateInfo;
 	
-	TaskStats taskStats = new TaskStatsEmpty();
+	protected IStats taskStats = new EmptyStats();
 	
-	public AbstractFractalsTask(SystemContext context, Integer id, TaskManager<T> taskManager, int jobId, Layer layer) {
+	public AbstractFractalsTask(SystemContext<?> context, Integer id, TaskManager<T> taskManager, int jobId, Layer layer) {
 		this.jobId = jobId;
 		System.out.println("Created Task with jobid "+jobId);
 		this.taskManager = taskManager;
@@ -47,7 +47,7 @@ public abstract class AbstractFractalsTask<T> implements FractalsTask{
 		return context_params;
 	}
 	
-	public void setContext(SystemContext context) {
+	public void setContext(SystemContext<?> context) {
 		this.context = context;
 		stateInfo.setContext(context);
 	}
@@ -80,11 +80,11 @@ public abstract class AbstractFractalsTask<T> implements FractalsTask{
 		return stateInfo.getSystemId();
 	}
 
-	public TaskStats getTaskStats() {
+	public IStats getTaskStats() {
 		return taskStats;
 	}
 
-	public void setTaskStats(TaskStats taskStats) {
+	public void setTaskStats(IStats taskStats) {
 		this.taskStats = taskStats;
 	}
 	

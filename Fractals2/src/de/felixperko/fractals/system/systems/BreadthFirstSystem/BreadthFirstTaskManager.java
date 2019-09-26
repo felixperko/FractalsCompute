@@ -1,6 +1,5 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -17,22 +16,14 @@ import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.ChunkBorderData;
 import de.felixperko.fractals.data.ChunkBorderDataImplNull;
 import de.felixperko.fractals.data.CompressedChunk;
-import de.felixperko.fractals.data.ReducedNaiveChunk;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.manager.server.ServerNetworkManager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.network.messages.ChunkUpdateMessage;
-import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
-import de.felixperko.fractals.system.Numbers.infra.Number;
-import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
-import de.felixperko.fractals.system.calculator.BurningShipCalculator;
-import de.felixperko.fractals.system.calculator.MandelbrotCalculator;
-import de.felixperko.fractals.system.calculator.NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator;
-import de.felixperko.fractals.system.calculator.NewtonThridPowerMinusOneCalculator;
-import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
+import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
-import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
+import de.felixperko.fractals.system.statistics.SummedHistogramStats;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.systems.infra.ViewData;
@@ -116,6 +107,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	Map<Integer, CalculateThreadReference> calculateThreadReferences = new HashMap<>(); //TODO remove?
 
 	int id_counter_tasks = 0;
+	
+	SummedHistogramStats stats = new SummedHistogramStats();
 
 	public BreadthFirstTaskManager(ServerManagers managers, CalcSystem system) {
 		super(managers, system);
@@ -280,6 +273,12 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				
 				final Integer taskId = task.getId();
 				
+				//update stats
+				stats.addHistogram(task.getTaskStats());
+				//TODO distribute stat update?
+				
+				
+				//distribute
 				if (task.getStateInfo().getLayer().renderingEnabled()) {
 					
 					//compress
@@ -349,6 +348,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		finishedTasks.clear();
 		borderTasks.clear();
 		newQueue.clear();
+		stats.reset();
 		BreadthFirstViewData viewData = context.getActiveViewData();
 		if (viewData != null) {
 //			viewData.dispose();

@@ -1,10 +1,8 @@
 package de.felixperko.fractals.system.task;
 
 import java.util.List;
-import java.util.Map;
 
 import de.felixperko.fractals.network.ParamContainer;
-import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 
 public interface TaskManager<T> {

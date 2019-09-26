@@ -1,7 +1,11 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
 
-import static de.felixperko.fractals.system.systems.common.BFOrbitCommon.*;
+import static de.felixperko.fractals.system.systems.common.BFOrbitCommon.booleanType;
+import static de.felixperko.fractals.system.systems.common.BFOrbitCommon.doubleType;
+import static de.felixperko.fractals.system.systems.common.BFOrbitCommon.integerType;
+import static de.felixperko.fractals.system.systems.common.BFOrbitCommon.listType;
+import static de.felixperko.fractals.system.systems.common.BFOrbitCommon.numberType;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -3,10 +3,10 @@ package de.felixperko.fractals.system;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
-import de.felixperko.fractals.system.Numbers.DoubleNumber;
-import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
-import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
+import de.felixperko.fractals.system.numbers.ComplexNumber;
+import de.felixperko.fractals.system.numbers.NumberFactory;
+import de.felixperko.fractals.system.numbers.impl.DoubleComplexNumber;
+import de.felixperko.fractals.system.numbers.impl.DoubleNumber;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstLayer;
 import de.felixperko.fractals.system.task.Layer;
 
@@ -59,7 +59,7 @@ public class PadovanLayerConfiguration extends LayerConfiguration {
 			offsets[i] = numberFactory.createComplexNumber(real, imag);
 			
 			//testdraw
-			if (debug && (i+1)%10 == 0) {
+			if (debug && (i+1) % 50 == 0) {
 				double[][] temp = new double[layers.size()][];
 				int sampleCounter = 0;
 				for (int l = 0 ; l < temp.length ; l++) {

@@ -9,7 +9,6 @@ import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.network.infra.connection.ClientLocalConnection;
 import de.felixperko.fractals.network.infra.connection.Connection;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
-import de.felixperko.fractals.network.messages.ConnectedMessage;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.systems.infra.ViewContainerListener;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;

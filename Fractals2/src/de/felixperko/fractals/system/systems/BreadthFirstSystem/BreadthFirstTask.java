@@ -3,21 +3,23 @@ package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.BorderAlignment;
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.data.ReducedNaiveChunk;
-import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
-import de.felixperko.fractals.system.parameters.suppliers.MappedParamSupplier;
-import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
-import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
+import de.felixperko.fractals.system.numbers.ComplexNumber;
+import de.felixperko.fractals.system.statistics.EmptyStats;
+import de.felixperko.fractals.system.statistics.HistogramStats;
+import de.felixperko.fractals.system.statistics.IHistogramStats;
+import de.felixperko.fractals.system.statistics.IStats;
+import de.felixperko.fractals.system.statistics.SummedHistogramStats;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.AbstractFractalsTask;
@@ -41,6 +43,9 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	
 	transient FractalsCalculator calculator;
 	
+	Map<Integer, HistogramStats> layerTaskStats = new HashMap<>(); //key = layerId
+	
+	
 	public BreadthFirstTask(SystemContext context, int id, TaskManager taskManager, AbstractArrayChunk chunk, ComplexNumber chunkPos, 
 			FractalsCalculator calculator, Layer layer, int jobId) {
 		super(context, id, taskManager, jobId, layer);
@@ -54,20 +59,22 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	@Override
 	public void run() {
 		try {
+			int layerId = getStateInfo().getLayerId();
+			previousLayerId = layerId-1;
+			taskStats = new HistogramStats(1000, ((BFSystemContext)getContext()).getParamValue("iterations", Integer.class));
+			
+			taskStats.executionStart();
+			
 			preprocess();
-			previousLayerId = getStateInfo().getLayerId()-1;
-//			Map<String, ParamSupplier> localParameters = new HashMap<>();
-//			for (Entry<String, ParamSupplier> e : getContext().getParameters().entrySet()){
-//				if (e.getValue() instanceof MappedParamSupplier)
-//					localParameters.put(e.getKey(), e.getValue().copy());
-//			}
-//			localParameters.put("chunkpos", new StaticParamSupplier("chunkpos", this.chunk.chunkPos.copy()));
-//			localParameters.put("chunksize", new StaticParamSupplier("chunksize", (Integer)chunk.getChunkDimensions()));
-//			localParameters.put("layer", new StaticParamSupplier("layer", (Integer)layer.getId()));
+			
 			Layer layer = getStateInfo().getLayer();
 			chunk.setUpsample(layer.getUpsample());
+			
 			calculator.setContext(getContext());
-			calculator.calculate(chunk);
+			calculator.calculate(chunk, taskStats);
+			
+			taskStats.executionEnd();
+			layerTaskStats.put(layerId, (HistogramStats)taskStats);
 		} catch (Exception e){
 			e.printStackTrace();
 		}
@@ -173,6 +180,13 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 				chunk.setCullFlags(i, upsample, cull);
 			}
 		}
+	}
+	
+	@Override
+	public HistogramStats getTaskStats() {
+		if (layerTaskStats.size() > 0)
+			return new SummedHistogramStats(new ArrayList<IHistogramStats>(layerTaskStats.values()));
+		return null;
 	}
 
 	public void updateDistance(double chunkX, double chunkY) {

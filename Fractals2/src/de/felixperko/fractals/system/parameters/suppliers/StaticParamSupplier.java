@@ -1,6 +1,6 @@
 package de.felixperko.fractals.system.parameters.suppliers;
 
-import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
+import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 
 public class StaticParamSupplier extends AbstractParamSupplier {

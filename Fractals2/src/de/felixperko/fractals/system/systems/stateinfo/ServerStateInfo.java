@@ -12,7 +12,7 @@ import de.felixperko.fractals.data.shareddata.DataContainer;
 import de.felixperko.fractals.data.shareddata.MappedSharedData;
 import de.felixperko.fractals.data.shareddata.MappedSharedDataUpdate;
 import de.felixperko.fractals.network.infra.connection.Connection;
-import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
+import de.felixperko.fractals.system.numbers.ComplexNumber;
 
 public class ServerStateInfo implements Serializable{
 	

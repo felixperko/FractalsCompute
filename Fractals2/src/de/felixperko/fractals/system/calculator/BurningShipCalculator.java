@@ -1,7 +1,7 @@
 package de.felixperko.fractals.system.calculator;
 
-import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.calculator.infra.AbstractPreparedFractalCalculator;
+import de.felixperko.fractals.system.numbers.ComplexNumber;
 
 public class BurningShipCalculator extends AbstractPreparedFractalCalculator {
 	

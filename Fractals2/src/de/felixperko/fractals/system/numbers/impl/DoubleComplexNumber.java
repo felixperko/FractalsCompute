@@ -1,9 +1,7 @@
-package de.felixperko.fractals.system.Numbers;
+package de.felixperko.fractals.system.numbers.impl;
 
-import java.io.Serializable;
-
-import de.felixperko.fractals.system.Numbers.infra.AbstractComplexNumber;
-import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
+import de.felixperko.fractals.system.numbers.AbstractComplexNumber;
+import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.parameters.suppliers.Copyable;
 
 public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, DoubleComplexNumber> implements Copyable<DoubleComplexNumber>{

@@ -3,7 +3,6 @@ package de.felixperko.fractals.manager.common;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import de.felixperko.fractals.FractalsMain;
 import de.felixperko.fractals.network.threads.LocalServerThread;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 import de.felixperko.fractals.system.thread.FractalsThread;

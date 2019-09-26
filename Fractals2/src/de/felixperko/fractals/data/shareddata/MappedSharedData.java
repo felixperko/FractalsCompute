@@ -9,7 +9,6 @@ import java.util.Set;
 
 import de.felixperko.fractals.network.infra.connection.Connection;
 import de.felixperko.fractals.network.infra.connection.ConnectionListener;
-import de.felixperko.fractals.util.NestedMap;
 import de.felixperko.fractals.util.NumberUtil;
 
 /**

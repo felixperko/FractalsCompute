@@ -9,9 +9,9 @@ import java.util.List;
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.data.ReducedNaiveChunk;
-import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
-import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
+import de.felixperko.fractals.system.numbers.ComplexNumber;
+import de.felixperko.fractals.system.statistics.EmptyStats;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.AbstractFractalsTask;
@@ -60,8 +60,10 @@ public class OrbitTask extends AbstractFractalsTask<OrbitTask> {
 
 	@Override
 	public void run() throws InterruptedException {
+		if (taskStats == null)
+			taskStats = new EmptyStats();
 		calculator.setContext(getContext());
-		calculator.calculate(chunk);
+		calculator.calculate(chunk, taskStats);
 	}
 
 	@Override

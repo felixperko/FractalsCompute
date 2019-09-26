@@ -3,7 +3,6 @@ package de.felixperko.fractals.network.threads;
 import java.net.Socket;
 
 import de.felixperko.fractals.manager.server.ServerManagers;
-import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.network.infra.connection.ClientRemoteConnection;
 import de.felixperko.fractals.network.infra.connection.Connection;
 import de.felixperko.fractals.network.messages.ConnectedMessage;

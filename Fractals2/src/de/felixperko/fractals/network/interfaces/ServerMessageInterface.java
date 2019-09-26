@@ -3,7 +3,6 @@ package de.felixperko.fractals.network.interfaces;
 import java.util.List;
 import java.util.UUID;
 
-import de.felixperko.fractals.FractalsMain;
 import de.felixperko.fractals.data.shareddata.DataContainer;
 import de.felixperko.fractals.data.shareddata.MappedSharedDataUpdate;
 import de.felixperko.fractals.data.shareddata.SharedDataUpdate;
@@ -12,7 +11,6 @@ import de.felixperko.fractals.manager.server.ServerNetworkManager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.system.parameters.ParameterConfiguration;
-import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateUpdate;
 import de.felixperko.fractals.system.task.FractalsTask;

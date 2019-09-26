@@ -1,4 +1,4 @@
-package de.felixperko.fractals.system.Numbers.infra;
+package de.felixperko.fractals.system.numbers;
 
 public abstract class AbstractComplexNumber<T extends Number<T>, N extends ComplexNumber<T,N>> implements ComplexNumber<T, N> {
 

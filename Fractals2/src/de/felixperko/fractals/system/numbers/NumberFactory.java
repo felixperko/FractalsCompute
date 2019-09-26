@@ -1,4 +1,4 @@
-package de.felixperko.fractals.system.Numbers.infra;
+package de.felixperko.fractals.system.numbers;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;

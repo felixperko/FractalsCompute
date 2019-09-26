@@ -12,9 +12,9 @@ import javax.imageio.ImageIO;
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.manager.client.ClientManagers;
 import de.felixperko.fractals.network.interfaces.ClientSystemInterface;
-import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
-import de.felixperko.fractals.system.Numbers.infra.Number;
-import de.felixperko.fractals.system.Numbers.infra.NumberFactory;
+import de.felixperko.fractals.system.numbers.infra.ComplexNumber;
+import de.felixperko.fractals.system.numbers.infra.Number;
+import de.felixperko.fractals.system.numbers.infra.NumberFactory;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 
 public class FractalsIOSystemInterface implements ClientSystemInterface {

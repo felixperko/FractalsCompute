@@ -9,7 +9,6 @@ import de.felixperko.fractals.manager.common.INetworkManager;
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.network.interfaces.Messageable;
-import de.felixperko.fractals.network.threads.ClientWriteThread;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateUpdate;
 
 /**

@@ -5,7 +5,6 @@ import java.util.List;
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
-import de.felixperko.fractals.system.systems.infra.ViewContainer;
 import de.felixperko.fractals.system.systems.infra.ViewData;
 
 public interface ChunkedViewData<CONTEXT extends SystemContext<?>> extends ViewData<CONTEXT>{

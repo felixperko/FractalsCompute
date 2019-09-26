@@ -1,9 +1,9 @@
 package de.felixperko.fractals.system.calculator.infra;
 
 import de.felixperko.fractals.data.AbstractArrayChunk;
-import de.felixperko.fractals.system.Numbers.DoubleComplexNumber;
-import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
-import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
+import de.felixperko.fractals.system.numbers.ComplexNumber;
+import de.felixperko.fractals.system.numbers.impl.DoubleComplexNumber;
+import de.felixperko.fractals.system.statistics.IStats;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
 import de.felixperko.fractals.system.task.Layer;
 
@@ -19,14 +19,17 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 	
 	protected DoubleComplexNumber[] roots;
 	
+	IStats taskStats;
+	
 	public NewtonFractalCalculator() {
 		super(NewtonFractalCalculator.class);
 	}
 
 	@Override
-	public void calculate(AbstractArrayChunk chunk) {
+	public void calculate(AbstractArrayChunk chunk, IStats taskStats) {
+		this.taskStats = taskStats;
 		setRoots();
-		double limit = (Double) systemContext.getParamValue("limit", Double.class); //TODO arbitrary precision
+		double limit = (Double) systemContext.getParamValue("limit", Double.class);
 		int it = (Integer) systemContext.getParamValue("iterations", Integer.class);
 		Layer layer = chunk.getCurrentTask().getStateInfo().getLayer();
 		int samples = layer.getSampleCount();
@@ -44,8 +47,10 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 				ComplexNumber copy1;
 				ComplexNumber copy2;
 				
+				int j;
+				int i = 0;
 				iterationLoop:
-				for (int j = 0 ; j < it ; j++) {
+				for (j = 0 ; j < it ; j++) {
 					copy1 = current.copy();
 					copy2 = current.copy();
 					executeFunctionKernel(copy1);
@@ -55,14 +60,15 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 //					if (test)
 //						System.out.println("("+current.toString()+")");
 					
-					for (int i = 0 ; i < roots.length ; i++) {
+					for (i = 0 ; i < roots.length ; i++) {
 						DoubleComplexNumber root = roots[i];
-						if (Math.abs(current.realDouble()-root.realDouble()) < limit && Math.abs(current.imagDouble()-root.imagDouble()) < limit) {
+						if (Math.abs(current.realDouble()-root.realDouble()) < limit && Math.abs(current.imagDouble()-root.imagDouble()) < limit) {//TODO arbitrary precision
 							chunk.addSample(pixel, getRootValue(i), upsample);
 							break iterationLoop;
 						}
 					}
 				}
+				taskStats.addSample(j+1, i+1);
 				chunk.addSample(pixel, -1, upsample);
 			}
 			chunk.getCurrentTask().getStateInfo().setProgress((pixel/(double)chunk.getArrayLength()));

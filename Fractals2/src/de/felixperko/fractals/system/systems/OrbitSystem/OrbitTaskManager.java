@@ -17,7 +17,6 @@ import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.AbstractTaskManager;
 import de.felixperko.fractals.system.task.FractalsTask;
-import de.felixperko.fractals.system.task.TaskProviderAdapter;
 
 public class OrbitTaskManager extends AbstractTaskManager<OrbitTask> {
 	

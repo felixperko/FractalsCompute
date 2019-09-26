@@ -5,9 +5,7 @@ import java.util.List;
 import de.felixperko.fractals.data.shareddata.DataContainer;
 import de.felixperko.fractals.manager.common.NetworkManager;
 import de.felixperko.fractals.network.infra.ClientMessage;
-import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
-import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
 
 public class ReachableResponseMessage extends ClientMessage{
 

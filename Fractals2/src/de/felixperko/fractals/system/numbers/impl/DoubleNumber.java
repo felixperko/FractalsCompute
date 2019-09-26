@@ -1,5 +1,5 @@
-package de.felixperko.fractals.system.Numbers;
-import de.felixperko.fractals.system.Numbers.infra.Number;
+package de.felixperko.fractals.system.numbers.impl;
+import de.felixperko.fractals.system.numbers.Number;
 import de.felixperko.fractals.system.parameters.suppliers.Copyable;
 
 public class DoubleNumber implements Number<DoubleNumber>, Copyable<DoubleNumber> {

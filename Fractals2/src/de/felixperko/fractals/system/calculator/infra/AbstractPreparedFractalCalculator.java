@@ -1,13 +1,13 @@
 package de.felixperko.fractals.system.calculator.infra;
 
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Queue;
 
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.BorderAlignment;
-import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
+import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
+import de.felixperko.fractals.system.statistics.IStats;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
 import de.felixperko.fractals.system.task.Layer;
 
@@ -30,7 +30,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 //	ParamSupplier p_limit;
 //	ParamSupplier p_samples;
 	
-	int iterations;
+	int maxIterations;
 	double limit;
 	int upsample;
 	AbstractArrayChunk chunk;
@@ -43,11 +43,16 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 	ParamSupplier p_pow;
 	ParamSupplier p_c;
 	
+	IStats taskStats;
+	
 	@Override
-	public void calculate(AbstractArrayChunk chunk) {
+	public void calculate(AbstractArrayChunk chunk, IStats taskStats) {
+		
 		this.chunk = chunk;
+		this.taskStats = taskStats;
+		
 		limit = systemContext.getParamValue("limit", Double.class);
-		iterations = systemContext.getParamValue("iterations", Integer.class);
+		maxIterations = systemContext.getParamValue("iterations", Integer.class);
 		p_current = systemContext.getParameters().get("start");
 		p_pow = systemContext.getParameters().get("pow");
 		p_c = systemContext.getParameters().get("c");
@@ -114,7 +119,8 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 		ComplexNumber<?, ?> pow = ((ComplexNumber)p_pow.get(systemContext, chunk.chunkPos, pixel, sample));
 		double logPow = Math.log(pow.absDouble());
 //		long t1 = System.nanoTime();
-		for (int k = 0 ; k < iterations ; k++) {
+		int k;
+		for (k = 0 ; k < maxIterations ; k++) {
 			executeKernel(current, pow, c);
 			double abs = current.absSqDouble();
 			if (abs > limit*limit) {
@@ -124,6 +130,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 				break;
 			}
 		}
+		taskStats.addSample(k+1, res);
 //		long t2 = System.nanoTime();
 //		if (res != -1)
 //			res = (t2-t1);

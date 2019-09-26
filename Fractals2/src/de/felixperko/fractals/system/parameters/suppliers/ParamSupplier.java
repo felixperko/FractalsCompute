@@ -2,8 +2,7 @@ package de.felixperko.fractals.system.parameters.suppliers;
 
 import java.io.Serializable;
 
-import de.felixperko.fractals.system.Numbers.infra.ComplexNumber;
-import de.felixperko.fractals.system.systems.BreadthFirstSystem.BFSystemContext;
+import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 
 public interface ParamSupplier extends Serializable{
