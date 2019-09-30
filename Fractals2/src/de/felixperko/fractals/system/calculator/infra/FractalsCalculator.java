@@ -12,4 +12,8 @@ public interface FractalsCalculator extends Serializable{
 	public boolean isCancelled();
 	public void setCancelled();
 	public void setContext(SystemContext<? extends ViewContainer<?>> systemContext);
+	
+	public void setTrace(boolean trace);
+	public void addTraceListener(TraceListener traceListener);
+	public void removeTraceListener(TraceListener traceListener);
 }

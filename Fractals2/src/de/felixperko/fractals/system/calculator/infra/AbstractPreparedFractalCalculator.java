@@ -57,7 +57,9 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 		p_pow = systemContext.getParameters().get("pow");
 		p_c = systemContext.getParameters().get("c");
 		Layer layer = chunk.getCurrentTask().getStateInfo().getLayer();
-		upsample = (layer instanceof BreadthFirstUpsampleLayer) ? ((BreadthFirstUpsampleLayer)layer).getUpsample()/2 : 0;
+		//upsample = (layer instanceof BreadthFirstUpsampleLayer) ? ((BreadthFirstUpsampleLayer)layer).getUpsample()/2 : 0;
+		//TODO validate
+		upsample = layer.getUpsample();
 		int samples = layer.getSampleCount();
 //		if (chunk.getChunkX() == 5 && chunk.getChunkY() == 10)
 //			System.out.println("test chunk");
@@ -122,6 +124,9 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 		int k;
 		for (k = 0 ; k < maxIterations ; k++) {
 			executeKernel(current, pow, c);
+			if (trace)
+				for (TraceListener listener : traceListeners)
+					listener.trace(current, pixel, sample, k);
 			double abs = current.absSqDouble();
 			if (abs > limit*limit) {
 //							Math.log( Math.log(real*real+imag*imag)*0.5 / Math.log(2) ) / Math.log(pow)  )

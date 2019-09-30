@@ -97,14 +97,12 @@ public class OrbitSystemContext extends AbstractSystemContext<OrbitViewData, Orb
 
 	@Override
 	public void taskStateUpdated(TaskStateInfo taskStateInfo, TaskState oldState) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public AbstractArrayChunk createChunk(int chunkX, int chunkY) {
-		// TODO Auto-generated method stub
-		return null;
+		return chunkFactory.createChunk(chunkX, chunkY);
 	}
 
 }

@@ -99,7 +99,9 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 			for (int i = activePixels.nextSetBit(0) ; i != -1 ; i = activePixels.nextSetBit(i+1)) { //loop active pixels
 				int x = i / dim;
 				int y = i % dim;
+				
 				boolean cull = true;
+				boolean oldCull = chunk.getValue(i, true) == AbstractArrayChunk.FLAG_CULL;
 				
 				evalCullingLoop:
 				for (int dx = -1 ; dx <= 1 ; dx++) {
@@ -177,7 +179,8 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 					}
 				}
 				
-				chunk.setCullFlags(i, upsample, cull);
+				if (oldCull != cull)
+					chunk.setCullFlags(i, upsample, cull);
 			}
 		}
 	}

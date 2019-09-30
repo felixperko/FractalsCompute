@@ -57,6 +57,9 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 					executeDerivativeKernel(copy2);
 					copy1.div(copy2);
 					current.sub(copy1);
+					if (trace)
+						for (TraceListener listener : traceListeners)
+							listener.trace(current, pixel, sample, j);
 //					if (test)
 //						System.out.println("("+current.toString()+")");
 					

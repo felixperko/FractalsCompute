@@ -10,6 +10,7 @@ import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.data.ReducedNaiveChunk;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
+import de.felixperko.fractals.system.calculator.infra.TraceListener;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.statistics.EmptyStats;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
@@ -31,11 +32,14 @@ public class OrbitTask extends AbstractFractalsTask<OrbitTask> {
 
 	public transient AbstractArrayChunk chunk;
 	private transient CompressedChunk compressed_chunk;
+	
+	List<ComplexNumber> traces = new ArrayList<>();
 
 	public OrbitTask(SystemContext context, Integer id, TaskManager<OrbitTask> taskManager, int jobId, Layer layer,
 			FractalsCalculator calculator, AbstractArrayChunk chunk) {
 		super(context, id, taskManager, jobId, layer);
 		getStateInfo().setState(TaskState.OPEN);
+		
 		this.calculator = calculator;
 		this.chunk = chunk;
 		chunk.setCurrentTask(this);
@@ -62,8 +66,24 @@ public class OrbitTask extends AbstractFractalsTask<OrbitTask> {
 	public void run() throws InterruptedException {
 		if (taskStats == null)
 			taskStats = new EmptyStats();
+		
+		TraceListener traceListener = new TraceListener() {
+			@Override
+			public void trace(ComplexNumber number, int pixel, int sample, int iteration) {
+				traces.add(number);
+			}
+		};
+		
+		calculator.addTraceListener(traceListener);
+		calculator.setTrace(true);
+			
 		calculator.setContext(getContext());
 		calculator.calculate(chunk, taskStats);
+		
+		calculator.removeTraceListener(traceListener);
+		calculator.setTrace(false);
+		
+		
 	}
 
 	@Override

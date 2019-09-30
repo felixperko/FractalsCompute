@@ -1,6 +1,8 @@
 package de.felixperko.fractals.system.calculator.infra;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import de.felixperko.fractals.system.systems.infra.SystemContext;
@@ -17,6 +19,9 @@ public abstract class AbstractFractalsCalculator implements FractalsCalculator {
 	Class<? extends AbstractFractalsCalculator> fieldClass;
 	
 	boolean cancelled = false;
+	
+	protected boolean trace = false;
+	List<TraceListener> traceListeners = new ArrayList<>();
 	
 	public AbstractFractalsCalculator(Class<? extends AbstractFractalsCalculator> fieldClass) {
 		this.fieldClass = fieldClass;
@@ -35,5 +40,20 @@ public abstract class AbstractFractalsCalculator implements FractalsCalculator {
 	@Override
 	public void setCancelled() {
 		cancelled = true;
+	}
+	
+	@Override
+	public void setTrace(boolean trace) {
+		this.trace = trace;
+	}
+	
+	@Override
+	public void addTraceListener(TraceListener traceListener) {
+		this.traceListeners.add(traceListener);
+	}
+	
+	@Override
+	public void removeTraceListener(TraceListener traceListener) {
+		this.traceListeners.remove(traceListener);
 	}
 }
