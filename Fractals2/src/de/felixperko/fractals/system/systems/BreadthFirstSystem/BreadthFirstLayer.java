@@ -21,6 +21,10 @@ public class BreadthFirstLayer implements Layer {
 	public BreadthFirstLayer() {
 	}
 	
+	public BitSet getEnabledBitSet(){
+		return enabledPixels;
+	}
+	
 	public BreadthFirstLayer with_culling(boolean culling) {
 		this.culling = culling;
 		return this;

@@ -63,7 +63,7 @@ public class ReducedNaiveChunk extends AbstractArrayChunk {
 	}
 	
 	@Override
-	public void addSample(int i, double value, int upsample) {
+	public void addSample(int i, double value, int higher) {
 		boolean hadValidValue = samples[i] > failedSamples[i];
 		boolean hasValidValue = hadValidValue;
 		synchronized (this) {
@@ -90,9 +90,13 @@ public class ReducedNaiveChunk extends AbstractArrayChunk {
 			for (ChunkBorderData data : getIndexBorderData(x, y, upsample)) {
 				BorderAlignment alignment = data.getAlignment();
 				if (alignment.isHorizontal()) {
-					data.set(hasValidValue, clampIndex(y-upsample/2), clampIndex(y+upsample/2-1));//TODO coordinates correct?
+					int lower = y-upsample/2;
+					int higher2 = lower+upsample-1;
+					data.set(hasValidValue, clampIndex(lower), clampIndex(higher2));//TODO coordinates correct?
 				} else {
-					data.set(hasValidValue, clampIndex(x-upsample/2), clampIndex(x+upsample/2-1));
+					int lower = x-upsample/2;
+					int higher2 = lower+upsample-1;
+					data.set(hasValidValue, clampIndex(lower), clampIndex(higher2));
 				}
 			}
 		}
