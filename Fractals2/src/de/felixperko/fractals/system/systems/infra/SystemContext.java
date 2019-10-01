@@ -12,6 +12,7 @@ import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.Number;
 import de.felixperko.fractals.system.numbers.NumberFactory;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
+import de.felixperko.fractals.system.systems.stateinfo.SystemStateInfo;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
 import de.felixperko.fractals.system.task.Layer;
@@ -52,5 +53,7 @@ public interface SystemContext<C extends ViewContainer> extends Serializable{
 	int getViewId();
 
 	void setViewId(Integer viewId);
+
+	SystemStateInfo getSystemStateInfo();
 
 }

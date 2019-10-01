@@ -184,5 +184,10 @@ public abstract class AbstractSystemContext<D extends ViewData, C extends ViewCo
 	public int getViewId() {
 		return viewId;
 	}
+	
+	@Override
+	public SystemStateInfo getSystemStateInfo() {
+		return systemStateInfo;
+	}
 
 }

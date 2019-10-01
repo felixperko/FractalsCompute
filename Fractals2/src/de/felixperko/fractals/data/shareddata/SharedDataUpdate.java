@@ -1,6 +1,6 @@
 package de.felixperko.fractals.data.shareddata;
 
-public interface SharedDataUpdate<T> {
+public interface SharedDataUpdate {
 	public boolean isSent();
 	public void setSent();
 }

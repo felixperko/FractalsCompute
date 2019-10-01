@@ -152,7 +152,7 @@ public class MappedSharedData<T> extends SharedData<MappedSharedDataUpdate<T>> {
 					changed = true;
 			}
 		}
-		for (Entry<String, T> e : update.getUpdateMap().entrySet()) {
+		for (Entry<String, T> e : update.getMap().entrySet()) {
 			if (setValue(e.getKey(), e.getValue()))
 				changed = true;
 		}

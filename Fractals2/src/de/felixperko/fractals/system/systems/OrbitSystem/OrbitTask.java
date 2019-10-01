@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.felixperko.fractals.data.AbstractArrayChunk;
+import de.felixperko.fractals.data.ArrayChunkFactory;
 import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.data.ReducedNaiveChunk;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
@@ -23,6 +24,8 @@ import de.felixperko.fractals.system.thread.FractalsThread;
 public class OrbitTask extends AbstractFractalsTask<OrbitTask> {
 
 	private static final long serialVersionUID = -7778760685136366361L;
+	
+	AbstractArrayChunk dummy_chunk = null;
 	
 	ComplexNumber current;
 	List<ComplexNumber> values = new ArrayList<>();
@@ -42,6 +45,8 @@ public class OrbitTask extends AbstractFractalsTask<OrbitTask> {
 		
 		this.calculator = calculator;
 		this.chunk = chunk;
+//		ArrayChunkFactory dummy_chunk_factory = new ArrayChunkFactory(ReducedNaiveChunk.class, 1);
+//		this.dummy_chunk = dummy_chunk_factory.createChunk(0, 0);
 		chunk.setCurrentTask(this);
 	}
 
@@ -72,6 +77,11 @@ public class OrbitTask extends AbstractFractalsTask<OrbitTask> {
 			public void trace(ComplexNumber number, int pixel, int sample, int iteration) {
 				traces.add(number);
 			}
+
+			@Override
+			public boolean isApplicable(int viewId, int chunkX, int chunkY) {
+				return true;
+			}
 		};
 		
 		calculator.addTraceListener(traceListener);
@@ -83,7 +93,9 @@ public class OrbitTask extends AbstractFractalsTask<OrbitTask> {
 		calculator.removeTraceListener(traceListener);
 		calculator.setTrace(false);
 		
-		
+		getContext().getSystemStateInfo().updateTraces(traces);
+		traces = new ArrayList<>();
+		traces.clear();
 	}
 
 	@Override

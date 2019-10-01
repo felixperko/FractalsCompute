@@ -5,10 +5,23 @@ import de.felixperko.fractals.system.task.Layer;
 public class OrbitLayer implements Layer {
 
 	private static final long serialVersionUID = -6099129991281941671L;
+	
+	int id;
+	
+	int maxIterations;
+	
+	public OrbitLayer(int maxIterations) {
+		this.maxIterations = maxIterations;
+	}
 
 	@Override
 	public int getId() {
-		return 0;
+		return id;
+	}
+
+	@Override
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	@Override
@@ -47,9 +60,8 @@ public class OrbitLayer implements Layer {
 	}
 
 	@Override
-	public void setId(int id) {
-		if (id != 0)
-			throw new IllegalArgumentException();
+	public int getMaxIterations() {
+		return maxIterations;
 	}
 
 }

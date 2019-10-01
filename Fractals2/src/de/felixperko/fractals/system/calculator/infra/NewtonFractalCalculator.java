@@ -19,6 +19,10 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 	
 	protected DoubleComplexNumber[] roots;
 	
+	int maxIterations;
+	int maxIterationsGlobal;
+	boolean storeEndResults;
+	
 	IStats taskStats;
 	
 	public NewtonFractalCalculator() {
@@ -32,6 +36,14 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 		double limit = (Double) systemContext.getParamValue("limit", Double.class);
 		int it = (Integer) systemContext.getParamValue("iterations", Integer.class);
 		Layer layer = chunk.getCurrentTask().getStateInfo().getLayer();
+		
+		maxIterations = layer.getMaxIterations();
+		maxIterationsGlobal = systemContext.getParamValue("iterations", Integer.class);
+		storeEndResults = maxIterations != -1 && maxIterations < maxIterationsGlobal;
+		if (maxIterations == -1) {
+			maxIterations = maxIterationsGlobal;
+		}
+		
 		int samples = layer.getSampleCount();
 		int upsample = (layer instanceof BreadthFirstUpsampleLayer) ? ((BreadthFirstUpsampleLayer)layer).getUpsample()/2 : 0;
 		loop : 
@@ -46,22 +58,29 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 				ComplexNumber c = systemContext.getParamValue("c", ComplexNumber.class, chunk.chunkPos, pixel, sample);
 				ComplexNumber copy1;
 				ComplexNumber copy2;
-				
-				int j;
+
+				int j = 0;
 				int i = 0;
 				iterationLoop:
-				for (j = 0 ; j < it ; j++) {
+				for ( ; j < it ; j++) {
+					if (sample == 0) {
+						ComplexNumber storedPosition = chunk.getStoredPosition(pixel);
+						if (storedPosition != null) {
+							current = storedPosition;
+							j = chunk.getStoredIterations(pixel);
+							chunk.removeStoredPosition(pixel);
+						}
+					}
 					copy1 = current.copy();
 					copy2 = current.copy();
 					executeFunctionKernel(copy1);
 					executeDerivativeKernel(copy2);
 					copy1.div(copy2);
 					current.sub(copy1);
+					
 					if (trace)
 						for (TraceListener listener : traceListeners)
 							listener.trace(current, pixel, sample, j);
-//					if (test)
-//						System.out.println("("+current.toString()+")");
 					
 					for (i = 0 ; i < roots.length ; i++) {
 						DoubleComplexNumber root = roots[i];
@@ -70,9 +89,16 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 							break iterationLoop;
 						}
 					}
+					i = -1;
 				}
-				taskStats.addSample(j+1, i+1);
-				chunk.addSample(pixel, -1, upsample);
+				
+				if (i == -1 && sample == 0 && storeEndResults)
+					chunk.storeCurrentState(pixel, current, j+1);
+				else
+					taskStats.addSample(j+1, i+1);
+				
+				double sampleValue = i == -1 ? -1 : getRootValue(i);
+				chunk.addSample(pixel, sampleValue, upsample);
 			}
 			chunk.getCurrentTask().getStateInfo().setProgress((pixel/(double)chunk.getArrayLength()));
 		}

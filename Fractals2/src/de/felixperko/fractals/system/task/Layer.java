@@ -13,5 +13,6 @@ public interface Layer extends Serializable{
 	boolean renderingEnabled();
 	int getUpsample();
 	void setId(int id);
+	int getMaxIterations();
 
 }

@@ -24,7 +24,7 @@ public class PrioritizedSharedData extends SharedData<PrioritizedSharedDataUpdat
 	public DataContainer getUpdates(Connection<?> connection) {
 		PrioritizedSharedDataUpdate update = null;
 
-		List<SharedDataUpdate<?>> list = new ArrayList<>();
+		List<SharedDataUpdate> list = new ArrayList<>();
 		synchronized (updates){
 			for (int i = 0 ; i < copyCount ; i++) {
 				update = getQueue(connection).poll();

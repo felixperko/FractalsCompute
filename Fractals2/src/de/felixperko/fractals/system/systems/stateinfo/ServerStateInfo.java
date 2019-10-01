@@ -22,9 +22,6 @@ public class ServerStateInfo implements Serializable{
 	List<Integer> remoteWorkerThreads = new ArrayList<>();
 	Map<UUID, SystemStateInfo> systemStates = new HashMap<>();
 	
-	MappedSharedData<TaskStateUpdate> taskStateChanges = new MappedSharedData<TaskStateUpdate>("taskStates", true);
-	MappedSharedData<ComplexNumberUpdate> currentMidpointData = new MappedSharedData<ComplexNumberUpdate>("currentMidpoint", false);
-	
 	long updateTime = 0;
 	
 	public void addSystemStateInfo(UUID systemId, SystemStateInfo systemStateInfo) {
@@ -54,12 +51,13 @@ public class ServerStateInfo implements Serializable{
 	
 	public List<DataContainer> getSharedDataUpdates(Connection connection){
 		List<DataContainer> list = new ArrayList<>();
-		taskStateChanges.getUpdatesAppendList(connection, list);
-		currentMidpointData.getUpdatesAppendList(connection, list);
+		//TODO subscribe system
+		for (SystemStateInfo ssi : systemStates.values())
+			list.addAll(ssi.getSharedDataUpdates(connection));
 		return list;
 	}
 
 	public void updateMidpoint(UUID systemId, ComplexNumber midpoint) {
-		currentMidpointData.update(new MappedSharedDataUpdate<ComplexNumberUpdate>(systemId.toString(), new ComplexNumberUpdate(systemId, midpoint)));
+		systemStates.get(systemId).updateMidpoint(midpoint);
 	}
 }

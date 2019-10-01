@@ -9,9 +9,9 @@ public class DataContainer implements Serializable{
 	private static final long serialVersionUID = 8570824204254426488L;
 	
 	String identifier;
-	protected List<SharedDataUpdate<?>> updates;
+	protected List<SharedDataUpdate> updates;
 
-	public DataContainer(String dataIdentifier, List<SharedDataUpdate<?>> updates) {
+	public DataContainer(String dataIdentifier, List<SharedDataUpdate> updates) {
 		this.identifier = dataIdentifier;
 		this.updates = updates;
 	}
@@ -22,7 +22,7 @@ public class DataContainer implements Serializable{
 		this.updates.add(update);
 	}
 
-	public List<SharedDataUpdate<?>> getUpdates(){
+	public List<SharedDataUpdate> getUpdates(){
 		return updates;
 	}
 

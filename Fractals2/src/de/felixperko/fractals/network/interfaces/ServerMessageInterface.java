@@ -51,9 +51,9 @@ public class ServerMessageInterface extends ClientMessageInterface {
 
 	@Override
 	public void updateSharedData(DataContainer container) {
-		for (SharedDataUpdate<?> sdu : container.getUpdates()){
-			if (container.getIdentifier().equals("remoteTaskStates")){
-				if (sdu instanceof MappedSharedDataUpdate<?>){
+		for (SharedDataUpdate sdu : container.getUpdates()){
+			if (sdu instanceof MappedSharedDataUpdate<?>){
+				if (container.getIdentifier().equals("remoteTaskStates")){
 					@SuppressWarnings("unchecked")
 					MappedSharedDataUpdate<TaskStateUpdate> msdu = (MappedSharedDataUpdate<TaskStateUpdate>) sdu;
 					for (TaskStateUpdate update : msdu.getUpdates()){

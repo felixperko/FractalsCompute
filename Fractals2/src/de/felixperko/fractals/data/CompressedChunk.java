@@ -3,6 +3,7 @@ package de.felixperko.fractals.data;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -36,6 +37,10 @@ public class CompressedChunk implements Serializable{
 	Map<BorderAlignment, ChunkBorderData> selfBorderData;
 	Map<BorderAlignment, ChunkBorderData> neighbourBorderData;
 	
+	byte[] storedIndices;
+	List<ComplexNumber> storedPositions;
+	byte[] storedIterations;
+	
 	public CompressedChunk(ReducedNaiveChunk chunk) {
 		FractalsTask task = chunk.getCurrentTask();
 		this.priority = 2;
@@ -49,8 +54,33 @@ public class CompressedChunk implements Serializable{
 		this.chunkY = chunk.chunkY;
 		this.dimensionSize = chunk.dimensionSize;
 		this.chunkPos = chunk.chunkPos;
+		
 		try {
 			long t1 = System.nanoTime();
+			
+			int storedSize = 0;
+			if (chunk.storedIterations != null)
+				storedSize = chunk.storedIterations.size();
+			
+			int[] storedIndicesArray = new int[storedSize];
+			int[] storedIterationsArray = new int[storedSize];
+			
+			if (storedSize > 0) {
+				int counter = 0;
+				for (Entry<Integer, ComplexNumber> e : chunk.storedPositions.entrySet()) {
+					storedIndicesArray[counter++] = e.getKey();
+					storedPositions.add(e.getValue());
+				}
+				counter = 0;
+				for (Entry<Integer, Integer> e : chunk.storedIterations.entrySet()) {
+					if (storedIndicesArray[counter] != e.getKey())
+						throw new IllegalStateException("Code doesn't work as expected: map order doesn't match.");
+					storedIterationsArray[counter++] = e.getValue();
+				}
+			}
+			storedIndices = Snappy.compress(BitShuffle.shuffle(storedIndicesArray));
+			storedIterations = Snappy.compress(BitShuffle.shuffle(storedIterationsArray));
+			
 			values_compressed = Snappy.compress(BitShuffle.shuffle(getUpsampledFloatArray(chunk.values)));
 			samples_compressed = Snappy.compress(getUpsampledByteArray(chunk.samples));
 			failedSamples_compressed = Snappy.compress(getUpsampledByteArray(chunk.failedSamples));
@@ -86,10 +116,23 @@ public class CompressedChunk implements Serializable{
 			ReducedNaiveChunk chunk = new ReducedNaiveChunk(chunkX, chunkY, dimensionSize, getFullFloatArray(values), getFullByteArray(samples), getFullByteArray(failedSamples));
 			chunk.setJobId(jobId);
 			chunk.chunkPos = chunkPos;
+			
+			int[] storedIterationsArray = BitShuffle.unshuffleIntArray(Snappy.uncompress(storedIterations));
+			if (storedIterationsArray.length > 0) {
+				chunk.storedPositions = new HashMap<>();
+				chunk.storedIterations = new HashMap<>();
+				for (int i = 0 ; i < storedIterationsArray.length ; i++) {
+					Integer index = storedIterationsArray[i];
+					chunk.storedPositions.put(index, storedPositions.get(i));
+					chunk.storedIterations.put(index, storedIterationsArray[i]);
+				}
+			}
+			
 			if (selfBorderData != null)
 				chunk.setSelfBorderData(selfBorderData);
 			if (neighbourBorderData != null)
 				chunk.setNeighbourBorderData(neighbourBorderData);
+			
 			return chunk;
 		} catch (IOException e) {
 			e.printStackTrace();

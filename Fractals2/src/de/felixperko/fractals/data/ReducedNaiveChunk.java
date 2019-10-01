@@ -1,5 +1,9 @@
 package de.felixperko.fractals.data;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.systems.infra.ViewData;
 
 public class ReducedNaiveChunk extends AbstractArrayChunk {
@@ -9,6 +13,7 @@ public class ReducedNaiveChunk extends AbstractArrayChunk {
 	float[] values;
 	byte[] samples;
 	byte[] failedSamples;
+	
 	// 32 bit + 2 * 8 bit -> 6 byte per pixel
 
 	ReducedNaiveChunk(ViewData viewData, int chunkX, int chunkY, int dimensionSize) {

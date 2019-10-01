@@ -8,7 +8,7 @@ public class ContinuousDataContainer extends DataContainer{
 	
 	int version;
 	
-	public ContinuousDataContainer(String dataIdentifier, int version, List<SharedDataUpdate<?>> updates) {
+	public ContinuousDataContainer(String dataIdentifier, int version, List<SharedDataUpdate> updates) {
 		super(dataIdentifier, updates);
 		this.version = version;
 	}

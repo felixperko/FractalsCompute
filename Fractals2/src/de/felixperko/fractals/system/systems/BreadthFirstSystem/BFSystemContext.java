@@ -1,7 +1,9 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.felixperko.fractals.data.AbstractArrayChunk;
@@ -17,6 +19,7 @@ import de.felixperko.fractals.system.calculator.NewtonEighthPowerPlusFifteenTime
 import de.felixperko.fractals.system.calculator.NewtonThridPowerMinusOneCalculator;
 import de.felixperko.fractals.system.calculator.TricornCalculator;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
+import de.felixperko.fractals.system.calculator.infra.TraceListener;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.Number;
 import de.felixperko.fractals.system.numbers.NumberFactory;

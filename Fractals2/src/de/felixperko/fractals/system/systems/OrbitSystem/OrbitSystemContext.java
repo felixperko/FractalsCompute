@@ -40,11 +40,12 @@ public class OrbitSystemContext extends AbstractSystemContext<OrbitViewData, Orb
 
 	public OrbitSystemContext(TaskManager<?> taskManager) {
 		super(taskManager, new OrbitViewContainer());
-		layer = new OrbitLayer();
 		
-		List<Layer> list = new ArrayList<>();
-		list.add(layer);
-		layerConfiguration = new LayerConfiguration(list, 0, 1, 42);
+//		layer = new OrbitLayer();
+//		
+//		List<Layer> list = new ArrayList<>();
+//		list.add(layer);
+//		layerConfiguration = new LayerConfiguration(list, 0, 1, 42);
 	}
 	
 	Layer layer;

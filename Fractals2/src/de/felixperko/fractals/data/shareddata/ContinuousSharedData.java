@@ -14,7 +14,7 @@ import de.felixperko.fractals.network.infra.connection.ConnectionListener;
  * Continuous data that needs to be synced for clients through update messages.
  * The data is divided in discrete SharedDataUpdate objects.
  */
-public class ContinuousSharedData<T extends SharedDataUpdate> extends SharedData<T>{
+public class ContinuousSharedData<U extends SharedDataUpdate> extends SharedData<U>{
 	int versionCounter = 0;
 	int disposedCounter = 0;
 	
@@ -31,7 +31,7 @@ public class ContinuousSharedData<T extends SharedDataUpdate> extends SharedData
 		
 		//prepare state
 		if (!connections.containsKey(connection)) {
-			final ContinuousSharedData<T> thisData = this;
+			final ContinuousSharedData<U> thisData = this;
 			connection.addConnectionListener(new ConnectionListener() {
 				@Override
 				public void connectionClosed(Connection<?> connection) {
@@ -49,9 +49,9 @@ public class ContinuousSharedData<T extends SharedDataUpdate> extends SharedData
 				return null;
 			
 			//accumulate past version updates
-			List<SharedDataUpdate<?>> list = new ArrayList<>();
+			List<SharedDataUpdate> list = new ArrayList<>();
 			for (int i = Math.max(currentVersion, 0) ; i < versionCounter ; i++) {
-				for (SharedDataUpdate<?> update : getUpdateList(i, false)) {
+				for (SharedDataUpdate update : getUpdateList(i, false)) {
 					update.setSent();
 					list.add(update);
 				}
@@ -59,7 +59,7 @@ public class ContinuousSharedData<T extends SharedDataUpdate> extends SharedData
 			
 			//add current version updates and increment version
 			synchronized (updates) {
-				for (SharedDataUpdate<?> update : getUpdateList(versionCounter, false)) {
+				for (SharedDataUpdate update : getUpdateList(versionCounter, false)) {
 					update.setSent();
 					list.add(update);
 				}

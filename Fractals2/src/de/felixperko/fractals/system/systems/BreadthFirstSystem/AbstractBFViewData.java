@@ -3,14 +3,15 @@ package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.data.ReducedNaiveChunk;
+import de.felixperko.fractals.system.systems.infra.BufferedChunkedViewData;
 import de.felixperko.fractals.system.systems.infra.ViewContainer;
 import de.felixperko.fractals.util.NestedMap;
 import de.felixperko.fractals.util.NumberUtil;
 
 /**
- * Provides general functionality for ViewData implementations, keeping data management to subclasses
+ * Provides general functionality for BufferedChunkedViewData implementations, keeping data management to subclasses
  */
-public abstract class AbstractBFViewData<VIEWDATA extends AbstractBFViewData<VIEWDATA>> implements ChunkedViewData<BFSystemContext>{
+public abstract class AbstractBFViewData<VIEWDATA extends AbstractBFViewData<VIEWDATA>> implements BufferedChunkedViewData<BFSystemContext>{
 	
 	private static final long serialVersionUID = 2638706868007870329L;
 
@@ -115,7 +116,7 @@ public abstract class AbstractBFViewData<VIEWDATA extends AbstractBFViewData<VIE
 		this.active = active;
 	}
 	
-	private ViewContainer getViewContainer() {
+	private ViewContainer<?> getViewContainer() {
 		return systemContext.getViewContainer();
 	}
 	

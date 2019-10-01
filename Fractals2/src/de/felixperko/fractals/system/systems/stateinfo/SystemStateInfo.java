@@ -2,12 +2,18 @@ package de.felixperko.fractals.system.systems.stateinfo;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import de.felixperko.fractals.data.shareddata.ContinuousSharedData;
+import de.felixperko.fractals.data.shareddata.DataContainer;
+import de.felixperko.fractals.data.shareddata.MappedSharedData;
 import de.felixperko.fractals.data.shareddata.MappedSharedDataUpdate;
+import de.felixperko.fractals.network.infra.connection.Connection;
+import de.felixperko.fractals.system.numbers.ComplexNumber;
 
 public class SystemStateInfo implements Serializable{
 	
@@ -16,6 +22,10 @@ public class SystemStateInfo implements Serializable{
 //	int stageCount;
 //	int currentWorkerThreads;
 	Map<Integer, TaskStateInfo> taskStates = new ConcurrentHashMap<>();
+	
+	MappedSharedData<TaskStateUpdate> taskStateChanges = new MappedSharedData<TaskStateUpdate>("taskStates", true);
+	MappedSharedData<ComplexNumberUpdate> currentMidpointData = new MappedSharedData<ComplexNumberUpdate>("currentMidpoint", false);
+	ContinuousSharedData<ComplexNumberListUpdate> currentTraces = new ContinuousSharedData<ComplexNumberListUpdate>("currentTraces", true);
 	
 	ServerStateInfo serverStateInfo;
 	
@@ -68,11 +78,27 @@ public class SystemStateInfo implements Serializable{
 		}
 		
 		TaskStateUpdate update = new TaskStateUpdate(systemId, taskId, stateInfo.getState(), stateInfo.getLayerId(), stateInfo.progress);
-		serverStateInfo.taskStateChanges.update(new MappedSharedDataUpdate<TaskStateUpdate>(systemId.toString()+taskId, update));
+		taskStateChanges.update(new MappedSharedDataUpdate<TaskStateUpdate>(systemId.toString()+taskId, update));
 		return update;
 	}
 
 	public void taskStateUpdated(TaskStateUpdate updateMessage) {
-		serverStateInfo.taskStateChanges.update(new MappedSharedDataUpdate<TaskStateUpdate>(systemId.toString()+updateMessage.getTaskId(), updateMessage));
+		taskStateChanges.update(new MappedSharedDataUpdate<TaskStateUpdate>(systemId.toString()+updateMessage.getTaskId(), updateMessage));
+	}
+
+	public void updateMidpoint(ComplexNumber midpoint) {
+		currentMidpointData.update(new MappedSharedDataUpdate<ComplexNumberUpdate>(systemId.toString(), new ComplexNumberUpdate(systemId, midpoint)));
+	}
+	
+	public void updateTraces(List<ComplexNumber> traces) {
+		currentTraces.update(new ComplexNumberListUpdate(traces));
+	}
+
+	public List<DataContainer> getSharedDataUpdates(Connection connection) {
+		List<DataContainer> list = new ArrayList<>();
+		taskStateChanges.getUpdatesAppendList(connection, list);
+		currentMidpointData.getUpdatesAppendList(connection, list);
+		currentTraces.getUpdatesAppendList(connection, list);
+		return list;
 	}
 }

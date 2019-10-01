@@ -13,6 +13,7 @@ public class BreadthFirstLayer implements Layer {
 	double priority_shift = 0;
 	BitSet enabledPixels = null;
 	int samples = 1;
+	int maxIterations = -1;
 	
 	boolean culling = false;
 	
@@ -64,6 +65,11 @@ public class BreadthFirstLayer implements Layer {
 	
 	public BreadthFirstLayer with_rendering(boolean rendering) {
 		this.rendering = rendering;
+		return this;
+	}
+	
+	public BreadthFirstLayer with_max_iterations(int maxIterations) {
+		this.maxIterations = maxIterations;
 		return this;
 	}
 	
@@ -159,6 +165,11 @@ public class BreadthFirstLayer implements Layer {
 	@Override
 	public int getUpsample() {
 		return 1;
+	}
+
+	@Override
+	public int getMaxIterations() {
+		return maxIterations;
 	}
 	
 }

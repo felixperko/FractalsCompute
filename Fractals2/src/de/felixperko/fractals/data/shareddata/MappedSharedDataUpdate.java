@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MappedSharedDataUpdate<T> implements SharedDataUpdate<T>, Serializable {
+public class MappedSharedDataUpdate<T> implements SharedDataUpdate, Serializable {
 
 	private static final long serialVersionUID = -510929972128464350L;
 	
@@ -39,10 +39,6 @@ public class MappedSharedDataUpdate<T> implements SharedDataUpdate<T>, Serializa
 		updates.put(key, null);
 	}
 	
-	public Map<String, T> getUpdateMap(){
-		return updates;
-	}
-	
 	public Collection<T> getUpdates(){
 		return updates.values();
 	}
@@ -53,5 +49,9 @@ public class MappedSharedDataUpdate<T> implements SharedDataUpdate<T>, Serializa
 	
 	public void setClearExisting() {
 		clearExisting = true;
+	}
+
+	public Map<String, T> getMap() {
+		return updates;
 	}
 }

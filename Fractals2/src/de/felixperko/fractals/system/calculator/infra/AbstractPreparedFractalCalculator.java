@@ -17,20 +17,14 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 	
 	final static double LOG_2 = Math.log(2);
 	
-	//ParamSupplier[] params;
-	
 	public AbstractPreparedFractalCalculator() {
 		super(AbstractPreparedFractalCalculator.class);
 	}
-
-//	ParamSupplier p_start;
-//	ParamSupplier p_c;
-//	ParamSupplier p_pow;
-//	ParamSupplier p_iterations;
-//	ParamSupplier p_limit;
-//	ParamSupplier p_samples;
 	
 	int maxIterations;
+	int maxIterationsGlobal;
+	boolean storeEndResults;
+	
 	double limit;
 	int upsample;
 	AbstractArrayChunk chunk;
@@ -52,17 +46,19 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 		this.taskStats = taskStats;
 		
 		limit = systemContext.getParamValue("limit", Double.class);
-		maxIterations = systemContext.getParamValue("iterations", Integer.class);
 		p_current = systemContext.getParameters().get("start");
 		p_pow = systemContext.getParameters().get("pow");
 		p_c = systemContext.getParameters().get("c");
 		Layer layer = chunk.getCurrentTask().getStateInfo().getLayer();
-		//upsample = (layer instanceof BreadthFirstUpsampleLayer) ? ((BreadthFirstUpsampleLayer)layer).getUpsample()/2 : 0;
-		//TODO validate
+
 		upsample = layer.getUpsample();
 		int samples = layer.getSampleCount();
-//		if (chunk.getChunkX() == 5 && chunk.getChunkY() == 10)
-//			System.out.println("test chunk");
+		maxIterations = layer.getMaxIterations();
+		maxIterationsGlobal = systemContext.getParamValue("iterations", Integer.class);
+		storeEndResults = maxIterations != -1 && maxIterations < maxIterationsGlobal;
+		if (maxIterations == -1) {
+			maxIterations = maxIterationsGlobal;
+		}
 		
 		int pixelCount = chunk.getArrayLength();
 		
@@ -120,13 +116,25 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 		ComplexNumber<?, ?> c = ((ComplexNumber)p_c.get(systemContext, chunk.chunkPos, pixel, sample));
 		ComplexNumber<?, ?> pow = ((ComplexNumber)p_pow.get(systemContext, chunk.chunkPos, pixel, sample));
 		double logPow = Math.log(pow.absDouble());
-//		long t1 = System.nanoTime();
-		int k;
-		for (k = 0 ; k < maxIterations ; k++) {
+
+		int k = 0;
+		
+		if (sample == 0) {
+			ComplexNumber storedPosition = chunk.getStoredPosition(pixel);
+			if (storedPosition != null) {
+				current = storedPosition;
+				k = chunk.getStoredIterations(pixel);
+				chunk.removeStoredPosition(pixel);
+			}
+		}
+		
+		for ( ; k < maxIterations ; k++) {
 			executeKernel(current, pow, c);
+			
 			if (trace)
 				for (TraceListener listener : traceListeners)
 					listener.trace(current, pixel, sample, k);
+			
 			double abs = current.absSqDouble();
 			if (abs > limit*limit) {
 //							Math.log( Math.log(real*real+imag*imag)*0.5 / Math.log(2) ) / Math.log(pow)  )
@@ -135,10 +143,11 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 				break;
 			}
 		}
-		taskStats.addSample(k+1, res);
-//		long t2 = System.nanoTime();
-//		if (res != -1)
-//			res = (t2-t1);
+		if (res == -1 && sample == 0 && storeEndResults)
+			chunk.storeCurrentState(pixel, current, k+1);
+		else 
+			taskStats.addSample(k+1, res);
+		
 		chunk.addSample(pixel, res, upsample);
 	}
 	

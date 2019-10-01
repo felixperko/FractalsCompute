@@ -1,13 +1,11 @@
-package de.felixperko.fractals.system.systems.BreadthFirstSystem;
+package de.felixperko.fractals.system.systems.infra;
 
 import java.util.List;
 
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.CompressedChunk;
-import de.felixperko.fractals.system.systems.infra.SystemContext;
-import de.felixperko.fractals.system.systems.infra.ViewData;
 
-public interface ChunkedViewData<CONTEXT extends SystemContext<?>> extends ViewData<CONTEXT>{
+public interface BufferedChunkedViewData<CONTEXT extends SystemContext<?>> extends ViewData<CONTEXT>{
 	//buffered chunk operations
 	boolean insertBufferedChunk(Chunk chunk, boolean insertCompressedChunk);
 	boolean updateBufferedChunk(Chunk chunk);

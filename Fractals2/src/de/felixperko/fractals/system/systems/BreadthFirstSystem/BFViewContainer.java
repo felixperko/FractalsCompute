@@ -53,7 +53,7 @@ public class BFViewContainer extends AbstractViewContainer<BreadthFirstViewData>
 	}
 
 	private void disposeLastOldViewData() {
-		ViewData old = oldViewData.removeLast();
+		ViewData<?> old = oldViewData.removeLast();
 		old.dispose();
 	}
 

@@ -8,6 +8,7 @@ import static de.felixperko.fractals.data.BorderAlignment.UP;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.systems.infra.ViewData;
 
 public abstract class AbstractArrayChunk extends AbstractChunk {
@@ -21,6 +22,9 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 	
 	Map<BorderAlignment, ChunkBorderData> selfBorderData = new HashMap<>();
 	Map<BorderAlignment, ChunkBorderData> neighbourBorderData = null;
+	
+	Map<Integer, ComplexNumber> storedPositions;
+	Map<Integer, Integer> storedIterations;
 	
 	public AbstractArrayChunk(ViewData viewData, int chunkX, int chunkY, int dimensionSize) {
 		super(viewData, chunkX, chunkY);
@@ -202,4 +206,22 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 	protected abstract void removeFlag(int i);
 
 	public abstract int getStartIndex();
+
+	public void storeCurrentState(Integer pixel, ComplexNumber current, Integer iterations) {
+		storedPositions.put(pixel, current);
+		storedIterations.put(pixel, iterations);
+	}
+
+	public ComplexNumber getStoredPosition(Integer pixel) {
+		return storedPositions.get((Integer)pixel);
+	}
+
+	public Integer getStoredIterations(Integer pixel) {
+		return storedIterations.get(pixel);
+	}
+	
+	public void removeStoredPosition(Integer pixel) {
+		storedPositions.remove(pixel);
+		storedIterations.remove(pixel);
+	}
 }
