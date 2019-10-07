@@ -72,6 +72,7 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 	}
 	
 	private static ChunkBorderData[] emptyBorderData = new ChunkBorderData[]{};
+	private static ChunkBorderDataNullImpl nullBorderData = new ChunkBorderDataNullImpl();
 	
 	public ChunkBorderData[] getIndexBorderData(int x, int y, int upsample) {
 		
@@ -85,54 +86,59 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 		if (lowestX > 0 && highestX < higherBorder && lowestY > 0 && highestY < higherBorder)
 			return emptyBorderData;
 		
+		//DOWN -> RIGHT
+		//UP -> LEFT
+		//RIGHT -> DOWN
+		//LEFT -> UP
+		
 		if (lowestX <= 0) {
 			if (highestX >= higherBorder) {
 				if (lowestY <= 0) {
 					if (highestY >= higherBorder)
-						return getBorderDataForAlignments(LEFT, RIGHT, UP, DOWN);
+						return getBorderDataForAlignments(UP, DOWN, LEFT, RIGHT);
 					else
-						return getBorderDataForAlignments(LEFT, RIGHT, UP);
+						return getBorderDataForAlignments(UP, DOWN, LEFT);
 				} else {
 					if (highestY >= higherBorder)
-						return getBorderDataForAlignments(LEFT, RIGHT, DOWN);
+						return getBorderDataForAlignments(UP, DOWN, RIGHT);
 					else
-						return getBorderDataForAlignments(LEFT, RIGHT);
+						return getBorderDataForAlignments(UP, DOWN);
 				}
 			} else {
 				if (lowestY <= 0) {
 					if (highestY >= higherBorder)
-						return getBorderDataForAlignments(LEFT, UP, DOWN);
+						return getBorderDataForAlignments(UP, LEFT, RIGHT);
 					else
-						return getBorderDataForAlignments(LEFT, UP);
+						return getBorderDataForAlignments(UP, LEFT);
 				} else {
 					if (highestY >= higherBorder)
-						return getBorderDataForAlignments(LEFT, DOWN);
+						return getBorderDataForAlignments(UP, RIGHT);
 					else
-						return getBorderDataForAlignments(LEFT);
+						return getBorderDataForAlignments(UP);
 				}
 			}
 		} else {
 			if (highestX >= higherBorder) {
 				if (lowestY <= 0) {
 					if (highestY >= higherBorder)
-						return getBorderDataForAlignments(RIGHT, UP, DOWN);
+						return getBorderDataForAlignments(DOWN, LEFT, RIGHT);
 					else
-						return getBorderDataForAlignments(RIGHT, UP);
+						return getBorderDataForAlignments(DOWN, LEFT);
 				} else {
 					if (highestY >= higherBorder)
-						return getBorderDataForAlignments(RIGHT, DOWN);
+						return getBorderDataForAlignments(DOWN, RIGHT);
 					else
-						return getBorderDataForAlignments(RIGHT);
+						return getBorderDataForAlignments(DOWN);
 				}
 			} else {
 				if (lowestY <= 0) {
 					if (highestY >= higherBorder)
-						return getBorderDataForAlignments(UP, DOWN);
+						return getBorderDataForAlignments(LEFT, RIGHT);
 					else
-						return getBorderDataForAlignments(UP);
+						return getBorderDataForAlignments(LEFT);
 				} else {
 					if (highestY >= higherBorder)
-						return getBorderDataForAlignments(DOWN);
+						return getBorderDataForAlignments(RIGHT);
 					else
 						throw new IllegalStateException("unexpected branch in AbstractArrayChunk.getIndexBorderData()");
 				}
@@ -145,7 +151,7 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 		for (int i = 0 ; i < alignments.length ; i++) {
 			BorderAlignment alignment = alignments[i];
 			//if (alignment.isHorizontal())
-				alignment = alignment.getAlignmentForNeighbour();
+//			alignment = alignment.getAlignmentForNeighbour();
 			res[i] = selfBorderData.get(alignment);
 		}
 		return res;
@@ -154,7 +160,7 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 	public void setNeighbourBorderData(Map<BorderAlignment, ChunkBorderData> neighbourBorderData) {
 		this.neighbourBorderData = neighbourBorderData;
 		for (ChunkBorderData data : neighbourBorderData.values())
-			if (!(data instanceof ChunkBorderDataImplNull))
+			if (!(data instanceof ChunkBorderDataNullImpl))
 				data.setChunk(this);
 	}
 	
@@ -173,7 +179,7 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 	public void setSelfBorderData(Map<BorderAlignment, ChunkBorderData> selfBorderData) {
 		this.selfBorderData = selfBorderData;
 		for (ChunkBorderData data : selfBorderData.values())
-			if (!(data instanceof ChunkBorderDataImplNull))
+			if (!(data instanceof ChunkBorderDataNullImpl))
 				data.setChunk(this);
 	}
 
@@ -213,10 +219,14 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 	}
 
 	public ComplexNumber getStoredPosition(Integer pixel) {
+		if (storedPositions == null)
+			return null;
 		return storedPositions.get((Integer)pixel);
 	}
 
 	public Integer getStoredIterations(Integer pixel) {
+		if (storedIterations == null)
+			return null;
 		return storedIterations.get(pixel);
 	}
 	

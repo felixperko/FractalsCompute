@@ -36,8 +36,6 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	
 	transient FractalsThread thread;
 	
-	int previousLayerId = -1;
-	
 	public transient AbstractArrayChunk chunk;
 	private transient CompressedChunk compressed_chunk;
 	
@@ -60,7 +58,6 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	public void run() {
 		try {
 			int layerId = getStateInfo().getLayerId();
-			previousLayerId = layerId-1;
 			taskStats = new HistogramStats(1000, ((BFSystemContext)getContext()).getParamValue("iterations", Integer.class));
 			
 			taskStats.executionStart();
@@ -82,12 +79,12 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 
 	private void preprocess() {
 		if (isPreviousLayerCullingEnabled()){
-			preprocess_culling((BreadthFirstLayer) getContext().getLayer(previousLayerId));
+			preprocess_culling((BreadthFirstLayer) getContext().getLayer(getStateInfo().getLayerId()-1));
 		}
 	}
 
 	private void preprocess_culling(BreadthFirstLayer prev) {
-		if (prev instanceof BreadthFirstUpsampleLayer) {
+		if (prev instanceof BreadthFirstUpsampleLayer && prev.cullingEnabled()) {
 			BreadthFirstUpsampleLayer prevUpsampled = (BreadthFirstUpsampleLayer) prev;
 			BitSet activePixels = prevUpsampled.getEnabledPixels();
 			int upsample = prevUpsampled.upsample;
@@ -204,11 +201,8 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 		return priority;
 	}
 	
-	public int getPreviousLayerId() {
-		return previousLayerId;
-	}
-	
 	public boolean isPreviousLayerCullingEnabled() {
+		int previousLayerId = getStateInfo().getLayerId()-1;
 		if (previousLayerId == -1)
 			return false;
 		Layer layer = getContext().getLayer(previousLayerId);

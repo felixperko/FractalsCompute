@@ -2,7 +2,7 @@ package de.felixperko.fractals.data;
 
 public enum BorderAlignment{
 	
-	LEFT(true, -1, 0), RIGHT(true, 1, 0), UP(false, 0, 1), DOWN(false, 0, -1);
+	LEFT(true, -1, 0), RIGHT(true, 1, 0), UP(false, 0, -1), DOWN(false, 0, 1);
 	
 	boolean horizontal;
 	int offsetX;
@@ -23,6 +23,7 @@ public enum BorderAlignment{
 	}
 	
 	public BorderAlignment getAlignmentForNeighbour() {
+		
 		switch (this) {
 		case LEFT:
 			return RIGHT;

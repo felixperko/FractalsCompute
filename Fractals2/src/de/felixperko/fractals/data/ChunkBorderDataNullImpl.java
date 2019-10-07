@@ -2,7 +2,7 @@ package de.felixperko.fractals.data;
 
 import java.util.List;
 
-public class ChunkBorderDataImplNull implements ChunkBorderData {
+public class ChunkBorderDataNullImpl implements ChunkBorderData {
 
 	private static final long serialVersionUID = 3220272617615167154L;
 
@@ -42,7 +42,7 @@ public class ChunkBorderDataImplNull implements ChunkBorderData {
 
 	@Override
 	public ChunkBorderData copy() {
-		return new ChunkBorderDataImplNull();
+		return new ChunkBorderDataNullImpl();
 	}
 
 }

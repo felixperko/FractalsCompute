@@ -11,7 +11,7 @@ import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.BorderAlignment;
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.ChunkBorderData;
-import de.felixperko.fractals.data.ChunkBorderDataImplNull;
+import de.felixperko.fractals.data.ChunkBorderDataNullImpl;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 
 public class BreadthFirstMultilayerQueue extends AbstractBreadthFirstMultilayerQueue<BreadthFirstTask, BreadthFirstLayer> {
@@ -156,7 +156,7 @@ public class BreadthFirstMultilayerQueue extends AbstractBreadthFirstMultilayerQ
 				Chunk c = taskManager.viewData.getBufferedChunk(alignment.getNeighbourX(x), alignment.getNeighbourY(y));
 				BorderAlignment relative = alignment.getAlignmentForNeighbour();
 				if (c == null) {
-					neighbourBorderData.put(relative, new ChunkBorderDataImplNull());
+					neighbourBorderData.put(relative, new ChunkBorderDataNullImpl());
 				} else {
 					AbstractArrayChunk neighbour = (AbstractArrayChunk) c;
 					neighbourBorderData.put(relative, neighbour.getBorderData(alignment));

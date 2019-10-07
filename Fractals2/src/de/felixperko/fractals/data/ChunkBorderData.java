@@ -15,7 +15,7 @@ public interface ChunkBorderData extends Serializable{
 	public List<Integer> getChangedIndices();
 	public void updateDone();
 	
-	public BorderAlignment getAlignment();
 	
+	public BorderAlignment getAlignment();
 	public ChunkBorderData copy();
 }
