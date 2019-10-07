@@ -30,4 +30,9 @@ public class EmptyStats implements IStats {
 		return 0;
 	}
 
+	@Override
+	public int getIterationsPerSecondSinceStart() {
+		return 0;
+	}
+
 }

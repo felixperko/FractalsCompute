@@ -1,14 +1,19 @@
 package de.felixperko.fractals.system.systems.OrbitSystem;
 
+import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.network.ParamContainer;
+import de.felixperko.fractals.system.systems.infra.SingleViewData;
 import de.felixperko.fractals.system.systems.infra.ViewData;
 
-public class OrbitViewData implements ViewData<OrbitSystemContext> {
+public class OrbitViewData implements SingleViewData<OrbitSystemContext> {
 
 	private static final long serialVersionUID = 7465341398909992740L;
 	
 	ParamContainer paramContainer;
 	OrbitSystemContext context;
+	Chunk chunk;
+	
+	boolean active;
 	
 	@Override
 	public ParamContainer getParams() {
@@ -32,31 +37,35 @@ public class OrbitViewData implements ViewData<OrbitSystemContext> {
 
 	@Override
 	public void tick() {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void setBufferTimeout(double seconds) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public boolean isActive() {
-		// TODO Auto-generated method stub
-		return false;
+		return active;
 	}
 
 	@Override
 	public void setActive(boolean active) {
-		// TODO Auto-generated method stub
-		
+		this.active = active;
 	}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
-		
+	}
+
+	@Override
+	public Chunk getChunk() {
+		return chunk;
+	}
+
+	@Override
+	public void setChunk(Chunk chunk) {
+		this.chunk = chunk;
 	}
 }

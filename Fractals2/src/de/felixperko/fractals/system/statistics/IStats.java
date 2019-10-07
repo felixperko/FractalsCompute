@@ -8,4 +8,5 @@ public interface IStats extends Serializable{
 	public void executionStart();
 	public void executionEnd();
 	public long getExecutionTimeNS();
+	public int getIterationsPerSecondSinceStart();
 }

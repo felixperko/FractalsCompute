@@ -1,5 +1,7 @@
 package de.felixperko.fractals.system.statistics;
 
+import de.felixperko.fractals.util.NumberUtil;
+
 public class HistogramStats implements IStats, IHistogramStats {
 	
 	private static final long serialVersionUID = -6580791494809928165L;
@@ -44,51 +46,49 @@ public class HistogramStats implements IStats, IHistogramStats {
 
 	@Override
 	public void addSample(int iterations, double result) {
-		if (!initialized)
-			throw new IllegalStateException("The histogram must be initialized first");
+		checkInit();
 		this.iterationHistogram[getIndex(iterations, result)]++;
 	}
 
 	@Override
 	public void addCulled() {
-		if (!initialized)
-			throw new IllegalStateException("The histogram must be initialized first");
+		checkInit();
 		iterationHistogram[0]++;
 	}
 	
 	@Override
 	public int getIterationCount() {
-		if (!initialized)
-			throw new IllegalStateException("The histogram must be initialized first");
+		checkInit();
 		return iterationCount;
 	}
 	
 	@Override
 	public int[] getIterationHistogram() {
-		if (!initialized)
-			throw new IllegalStateException("The histogram must be initialized first");
+		checkInit();
 		return iterationHistogram;
 	}
 
 	@Override
 	public int getBinWidth() {
-		if (!initialized)
-			throw new IllegalStateException("The histogram must be initialized first");
+		checkInit();
 		return binWidth;
 	}
 
 	@Override
 	public int getMaxIterations() {
-		if (!initialized)
-			throw new IllegalStateException("The histogram must be initialized first");
+		checkInit();
 		return maxIterations;
 	}
 
 	@Override
 	public void executionStart() {
+		checkInit();
+		this.executionStart = System.nanoTime();
+	}
+	
+	private void checkInit() {
 		if (!initialized)
 			throw new IllegalStateException("The histogram must be initialized first");
-		this.executionStart = System.nanoTime();
 	}
 
 	@Override
@@ -106,6 +106,12 @@ public class HistogramStats implements IStats, IHistogramStats {
 	@Override
 	public boolean isInitialized() {
 		return initialized;
+	}
+
+	@Override
+	public int getIterationsPerSecondSinceStart() {
+		double timeInS = NumberUtil.NS_TO_S*(System.nanoTime()-executionStart);
+		return (int)(iterationCount/timeInS);
 	}
 
 }
