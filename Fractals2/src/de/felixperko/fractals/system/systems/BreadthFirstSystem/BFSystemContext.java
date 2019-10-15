@@ -66,8 +66,20 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 	
 	public BFSystemContext(TaskManager<?> taskManager) {
 		super(taskManager, new BFViewContainer(0));
+		viewContainer.setContext(this);
 		if (taskManager != null)
 			systemStateInfo = taskManager.getSystem().getSystemStateInfo();
+	}
+	
+	public AbstractArrayChunk generateChunk(long chunkX, long chunkY, boolean generateTaskIfLocal) {
+		if (generateTaskIfLocal && taskManager != null && taskManager instanceof BreadthFirstTaskManager) {
+			BreadthFirstTask task = ((BreadthFirstTaskManager)taskManager).generateTask(chunkX, chunkY);
+			return (AbstractArrayChunk) task.getChunk();
+		} else {
+			AbstractArrayChunk chunk = chunkFactory.createChunk(chunkX, chunkY);
+			getActiveViewData().insertBufferedChunk(chunk, true);
+			return chunk;
+		}
 	}
 	
 	@Override
@@ -142,6 +154,7 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 			paramContainer.addClientParameter(new StaticParamSupplier("pixelzoom", pixelzoom));
 			chunkZoom = pixelzoom.copy();
 			chunkZoom.mult(numberFactory.createNumber(chunkSize));
+			paramContainer.addClientParameter(new StaticParamSupplier("chunkzoom", chunkZoom));
 			
 			Number rX = numberFactory.createNumber(0.5*(width+chunkSize));
 			rX.mult(pixelzoom);
@@ -160,7 +173,9 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 			
 			BreadthFirstViewData activeViewData = (BreadthFirstViewData)getActiveViewData();
 			if (activeViewData == null) {
-				setActiveViewData(new BreadthFirstViewData(anchor).setContext(this));
+				BreadthFirstViewData viewData = new BreadthFirstViewData(anchor).setContext(this);
+				setActiveViewData(viewData);
+				viewData.setParams(paramContainer);
 			} else {
 				activeViewData.setParams(paramContainer);
 			}
@@ -208,16 +223,14 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 	
 	public double getChunkY(ComplexNumber pos) {
 		Number value = pos.getImag();
-		value.sub(((BreadthFirstViewData)getActiveViewData()).anchor.getImag());
+		value.sub(getCurrentAnchor().getImag());
 		value.div(chunkZoom);
 		return value.toDouble();
 	}
 
-	public ComplexNumber getChunkPos(long chunkX, long chunkY) {
+	public ComplexNumber getPos(long chunkX, long chunkY) {
 		ComplexNumber chunkPos = numberFactory.createComplexNumber(chunkX, chunkY);
-		chunkPos.add(relativeStartShift);
-		chunkPos.multNumber(chunkZoom);
-		chunkPos.add(((BreadthFirstViewData)getActiveViewData()).anchor);
+		toPos(chunkPos);
 		return chunkPos;
 	}
 	
@@ -266,5 +279,15 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 	@Override
 	public AbstractArrayChunk createChunk(int chunkX, int chunkY) {
 		return chunkFactory.createChunk(chunkX, chunkY);
+	}
+
+	public void toPos(ComplexNumber gridPos) {
+		gridPos.add(relativeStartShift);
+		gridPos.multNumber(chunkZoom);
+		gridPos.add(((BreadthFirstViewData)getActiveViewData()).anchor);
+	}
+
+	public Number getChunkZoom() {
+		return chunkZoom;
 	}
 }

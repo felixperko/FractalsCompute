@@ -10,6 +10,7 @@ import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.data.ReducedNaiveChunk;
 import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
+import de.felixperko.fractals.system.numbers.Number;
 import de.felixperko.fractals.util.Nestable;
 import de.felixperko.fractals.util.NestedMap;
 import de.felixperko.fractals.util.NestedNull;
@@ -29,6 +30,11 @@ public class BreadthFirstViewData extends AbstractBFViewData<BreadthFirstViewDat
 	
 	public BreadthFirstViewData(ComplexNumber anchor) {
 		this.anchor = anchor;
+	}
+	
+	public void toPos(ComplexNumber gridPos, Number chunkZoom) {
+		gridPos.multNumber(chunkZoom);
+		gridPos.add(anchor);
 	}
 	
 	public boolean insertCompressedChunkImpl(CompressedChunk compressedChunk) {
