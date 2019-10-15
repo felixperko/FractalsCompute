@@ -93,4 +93,34 @@ public class ParameterDefinition implements Serializable{
 	public List<String> getHints() {
 		return hints;
 	}
+	
+	public String getHintValue(String hintName, boolean returnEmptyStringIfAbsent){
+		for (String hint : hints)
+			if (hint.startsWith(hintName))
+				return hint.split(" ", 2)[1];
+		if (returnEmptyStringIfAbsent)
+			return "";
+		else
+			return null;
+	}
+	
+	public String getHintAttributeValue(String hintName, String attributeName){
+		for (String attribute : getHintValue(hintName, true).split(" ")){
+            String[] pair = attribute.split("=");
+            if (pair.length != 2)
+                continue;
+            String key = pair[0];
+            String value = pair[1];
+            if (key.equals(attributeName))
+            	return value;
+		}
+		return null;
+	}
+	
+	public Double getHintAttributeDoubleValue(String hintName, String attributeName){
+		String hintAttribute = getHintAttributeValue(hintName, attributeName);
+		if (hintAttribute == null)
+			return null;
+		return Double.parseDouble(hintAttribute);
+	}
 }
