@@ -129,13 +129,18 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	}
 	
 	protected void generateRootTask() {
-		AbstractArrayChunk chunk = context.chunkFactory.createChunk(0, 0);
-		BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getChunkPos(0, 0), 
+		generateTask(0, 0);
+	}
+	
+	public BreadthFirstTask generateTask(long chunkX, long chunkY) {
+		AbstractArrayChunk chunk = context.chunkFactory.createChunk(chunkX, chunkY);
+		BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getPos(chunkX, chunkY), 
 				context.createCalculator(), context.layerConfig.getLayers().get(0), context.getViewId());
 		rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, context.layerConfig.getLayers().get(0));
 		context.getActiveViewData().insertBufferedChunk(chunk, true);
 		openTasks.get(0).add(rootTask);
 		openChunks++;
+		return rootTask;
 	}
 	
 	@Override
@@ -428,7 +433,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			BreadthFirstViewData viewData = context.getActiveViewData();
 			if (!viewData.hasCompressedChunk(midpointChunkXFloor, midpointChunkYFloor)){
 				AbstractArrayChunk chunk = context.chunkFactory.createChunk(midpointChunkXFloor, midpointChunkYFloor);
-				BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getChunkPos(midpointChunkXFloor, midpointChunkYFloor),
+				BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getPos(midpointChunkXFloor, midpointChunkYFloor),
 						context.createCalculator(), layers.get(0), context.getViewId());
 				rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(0));
 				viewData.insertBufferedChunk(chunk, true);
@@ -542,7 +547,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 					}
 			}
 		}
-		BreadthFirstTask task = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getChunkPos(chunkX, chunkY),
+		BreadthFirstTask task = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getPos(chunkX, chunkY),
 				context.createCalculator(), context.layerConfig.getLayers().get(0), context.getViewId());
 		task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, context.layerConfig.getLayers().get(0));
 		openChunks++;

@@ -18,7 +18,7 @@ public class ArrayChunkFactory implements Serializable{
 		this.dimensionSize = dimensionSize;
 	}
 	
-	public AbstractArrayChunk createChunk(int chunkX, int chunkY) {
+	public AbstractArrayChunk createChunk(long chunkX, long chunkY) {
 		if (viewData == null) {
 			System.out.println("Exception at "+System.currentTimeMillis());
 			throw new IllegalStateException("Couldn't create Chunk: ViewData is null");
