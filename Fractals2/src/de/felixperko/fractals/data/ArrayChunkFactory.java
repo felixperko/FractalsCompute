@@ -24,9 +24,10 @@ public class ArrayChunkFactory implements Serializable{
 			throw new IllegalStateException("Couldn't create Chunk: ViewData is null");
 		}
 		try {
-			return chunkClass.getDeclaredConstructor(ViewData.class, int.class, int.class, int.class).newInstance(viewData, chunkX, chunkY, dimensionSize);
+			return chunkClass.getDeclaredConstructor(ViewData.class, int.class, int.class, int.class).newInstance(viewData, (int)chunkX, (int)chunkY, dimensionSize);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
+			System.err.println("Failed to create instance of "+chunkClass.getName());
 			e.printStackTrace();
 		}
 		return null;
