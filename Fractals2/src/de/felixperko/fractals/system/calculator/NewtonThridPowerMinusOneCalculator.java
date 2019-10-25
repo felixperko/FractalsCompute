@@ -17,19 +17,19 @@ public class NewtonThridPowerMinusOneCalculator extends NewtonFractalCalculator 
 		roots[2] = new DoubleComplexNumber(-.5, -sqrt3/2);
 	}
 
-	@Override
-	public double getRootValue(int root) {
-		switch (root) {
-		case 0:
-			return 10;
-		case 1:
-			return 20;
-		case 2:
-			return 30;
-		default:
-			return -1;
-		}
-	}
+//	@Override
+//	public double getRootValue(int root) {
+//		switch (root) {
+//		case 0:
+//			return 10;
+//		case 1:
+//			return 20;
+//		case 2:
+//			return 30;
+//		default:
+//			return -1;
+//		}
+//	}
 	
 	DoubleComplexNumber pow1 = new DoubleComplexNumber(3, 0);
 	DoubleComplexNumber add1 = new DoubleComplexNumber(-1, 0);

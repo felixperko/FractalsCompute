@@ -224,7 +224,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 
 				
 				//Prepare culling
-				if (task.isPreviousLayerCullingEnabled()) {
+//				if (task.isPreviousLayerCullingEnabled()) {
 					Map<BorderAlignment, ChunkBorderData> neighbourBorderData = new HashMap<>();
 					AbstractArrayChunk chunk = ((AbstractArrayChunk)task.getChunk());
 					int x = chunk.getChunkX();
@@ -240,7 +240,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 						}
 					}
 					chunk.setNeighbourBorderData(neighbourBorderData);
-				}
+//				}
 					
 				tasks.add(task);
 				task.setContext(context);

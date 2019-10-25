@@ -95,12 +95,12 @@ public class ReducedNaiveChunk extends AbstractArrayChunk {
 			for (ChunkBorderData data : getIndexBorderData(x, y, upsample)) {
 				BorderAlignment alignment = data.getAlignment();
 				if (alignment.isHorizontal()) {
-					int lower = y-upsample/2;
-					int higher2 = lower+upsample-1;
-					data.set(hasValidValue, clampIndex(lower), clampIndex(higher2));//TODO coordinates correct?
+					int lower = y-upsample/2-1;
+					int higher2 = lower+upsample;
+					data.set(hasValidValue, clampIndex(lower), clampIndex(higher2));
 				} else {
-					int lower = x-upsample/2;
-					int higher2 = lower+upsample-1;
+					int lower = x-upsample/2-1;
+					int higher2 = lower+upsample;
 					data.set(hasValidValue, clampIndex(lower), clampIndex(higher2));
 				}
 			}
@@ -122,18 +122,13 @@ public class ReducedNaiveChunk extends AbstractArrayChunk {
 
 	@Override
 	protected void removeFlag(int i) {
-		if (samples[i] == 0)
-			values[i] = 0;
+		samples[i] = 0;
+		values[i] = 0;
 	}
 
 	@Override
 	public int getStartIndex() {
 		return 0;
-	}
-
-	@Override
-	public int getUpsample() {
-		return upsample;
 	}
 
 }

@@ -59,34 +59,52 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 		if (maxIterations == -1) {
 			maxIterations = maxIterationsGlobal;
 		}
-		
+
+		int chunkSize = chunk.getChunkDimensions();
 		int pixelCount = chunk.getArrayLength();
 		
 		phase = CalculatePhase.PHASE_MAINLOOP;
 		
+		
 		loop : 
 		for (int pixel = 0 ; pixel < pixelCount ; pixel++) {
-			if (!layer.isActive(pixel))
-				continue;
-			if (chunk.getValue(pixel) == AbstractArrayChunk.FLAG_CULL) {
-//				int x = pixel / chunkSize;
-//				int y = pixel % chunkSize;
-//				for (int x2 = x-1 ; x2 <= x+1 ; x++) {
-//					for (int y2 = y-1 ; y2 <= y+1 ; y++) {
-//						if (x < 0) {
-//							
-//						} else if (x >= chunkSize) {
-//							
-//						}
-//					}
-//				}
+			if (!layer.isActive(pixel)){
+				if (layer instanceof BreadthFirstUpsampleLayer)
+					pixel = ((BreadthFirstUpsampleLayer)layer).getEnabledBitSet().nextSetBit(pixel)-1;
+				if (pixel == -2)
+					break;
 				continue;
 			}
+			
+			boolean cull = true;
+			if (chunk.getValue(pixel) == AbstractArrayChunk.FLAG_CULL) {
+				int x = pixel / chunkSize;
+				int y = pixel % chunkSize;
+				if (x-upsample < 0){
+					if (chunk.getNeighbourBorderData(BorderAlignment.LEFT).isSet(y))
+						cull = false;
+				} else if (x+upsample >= chunkSize){
+					if (chunk.getNeighbourBorderData(BorderAlignment.RIGHT).isSet(y))
+						cull = false;
+				}
+				if (y-upsample < 0){
+					if (chunk.getNeighbourBorderData(BorderAlignment.UP).isSet(x))
+						cull = false;
+				} else if (y+upsample >= chunkSize){
+					if (chunk.getNeighbourBorderData(BorderAlignment.DOWN).isSet(x))
+						cull = false;
+				}
+				if (cull)
+					continue;
+			}
+			
 			if (isCancelled())
 				break loop;
+			
 			for (int sample = chunk.getSampleCount(pixel) ; sample < samples ; sample++){
 				calculateSample(pixel, sample);
 			}
+			
 			chunk.getCurrentTask().getStateInfo().setProgress((pixel+1.-redo.size())/pixelCount);
 		}
 		
@@ -152,13 +170,14 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 	}
 	
 	private void sample_success(int pixel) {
-		if (chunk.getValue(pixel, true) <= 0)
+//		if (chunk.getValue(pixel, true) <= 0)
 			sample_first_success(pixel);
 			
 	}
 	
 	private void sample_first_success(int pixel) {
 		final int chunkDimensions = chunk.getChunkDimensions();
+		final int upsample = chunk.getUpsample();
 		final int chunkArrayLength = chunk.getArrayLength();
 		int thisX = pixel / chunkDimensions;
 		int thisY = pixel % chunkDimensions;
@@ -169,29 +188,37 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 				if (dx == 0 && dy == 0)
 					continue;
 				
-				int x = thisX + dx;
-				int y = thisY + dy;
+				int x = thisX + dx*upsample;
+				int y = thisY + dy*upsample;
 				
 				//determine if in neighbour chunk
 				boolean local = true;
 				if (x < 0){
+					int low = thisY - thisY % (upsample);
+					int high = low+upsample-1;
 					local = false;
 					if (y > 0 && y < chunkDimensions)
-						chunk.getBorderData(BorderAlignment.LEFT).set(true, y, y);
+						chunk.getBorderData(BorderAlignment.LEFT).set(true, low, high);
 				} else if (x >= chunkDimensions){
+					int low = thisY - thisY % (upsample);
+					int high = low+upsample-1;
 					local = false;
 					if (y > 0 && y < chunkDimensions)
-						chunk.getBorderData(BorderAlignment.RIGHT).set(true, y, y);
+						chunk.getBorderData(BorderAlignment.RIGHT).set(true, low, high);
 				}
 				
 				if (y < 0){
+					int low = thisX - thisX % (upsample);
+					int high = low+upsample-1;
 					local = false;
 					if (x > 0 && x < chunkDimensions)
-						chunk.getBorderData(BorderAlignment.UP).set(true, x, x);
+						chunk.getBorderData(BorderAlignment.UP).set(true, low, high);
 				} else if (y >= chunkDimensions){
+					int low = thisX - thisX % (upsample);
+					int high = low+upsample-1;
 					local = false;
 					if (x > 0 && x < chunkDimensions)
-						chunk.getBorderData(BorderAlignment.DOWN).set(true, x, x);
+						chunk.getBorderData(BorderAlignment.DOWN).set(true, low, high);
 				}
 				
 				//local -> add to redo queue

@@ -77,7 +77,7 @@ public class PadovanLayerConfiguration extends LayerConfiguration {
 						}
 					}
 				}
-				testDraw(temp, layers.size(), i);
+				//testDraw(temp, layers.size(), i);
 			}
 		}
 		prepared = true;

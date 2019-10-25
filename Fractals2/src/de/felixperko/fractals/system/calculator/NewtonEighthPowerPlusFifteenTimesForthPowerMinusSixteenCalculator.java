@@ -26,10 +26,10 @@ public class NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator e
 		roots[7] = new DoubleComplexNumber(sqrt2,-sqrt2);
 	}
 
-	@Override
-	public double getRootValue(int root) {
-		return Math.pow(root+1, 2);
-	}
+//	@Override
+//	public double getRootValue(int root) {
+//		//return Math.pow(root+1, 2);
+//	}
 	
 	DoubleComplexNumber pow11 = new DoubleComplexNumber(8, 0);
 	DoubleComplexNumber pow12 = new DoubleComplexNumber(4, 0);
@@ -42,8 +42,8 @@ public class NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator e
 
 	@Override
 	public void executeFunctionKernel(ComplexNumber z_copy) {
-//		if (!(z_copy instanceof DoubleComplexNumber))
-//			throw new IllegalArgumentException("only supports DoubleComplexNumbers for now.");
+		if (!(z_copy instanceof DoubleComplexNumber))
+			throw new IllegalArgumentException("only supports DoubleComplexNumbers for now.");
 		ComplexNumber z = z_copy;
 		ComplexNumber z2 = z.copy();
 		//x^8 + 15*x^4 - 16
@@ -62,7 +62,7 @@ public class NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator e
 		DoubleComplexNumber z2 = (DoubleComplexNumber)z.copy();
 		//8x^7 + 60*x^3
 		z.pow(pow21);
-		z2.mult(mult21);
+		z.mult(mult21);
 		z2.pow(pow22);
 		z2.mult(mult22);
 		z.add(z2);

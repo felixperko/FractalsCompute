@@ -8,9 +8,13 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.GroupLayout.Alignment;
+
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.BorderAlignment;
 import de.felixperko.fractals.data.Chunk;
+import de.felixperko.fractals.data.ChunkBorderData;
+import de.felixperko.fractals.data.ChunkBorderDataNullImpl;
 import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.data.ReducedNaiveChunk;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
@@ -84,11 +88,12 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	}
 
 	private void preprocess_culling(BreadthFirstLayer prev) {
+		int dim = chunk.getChunkDimensions();
+		int prevUpsample = prev.getUpsample();
 		if (prev instanceof BreadthFirstUpsampleLayer && prev.cullingEnabled()) {
 			BreadthFirstUpsampleLayer prevUpsampled = (BreadthFirstUpsampleLayer) prev;
 			BitSet activePixels = prevUpsampled.getEnabledPixels();
-			int upsample = prevUpsampled.upsample;
-			int dim = chunk.getChunkDimensions();
+			int currentUpsample = getStateInfo().getLayer().getUpsample();
 			//for (int i = 0 ; i < chunk.getArrayLength() ; i++) {
 			//}
 			
@@ -104,9 +109,9 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 				for (int dx = -1 ; dx <= 1 ; dx++) {
 					for (int dy = -1 ; dy <= 1 ; dy++) {
 						
-						int neighbourUpsampleIndex = i + dx*upsample*dim + dy*upsample;
-						int x2 = x+dx*upsample;
-						int y2 = y+dy*upsample;
+						int neighbourUpsampleIndex = i + dx*prevUpsample*dim + dy*prevUpsample;
+						int x2 = x+dx*prevUpsample;
+						int y2 = y+dy*prevUpsample;
 
 						boolean local = true;
 						
@@ -177,9 +182,45 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 				}
 				
 				if (oldCull != cull)
-					chunk.setCullFlags(i, upsample, cull);
+					chunk.setCullFlags(i, prevUpsample, cull);
 			}
 		}
+//		else {
+//			for (BorderAlignment alignment : BorderAlignment.values()){
+//				ChunkBorderData neighbourData = chunk.getNeighbourBorderData(alignment);
+//				if (neighbourData instanceof ChunkBorderDataNullImpl)
+//					continue;
+//				for (int i = 0 ; i < dim ; i++){
+//					if (!neighbourData.isSet(i))
+//						continue;
+//					int x = 0;
+//					int y = 0;
+//					switch (alignment)
+//					{
+//					case UP:
+//						x = i;
+//						y = 0;
+//						break;
+//					case DOWN:
+//						x = i;
+//						y = dim-1;
+//						break;
+//					case LEFT:
+//						x = 0;
+//						y = i;
+//						break;
+//					case RIGHT:
+//						x = dim-1;
+//						y = i;
+//						break;
+//					}
+//					int index = x*dim + y;
+//					boolean oldCull = chunk.getValue(index, true) == AbstractArrayChunk.FLAG_CULL;
+//					if (oldCull)
+//						chunk.setCullFlags(index, 1, false);
+//				}
+//			}
+//		}
 	}
 	
 	@Override

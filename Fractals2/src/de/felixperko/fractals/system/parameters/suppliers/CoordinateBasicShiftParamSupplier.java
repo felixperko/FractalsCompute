@@ -17,10 +17,10 @@ public class CoordinateBasicShiftParamSupplier extends MappedParamSupplier {
 		int chunkSize = systemContext.getChunkSize();
 		int x = pixel/chunkSize;
 		int y = pixel%chunkSize;
-		Number pixelzoom = systemContext.getPixelzoom();
 		ComplexNumber n = systemContext.getNumberFactory().createComplexNumber(x, y);
 		ComplexNumber offset = systemContext.getLayerConfiguration().getOffsetForSample(sample);
 		n.add(offset);
+		Number pixelzoom = systemContext.getPixelzoom();
 		n.multNumber(pixelzoom);
 		n.add(chunkPos);
 		return n;

@@ -26,6 +26,8 @@ public class CompressedChunk implements Serializable{
 	byte[] samples_compressed;
 	byte[] failedSamples_compressed;
 	
+	byte[] borderData_compressed;
+	
 	int chunkX;
 	int chunkY;
 	int dimensionSize;
@@ -34,8 +36,8 @@ public class CompressedChunk implements Serializable{
 	
 	ComplexNumber chunkPos;
 	
-	Map<BorderAlignment, ChunkBorderData> selfBorderData;
-	Map<BorderAlignment, ChunkBorderData> neighbourBorderData;
+//	Map<BorderAlignment, ChunkBorderData> selfBorderData;
+//	Map<BorderAlignment, ChunkBorderData> neighbourBorderData;
 	
 	byte[] storedIndices;
 	List<ComplexNumber> storedPositions;
@@ -84,9 +86,47 @@ public class CompressedChunk implements Serializable{
 			values_compressed = Snappy.compress(BitShuffle.shuffle(getUpsampledFloatArray(chunk.values)));
 			samples_compressed = Snappy.compress(getUpsampledByteArray(chunk.samples));
 			failedSamples_compressed = Snappy.compress(getUpsampledByteArray(chunk.failedSamples));
+			
+			//
+			// BorderData
+			//
+			
+			boolean[] borderData = new boolean[dimensionSize*8];
+			int directionOffset = 0;
+			int setOffset = dimensionSize*4;
+			for (BorderAlignment alignment : BorderAlignment.values()){
+				
+				ChunkBorderData selfData = chunk.getBorderData(alignment);
+				ChunkBorderData neighbourData = chunk.getBorderData(alignment);
+				
+				boolean useSelfData = selfData instanceof ChunkBorderDataArrayImpl;
+				boolean useNeighbourData = selfData instanceof ChunkBorderDataArrayImpl;
+				
+				if ((!useSelfData && !(selfData instanceof ChunkBorderDataNullImpl)) || (!useNeighbourData && !(neighbourData instanceof ChunkBorderDataNullImpl)))
+					throw new IllegalStateException("Unexpected ChunkBorder type");
+				
+				for (int i = 0 ; i < dimensionSize ; i++){
+					if (useSelfData)
+						borderData[directionOffset+i] = ((ChunkBorderDataArrayImpl)selfData).data[i];
+					if (useNeighbourData)
+						borderData[directionOffset+i+setOffset] = ((ChunkBorderDataArrayImpl)neighbourData).data[i];
+				}
+				
+				directionOffset += dimensionSize;
+			}
+			
+			byte[] borderData_bytes = new byte[dimensionSize];
+			for (int i = 0 ; i < dimensionSize ; i++){
+				for (int j = 0 ; j < 8 ; j++)
+					if (borderData[j])
+						borderData_bytes[i] &= 1 << j;
+			}
+			
+			borderData_compressed = Snappy.compress(borderData_bytes);
+			
 			double t = NumberUtil.getElapsedTimeInS(t1, 5);
-			int size_uncompressed = ((chunk.values.length*4)+(chunk.samples.length)+(chunk.failedSamples.length))/(upsample*upsample);
-			int size_compressed = values_compressed.length+samples_compressed.length+failedSamples_compressed.length;
+			int size_uncompressed = ((chunk.values.length*4)+(chunk.samples.length)+(chunk.failedSamples.length))/(upsample*upsample) + dimensionSize;//TODO add neighbourData
+			int size_compressed = values_compressed.length+samples_compressed.length+failedSamples_compressed.length + borderData_compressed.length;
 			String kbString = (size_compressed/1000.0)+" kb / "+(size_uncompressed/1000.0)+" kb";
 			System.out.println("saved bytes: "+values_compressed.length+"/"+(chunk.values.length*4/(upsample*upsample))+" "+
 					(samples_compressed.length)+"/"+(chunk.samples.length/(upsample*upsample))+" "+
@@ -96,16 +136,16 @@ public class CompressedChunk implements Serializable{
 			e.printStackTrace();
 		}
 		
-		this.selfBorderData = new HashMap<>();
-		for (Entry<BorderAlignment, ChunkBorderData> e : chunk.getSelfBorderData().entrySet())
-			this.selfBorderData.put(e.getKey(), e.getValue().copy());
-
-		Map<BorderAlignment, ChunkBorderData> nbd = chunk.getNeighbourBorderData();
-		if (nbd != null){
-			this.neighbourBorderData = new HashMap<>();
-			for (Entry<BorderAlignment, ChunkBorderData> e : chunk.getSelfBorderData().entrySet())
-				this.neighbourBorderData.put(e.getKey(), e.getValue().copy());
-		}
+//		this.selfBorderData = new HashMap<>();
+//		for (Entry<BorderAlignment, ChunkBorderData> e : chunk.getSelfBorderData().entrySet())
+//			this.selfBorderData.put(e.getKey(), e.getValue().copy());
+//
+//		Map<BorderAlignment, ChunkBorderData> nbd = chunk.getNeighbourBorderData();
+//		if (nbd != null){
+//			this.neighbourBorderData = new HashMap<>();
+//			for (Entry<BorderAlignment, ChunkBorderData> e : chunk.getNeighbourBorderData().entrySet())
+//				this.neighbourBorderData.put(e.getKey(), e.getValue().copy());
+//		}
 	}
 	
 	public ReducedNaiveChunk decompress() {
@@ -128,10 +168,11 @@ public class CompressedChunk implements Serializable{
 				}
 			}
 			
-			if (selfBorderData != null)
-				chunk.setSelfBorderData(selfBorderData);
-			if (neighbourBorderData != null)
-				chunk.setNeighbourBorderData(neighbourBorderData);
+			uncompressBorderData(chunk);
+//			if (selfBorderData != null)
+//				chunk.setSelfBorderData(selfBorderData);
+//			if (neighbourBorderData != null)
+//				chunk.setNeighbourBorderData(neighbourBorderData);
 			
 			return chunk;
 		} catch (IOException e) {
@@ -148,10 +189,13 @@ public class CompressedChunk implements Serializable{
 			AbstractArrayChunk chunk = new ReducedNaivePackedChunk(chunkX, chunkY, dimensionSize, values, samples, failedSamples, upsample);
 			chunk.setJobId(jobId);
 			chunk.chunkPos = chunkPos;
-			if (selfBorderData != null)
-				chunk.setSelfBorderData(selfBorderData);
-			if (neighbourBorderData != null)
-				chunk.setNeighbourBorderData(neighbourBorderData);
+			
+			uncompressBorderData(chunk);
+//			if (selfBorderData != null)
+//				chunk.setSelfBorderData(selfBorderData);
+//			if (neighbourBorderData != null)
+//				chunk.setNeighbourBorderData(neighbourBorderData);
+			
 			return chunk;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -192,6 +236,42 @@ public class CompressedChunk implements Serializable{
 //				break;
 		}
 		return ans;
+	}
+	
+	private void uncompressBorderData(AbstractArrayChunk chunk){
+		byte[] borderDataBytes;
+		try {
+			borderDataBytes = Snappy.uncompress(borderData_compressed);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new IllegalStateException();
+		}
+		
+		boolean[] borderData = new boolean[borderDataBytes.length*8];
+		for (int i = 0 ; i < borderDataBytes.length ; i++){
+			for (int j = 0 ; j < 8 ; j++){
+				if ((borderDataBytes[i] >> j) == 1)
+					borderData[i*8+j] = true;
+			}
+		}
+		
+		Map<BorderAlignment, ChunkBorderData> selfBorderData = new HashMap<>();
+		Map<BorderAlignment, ChunkBorderData> neighbourBorderData = new HashMap<>();
+		
+		int dim = chunk.dimensionSize;
+		int loopCounter = 0;
+		for (BorderAlignment alignment : BorderAlignment.values()){
+			ChunkBorderData selfData = new ChunkBorderDataArrayImpl(chunk, alignment);
+			ChunkBorderData neighbourData = new ChunkBorderDataArrayImpl(chunk, alignment);
+			for (int i = 0 ; i < dim ; i++){
+				
+			}
+			selfBorderData.put(alignment, selfData);
+			neighbourBorderData.put(alignment, neighbourData);
+		}
+		
+		chunk.setSelfBorderData(selfBorderData);
+		chunk.setNeighbourBorderData(neighbourBorderData);
 	}
 
 	private byte[] getFullByteArray(byte[] arr) {
@@ -317,13 +397,13 @@ public class CompressedChunk implements Serializable{
 		return chunkPos;
 	}
 
-	public Map<BorderAlignment, ChunkBorderData> getSelfBorderData() {
-		return selfBorderData;
-	}
-
-	public Map<BorderAlignment, ChunkBorderData> getNeighbourBorderData() {
-		return neighbourBorderData;
-	}
+//	public Map<BorderAlignment, ChunkBorderData> getSelfBorderData() {
+//		return selfBorderData;
+//	}
+//
+//	public Map<BorderAlignment, ChunkBorderData> getNeighbourBorderData() {
+//		return neighbourBorderData;
+//	}
 	
 	public double getPriority() {
 		return priority;

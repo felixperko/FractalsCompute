@@ -20,6 +20,7 @@ public class ChunkBorderDataImpl implements ChunkBorderData {
 		this.chunk = chunk;
 		this.alignment = alignment;
 		bits = new BitSet();
+		bits.set(0, chunk.arrayLength, false);
 	}
 	
 	@Override

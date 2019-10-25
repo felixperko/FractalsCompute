@@ -85,7 +85,7 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 					for (i = 0 ; i < roots.length ; i++) {
 						DoubleComplexNumber root = roots[i];
 						if (Math.abs(current.realDouble()-root.realDouble()) < limit && Math.abs(current.imagDouble()-root.imagDouble()) < limit) {//TODO arbitrary precision
-							chunk.addSample(pixel, getRootValue(i), upsample);
+							chunk.addSample(pixel, getRootValue(i, j, it), upsample);
 							break iterationLoop;
 						}
 					}
@@ -97,7 +97,7 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 				else
 					taskStats.addSample(j+1, i+1);
 				
-				double sampleValue = i == -1 ? -1 : getRootValue(i);
+				double sampleValue = i == -1 ? -1 : getRootValue(i, j, it);
 				chunk.addSample(pixel, sampleValue, upsample);
 			}
 			chunk.getCurrentTask().getStateInfo().setProgress((pixel/(double)chunk.getArrayLength()));
@@ -106,7 +106,9 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 	
 	public abstract void setRoots();
 	
-	public abstract double getRootValue(int root);
+	public double getRootValue(int root, int iterations, int max_iterations){
+		return 1 + root + iterations/(double)maxIterations;
+	}
 
 	public abstract void executeFunctionKernel(ComplexNumber z_copy);
 

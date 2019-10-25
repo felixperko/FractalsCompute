@@ -31,10 +31,10 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 		
 		this.dimensionSize = dimensionSize;
 		this.arrayLength = dimensionSize*dimensionSize;
-		this.upsample = dimensionSize;
+		this.upsample = 1;
 		
 		for (BorderAlignment alignment : BorderAlignment.values()) {
-			selfBorderData.put(alignment, new ChunkBorderDataImpl(this, alignment));
+			selfBorderData.put(alignment, new ChunkBorderDataArrayImpl(this, alignment));
 		}
 	}
 
@@ -76,10 +76,10 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 	
 	public ChunkBorderData[] getIndexBorderData(int x, int y, int upsample) {
 		
-		int lowestX = x-upsample-1;
-		int highestX = x+upsample;
-		int lowestY = y-upsample-1;
-		int highestY = y+upsample;
+		int lowestX = x-upsample/2-1;
+		int highestX = lowestX+upsample/2;
+		int lowestY = y-upsample/2-1;
+		int highestY = lowestY+upsample;
 		final int higherBorder = dimensionSize-1;
 		
 		//most cases -> check first
@@ -90,6 +90,60 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 		//UP -> LEFT
 		//RIGHT -> DOWN
 		//LEFT -> UP
+		
+//		if (lowestY <= 0) {
+//			if (highestY >= higherBorder) {
+//				if (lowestX <= 0) {
+//					if (highestX >= higherBorder)
+//						return getBorderDataForAlignments(UP, DOWN, LEFT, RIGHT);
+//					else
+//						return getBorderDataForAlignments(UP, DOWN, LEFT);
+//				} else {
+//					if (highestX >= higherBorder)
+//						return getBorderDataForAlignments(UP, DOWN, RIGHT);
+//					else
+//						return getBorderDataForAlignments(UP, DOWN);
+//				}
+//			} else {
+//				if (lowestX <= 0) {
+//					if (highestX >= higherBorder)
+//						return getBorderDataForAlignments(UP, LEFT, RIGHT);
+//					else
+//						return getBorderDataForAlignments(UP, LEFT);
+//				} else {
+//					if (highestX >= higherBorder)
+//						return getBorderDataForAlignments(UP, RIGHT);
+//					else
+//						return getBorderDataForAlignments(UP);
+//				}
+//			}
+//		} else {
+//			if (highestY >= higherBorder) {
+//				if (lowestX <= 0) {
+//					if (highestX >= higherBorder)
+//						return getBorderDataForAlignments(DOWN, LEFT, RIGHT);
+//					else
+//						return getBorderDataForAlignments(DOWN, LEFT);
+//				} else {
+//					if (highestX >= higherBorder)
+//						return getBorderDataForAlignments(DOWN, RIGHT);
+//					else
+//						return getBorderDataForAlignments(DOWN);
+//				}
+//			} else {
+//				if (lowestX <= 0) {
+//					if (highestX >= higherBorder)
+//						return getBorderDataForAlignments(LEFT, RIGHT);
+//					else
+//						return getBorderDataForAlignments(LEFT);
+//				} else {
+//					if (highestX >= higherBorder)
+//						return getBorderDataForAlignments(RIGHT);
+//					else
+//						throw new IllegalStateException("unexpected branch in AbstractArrayChunk.getIndexBorderData()");
+//				}
+//			}
+//		}
 		
 		if (lowestX <= 0) {
 			if (highestX >= higherBorder) {
@@ -192,7 +246,7 @@ public abstract class AbstractArrayChunk extends AbstractChunk {
 		for (int x = startX ; x < upsample+startX ; x++) {
 			for (int y = startY ; y < upsample+startY ; y++) {
 				int i = offX + y;
-				setCullFlag(i, cull, upsample);
+				setCullFlag(i, cull, 1);
 			}
 			offX += dimensionSize;
 		}
