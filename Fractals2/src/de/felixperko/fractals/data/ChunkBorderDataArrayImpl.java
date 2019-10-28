@@ -40,6 +40,11 @@ public class ChunkBorderDataArrayImpl implements ChunkBorderData{
 	}
 
 	@Override
+	public void set(boolean set, int index) {
+		data[index] = set;
+	}
+
+	@Override
 	public List<Integer> getChangedIndices() {
 		return null;
 	}

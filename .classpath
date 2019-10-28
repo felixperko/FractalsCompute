@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="Fractals2/src"/>
+	<classpathentry kind="src" path="FractalsIO/src"/>
+	<classpathentry kind="lib" path="desktop-1.0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="Fractals2/bin"/>
+</classpath>

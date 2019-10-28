@@ -77,7 +77,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 			}
 			
 			boolean cull = true;
-			if (chunk.getValue(pixel) == AbstractArrayChunk.FLAG_CULL) {
+			if (chunk.getValue(pixel, true) == AbstractArrayChunk.FLAG_CULL) {
 				int x = pixel / chunkSize;
 				int y = pixel % chunkSize;
 				if (x-upsample < 0){
@@ -105,7 +105,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 				calculateSample(pixel, sample);
 			}
 			
-			chunk.getCurrentTask().getStateInfo().setProgress((pixel+1.-redo.size())/pixelCount);
+//			chunk.getCurrentTask().getStateInfo().setProgress((pixel+1.-redo.size())/pixelCount);
 		}
 		
 		redoLoop:
@@ -120,7 +120,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 					}
 					calculateSample(pixel, sample);
 				}
-				chunk.getCurrentTask().getStateInfo().setProgress((pixelCount-redo.size())/pixelCount);
+//				chunk.getCurrentTask().getStateInfo().setProgress((pixelCount-redo.size())/pixelCount);
 			} catch (Exception e) {
 				e.printStackTrace();
 				break;

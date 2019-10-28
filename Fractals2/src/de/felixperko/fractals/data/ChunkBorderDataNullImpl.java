@@ -22,6 +22,11 @@ public class ChunkBorderDataNullImpl implements ChunkBorderData {
 	}
 
 	@Override
+	public void set(boolean set, int index) {
+		throw new IllegalStateException("method call for ChunkBorderDataImplNull shouldn't be possible");
+	}
+
+	@Override
 	public void set(boolean set, int lowerIndex, int higherIndex) {
 		throw new IllegalStateException("method call for ChunkBorderDataImplNull shouldn't be possible");
 	}

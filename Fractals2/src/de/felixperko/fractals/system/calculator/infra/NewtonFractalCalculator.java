@@ -85,7 +85,7 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 					for (i = 0 ; i < roots.length ; i++) {
 						DoubleComplexNumber root = roots[i];
 						if (Math.abs(current.realDouble()-root.realDouble()) < limit && Math.abs(current.imagDouble()-root.imagDouble()) < limit) {//TODO arbitrary precision
-							chunk.addSample(pixel, getRootValue(i, j, it), upsample);
+//							chunk.addSample(pixel, getRootValue(i, j, it), upsample);
 							break iterationLoop;
 						}
 					}

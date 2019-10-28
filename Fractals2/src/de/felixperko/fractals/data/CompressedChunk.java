@@ -117,9 +117,10 @@ public class CompressedChunk implements Serializable{
 			
 			byte[] borderData_bytes = new byte[dimensionSize];
 			for (int i = 0 ; i < dimensionSize ; i++){
+				borderData_bytes[i] = Byte.MIN_VALUE;
 				for (int j = 0 ; j < 8 ; j++)
 					if (borderData[j])
-						borderData_bytes[i] &= 1 << j;
+						borderData_bytes[i] += (1 << j);
 			}
 			
 			borderData_compressed = Snappy.compress(borderData_bytes);
@@ -168,7 +169,7 @@ public class CompressedChunk implements Serializable{
 				}
 			}
 			
-			uncompressBorderData(chunk);
+			decompressBorderData(chunk);
 //			if (selfBorderData != null)
 //				chunk.setSelfBorderData(selfBorderData);
 //			if (neighbourBorderData != null)
@@ -190,7 +191,7 @@ public class CompressedChunk implements Serializable{
 			chunk.setJobId(jobId);
 			chunk.chunkPos = chunkPos;
 			
-			uncompressBorderData(chunk);
+			decompressBorderData(chunk);
 //			if (selfBorderData != null)
 //				chunk.setSelfBorderData(selfBorderData);
 //			if (neighbourBorderData != null)
@@ -238,7 +239,7 @@ public class CompressedChunk implements Serializable{
 		return ans;
 	}
 	
-	private void uncompressBorderData(AbstractArrayChunk chunk){
+	private void decompressBorderData(AbstractArrayChunk chunk){
 		byte[] borderDataBytes;
 		try {
 			borderDataBytes = Snappy.uncompress(borderData_compressed);
@@ -249,9 +250,21 @@ public class CompressedChunk implements Serializable{
 		
 		boolean[] borderData = new boolean[borderDataBytes.length*8];
 		for (int i = 0 ; i < borderDataBytes.length ; i++){
-			for (int j = 0 ; j < 8 ; j++){
-				if ((borderDataBytes[i] >> j) == 1)
+			int correctedByte = borderDataBytes[i]-(int)Byte.MIN_VALUE;
+			int compare = 127;
+			int step = 128;
+			byte value = borderDataBytes[i];
+			for (int j = 7 ; j >= 0 ; j--){
+				if (compare == borderDataBytes[i]){
+					compare -= step;
+					value -= step;
+					step >>= 1;
 					borderData[i*8+j] = true;
+				}
+				
+//				int bitMask = 1 >> j;
+//				if ((correctedByte & bitMask) > 0)
+//					borderData[i*8+j] = true;
 			}
 		}
 		
@@ -264,10 +277,14 @@ public class CompressedChunk implements Serializable{
 			ChunkBorderData selfData = new ChunkBorderDataArrayImpl(chunk, alignment);
 			ChunkBorderData neighbourData = new ChunkBorderDataArrayImpl(chunk, alignment);
 			for (int i = 0 ; i < dim ; i++){
-				
+				if (borderData[i+loopCounter*dim])
+					selfData.set(true, i);
+				if (borderData[i+(loopCounter+4)*dim])
+					neighbourData.set(true, i);
 			}
 			selfBorderData.put(alignment, selfData);
 			neighbourBorderData.put(alignment, neighbourData);
+			loopCounter++;
 		}
 		
 		chunk.setSelfBorderData(selfBorderData);
