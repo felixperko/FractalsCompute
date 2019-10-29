@@ -43,14 +43,13 @@ public class BFViewContainer extends AbstractViewContainer<BreadthFirstViewData>
 			if (!(chunk instanceof AbstractArrayChunk))
 				throw new IllegalStateException();
 			
-			//integer zoom factor? don't bother if not
 			Number oldChunkZoom = fromViewData.paramContainer.getClientParameter("chunkzoom").getGeneral(Number.class);
 			Number zoomFactorN = oldChunkZoom;
 			zoomFactorN.div(context.getChunkZoom());
 			double zoomFactor = zoomFactorN.toDouble();
 			if (zoomFactor < 1)
 				zoomFactor = 1./zoomFactor;
-			if (Math.abs(zoomFactor%1) > 0.00000000001)
+			if (Math.abs(zoomFactor%1) > 0.00000000001) //integer zoom factor? don't bother if not
 				return;
 
 			//check other relevant parameters
@@ -103,7 +102,8 @@ public class BFViewContainer extends AbstractViewContainer<BreadthFirstViewData>
 				//get old grid coords
 				double pXFrom = i/fromDim;
 				double pYFrom = i%fromDim;
-				ComplexNumber pixelGridPosOld = context.getNumberFactory().createComplexNumber(fromChunk.getChunkX() + pXFrom/fromDim, fromChunk.getChunkY() + pYFrom/fromDim);
+				ComplexNumber pixelGridPosOld = context.getNumberFactory()
+						.createComplexNumber(fromChunk.getChunkX() + pXFrom/fromDim, fromChunk.getChunkY() + pYFrom/fromDim);
 				
 				//get position for grid coords
 				ComplexNumber pos = pixelGridPosOld;

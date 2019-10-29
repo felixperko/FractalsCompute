@@ -20,6 +20,7 @@ import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.manager.server.ServerNetworkManager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.ParamContainer;
+import de.felixperko.fractals.network.infra.connection.ClientLocalConnection;
 import de.felixperko.fractals.network.messages.ChunkUpdateMessage;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
@@ -298,7 +299,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 					
 					//send update messages
 					for (ClientConfiguration client : clients) {
-						((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, compressedChunk);
+						if (!(client.getConnection() instanceof ClientLocalConnection))
+							((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, compressedChunk);
 					}
 				}
 				
