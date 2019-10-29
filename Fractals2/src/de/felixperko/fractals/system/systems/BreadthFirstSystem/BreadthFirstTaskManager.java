@@ -215,17 +215,18 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		for (int i = 0 ; i < count ; i++) {
 			synchronized (this){
 				BreadthFirstTask task = null;
-				for (int try1 = 0 ; try1 < 3 ; try1++){//TODO remove
-					try {
+				//TODO remove
+//				for (int try1 = 0 ; try1 < 3 ; try1++){
+//					try {
 						task = nextBufferedTasks.poll();
 						if (task != null)
 							break;
-					} catch (NullPointerException e) {
-						e.printStackTrace();
-					}
-				}
-				if (task == null)
-					break;
+//					} catch (NullPointerException e) {
+//						e.printStackTrace();
+//					}
+//				}
+//				if (task == null)
+//					break;
 
 				
 				//Prepare culling
@@ -532,21 +533,22 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		
 		AbstractArrayChunk chunk = null;
 		context.chunkFactory.setViewData(context.getActiveViewData());
-		for (int try1 = 0 ; try1 < 10 ; try1++) {//TODO remove
-			try {
+		//TODO remove
+//		for (int try1 = 0 ; try1 < 10 ; try1++) {
+//			try {
 				chunk = context.chunkFactory.createChunk(chunkX, chunkY);
-				break;
-			} catch (Exception e) {
-				if (try1 == 9 && parentTask.getJobId() == context.getViewId())
-					throw e;
-				else
-					try {
-						Thread.sleep(1);
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
-					}
-			}
-		}
+//				break;
+//			} catch (Exception e) {
+//				if (try1 == 9 && parentTask.getJobId() == context.getViewId())
+//					throw e;
+//				else
+//					try {
+//						Thread.sleep(1);
+//					} catch (InterruptedException e1) {
+//						e1.printStackTrace();
+//					}
+//			}
+//		}
 		BreadthFirstTask task = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getPos(chunkX, chunkY),
 				context.createCalculator(), context.layerConfig.getLayers().get(0), context.getViewId());
 		task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, context.layerConfig.getLayers().get(0));

@@ -126,7 +126,7 @@ public class CompressedChunk implements Serializable{
 			borderData_compressed = Snappy.compress(borderData_bytes);
 			
 			double t = NumberUtil.getElapsedTimeInS(t1, 5);
-			int size_uncompressed = ((chunk.values.length*4)+(chunk.samples.length)+(chunk.failedSamples.length))/(upsample*upsample) + dimensionSize;//TODO add neighbourData
+			int size_uncompressed = ((chunk.values.length*4)+(chunk.samples.length)+(chunk.failedSamples.length))/(upsample*upsample) + dimensionSize;
 			int size_compressed = values_compressed.length+samples_compressed.length+failedSamples_compressed.length + borderData_compressed.length;
 			String kbString = (size_compressed/1000.0)+" kb / "+(size_uncompressed/1000.0)+" kb";
 			System.out.println("saved bytes: "+values_compressed.length+"/"+(chunk.values.length*4/(upsample*upsample))+" "+
