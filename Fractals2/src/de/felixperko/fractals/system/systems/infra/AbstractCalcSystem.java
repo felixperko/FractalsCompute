@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.ClientConfiguration;
-import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.network.messages.SystemConnectedMessage;
 import de.felixperko.fractals.system.parameters.ParameterConfiguration;

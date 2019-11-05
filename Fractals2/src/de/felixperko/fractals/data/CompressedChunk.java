@@ -251,21 +251,31 @@ public class CompressedChunk implements Serializable{
 		boolean[] borderData = new boolean[borderDataBytes.length*8];
 		for (int i = 0 ; i < borderDataBytes.length ; i++){
 			int correctedByte = borderDataBytes[i]-(int)Byte.MIN_VALUE;
-			int compare = 127;
+			int compare = 255;
 			int step = 128;
-			byte value = borderDataBytes[i];
-			for (int j = 7 ; j >= 0 ; j--){
-				if (compare == borderDataBytes[i]){
-					compare -= step;
-					value -= step;
-					step >>= 1;
-					borderData[i*8+j] = true;
+			for (int j = 7 ; j >= 0 ; j++) {
+				if (correctedByte == compare) {
+					correctedByte -= step;
 				}
-				
-//				int bitMask = 1 >> j;
-//				if ((correctedByte & bitMask) > 0)
-//					borderData[i*8+j] = true;
+				compare -= step;
+				step >>= 1;
+				borderData[i*8+j] = true;
 			}
+//			int compare = 127;
+//			int step = 128;
+//			byte value = borderDataBytes[i];
+//			for (int j = 7 ; j >= 0 ; j--){
+//				if (compare == value){
+//					compare -= step;
+//					value -= step;
+//					step >>= 1;
+//					borderData[i*8+j] = true;
+//				}
+//				
+////				int bitMask = 1 >> j;
+////				if ((correctedByte & bitMask) > 0)
+////					borderData[i*8+j] = true;
+//			}
 		}
 		
 		Map<BorderAlignment, ChunkBorderData> selfBorderData = new HashMap<>();

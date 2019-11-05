@@ -1,4 +1,4 @@
-package de.felixperko.fractals.network;
+package de.felixperko.fractals.data;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -47,6 +48,31 @@ public class ParamContainer implements Serializable{
 				this.clientParameters.put(e.getKey(), e.getValue().copy());
 			}
 		}
+	}
+	
+	public void applyParams(ParamContainer copyContainer, boolean onlyOverrideExisting) {
+		for (Entry<String, ParamSupplier> e : copyContainer.getClientParameters().entrySet()) {
+			String name = e.getKey();
+			if (!onlyOverrideExisting || this.clientParameters.containsKey(name))
+				this.clientParameters.put(name, e.getValue().copy());
+		}
+	}
+	
+	public void applyParams(ParamContainer copyContainer, HashSet<String> overrideParamNames) {
+		for (Entry<String, ParamSupplier> e : copyContainer.getClientParameters().entrySet()) {
+			String name = e.getKey();
+			if (overrideParamNames.contains(name))
+				this.clientParameters.put(name, e.getValue().copy());
+		}
+	}
+	
+	public ParamContainer getSubContainer(HashSet<String> includeParamNames) {
+		HashMap<String, ParamSupplier> map = new HashMap<>();
+		for (String name : includeParamNames) {
+			if (clientParameters.containsKey(name))
+				map.put(name, clientParameters.get(name).copy());
+		}
+		return new ParamContainer(map);
 	}
 
 	public boolean needsReset(Map<String, ParamSupplier> oldParams){

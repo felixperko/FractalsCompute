@@ -3,7 +3,7 @@ package de.felixperko.fractals.network.interfaces;
 import java.util.UUID;
 
 import de.felixperko.fractals.data.CompressedChunk;
-import de.felixperko.fractals.network.ParamContainer;
+import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.system.parameters.ParameterConfiguration;
 
 public interface ClientSystemInterface {

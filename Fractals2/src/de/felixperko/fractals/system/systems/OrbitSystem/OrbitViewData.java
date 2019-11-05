@@ -1,7 +1,7 @@
 package de.felixperko.fractals.system.systems.OrbitSystem;
 
 import de.felixperko.fractals.data.Chunk;
-import de.felixperko.fractals.network.ParamContainer;
+import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.system.systems.infra.SingleViewData;
 import de.felixperko.fractals.system.systems.infra.ViewData;
 

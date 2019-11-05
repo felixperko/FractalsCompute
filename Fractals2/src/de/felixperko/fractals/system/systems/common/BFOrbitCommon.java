@@ -15,7 +15,7 @@ import de.felixperko.fractals.system.parameters.ParameterDefinition;
 import de.felixperko.fractals.system.parameters.suppliers.CoordinateBasicShiftParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
-import de.felixperko.fractals.system.systems.BreadthFirstSystem.Selection;
+import de.felixperko.fractals.system.systems.infra.Selection;
 
 public class BFOrbitCommon {
 	

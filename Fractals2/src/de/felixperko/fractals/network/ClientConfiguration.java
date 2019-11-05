@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 

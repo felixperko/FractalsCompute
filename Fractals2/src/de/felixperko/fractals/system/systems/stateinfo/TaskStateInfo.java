@@ -20,6 +20,8 @@ public class TaskStateInfo implements Serializable{
 	int layerId;
 	double progress;
 	
+	transient double lastUpdateProgress = 0;
+	
 	public TaskStateInfo(int taskId, UUID systemId, SystemContext context) {
 		this.taskId = taskId;
 		this.systemId = systemId;

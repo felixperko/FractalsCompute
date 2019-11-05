@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.felixperko.fractals.system.systems.BreadthFirstSystem.Selection;
+import de.felixperko.fractals.system.systems.infra.Selection;
 
 public class ParameterConfiguration implements Serializable{
 	

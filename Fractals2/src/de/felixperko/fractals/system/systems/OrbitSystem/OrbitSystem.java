@@ -1,8 +1,8 @@
 package de.felixperko.fractals.system.systems.OrbitSystem;
 
+import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.ClientConfiguration;
-import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.system.parameters.ParameterConfiguration;
 import de.felixperko.fractals.system.systems.common.BFOrbitCommon;
 import de.felixperko.fractals.system.systems.infra.AbstractCalcSystem;

@@ -10,9 +10,9 @@ import static de.felixperko.fractals.system.systems.common.BFOrbitCommon.numberT
 import java.util.ArrayList;
 import java.util.List;
 
+import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.ClientConfiguration;
-import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.system.parameters.ParamValueField;
 import de.felixperko.fractals.system.parameters.ParamValueType;
 import de.felixperko.fractals.system.parameters.ParameterConfiguration;

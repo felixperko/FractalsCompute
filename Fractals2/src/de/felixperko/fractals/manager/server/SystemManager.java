@@ -8,9 +8,9 @@ import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
+import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.manager.common.Manager;
 import de.felixperko.fractals.network.ClientConfiguration;
-import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstSystem;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;

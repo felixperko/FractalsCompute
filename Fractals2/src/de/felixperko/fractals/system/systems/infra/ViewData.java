@@ -2,7 +2,7 @@ package de.felixperko.fractals.system.systems.infra;
 
 import java.io.Serializable;
 
-import de.felixperko.fractals.network.ParamContainer;
+import de.felixperko.fractals.data.ParamContainer;
 
 public interface ViewData<CONTEXT> extends Serializable{
 	
