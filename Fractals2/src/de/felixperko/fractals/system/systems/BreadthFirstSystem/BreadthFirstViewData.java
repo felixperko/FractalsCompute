@@ -77,10 +77,13 @@ public class BreadthFirstViewData extends AbstractBFViewData<BreadthFirstViewDat
 	}
 
 	private Map<Integer, Chunk> getXMap(Integer chunkX){
-		Map<Integer, Chunk> ans = chunks_buffered.get(chunkX);
-		if (ans == null) {
-			ans = new HashMap<Integer, Chunk>();
-			chunks_buffered.put(chunkX, ans);
+		Map<Integer, Chunk> ans;
+		synchronized (chunks_buffered) {
+			ans = chunks_buffered.get(chunkX);
+			if (ans == null) {
+				ans = new HashMap<Integer, Chunk>();
+				chunks_buffered.put(chunkX, ans);
+			}
 		}
 		return ans;
 	}
@@ -115,27 +118,31 @@ public class BreadthFirstViewData extends AbstractBFViewData<BreadthFirstViewDat
 
 	@Override
 	public boolean removeBufferedChunkImpl(Integer chunkX, Integer chunkY, boolean removeCompressed) {
-		boolean hasBuffered = !hasBufferedChunk(chunkX, chunkY);
-		if (removeCompressed) {
-			removeCompressedChunk(chunkX, chunkY);
-			return true;
-		}
-		else {
-			if (!hasBuffered)
-				return false;
-			synchronized (chunks_buffered) {
-				Map<Integer, Chunk> xMap = getXMap(chunkX);
-				xMap.remove(chunkY);
-				if (xMap.isEmpty())
-					chunks_buffered.remove(chunkX);
+		synchronized (chunks_buffered) {
+			boolean hasBuffered = !hasBufferedChunk(chunkX, chunkY);
+			if (removeCompressed) {
+				removeCompressedChunk(chunkX, chunkY);
+				return true;
 			}
-			return true;
+			else {
+				if (!hasBuffered)
+					return false;
+				synchronized (chunks_buffered) {
+					Map<Integer, Chunk> xMap = getXMap(chunkX);
+					xMap.remove(chunkY);
+					if (xMap.isEmpty())
+						chunks_buffered.remove(chunkX);
+				}
+				return true;
+			}
 		}
 	}
 
 	@Override
 	public void clearBufferedChunksImpl() {
-		chunks_buffered.clear();
+		synchronized (chunks_buffered) {
+			chunks_buffered.clear();
+		}
 	}
 
 	@Override

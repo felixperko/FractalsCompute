@@ -253,7 +253,7 @@ public class CompressedChunk implements Serializable{
 			int correctedByte = borderDataBytes[i]-(int)Byte.MIN_VALUE;
 			int compare = 255;
 			int step = 128;
-			for (int j = 7 ; j >= 0 ; j++) {
+			for (int j = 7 ; j >= 0 ; j--) {
 				if (correctedByte == compare) {
 					correctedByte -= step;
 				}
