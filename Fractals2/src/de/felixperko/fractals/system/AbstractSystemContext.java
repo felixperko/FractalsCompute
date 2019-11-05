@@ -7,8 +7,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import de.felixperko.fractals.data.ArrayChunkFactory;
+import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.data.shareddata.MappedSharedDataUpdate;
-import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
@@ -24,8 +24,12 @@ import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateUpdate;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskManager;
+import de.felixperko.fractals.util.NumberUtil;
 
 public abstract class AbstractSystemContext<D extends ViewData, C extends ViewContainer<D>> implements SystemContext<C> {
+	
+	double taskStateUpdateCooldownInS = 0.1; 
+	long taskStateUpdateTime = 0; //TODO move, client specific, send update after cooldown
 
 	private static final long serialVersionUID = -5080191521407651861L;
 	
@@ -52,11 +56,18 @@ public abstract class AbstractSystemContext<D extends ViewData, C extends ViewCo
 
 	@Override
 	public void taskStateUpdated(TaskStateInfo taskStateInfo, TaskState oldState) {
-		if (systemStateInfo != null) { //TODO local
+		
+		if (System.nanoTime()-taskStateUpdateTime < taskStateUpdateCooldownInS*NumberUtil.S_TO_NS) {
+			return;
+		} else {
+			taskStateUpdateTime = System.nanoTime();
+		}
+		
+		if (systemStateInfo != null) { //local calculation
 			TaskStateUpdate updateMessage = taskStateInfo.getUpdateMessage();
 			if (updateMessage == null || updateMessage.isSent())
 				taskStateInfo.setUpdateMessage(systemStateInfo.taskStateChanged(taskStateInfo.getTaskId(), oldState, taskStateInfo));
-			else {
+			else { //TODO remote calculation
 				synchronized (updateMessage) {
 					updateMessage.refresh(taskStateInfo.getState(), taskStateInfo.getLayerId(), taskStateInfo.getProgress());
 					systemStateInfo.taskStateUpdated(updateMessage);

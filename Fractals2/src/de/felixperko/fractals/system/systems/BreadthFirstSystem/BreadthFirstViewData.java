@@ -7,8 +7,8 @@ import java.util.Map;
 
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.CompressedChunk;
+import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.data.ReducedNaiveChunk;
-import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.Number;
 import de.felixperko.fractals.util.Nestable;

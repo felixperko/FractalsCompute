@@ -5,7 +5,7 @@ import java.util.LinkedList;
 
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.Chunk;
-import de.felixperko.fractals.network.ParamContainer;
+import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.system.AbstractViewContainer;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.Number;

@@ -1,12 +1,31 @@
 package de.felixperko.fractals.system.numbers.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.felixperko.fractals.system.numbers.AbstractComplexNumber;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.parameters.suppliers.Copyable;
+import de.felixperko.fractals.util.NumberUtil;
 
 public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, DoubleComplexNumber> implements Copyable<DoubleComplexNumber>{
 	
 	private static final long serialVersionUID = -6625226042922366712L;
+	
+	public static void main(String[] args) {
+		DoubleComplexNumber val = new DoubleComplexNumber(1.1, 0);
+		DoubleComplexNumber pow = new DoubleComplexNumber(-2, 0);
+		System.out.println(val.toString()+" ^ ("+pow.toString()+")");
+		int steps = 1 << 2;
+		System.out.println("steps: "+steps);
+		long t1 = System.nanoTime();
+		for (int i = 0 ; i < steps ; i++)
+			val.pow(pow);
+		long t2 = System.nanoTime();
+		System.out.println(val.toString());
+		System.out.println("time: "+NumberUtil.NS_TO_MS*(t2-t1)+" ms");
+	}
+	
 	
 	double real, imag;
 	
@@ -65,12 +84,58 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 
 	@Override
 	public void pow(DoubleComplexNumber other) {
-		if (real == 0 && imag == 0)
+		if (other.real == 0 && other.imag == 0){
+			real = 0;
+			imag = 0;
 			return;
+		}
 		if (other.imag == 0) {
 			if (other.real == 2) //just squared
 				square();
-			else { //real power
+			else if (other.real%1 == 0) {
+				double powLeft = other.real;
+				boolean negativePower = powLeft < 0;
+				if (negativePower) {
+					powLeft = -powLeft;
+				}
+				
+				int squarePow = 2;
+				List<DoubleComplexNumber> pow2Buffer = new ArrayList<>();
+				
+				//square as long as possible
+				for ( ; squarePow <= powLeft ; ) {
+					pow2Buffer.add(copy());
+					square();
+					squarePow <<= 1;
+				}
+				
+				powLeft -= squarePow >> 1;
+				if (powLeft == 0) {
+					if (negativePower) {
+						real = real == 0 ? 0 : 1/real;
+						imag = imag == 0 ? 0 : 1/imag;
+					}
+					return;
+				}
+				
+				//add intermediate results
+				int powStep = 1 << (pow2Buffer.size()-1);
+				for (int i = pow2Buffer.size()-1 ; i >= 0 ; i--) {
+					if (powLeft >= powStep) {
+						mult(pow2Buffer.get(i));
+						powLeft -= powStep;
+						if (powLeft == 0) {
+							if (negativePower) {
+								real = real == 0 ? 0 : 1/real;
+								imag = imag == 0 ? 0 : 1/imag;
+							}
+							return;
+						}
+					}
+					powStep >>= 1;
+				}
+			}
+			else {
 				double abs = absDouble();
 				double logReal = Math.log(abs);
 				double logImag = Math.atan2(imag, real);

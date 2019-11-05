@@ -9,7 +9,7 @@ import java.util.Map;
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.ArrayChunkFactory;
 import de.felixperko.fractals.data.Chunk;
-import de.felixperko.fractals.network.ParamContainer;
+import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.system.AbstractSystemContext;
 import de.felixperko.fractals.system.LayerConfiguration;
 import de.felixperko.fractals.system.ZoomableSystemContext;

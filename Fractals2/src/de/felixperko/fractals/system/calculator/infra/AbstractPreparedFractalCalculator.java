@@ -105,7 +105,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 				calculateSample(pixel, sample);
 			}
 			
-//			chunk.getCurrentTask().getStateInfo().setProgress((pixel+1.-redo.size())/pixelCount);
+			chunk.getCurrentTask().getStateInfo().setProgress((pixel+1.-redo.size())/pixelCount);
 		}
 		
 		redoLoop:
@@ -120,7 +120,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 					}
 					calculateSample(pixel, sample);
 				}
-//				chunk.getCurrentTask().getStateInfo().setProgress((pixelCount-redo.size())/pixelCount);
+				chunk.getCurrentTask().getStateInfo().setProgress((pixelCount-redo.size())/pixelCount);
 			} catch (Exception e) {
 				e.printStackTrace();
 				break;

@@ -1,4 +1,4 @@
-package de.felixperko.fractals.system.systems.BreadthFirstSystem;
+package de.felixperko.fractals.system.systems.infra;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -2,7 +2,7 @@ package de.felixperko.fractals.system.task;
 
 import java.util.List;
 
-import de.felixperko.fractals.network.ParamContainer;
+import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 
 public interface TaskManager<T>{

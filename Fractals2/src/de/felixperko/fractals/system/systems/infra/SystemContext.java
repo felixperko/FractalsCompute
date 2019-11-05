@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import de.felixperko.fractals.data.AbstractArrayChunk;
-import de.felixperko.fractals.network.ParamContainer;
+import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.system.LayerConfiguration;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;

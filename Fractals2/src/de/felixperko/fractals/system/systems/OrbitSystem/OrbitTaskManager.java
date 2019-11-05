@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.felixperko.fractals.data.CompressedChunk;
+import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.ClientConfiguration;
-import de.felixperko.fractals.network.ParamContainer;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.network.messages.ChunkUpdateMessage;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;

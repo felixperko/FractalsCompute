@@ -5,7 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.UUID;
 
-import de.felixperko.fractals.network.ParamContainer;
+import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.system.statistics.EmptyStats;
 import de.felixperko.fractals.system.statistics.IStats;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
