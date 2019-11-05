@@ -215,19 +215,23 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		List<BreadthFirstTask> tasks = new ArrayList<>();
 		for (int i = 0 ; i < count ; i++) {
 			synchronized (this){
-				BreadthFirstTask task = null;
+				
 				//TODO remove
+//				BreadthFirstTask task = null;
 //				for (int try1 = 0 ; try1 < 3 ; try1++){
 //					try {
-						task = nextBufferedTasks.poll();
-						if (task != null)
-							break;
+//						task = nextBufferedTasks.poll();
+						
+//						if (task != null)
+//							break;
 //					} catch (NullPointerException e) {
 //						e.printStackTrace();
 //					}
 //				}
-//				if (task == null)
-//					break;
+
+				BreadthFirstTask task = nextBufferedTasks.poll();
+				if (task == null)
+					return null;
 
 				
 				//Prepare culling
