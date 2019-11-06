@@ -308,14 +308,14 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 						for (ClientConfiguration client : clients) {
 							if (!(client.getConnection() instanceof ClientLocalConnection)) {
 								ChunkUpdateMessage msg = ((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, compressedChunk);
-								List<ChunkUpdateMessage> clientMsgs = pendingUpdateMessages.get(client);
-								if (clientMsgs == null) {
-									clientMsgs = new ArrayList<>();
-									pendingUpdateMessages.put(client, clientMsgs);
-								}
-								clientMsgs.add(msg);
-								final List<ChunkUpdateMessage> finalList = clientMsgs;
-								msg.addSentCallback(() -> {finalList.remove(msg);});
+//								List<ChunkUpdateMessage> clientMsgs = pendingUpdateMessages.get(client);
+//								if (clientMsgs == null) {
+//									clientMsgs = new ArrayList<>();
+//									pendingUpdateMessages.put(client, clientMsgs);
+//								}
+//								clientMsgs.add(msg);
+//								final List<ChunkUpdateMessage> finalList = clientMsgs;
+//								msg.addSentCallback(() -> {finalList.remove(msg);});
 							}
 						}
 					}
@@ -469,7 +469,14 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			int midpointChunkYFloor = (int)midpointChunkY;
 			BreadthFirstViewData viewData = context.getActiveViewData();
 			if (!viewData.hasCompressedChunk(midpointChunkXFloor, midpointChunkYFloor)){
-				AbstractArrayChunk chunk = context.chunkFactory.createChunk(midpointChunkXFloor, midpointChunkYFloor);
+				AbstractArrayChunk chunk = null;
+				try {
+					chunk = context.chunkFactory.createChunk(midpointChunkXFloor, midpointChunkYFloor);
+				} catch (IllegalStateException e){
+					System.err.println("IllegalStateException in while creating root task");
+					e.printStackTrace();
+					return true;
+				}
 				BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getPos(midpointChunkXFloor, midpointChunkYFloor),
 						context.createCalculator(), layers.get(0), context.getViewId());
 				rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(0));
