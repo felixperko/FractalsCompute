@@ -39,4 +39,5 @@ public interface FractalsTask extends Serializable{
 	
 	Double getPriority();
 	
+	boolean isCancelled();
 }

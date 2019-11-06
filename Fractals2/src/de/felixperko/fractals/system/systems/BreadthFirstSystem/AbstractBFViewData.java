@@ -60,8 +60,8 @@ public abstract class AbstractBFViewData<VIEWDATA extends AbstractBFViewData<VIE
 	}
 	
 	private boolean isSeeable(Integer chunkX, Integer chunkY) {
-		//TODO generalize AbstractBFViewData.isSeeable()
-		return ((BFSystemContext)systemContext).getScreenDistance(chunkX, chunkY) <= ((BFSystemContext)systemContext).border_dispose;
+//		return ((BFSystemContext)systemContext).getScreenDistance(chunkX, chunkY) <= ((BFSystemContext)systemContext).border_dispose;
+		return systemContext.getDrawRegion().inRegion(systemContext, chunkX, chunkY);
 	}
 	
 	@Override

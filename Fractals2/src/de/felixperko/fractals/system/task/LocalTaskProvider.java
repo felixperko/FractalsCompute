@@ -91,7 +91,7 @@ public class LocalTaskProvider implements TaskProvider {
 	
 	@Override
 	public void finishedTask(FractalsTask task) {
-		TaskManager tm = task.getTaskManager();
+		TaskManager<?> tm = task.getTaskManager();
 		if (tm != null){
 			tm.taskFinished(task);
 			return;

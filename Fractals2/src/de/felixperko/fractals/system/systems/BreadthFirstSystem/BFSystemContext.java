@@ -1,9 +1,7 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import de.felixperko.fractals.data.AbstractArrayChunk;
@@ -19,12 +17,12 @@ import de.felixperko.fractals.system.calculator.NewtonEighthPowerPlusFifteenTime
 import de.felixperko.fractals.system.calculator.NewtonThridPowerMinusOneCalculator;
 import de.felixperko.fractals.system.calculator.TricornCalculator;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
-import de.felixperko.fractals.system.calculator.infra.TraceListener;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.Number;
 import de.felixperko.fractals.system.numbers.NumberFactory;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
+import de.felixperko.fractals.system.systems.infra.DrawRegion;
 import de.felixperko.fractals.system.task.TaskManager;
 
 public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData, BFViewContainer> implements ZoomableSystemContext<BFViewContainer> {
@@ -54,13 +52,9 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 	public transient int chunksHeight;
 	
 	public transient ComplexNumber relativeStartShift;
+
 	
-	public transient ComplexNumber leftLowerCorner;
-	public transient double leftLowerCornerChunkX;
-	public transient double leftLowerCornerChunkY;
-	public transient ComplexNumber rightUpperCorner;
-	public transient double rightUpperCornerChunkX;
-	public transient double rightUpperCornerChunkY;
+	transient BFScreenDrawRegion drawRegion;
 	
 	private transient Number pixelzoom;
 	
@@ -185,16 +179,18 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 			else
 				viewId = jobIdSupplier.getGeneral(Integer.class);
 			chunkFactory.setViewData(getActiveViewData());
-	
-			leftLowerCorner = midpoint.copy();
-			leftLowerCorner.sub(sideDist);
-			leftLowerCornerChunkX = getChunkX(leftLowerCorner);
-			leftLowerCornerChunkY = getChunkY(leftLowerCorner);
 			
-			rightUpperCorner = sideDist;
-			rightUpperCorner.add(midpoint);
-			rightUpperCornerChunkX = getChunkX(rightUpperCorner);
-			rightUpperCornerChunkY = getChunkY(rightUpperCorner);
+			if (drawRegion == null)
+				drawRegion = new BFScreenDrawRegion();
+			drawRegion.leftLowerCorner = midpoint.copy();
+			drawRegion.leftLowerCorner.sub(sideDist);
+			drawRegion.leftLowerCornerChunkX = getChunkX(drawRegion.leftLowerCorner);
+			drawRegion.leftLowerCornerChunkY = getChunkY(drawRegion.leftLowerCorner);
+			
+			drawRegion.rightUpperCorner = sideDist;
+			drawRegion.rightUpperCorner.add(midpoint);
+			drawRegion.rightUpperCornerChunkX = getChunkX(drawRegion.rightUpperCorner);
+			drawRegion.rightUpperCornerChunkY = getChunkY(drawRegion.rightUpperCorner);
 		}
 		
 		return reset;
@@ -237,25 +233,17 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 	private ComplexNumber getCurrentAnchor() {
 		return ((BreadthFirstViewData)getActiveViewData()).anchor;
 	}
+
+	public double getDrawRegionDistance(Chunk chunk) {
+		return getDrawRegionDistance(chunk.getChunkX(), chunk.getChunkY());
+	}
 	
-	public double getScreenDistance(long chunkX, long chunkY) {
-		if (chunkX+1 >= leftLowerCornerChunkX && chunkY+1 >= leftLowerCornerChunkY) {
-			if (chunkX <= rightUpperCornerChunkX && chunkY <= rightUpperCornerChunkY) {
-				return 0;
-			}
-			double dx = chunkX > rightUpperCornerChunkX ? chunkX-rightUpperCornerChunkX : 0;
-			double dy = chunkY > rightUpperCornerChunkY ? chunkY-rightUpperCornerChunkY : 0;
-			return Math.sqrt(dx*dx + dy*dy);
-		}
-		chunkX++;
-		chunkY++;
-		double dx = chunkX < leftLowerCornerChunkX ? leftLowerCornerChunkX-chunkX : 0;
-		double dy = chunkY < leftLowerCornerChunkY ? leftLowerCornerChunkY-chunkY : 0;
-		return Math.sqrt(dx*dx + dy*dy);
+	public double getDrawRegionDistance(long chunkX, long chunkY) {
+		return getDrawRegion().getRegionDistance(this, chunkX, chunkY);
 	}
 
-	public double getScreenDistance(Chunk chunk) {
-		return getScreenDistance(chunk.getChunkX(), chunk.getChunkY());
+	public boolean isInDrawRegion(int chunkX, int chunkY) {
+		return getDrawRegion().inRegion(this, chunkX, chunkY);
 	}
 	
 	@Override
@@ -289,5 +277,9 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 
 	public Number getChunkZoom() {
 		return chunkZoom;
+	}
+
+	public DrawRegion<BFSystemContext> getDrawRegion() {
+		return drawRegion;
 	}
 }

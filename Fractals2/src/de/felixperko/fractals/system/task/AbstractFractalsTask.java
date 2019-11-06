@@ -26,6 +26,8 @@ public abstract class AbstractFractalsTask<T> implements FractalsTask{
 	
 	protected IStats taskStats = new EmptyStats();
 	
+	boolean cancelled;
+	
 	public AbstractFractalsTask(SystemContext<?> context, Integer id, TaskManager<T> taskManager, int jobId, Layer layer) {
 		this.jobId = jobId;
 		System.out.println("Created Task with jobid "+jobId);
@@ -108,6 +110,15 @@ public abstract class AbstractFractalsTask<T> implements FractalsTask{
 		setContext(localTask.getContext());
 	}
 	
+	@Override
+	public boolean isCancelled() {
+		return cancelled;
+	}
+
+	public void setCancelled(boolean cancelled) {
+		this.cancelled = cancelled;
+	}
+
 	private void writeObject(ObjectOutputStream oos) throws IOException{
 		if (context != null)
 			context_params = context.getParamContainer();

@@ -9,7 +9,6 @@ public interface ComplexNumber<NUMBER extends Number<NUMBER>, COMPLEX extends Co
 	public void multNumber(NUMBER number);
 	public void multValues(COMPLEX otherComplex);
 	public void divNumber(NUMBER number);
-	//void mult(DoubleNumber number);
 	public COMPLEX copy();
 	public void toPositive();
 	public void complexConjugate();

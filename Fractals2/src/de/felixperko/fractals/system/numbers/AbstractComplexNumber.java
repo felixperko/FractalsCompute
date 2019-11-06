@@ -1,6 +1,6 @@
 package de.felixperko.fractals.system.numbers;
 
-public abstract class AbstractComplexNumber<T extends Number<T>, N extends ComplexNumber<T,N>> implements ComplexNumber<T, N> {
+public abstract class AbstractComplexNumber<NUMBER extends Number<NUMBER>, COMPLEXNUMBER extends ComplexNumber<NUMBER,COMPLEXNUMBER>> implements ComplexNumber<NUMBER, COMPLEXNUMBER> {
 
 	private static final long serialVersionUID = 1354288026927154373L;
 	
@@ -8,7 +8,7 @@ public abstract class AbstractComplexNumber<T extends Number<T>, N extends Compl
 		
 	}
 	
-	public AbstractComplexNumber(T real, T imag) {
+	public AbstractComplexNumber(NUMBER real, NUMBER imag) {
 		
 	}
 	

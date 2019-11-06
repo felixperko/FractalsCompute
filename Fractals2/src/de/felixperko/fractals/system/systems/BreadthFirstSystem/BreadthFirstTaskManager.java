@@ -272,7 +272,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	public synchronized void taskFinished(FractalsTask task) {
 		if (context.getViewId() != task.getJobId())
 			return;
-		finishedTasks.add((BreadthFirstTask)task);
+		BreadthFirstTask bfTask = (BreadthFirstTask) task;
+		finishedTasks.add(bfTask);
 		task.getStateInfo().setState(TaskState.FINISHED);
 	}
 	
@@ -291,37 +292,31 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				
 				assignedTasks.remove(task);
 				
-				final Integer taskId = task.getId();
-				
 				//update stats
 				stats.addHistogram(task.getTaskStats());
 				//TODO distribute stat update?
 				
+				boolean paused = task.isCancelled() && task.getState() == TaskState.BORDER;
 				
-				//distribute
-				if (task.getStateInfo().getLayer().renderingEnabled()) {
-					
-					//compress
-					Layer layer = task.chunk.getCurrentTask().getStateInfo().getLayer();
-					int upsample = 1;
-					if (layer instanceof BreadthFirstUpsampleLayer)
-						upsample = ((BreadthFirstUpsampleLayer)layer).getUpsample();
-					
-
+				if (!paused) {
 					CompressedChunk compressedChunk = context.getActiveViewData().updateBufferedAndCompressedChunk(task.getChunk());
 					
-					//send update messages
-					for (ClientConfiguration client : clients) {
-						if (!(client.getConnection() instanceof ClientLocalConnection)) {
-							ChunkUpdateMessage msg = ((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, compressedChunk);
-							List<ChunkUpdateMessage> clientMsgs = pendingUpdateMessages.get(client);
-							if (clientMsgs == null) {
-								clientMsgs = new ArrayList<>();
-								pendingUpdateMessages.put(client, clientMsgs);
+					//distribute
+					if (task.getStateInfo().getLayer().renderingEnabled()) {
+						
+						//send update messages
+						for (ClientConfiguration client : clients) {
+							if (!(client.getConnection() instanceof ClientLocalConnection)) {
+								ChunkUpdateMessage msg = ((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, compressedChunk);
+								List<ChunkUpdateMessage> clientMsgs = pendingUpdateMessages.get(client);
+								if (clientMsgs == null) {
+									clientMsgs = new ArrayList<>();
+									pendingUpdateMessages.put(client, clientMsgs);
+								}
+								clientMsgs.add(msg);
+								final List<ChunkUpdateMessage> finalList = clientMsgs;
+								msg.addSentCallback(() -> {finalList.remove(msg);});
 							}
-							clientMsgs.add(msg);
-							final List<ChunkUpdateMessage> finalList = clientMsgs;
-							msg.addSentCallback(() -> {finalList.remove(msg);});
 						}
 					}
 				}
@@ -332,21 +327,20 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				if (currentLayer.getId() >= context.layerConfig.getLayers().size()-1) {
 					openChunks--;
 					if (openChunks == 0) { //finished
-						try {
-							Thread.sleep(100);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-						system.stop();
+						
 					}
 					task.getStateInfo().setState(TaskState.DONE);
 				} else {
-					currentLayerId++;
-					Layer layer = context.layerConfig.getLayers().get(currentLayerId);
-					task.getStateInfo().setLayer(layer);
-					task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layer);
-					openTasks.get(currentLayerId).add(task);
-					task.getStateInfo().setState(TaskState.OPEN);
+					if (!paused) {
+						currentLayerId++;
+						Layer layer = context.layerConfig.getLayers().get(currentLayerId);
+						task.getStateInfo().setLayer(layer);
+						task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layer);
+						openTasks.get(currentLayerId).add(task);
+						task.getStateInfo().setState(TaskState.OPEN);
+					} else {
+						borderTasks.add(task);
+					}
 				}
 			}
 			finishedTasks.clear();
@@ -411,7 +405,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				//TODO wip
 				if (calculator != null) {
 					task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, task.getStateInfo().getLayer());
-					if (context.getScreenDistance(task.getChunk()) > context.border_generation) {
+					if (context.getDrawRegionDistance(task.getChunk()) > context.border_generation) {
 						calculator.setCancelled();
 						assignedIt.remove();
 						tempList.get(task.getLayerId()).add(task);
@@ -441,7 +435,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			Iterator<BreadthFirstTask> borderIt = borderTasks.iterator();
 			while (borderIt.hasNext()) {
 				BreadthFirstTask borderTask = borderIt.next();
-				if (context.getScreenDistance(borderTask.getChunk()) <= context.border_generation) {
+				if (context.getDrawRegionDistance(borderTask.getChunk()) <= context.border_generation) {
 					borderTask.getStateInfo().setState(TaskState.OPEN);
 					openTasks.get(borderTask.getStateInfo().getLayer().getId()).add(borderTask);
 					borderIt.remove();
@@ -454,7 +448,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				for (BreadthFirstTask task : tempList.get(l)) {
 //					if (task.getChunk().getChunkX() == (long)midpointChunkX && task.getChunk().getChunkY() == (long)midpointChunkY)
 //						addedMidpoint = true;
-					double screenDistance = context.getScreenDistance(task.getChunk());
+					double screenDistance = context.getDrawRegionDistance(task.getChunk());
 					if (screenDistance > context.border_dispose) {
 						task.getStateInfo().setState(TaskState.REMOVED);
 						continue;
@@ -554,11 +548,11 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		long t2 = System.nanoTime();
 		if (!newQueue.isEmpty()) {
 			double time = NumberUtil.getRoundedDouble(NumberUtil.NS_TO_MS*(t2-t1), 6);
-			System.out.println("[BFTaskManager.generateNeighbours()] time to generate "+newQueue.size()+" Tasks: "+time);
+			System.out.println("[BFTaskManager.generateNeighbours()] time to generate "+newQueue.size()+" Tasks: "+time+" ms");
 		}
 		//add new neigbours to storing queue
 		for (BreadthFirstTask newTask : newQueue) {
-			double screenDistance = context.getScreenDistance(newTask.getChunk());
+			double screenDistance = context.getDrawRegionDistance(newTask.getChunk());
 			if (screenDistance > context.border_generation) {
 				newTask.getStateInfo().setState(TaskState.BORDER);
 				borderTasks.add(newTask);

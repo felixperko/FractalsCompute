@@ -6,6 +6,9 @@ import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.CompressedChunk;
 
 public interface BufferedChunkedViewData<CONTEXT extends SystemContext<?>> extends ViewData<CONTEXT>{
+	
+	void screenPosUpdated(CONTEXT context);
+	
 	//buffered chunk operations
 	boolean insertBufferedChunk(Chunk chunk, boolean insertCompressedChunk);
 	boolean updateBufferedChunk(Chunk chunk);

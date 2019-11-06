@@ -2,8 +2,10 @@ package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.CompressedChunk;
@@ -212,5 +214,30 @@ public class BreadthFirstViewData extends AbstractBFViewData<BreadthFirstViewDat
 	
 	public ComplexNumber getAnchor() {
 		return anchor;
+	}
+
+	@Override
+	public void screenPosUpdated(BFSystemContext context) {
+		synchronized (chunks_buffered) {
+			Iterator<Entry<Integer, Map<Integer, Chunk>>> yMapIt = chunks_buffered.entrySet().iterator();
+			while(yMapIt.hasNext()) {
+				Entry<Integer, Map<Integer, Chunk>> e = yMapIt.next();
+				Iterator<Entry<Integer, Chunk>> it2 = e.getValue().entrySet().iterator();
+				while (it2.hasNext()) {
+					Entry<Integer, Chunk> e2 = it2.next();
+					int chunkX = e.getKey();
+					int chunkY = e2.getKey();
+					double distance = context.getDrawRegionDistance(chunkX, chunkY);
+					if (distance > 0) {
+						it2.remove();
+						context.getViewContainer().removedBufferedChunk(chunkX, chunkY, this);
+					}
+					if (distance > context.border_dispose)
+						removeCompressedChunk(chunkX, chunkY);
+				}
+				if (e.getValue().isEmpty())
+					yMapIt.remove();
+			}
+		}
 	}
 }

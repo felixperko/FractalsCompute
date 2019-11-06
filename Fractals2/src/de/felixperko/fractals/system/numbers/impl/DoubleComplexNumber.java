@@ -26,7 +26,6 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 		System.out.println("time: "+NumberUtil.NS_TO_MS*(t2-t1)+" ms");
 	}
 	
-	
 	double real, imag;
 	
 	public DoubleComplexNumber() {

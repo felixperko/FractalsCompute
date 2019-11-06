@@ -73,6 +73,10 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 			
 			calculator.setContext(getContext());
 			calculator.calculate(chunk, taskStats);
+			if (calculator.isCancelled()) {
+				getStateInfo().setState(TaskState.BORDER);
+				setCancelled(true);	
+			}
 			
 			taskStats.executionEnd();
 			layerTaskStats.put(layerId, (HistogramStats)taskStats);
