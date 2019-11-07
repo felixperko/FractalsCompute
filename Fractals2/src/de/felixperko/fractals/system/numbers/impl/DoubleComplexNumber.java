@@ -83,18 +83,23 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 
 	@Override
 	public void pow(DoubleComplexNumber other) {
-		if (other.real == 0 && other.imag == 0){
-			real = 0;
+		if (other.real == 0 && other.imag == 0) {
+			//z^0 = 1
+			//Technically the method should throw an exception if _this_ is 0 as well since 0^0 is undefined.
+			//This edge case should be irrelevant for Fractals though, so it returns 1 if the exponent is 0
+			real = 1;
 			imag = 0;
 			return;
 		}
 		if (other.imag == 0) {
 			if (other.real == 2) //just squared
 				square();
-			else if (other.real%1 == 0) {
+			else if (other.real%1 == 0) { //faster integer exponentiation
 				double powLeft = other.real;
 				boolean negativePower = powLeft < 0;
 				if (negativePower) {
+					if (real == 0 && imag == 0) //Same principle as above but for this since x^-n = 1/x^n 
+						return;
 					powLeft = -powLeft;
 				}
 				
@@ -111,8 +116,13 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 				powLeft -= squarePow >> 1;
 				if (powLeft == 0) {
 					if (negativePower) {
-						real = real == 0 ? 0 : 1/real;
-						imag = imag == 0 ? 0 : 1/imag;
+						//inverse result by multiplying with complex conjugate
+						// 1   1*conj(z)   conj(z)
+						// - = --------- = ---------
+						// z   z*conj(z)   real(z)^2+imag(z)^2
+						double div = real*real + imag*imag;
+						real = real/div;
+						imag = -imag/div;
 					}
 					return;
 				}
@@ -125,8 +135,10 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 						powLeft -= powStep;
 						if (powLeft == 0) {
 							if (negativePower) {
-								real = real == 0 ? 0 : 1/real;
-								imag = imag == 0 ? 0 : 1/imag;
+								//see above
+								double div = real*real + imag*imag;
+								real = real/div;
+								imag = -imag/div;
 							}
 							return;
 						}
@@ -136,33 +148,33 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 			}
 			else {
 				double abs = absDouble();
-				double logReal = Math.log(abs);
-				double logImag = Math.atan2(imag, real);
+				double logAbs = Math.log(abs);
+				double angle = Math.atan2(imag, real);
 				//mult
-				logReal = logReal*other.real;
-				logImag = logImag*other.real;
+				logAbs = logAbs*other.real;
+				angle = angle*other.real;
 				//exp
-				double expReal = Math.exp(logReal);
-				real = expReal * Math.cos(logImag);
-				imag = expReal * Math.sin(logImag);
+				double factor = Math.exp(logAbs);
+				real = factor * Math.cos(angle);
+				imag = factor * Math.sin(angle);
 			}
 		}
 		else { //complex power
 			//log().multiply(x).exp()
 			//log
 			double abs = absDouble();
-			double logReal = 0;
+			double logAbs = 0;
 			if (abs != 0)
-				logReal = Math.log(abs);
-			double logImag = Math.atan2(imag, real);
+				logAbs = Math.log(abs);
+			double angle = Math.atan2(imag, real);
 			//mult
-			double temp = logReal*other.real - logImag*other.imag;
-			logImag = logReal*other.imag + logImag*other.real;
-			logReal = temp;
+			double temp = logAbs*other.real - angle*other.imag;
+			angle = logAbs*other.imag + angle*other.real;
+			logAbs = temp;
 			//exp
-			double expReal = Math.exp(logReal);
-			real = expReal * Math.cos(logImag);
-			imag = expReal * Math.sin(logImag);
+			double factor = Math.exp(logAbs);
+			real = factor * Math.cos(angle);
+			imag = factor * Math.sin(angle);
 		}
 	}
 	
