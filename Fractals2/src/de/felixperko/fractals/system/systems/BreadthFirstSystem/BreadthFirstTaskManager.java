@@ -299,7 +299,9 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				boolean paused = task.isCancelled() && task.getState() == TaskState.BORDER;
 				
 				if (!paused) {
-					CompressedChunk compressedChunk = context.getActiveViewData().updateBufferedAndCompressedChunk(task.getChunk());
+					BreadthFirstViewData activeViewData = context.getActiveViewData();
+					Chunk chunk = task.getChunk();
+					CompressedChunk compressedChunk = activeViewData.updateBufferedAndCompressedChunk(chunk);
 					
 					//distribute
 					if (task.getStateInfo().getLayer().renderingEnabled()) {
@@ -385,10 +387,12 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	
 	public void updatePredictedMidpoint() {
 		ComplexNumber delta = context.midpoint.copy();
-		delta.sub(((BreadthFirstViewData)context.getActiveViewData()).anchor);
-		delta.divNumber(context.chunkZoom);
-		midpointChunkX += delta.realDouble();
-		midpointChunkY += delta.imagDouble();
+//		delta.sub(((BreadthFirstViewData)context.getActiveViewData()).anchor);
+		delta.multNumber(context.chunkZoom);
+//		midpointChunkX += delta.realDouble();
+//		midpointChunkY += delta.imagDouble();
+		midpointChunkX = delta.realDouble();
+		midpointChunkY = delta.imagDouble();
 	}
 
 	public boolean predictedMidpointUpdated() {
@@ -560,11 +564,15 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		//add new neigbours to storing queue
 		for (BreadthFirstTask newTask : newQueue) {
 			double screenDistance = context.getDrawRegionDistance(newTask.getChunk());
+			TaskStateInfo stateInfo = newTask.getStateInfo();
 			if (screenDistance > context.border_generation) {
-				newTask.getStateInfo().setState(TaskState.BORDER);
+				stateInfo.setState(TaskState.BORDER);
 				borderTasks.add(newTask);
 			} else {
-				openTasks.get(newTask.getStateInfo().getLayer().getId()).add(newTask);
+				Layer layer = stateInfo.getLayer();
+				int layerId = layer.getId();
+				Queue<BreadthFirstTask> openLayerTasks = openTasks.get(layerId);
+				openLayerTasks.add(newTask);
 			}
 		}
 		newQueue.clear();

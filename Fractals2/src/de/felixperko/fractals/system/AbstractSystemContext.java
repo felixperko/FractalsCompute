@@ -176,7 +176,9 @@ public abstract class AbstractSystemContext<D extends ViewData, C extends ViewCo
 	@Override
 	public void setMidpoint(ComplexNumber midpoint) {
 		this.midpoint = midpoint;
-		paramContainer.addClientParameter(new StaticParamSupplier("midpoint", midpoint));
+		StaticParamSupplier supplier = new StaticParamSupplier("midpoint", midpoint);
+		supplier.updateChanged(paramContainer.getClientParameter("midpoint"));
+		paramContainer.addClientParameter(supplier);
 	}
 
 	@Override

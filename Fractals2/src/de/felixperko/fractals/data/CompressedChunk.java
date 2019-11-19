@@ -244,8 +244,7 @@ public class CompressedChunk implements Serializable{
 		try {
 			borderDataBytes = Snappy.uncompress(borderData_compressed);
 		} catch (IOException e) {
-			e.printStackTrace();
-			throw new IllegalStateException();
+			throw new IllegalStateException("Error while decompressing border data.");
 		}
 		
 		boolean[] borderData = new boolean[borderDataBytes.length*8];
