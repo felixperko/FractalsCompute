@@ -19,6 +19,7 @@ import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.AbstractFractalsTask;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskManager;
+import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 import de.felixperko.fractals.system.thread.FractalsThread;
 
 public class OrbitTask extends AbstractFractalsTask<OrbitTask> {
@@ -51,7 +52,7 @@ public class OrbitTask extends AbstractFractalsTask<OrbitTask> {
 	}
 
 	@Override
-	public void setThread(FractalsThread thread) {
+	public void setThread(CalculateFractalsThread thread) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -29,6 +29,7 @@ import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.AbstractFractalsTask;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskManager;
+import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 import de.felixperko.fractals.system.thread.FractalsThread;
 
 public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> implements BreadthFirstQueueEntry {
@@ -38,12 +39,12 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	double distance;
 	double priority;
 	
-	transient FractalsThread thread;
+	transient CalculateFractalsThread thread;
 	
 	public transient AbstractArrayChunk chunk;
 	private transient CompressedChunk compressed_chunk;
 	
-	transient FractalsCalculator calculator;
+	//transient FractalsCalculator calculator;
 	
 	Map<Integer, HistogramStats> layerTaskStats = new HashMap<>(); //key = layerId
 	
@@ -52,7 +53,7 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 			FractalsCalculator calculator, Layer layer, int jobId) {
 		super(context, id, taskManager, jobId, layer);
 		getStateInfo().setState(TaskState.OPEN);
-		this.calculator = calculator;
+		//this.calculator = calculator;
 		this.chunk = chunk;
 		this.chunk.chunkPos = chunkPos.copy();
 		chunk.setCurrentTask(this);
@@ -71,11 +72,24 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 			Layer layer = getStateInfo().getLayer();
 			chunk.setUpsample(layer.getUpsample());
 			
-			calculator.setContext(getContext());
+			//calculator.setContext(getContext());
+			FractalsCalculator calculator = thread.getCalculator();
+			if (calculator == null) {
+				calculator = getContext().createCalculator();
+				thread.setCalculator(calculator);
+			}
+			
 			calculator.calculate(chunk, taskStats);
+			
 			if (calculator.isCancelled()) {
 				getStateInfo().setState(TaskState.BORDER);
-				setCancelled(true);	
+				setCancelled(true);
+				int prevLayerId = getStateInfo().getLayerId()-1;
+				if (prevLayerId >= 0) {
+					Layer prevLayer = getContext().getLayer(prevLayerId);
+					if (prevLayer != null)
+						chunk.setUpsample(prevLayer.getUpsample());	
+				}
 			}
 			
 			taskStats.executionEnd();
@@ -270,19 +284,20 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	}
 
 	@Override
-	public void setThread(FractalsThread thread) {
+	public void setThread(CalculateFractalsThread thread) {
 		this.thread = thread;
 	}
 
 	@Override
 	public FractalsCalculator getCalculator() {
-		return calculator;
+		if (thread == null)
+			return null;
+		return thread.getCalculator();
 	}
 	
 	@Override
 	public void setContext(SystemContext context) {
 		super.setContext(context);
-		this.calculator = context.createCalculator();
 	}
 	
 	private void writeObject(ObjectOutputStream out) throws IOException {

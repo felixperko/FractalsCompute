@@ -1,6 +1,7 @@
 package de.felixperko.fractals.system.thread;
 
 import de.felixperko.fractals.manager.common.Managers;
+import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.FractalsTask;
@@ -19,6 +20,8 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 	int abortedTaskId = -1;
 	
 	boolean taskCancelled = false;
+	
+	FractalsCalculator calculator;
 	
 	public CalculateFractalsThread(Managers managers, TaskProvider taskProvider){
 		super(managers, "CALC_"+ID_COUNTER);
@@ -133,5 +136,13 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 		if (reset)
 			curr = false;
 		return curr;
+	}
+
+	public FractalsCalculator getCalculator() {
+		return calculator;
+	}
+
+	public void setCalculator(FractalsCalculator calculator) {
+		this.calculator = calculator;
 	}
 }
