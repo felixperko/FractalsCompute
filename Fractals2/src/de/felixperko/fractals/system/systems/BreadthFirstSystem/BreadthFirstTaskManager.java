@@ -73,6 +73,10 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	Comparator<BreadthFirstTask> comparator_distance = new Comparator<BreadthFirstTask>() {
 		@Override
 		public int compare(BreadthFirstTask arg0, BreadthFirstTask arg1) {
+			if (arg0 == null)
+				return -1;
+			if (arg1 == null)
+				return 1;
 			return arg0.getDistance().compareTo(arg1.getDistance());
 		}
 	};
@@ -80,7 +84,9 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	Comparator<BreadthFirstTask> comparator_priority = new Comparator<BreadthFirstTask>() {
 		@Override
 		public int compare(BreadthFirstTask arg0, BreadthFirstTask arg1) {
-			if (arg0 == null || arg1 == null)
+			if (arg0 == null)
+				return -1;
+			if (arg1 == null)
 				return 1;
 			return arg0.getPriority().compareTo(arg1.getPriority());
 		}
@@ -283,70 +289,84 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		if (finishedTasks.isEmpty())
 			return false;
 		setLifeCycleState(LifeCycleState.RUNNING);
+		List<ClientConfiguration> clients = system.getClients();
+		List<BreadthFirstTask> finishedTasks = null;
 		synchronized (this) {
-			List<ClientConfiguration> clients = new ArrayList<>(system.getClients());
-			for (BreadthFirstTask task : finishedTasks) {
+			finishedTasks = new ArrayList<>(this.finishedTasks);
+			this.finishedTasks.clear();
+		}
+		for (BreadthFirstTask task : finishedTasks) {
 
-				if (context.getViewId() != task.getJobId())
-					continue;
-				
+			if (context.getViewId() != task.getJobId())
+				continue;
+			
+			synchronized(this) {
 				assignedTasks.remove(task);
+			}
 				
-				//update stats
-				stats.addHistogram(task.getTaskStats());
-				//TODO distribute stat update?
+			BreadthFirstViewData activeViewData = context.getActiveViewData();
+			if (activeViewData == null)
+				continue;
+			
+			//update stats
+			stats.addHistogram(task.getTaskStats());
+			//TODO distribute stat update?
+			
+			boolean paused = task.isCancelled() && task.getState() == TaskState.BORDER;
+
+			if (!paused) {
+				Chunk chunk = task.getChunk();
+				CompressedChunk compressedChunk = activeViewData.updateBufferedAndCompressedChunk(chunk);
 				
-				boolean paused = task.isCancelled() && task.getState() == TaskState.BORDER;
-				
-				if (!paused) {
-					BreadthFirstViewData activeViewData = context.getActiveViewData();
-					Chunk chunk = task.getChunk();
-					CompressedChunk compressedChunk = activeViewData.updateBufferedAndCompressedChunk(chunk);
+				//distribute
+				if (task.getStateInfo().getLayer().renderingEnabled()) {
 					
-					//distribute
-					if (task.getStateInfo().getLayer().renderingEnabled()) {
-						
-						//send update messages
+					//send update messages
+					synchronized (clients) {
 						for (ClientConfiguration client : clients) {
 							if (!(client.getConnection() instanceof ClientLocalConnection)) {
 								ChunkUpdateMessage msg = ((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, compressedChunk);
-//								List<ChunkUpdateMessage> clientMsgs = pendingUpdateMessages.get(client);
-//								if (clientMsgs == null) {
-//									clientMsgs = new ArrayList<>();
-//									pendingUpdateMessages.put(client, clientMsgs);
-//								}
-//								clientMsgs.add(msg);
-//								final List<ChunkUpdateMessage> finalList = clientMsgs;
-//								msg.addSentCallback(() -> {finalList.remove(msg);});
+								msg.addSentCallback(() -> {
+									if (msg.getChunk().getJobId() != context.getViewId())
+										msg.setCancelled(true);
+								});
+//									List<ChunkUpdateMessage> clientMsgs = pendingUpdateMessages.get(client);
+//									if (clientMsgs == null) {
+//										clientMsgs = new ArrayList<>();
+//										pendingUpdateMessages.put(client, clientMsgs);
+//									}
+//									clientMsgs.add(msg);
+//									final List<ChunkUpdateMessage> finalList = clientMsgs;
+//									msg.addSentCallback(() -> {finalList.remove(msg);});
 							}
 						}
 					}
 				}
-				
-				//update layer and re-add or dispose
-				Layer currentLayer = task.getStateInfo().getLayer();
-				int currentLayerId = currentLayer.getId();
-				if (currentLayer.getId() >= context.layerConfig.getLayers().size()-1) {
-					openChunks--;
-					if (openChunks == 0) { //finished
-						
-					}
-					task.getStateInfo().setState(TaskState.DONE);
+			}
+		
+			//update layer and re-add or dispose
+			Layer currentLayer = task.getStateInfo().getLayer();
+			int currentLayerId = currentLayer.getId();
+			if (currentLayer.getId() >= context.layerConfig.getLayers().size()-1) {
+				openChunks--;
+				if (openChunks == 0) { //finished
+					
+				}
+				task.getStateInfo().setState(TaskState.DONE);
+			} else {
+				if (!paused) {
+					currentLayerId++;
+					Layer layer = context.layerConfig.getLayers().get(currentLayerId);
+					task.getStateInfo().setLayer(layer);
+					task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layer);
+					openTasks.get(currentLayerId).add(task);
+					task.getStateInfo().setState(TaskState.OPEN);
 				} else {
-					if (!paused) {
-						currentLayerId++;
-						Layer layer = context.layerConfig.getLayers().get(currentLayerId);
-						task.getStateInfo().setLayer(layer);
-						task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layer);
-						openTasks.get(currentLayerId).add(task);
-						task.getStateInfo().setState(TaskState.OPEN);
-					} else {
-						borderTasks.add(task);
-					}
+					borderTasks.add(task);
 				}
 			}
-			finishedTasks.clear();
 		}
+		finishedTasks.clear();
 		return true;
 	}
 
@@ -446,52 +466,60 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				}
 			}
 			
-			//re-add
-//			boolean addedMidpoint = false;
-			for (int l = 0 ; l < layers.size() ; l++) {
-				for (BreadthFirstTask task : tempList.get(l)) {
-//					if (task.getChunk().getChunkX() == (long)midpointChunkX && task.getChunk().getChunkY() == (long)midpointChunkY)
-//						addedMidpoint = true;
-					double screenDistance = context.getDrawRegionDistance(task.getChunk());
-					if (screenDistance > context.border_dispose) {
-						task.getStateInfo().setState(TaskState.REMOVED);
-						continue;
-					}
-					task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(l));
-					if (screenDistance > context.border_generation) {
-						task.getStateInfo().setState(TaskState.BORDER);
-						borderTasks.add(task);
-					} else {
-						openTasks.get(l).add(task);
-					}
+			synchronized (context) {
+				
+				BreadthFirstViewData viewData = context.getActiveViewData();
+				if (viewData == null) {
+					tempList.clear();
+					return true;
 				}
-				tempList.get(l).clear();
-			}
+				
+				//re-add
+	//			boolean addedMidpoint = false;
+				for (int l = 0 ; l < layers.size() ; l++) {
+					
+					for (BreadthFirstTask task : tempList.get(l)) {
+	//					if (task.getChunk().getChunkX() == (long)midpointChunkX && task.getChunk().getChunkY() == (long)midpointChunkY)
+	//						addedMidpoint = true;
+						double screenDistance = context.getDrawRegionDistance(task.getChunk());
+						if (screenDistance > context.border_dispose) {
+							task.getStateInfo().setState(TaskState.REMOVED);
+							continue;
+						}
+						task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(l));
+						if (screenDistance > context.border_generation) {
+							task.getStateInfo().setState(TaskState.BORDER);
+							borderTasks.add(task);
+						} else {
+							openTasks.get(l).add(task);
+						}
+					}
+					tempList.get(l).clear();
+				}
 			
 			//add task for chunk at midpoint if not calculated
 			int midpointChunkXFloor = (int)midpointChunkX;
 			int midpointChunkYFloor = (int)midpointChunkY;
-			BreadthFirstViewData viewData = context.getActiveViewData();
-			if (!viewData.hasCompressedChunk(midpointChunkXFloor, midpointChunkYFloor)){
-				AbstractArrayChunk chunk = null;
-				try {
-					chunk = context.chunkFactory.createChunk(midpointChunkXFloor, midpointChunkYFloor);
-				} catch (IllegalStateException e){
-					System.err.println("IllegalStateException in while creating root task");
-					e.printStackTrace();
-					return true;
+				if (!viewData.hasCompressedChunk(midpointChunkXFloor, midpointChunkYFloor)){
+					AbstractArrayChunk chunk = null;
+					try {
+						chunk = context.chunkFactory.createChunk(midpointChunkXFloor, midpointChunkYFloor);
+					} catch (IllegalStateException e){
+						System.err.println("IllegalStateException in while creating root task");
+						e.printStackTrace();
+						return true;
+					}
+					BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getPos(midpointChunkXFloor, midpointChunkYFloor),
+							context.createCalculator(), layers.get(0), context.getViewId());
+					rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(0));
+					viewData.insertBufferedChunk(chunk, true);
+					openTasks.get(0).add(rootTask);
+					openChunks++;
 				}
-				BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getPos(midpointChunkXFloor, midpointChunkYFloor),
-						context.createCalculator(), layers.get(0), context.getViewId());
-				rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(0));
-				viewData.insertBufferedChunk(chunk, true);
-				openTasks.get(0).add(rootTask);
-				openChunks++;
+				
+				getSystem().getSystemStateInfo().getServerStateInfo().updateMidpoint(system.getId(), 
+						context.numberFactory.createComplexNumber(midpointChunkX, midpointChunkY));
 			}
-			
-			getSystem().getSystemStateInfo().getServerStateInfo().updateMidpoint(system.getId(), 
-					context.numberFactory.createComplexNumber(midpointChunkX, midpointChunkY));
-			
 			//re-fill
 //			fillQueues();//TODO sync?
 		}

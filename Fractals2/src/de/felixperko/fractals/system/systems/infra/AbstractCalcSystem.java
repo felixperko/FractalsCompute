@@ -127,14 +127,17 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	@Override
 	public boolean isApplicable(ClientConnection connection, ParamContainer paramContainer) {
 		boolean hasClient = false;
-		for (ClientConfiguration conf : clients) {
-			if (conf.getConnection() == connection) {
-				hasClient = true;
-				break;
+		synchronized (clients) {
+			for (ClientConfiguration conf : clients) {
+				if (conf.getConnection() == connection) {
+					hasClient = true;
+					break;
+				}
 			}
+			if (hasClient && clients.size() == 1)
+				return true;
+			
 		}
-		if (hasClient && clients.size() == 1)
-			return true;
 		for (ParamSupplier param : paramContainer.getClientParameters().values()) {
 			if (param.isSystemRelevant() || param.isLayerRelevant()) {
 				return false;

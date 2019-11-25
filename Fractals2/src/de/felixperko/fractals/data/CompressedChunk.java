@@ -2,6 +2,7 @@ package de.felixperko.fractals.data;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -124,6 +125,7 @@ public class CompressedChunk implements Serializable{
 			}
 			
 			borderData_compressed = Snappy.compress(borderData_bytes);
+//			borderData_compressed = new byte[0];
 			
 			double t = NumberUtil.getElapsedTimeInS(t1, 5);
 			int size_uncompressed = ((chunk.values.length*4)+(chunk.samples.length)+(chunk.failedSamples.length))/(upsample*upsample) + dimensionSize;
@@ -170,6 +172,8 @@ public class CompressedChunk implements Serializable{
 			}
 			
 			decompressBorderData(chunk);
+			
+			
 //			if (selfBorderData != null)
 //				chunk.setSelfBorderData(selfBorderData);
 //			if (neighbourBorderData != null)
@@ -335,7 +339,7 @@ public class CompressedChunk implements Serializable{
 
 	private float[] getUpsampledFloatArray(float[] arr) {
 		if (upsample == 1)
-			return arr;
+			return Arrays.copyOf(arr, arr.length);
 		float[] ans = new float[arr.length/(upsample*upsample)];
 		int dim = (int)Math.sqrt(arr.length);
 		int start = (upsample/2)*dim + upsample/2;
@@ -364,7 +368,7 @@ public class CompressedChunk implements Serializable{
 
 	private byte[] getUpsampledByteArray(byte[] arr) {
 		if (upsample == 1)
-			return arr;
+			return Arrays.copyOf(arr, arr.length);
 		byte[] ans = new byte[arr.length/(upsample*upsample)];
 		int dim = (int)Math.sqrt(arr.length);
 		int start = (upsample/2)*dim + upsample/2;
