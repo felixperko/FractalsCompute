@@ -127,7 +127,8 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 	public void setTaskCancelled() {
 		if (currentTask != null) {
 			taskCancelled = true;
-			currentTask.getCalculator().setCancelled();
+			if (calculator != null)
+				calculator.setCancelled();
 		}
 	}
 	

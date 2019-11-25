@@ -419,6 +419,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		if (!updatedPredictedMidpoint)
 			return false;
 		updatedPredictedMidpoint = false;
+		List<Layer> layers;
 		//clear queues to update sorting
 		synchronized (this) {
 			//cancel running tasks if outside of calculation area
@@ -438,7 +439,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			}
 			
 			//extract pending tasks
-			List<Layer> layers = context.layerConfig.getLayers();
+			layers = context.layerConfig.getLayers();
 			for (int l = 0 ; l < layers.size() ; l++) {
 				tempList.get(l).addAll(openTasks.get(l));
 				openTasks.get(l).clear();
@@ -465,61 +466,63 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 					borderIt.remove();
 				}
 			}
+		}
 			
-			synchronized (context) {
+		BreadthFirstViewData viewData;
+		synchronized (context) {
+			viewData = context.getActiveViewData();
+			if (viewData == null) {
+				tempList.clear();
+				return true;
+			}
+		}
+		
+		synchronized (this) {
+			//re-add
+//			boolean addedMidpoint = false;
+			for (int l = 0 ; l < layers.size() ; l++) {
 				
-				BreadthFirstViewData viewData = context.getActiveViewData();
-				if (viewData == null) {
-					tempList.clear();
+				for (BreadthFirstTask task : tempList.get(l)) {
+//					if (task.getChunk().getChunkX() == (long)midpointChunkX && task.getChunk().getChunkY() == (long)midpointChunkY)
+//						addedMidpoint = true;
+					double screenDistance = context.getDrawRegionDistance(task.getChunk());
+					if (screenDistance > context.border_dispose) {
+						task.getStateInfo().setState(TaskState.REMOVED);
+						continue;
+					}
+					task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(l));
+					if (screenDistance > context.border_generation) {
+						task.getStateInfo().setState(TaskState.BORDER);
+						borderTasks.add(task);
+					} else {
+						openTasks.get(l).add(task);
+					}
+				}
+				tempList.get(l).clear();
+			}
+		
+		//add task for chunk at midpoint if not calculated
+		int midpointChunkXFloor = (int)midpointChunkX;
+		int midpointChunkYFloor = (int)midpointChunkY;
+			if (!viewData.hasCompressedChunk(midpointChunkXFloor, midpointChunkYFloor)){
+				AbstractArrayChunk chunk = null;
+				try {
+					chunk = context.chunkFactory.createChunk(midpointChunkXFloor, midpointChunkYFloor);
+				} catch (IllegalStateException e){
+					System.err.println("IllegalStateException in while creating root task");
+					e.printStackTrace();
 					return true;
 				}
-				
-				//re-add
-	//			boolean addedMidpoint = false;
-				for (int l = 0 ; l < layers.size() ; l++) {
-					
-					for (BreadthFirstTask task : tempList.get(l)) {
-	//					if (task.getChunk().getChunkX() == (long)midpointChunkX && task.getChunk().getChunkY() == (long)midpointChunkY)
-	//						addedMidpoint = true;
-						double screenDistance = context.getDrawRegionDistance(task.getChunk());
-						if (screenDistance > context.border_dispose) {
-							task.getStateInfo().setState(TaskState.REMOVED);
-							continue;
-						}
-						task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(l));
-						if (screenDistance > context.border_generation) {
-							task.getStateInfo().setState(TaskState.BORDER);
-							borderTasks.add(task);
-						} else {
-							openTasks.get(l).add(task);
-						}
-					}
-					tempList.get(l).clear();
-				}
-			
-			//add task for chunk at midpoint if not calculated
-			int midpointChunkXFloor = (int)midpointChunkX;
-			int midpointChunkYFloor = (int)midpointChunkY;
-				if (!viewData.hasCompressedChunk(midpointChunkXFloor, midpointChunkYFloor)){
-					AbstractArrayChunk chunk = null;
-					try {
-						chunk = context.chunkFactory.createChunk(midpointChunkXFloor, midpointChunkYFloor);
-					} catch (IllegalStateException e){
-						System.err.println("IllegalStateException in while creating root task");
-						e.printStackTrace();
-						return true;
-					}
-					BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getPos(midpointChunkXFloor, midpointChunkYFloor),
-							context.createCalculator(), layers.get(0), context.getViewId());
-					rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(0));
-					viewData.insertBufferedChunk(chunk, true);
-					openTasks.get(0).add(rootTask);
-					openChunks++;
-				}
-				
-				getSystem().getSystemStateInfo().getServerStateInfo().updateMidpoint(system.getId(), 
-						context.numberFactory.createComplexNumber(midpointChunkX, midpointChunkY));
+				BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getPos(midpointChunkXFloor, midpointChunkYFloor),
+						context.createCalculator(), layers.get(0), context.getViewId());
+				rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(0));
+				viewData.insertBufferedChunk(chunk, true);
+				openTasks.get(0).add(rootTask);
+				openChunks++;
 			}
+			
+			getSystem().getSystemStateInfo().getServerStateInfo().updateMidpoint(system.getId(), 
+					context.numberFactory.createComplexNumber(midpointChunkX, midpointChunkY));
 			//re-fill
 //			fillQueues();//TODO sync?
 		}

@@ -72,13 +72,13 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 			Layer layer = getStateInfo().getLayer();
 			chunk.setUpsample(layer.getUpsample());
 			
-			//calculator.setContext(getContext());
 			FractalsCalculator calculator = thread.getCalculator();
-			if (calculator == null) {
+//			if (calculator == null) {
 				calculator = getContext().createCalculator();
 				thread.setCalculator(calculator);
-			}
+//			}
 			
+			calculator.setContext(getContext());
 			calculator.calculate(chunk, taskStats);
 			
 			if (calculator.isCancelled()) {
