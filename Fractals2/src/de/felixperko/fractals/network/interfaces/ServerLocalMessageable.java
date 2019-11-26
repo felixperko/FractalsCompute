@@ -2,6 +2,9 @@ package de.felixperko.fractals.network.interfaces;
 
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.felixperko.fractals.data.shareddata.SharedDataController;
 import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.manager.server.ServerManagers;
@@ -12,8 +15,6 @@ import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.systems.infra.ViewContainerListener;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
-import de.felixperko.fractals.util.CategoryLogger;
-import de.felixperko.fractals.util.ColorContainer;
 
 /**
  * Interface to server for local connections.
@@ -25,7 +26,7 @@ public class ServerLocalMessageable extends AbstractFractalsThread implements Me
 		super(managers, name);
 	}
 
-	CategoryLogger log = new CategoryLogger("com/toLocalServer", new ColorContainer(1f, 0, 1));
+	Logger log = LoggerFactory.getLogger("com/toLocalServer");
 	
 	ServerConnection serverConnection;
 	ClientLocalConnection clientLocalConnection;

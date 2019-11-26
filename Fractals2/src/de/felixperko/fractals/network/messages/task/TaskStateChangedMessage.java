@@ -31,7 +31,7 @@ public class TaskStateChangedMessage extends ClientMessage {
 		for (TaskStateInfo taskStateInfo : taskStateInfos) {
 			FractalsTask task = getReceiverManagers().getSystemManager().getTask(taskStateInfo.getSystemId(), taskStateInfo.getTaskId());
 			if (task == null) {
-				log.log("warn", "TaskStateChanged: task is null");
+				log.warn("TaskStateChanged: task is null");
 			} else {
 				task.setStateInfo(taskStateInfo);
 			}

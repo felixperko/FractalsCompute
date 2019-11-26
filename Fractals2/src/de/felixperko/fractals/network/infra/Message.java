@@ -4,10 +4,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+
 import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.connection.Connection;
-import de.felixperko.fractals.util.CategoryLogger;
 import de.felixperko.fractals.util.NumberUtil;
 
 public abstract class Message<CONN extends Connection<?>, BACKCONN extends Connection<?>> implements Serializable, Comparable<Message<?, ?>>{
@@ -24,7 +25,7 @@ public abstract class Message<CONN extends Connection<?>, BACKCONN extends Conne
 	
 	transient boolean cancelled = false;
 	
-	protected transient CategoryLogger log;
+	protected transient Logger log;
 	
 	protected transient List<Runnable> sentCallbacks = null;
 	
@@ -41,7 +42,7 @@ public abstract class Message<CONN extends Connection<?>, BACKCONN extends Conne
 			setLastMessageTime(lastMessage.getLatency());
 	}
 	
-	void setComLogger(CategoryLogger comLogger) {
+	void setComLogger(Logger comLogger) {
 		log = comLogger;
 	}
 
@@ -51,7 +52,7 @@ public abstract class Message<CONN extends Connection<?>, BACKCONN extends Conne
 	protected abstract void setBackConnection(BACKCONN connection);
 	public abstract BACKCONN getBackConnection();
 	
-	public void received(BACKCONN connection, CategoryLogger log) {
+	public void received(BACKCONN connection, Logger log) {
 		this.latency = System.nanoTime()-sentTime;
 		if (connection == null)
 			throw new IllegalStateException("Back connection is null");
@@ -69,7 +70,7 @@ public abstract class Message<CONN extends Connection<?>, BACKCONN extends Conne
 	}
 	
 	public void logIncoming() {
-		log.log("received "+getClass().getSimpleName()+" ("+getLatencyInMs(1)+"ms)");
+		log.info("received "+getClass().getSimpleName()+" ("+getLatencyInMs(1)+"ms)");
 	}
 	
 	public double getLatencyInMs(int precision) {

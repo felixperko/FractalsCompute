@@ -2,9 +2,10 @@ package de.felixperko.fractals.network.infra;
 
 import java.util.UUID;
 
+import org.slf4j.Logger;
+
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
-import de.felixperko.fractals.util.CategoryLogger;
 
 public abstract class SystemClientMessage extends ClientMessage{
 	
@@ -22,7 +23,7 @@ public abstract class SystemClientMessage extends ClientMessage{
 	}
 	
 	@Override
-	public void received(ClientConnection connection, CategoryLogger log) {
+	public void received(ClientConnection connection, Logger log) {
 		super.received(connection, log);
 	}
 	

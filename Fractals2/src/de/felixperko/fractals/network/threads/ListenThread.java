@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.SocketException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xerial.snappy.SnappyInputStream;
 
 import de.felixperko.fractals.manager.common.INetworkManager;
@@ -14,16 +16,12 @@ import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
-import de.felixperko.fractals.util.CategoryLogger;
-import de.felixperko.fractals.util.ColorContainer;
 
 public class ListenThread extends AbstractFractalsThread {
 	
-	final static CategoryLogger LOGGER_GENERIC = new CategoryLogger("com/server/generic/in", ColorContainer.MAGENTA);
-	
 	static int ID_COUNTER = 0;
 
-	CategoryLogger log = LOGGER_GENERIC;
+	Logger log = LoggerFactory.getLogger("com/server/generic/in");
 	
 	WriteThread writeThread;
 	InputStream in;
@@ -80,7 +78,7 @@ public class ListenThread extends AbstractFractalsThread {
 				if (writeThread instanceof ServerWriteThread)
 					((ServerWriteThread)writeThread).resetLastReachableTime();
 			} catch (SocketException e) {
-				log.log("lost connection");
+				log.warn("lost connection");
 				setCloseConnection(true);
 				if (writeThread.getConnection() instanceof ClientConnection)
 					((ServerManagers)managers).getServerNetworkManager().removeClient(writeThread.getConnection());
@@ -116,7 +114,7 @@ public class ListenThread extends AbstractFractalsThread {
 		writeThread.closeConnection();
 	}
 
-	public void setLogger(CategoryLogger log) {
+	public void setLogger(Logger log) {
 		this.log = log;
 	}
 	

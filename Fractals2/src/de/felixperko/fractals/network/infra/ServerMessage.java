@@ -1,5 +1,7 @@
 package de.felixperko.fractals.network.infra;
 
+import org.slf4j.Logger;
+
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
@@ -23,7 +25,7 @@ public abstract class ServerMessage extends Message<ClientConnection, ServerConn
 	}
 	
 	@Override
-	public void received(ServerConnection connection, CategoryLogger log) {
+	public void received(ServerConnection connection, Logger log) {
 		clientMessageInterface = connection.getNetworkManager().getMessageInterface(connection);
 		super.received(connection, log);
 	}

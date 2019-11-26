@@ -10,6 +10,8 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xerial.snappy.SnappyOutputStream;
 
 import de.felixperko.fractals.data.shareddata.SharedDataController;
@@ -25,7 +27,7 @@ public abstract class WriteThread extends AbstractFractalsThread implements Mess
 	
 	static int ID_COUNTER = 0;
 	
-	CategoryLogger log;
+	Logger log = LoggerFactory.getLogger(WriteThread.class);
 	
 	ListenThread listenThread;
 	boolean closeConnection = false;
@@ -40,7 +42,7 @@ public abstract class WriteThread extends AbstractFractalsThread implements Mess
 	
 //	Connection connection;
 	
-	private CategoryLogger listenLogger; //used to buffer logger for listen thread until its creation
+	private Logger listenLogger; //used to buffer logger for listen thread until its creation
 	
 	int writeThreadId;
 	
@@ -111,7 +113,7 @@ public abstract class WriteThread extends AbstractFractalsThread implements Mess
 							if (msg.isCancelled())
 								continue;
 							prepareMessage(msg);
-							log.log("sending message: "+msg.getClass().getSimpleName());
+							log.info("sending message: "+msg.getClass().getSimpleName());
 							try {
 								out.writeUnshared(msg);
 								out.flush();
@@ -180,7 +182,7 @@ public abstract class WriteThread extends AbstractFractalsThread implements Mess
 		return closeConnection;
 	};
 	
-	public void setListenLogger(CategoryLogger log) {
+	public void setListenLogger(Logger log) {
 		listenLogger = log;
 		if (listenThread != null)
 			listenThread.setLogger(listenLogger);

@@ -17,7 +17,7 @@ public class ConnectedMessage extends ServerMessage {
 	@Override
 	protected void process() {
 		getBackConnection().setClientInfo(clientInfo);
-		log.log("Got client info!");
+		log.info("Got client info!");
 		answer(new ConnectedAckMessage());
 	}
 

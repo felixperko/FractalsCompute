@@ -8,7 +8,7 @@ public class ConnectedAckMessage extends ClientMessage{
 
 	@Override
 	protected void process() {
-		log.log("Got answer from client!");
+		log.info("Got answer from client!");
 	}
 	
 }

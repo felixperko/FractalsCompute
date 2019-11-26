@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import org.slf4j.LoggerFactory;
+
 import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.Message;
@@ -14,14 +16,12 @@ import de.felixperko.fractals.util.ColorContainer;
 
 public class ClientWriteThread extends WriteThread{
 	
-	final static CategoryLogger superLogger = new CategoryLogger("com/client", ColorContainer.MAGENTA);
-	
 	ServerConnection serverConnection;
 	
 	public ClientWriteThread(Managers managers, Socket socket, ServerConnection serverConnection) throws UnknownHostException, IOException {
 		super(managers, socket);
-		log = superLogger.createSubLogger("out");
-		setListenLogger(new CategoryLogger("com/client/in", ColorContainer.MAGENTA));
+		log = LoggerFactory.getLogger("com/client/out");
+		setListenLogger(LoggerFactory.getLogger("com/client/in"));
 		setConnection(serverConnection);
 	}
 	

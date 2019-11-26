@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.ArrayChunkFactory;
 import de.felixperko.fractals.data.Chunk;
@@ -57,6 +60,8 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 	transient BFScreenDrawRegion drawRegion;
 	
 	private transient Number pixelzoom;
+	
+	transient Logger log = LoggerFactory.getLogger(BFSystemContext.class);
 	
 	public BFSystemContext(TaskManager<?> taskManager) {
 		super(taskManager, new BFViewContainer(0));
@@ -231,7 +236,11 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 	}
 	
 	private ComplexNumber getCurrentAnchor() {
-		return ((BreadthFirstViewData)getActiveViewData()).anchor;
+		BreadthFirstViewData activeViewData = (BreadthFirstViewData)getActiveViewData();
+		if (activeViewData != null)
+			return activeViewData.anchor;
+		log.warn("getCurrentAnchor() called while activeViewData == null, returned (0, 0)");
+		return numberFactory.createComplexNumber(0, 0);
 	}
 
 	public double getDrawRegionDistance(Chunk chunk) {

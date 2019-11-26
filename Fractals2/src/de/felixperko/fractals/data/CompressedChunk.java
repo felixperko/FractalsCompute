@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xerial.snappy.BitShuffle;
 import org.xerial.snappy.Snappy;
 
@@ -43,6 +45,8 @@ public class CompressedChunk implements Serializable{
 	byte[] storedIndices;
 	List<ComplexNumber> storedPositions;
 	byte[] storedIterations;
+	
+	Logger log = LoggerFactory.getLogger(CompressedChunk.class);
 	
 	public CompressedChunk(ReducedNaiveChunk chunk) {
 		FractalsTask task = chunk.getCurrentTask();
@@ -131,7 +135,7 @@ public class CompressedChunk implements Serializable{
 			int size_uncompressed = ((chunk.values.length*4)+(chunk.samples.length)+(chunk.failedSamples.length))/(upsample*upsample) + dimensionSize;
 			int size_compressed = values_compressed.length+samples_compressed.length+failedSamples_compressed.length + borderData_compressed.length;
 			String kbString = (size_compressed/1000.0)+" kb / "+(size_uncompressed/1000.0)+" kb";
-			System.out.println("saved bytes: "+values_compressed.length+"/"+(chunk.values.length*4/(upsample*upsample))+" "+
+			log.debug("saved bytes: "+values_compressed.length+"/"+(chunk.values.length*4/(upsample*upsample))+" "+
 					(samples_compressed.length)+"/"+(chunk.samples.length/(upsample*upsample))+" "+
 					(failedSamples_compressed.length)+"/"+(chunk.failedSamples.length/(upsample*upsample))+" "+
 					kbString+" in "+t+"s");
