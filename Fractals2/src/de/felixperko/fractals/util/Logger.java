@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+@Deprecated
 public class Logger {
 	
 	//public static State<Integer> state = new State<>("loggercontrol", 0);

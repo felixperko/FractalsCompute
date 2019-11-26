@@ -19,10 +19,6 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 	FractalsTask currentTask;
 	int abortedTaskId = -1;
 	
-	boolean taskCancelled = false;
-	
-	FractalsCalculator calculator;
-	
 	public CalculateFractalsThread(Managers managers, TaskProvider taskProvider){
 		super(managers, "CALC_"+ID_COUNTER);
 		calcThreadId = ID_COUNTER++;
@@ -106,7 +102,7 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 	public void abortTask() {
 		if (currentTask != null) {
 			setTaskCancelled();
-			this.interrupt();
+			//this.interrupt();
 		}
 	}
 
@@ -126,24 +122,9 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 	
 	public void setTaskCancelled() {
 		if (currentTask != null) {
-			taskCancelled = true;
+			FractalsCalculator calculator = currentTask.getCalculator();
 			if (calculator != null)
 				calculator.setCancelled();
 		}
-	}
-	
-	public boolean isTaskCancelled(boolean reset) {
-		boolean curr = taskCancelled;
-		if (reset)
-			curr = false;
-		return curr;
-	}
-
-	public FractalsCalculator getCalculator() {
-		return calculator;
-	}
-
-	public void setCalculator(FractalsCalculator calculator) {
-		this.calculator = calculator;
 	}
 }

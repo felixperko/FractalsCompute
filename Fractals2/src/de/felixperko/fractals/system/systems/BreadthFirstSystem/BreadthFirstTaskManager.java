@@ -10,6 +10,9 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.BorderAlignment;
 import de.felixperko.fractals.data.Chunk;
@@ -92,7 +95,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		}
 	};
 	
-	CategoryLogger log;
+	//CategoryLogger log;
+	Logger log = LoggerFactory.getLogger(BreadthFirstTaskManager.class);
 	
 	List<Queue<BreadthFirstTask>> openTasks = new ArrayList<>();
 	Queue<BreadthFirstTask> nextOpenTasks = new PriorityQueue<>(comparator_priority);//highest priority chunk for each layer that isn't in nextBufferedTasks
@@ -124,7 +128,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 
 	public BreadthFirstTaskManager(ServerManagers managers, CalcSystem system) {
 		super(managers, system);
-		log = ((BreadthFirstSystem)system).getLogger().createSubLogger("tm");
+		//log = ((BreadthFirstSystem)system).getLogger().createSubLogger("tm");
 	}
 
 	@Override
@@ -148,7 +152,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		
 		AbstractArrayChunk chunk = context.chunkFactory.createChunk(chunkX, chunkY);
 		BreadthFirstTask task = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getPos(chunkX, chunkY), 
-				context.createCalculator(), context.layerConfig.getLayers().get(0), context.getViewId());
+				context.layerConfig.getLayers().get(0), context.getViewId());
 		task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, context.layerConfig.getLayers().get(0));
 		context.getActiveViewData().insertBufferedChunk(chunk, true);
 		openTasks.get(0).add(task);
@@ -514,7 +518,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 					return true;
 				}
 				BreadthFirstTask rootTask = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getPos(midpointChunkXFloor, midpointChunkYFloor),
-						context.createCalculator(), layers.get(0), context.getViewId());
+						layers.get(0), context.getViewId());
 				rootTask.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layers.get(0));
 				viewData.insertBufferedChunk(chunk, true);
 				openTasks.get(0).add(rootTask);
@@ -590,7 +594,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		long t2 = System.nanoTime();
 		if (!newQueue.isEmpty()) {
 			double time = NumberUtil.getRoundedDouble(NumberUtil.NS_TO_MS*(t2-t1), 6);
-			System.out.println("[BFTaskManager.generateNeighbours()] time to generate "+newQueue.size()+" Tasks: "+time+" ms");
+			log.trace("time to generate "+newQueue.size()+" Tasks: "+time+" ms");
 		}
 		//add new neigbours to storing queue
 		for (BreadthFirstTask newTask : newQueue) {
@@ -638,7 +642,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 //			}
 //		}
 		BreadthFirstTask task = new BreadthFirstTask(context, id_counter_tasks++, this, chunk, context.getPos(chunkX, chunkY),
-				context.createCalculator(), context.layerConfig.getLayers().get(0), context.getViewId());
+				context.layerConfig.getLayers().get(0), context.getViewId());
 		task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, context.layerConfig.getLayers().get(0));
 		openChunks++;
 		newQueue.add(task);

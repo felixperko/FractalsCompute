@@ -37,30 +37,35 @@ public class BFViewContainer extends AbstractViewContainer<BreadthFirstViewData>
 	
 	private void copyData(BreadthFirstViewData fromViewData, BreadthFirstViewData toViewData) {
 		ComplexNumber complex11 = context.getNumberFactory().createComplexNumber(1, 1);
+
+		Number oldChunkZoom = fromViewData.paramContainer.getClientParameter("chunkzoom").getGeneral(Number.class);
+		Number zoomFactorN = oldChunkZoom;
+		zoomFactorN.div(context.getChunkZoom());
+		float zoomFactor = (float)zoomFactorN.toDouble();
+		if (zoomFactor < 1)
+			zoomFactor = 1f/zoomFactor;
+		if (Math.abs(zoomFactor%1) > 0.000000001f) //integer zoom factor? don't bother if not
+			return;
+
+		//check other relevant parameters
+		ParamContainer oldParamContainer = fromViewData.paramContainer;
+		ParamContainer tempParamContainer = new ParamContainer(context.getParamContainer(), true);
+		for (String name : tempParamContainer.getClientParameters().keySet()) {
+			if (name.equals("zoom") || name.equals("midpoint"))
+				continue;
+			ParamSupplier tempSupplier = tempParamContainer.getClientParameter(name);
+			ParamSupplier oldSupplier = oldParamContainer.getClientParameter(name);
+			if (tempSupplier.evaluateChanged(oldSupplier) && tempSupplier.isLayerRelevant())
+				return;
+		}
 		
 		for (Chunk chunk : fromViewData.getBufferedChunks()) {
 			
 			if (!(chunk instanceof AbstractArrayChunk))
 				throw new IllegalStateException();
-			
-			Number oldChunkZoom = fromViewData.paramContainer.getClientParameter("chunkzoom").getGeneral(Number.class);
-			Number zoomFactorN = oldChunkZoom;
-			zoomFactorN.div(context.getChunkZoom());
-			double zoomFactor = zoomFactorN.toDouble();
-			if (zoomFactor < 1)
-				zoomFactor = 1./zoomFactor;
-			if (Math.abs(zoomFactor%1) > 0.00000000001) //integer zoom factor? don't bother if not
-				return;
 
-			//check other relevant parameters
-			ParamContainer oldParamContainer = fromViewData.paramContainer;
-			ParamContainer tempParamContainer = new ParamContainer(context.getParamContainer(), true);
-			for (String name : tempParamContainer.getClientParameters().keySet()) {
-				ParamSupplier tempSupplier = tempParamContainer.getClientParameter(name);
-				ParamSupplier oldSupplier = oldParamContainer.getClientParameter(name);
-				if (tempSupplier.evaluateChanged(oldSupplier) && tempSupplier.isLayerRelevant())
-					return;
-			}
+			
+			int newUpsample = Math.round(((AbstractArrayChunk)chunk).getUpsample()*zoomFactor);
 			
 			//prepare data
 			AbstractArrayChunk fromChunk = (AbstractArrayChunk) chunk;
@@ -117,6 +122,8 @@ public class BFViewContainer extends AbstractViewContainer<BreadthFirstViewData>
 				int iX = (int)(newGridX-minXi);
 				int iY = (int)(newGridY-minYi);
 				AbstractArrayChunk toChunk = toChunks[iX][iY];
+				if (toChunk.getUpsample() < newUpsample)
+					toChunk.setUpsample(newUpsample);
 				
 				//get new internal index
 				int pXTo = (int)Math.round((newGridX % 1) * toDim);
@@ -125,7 +132,7 @@ public class BFViewContainer extends AbstractViewContainer<BreadthFirstViewData>
 				
 				//apply properties
 				//TODO other properties?
-				toChunk.addSample(iTo, fromChunk.getValue(iTo, true), 1);
+				toChunk.addSample(iTo, fromChunk.getValue(iTo, true), newUpsample);
 			}
 			
 			//update ViewData

@@ -3,6 +3,9 @@ package de.felixperko.fractals.network.threads;
 import java.io.IOException;
 import java.net.ServerSocket;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.manager.server.ServerNetworkManager;
 import de.felixperko.fractals.manager.server.ServerThreadManager;
@@ -14,7 +17,8 @@ import de.felixperko.fractals.util.ColorContainer;
 
 public class ServerConnectThread extends AbstractFractalsThread{
 
-	CategoryLogger log = new CategoryLogger("com/server", ColorContainer.MAGENTA);
+	//CategoryLogger log = new CategoryLogger("com/server", ColorContainer.MAGENTA);
+	Logger log = LoggerFactory.getLogger(ServerConnectThread.class);
 	
 	public ServerConnectThread(ServerManagers managers) {
 		super(managers, "COM_CONN");
@@ -25,7 +29,8 @@ public class ServerConnectThread extends AbstractFractalsThread{
 
 		try {
 			ServerSocket server = new ServerSocket(3141);
-			log.log("Waiting for incoming connections...");
+			
+			log.info("Waiting for incoming connections...");
 			while (getLifeCycleState() != LifeCycleState.STOPPED) {
 				
 				while (getLifeCycleState() == LifeCycleState.PAUSED) {

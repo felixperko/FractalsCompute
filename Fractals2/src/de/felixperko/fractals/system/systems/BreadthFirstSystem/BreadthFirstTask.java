@@ -48,9 +48,10 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	
 	Map<Integer, HistogramStats> layerTaskStats = new HashMap<>(); //key = layerId
 	
+	FractalsCalculator calculator = null;
 	
-	public BreadthFirstTask(SystemContext context, int id, TaskManager taskManager, AbstractArrayChunk chunk, ComplexNumber chunkPos, 
-			FractalsCalculator calculator, Layer layer, int jobId) {
+	public BreadthFirstTask(SystemContext context, int id, TaskManager taskManager, AbstractArrayChunk chunk,
+			ComplexNumber chunkPos, Layer layer, int jobId) {
 		super(context, id, taskManager, jobId, layer);
 		getStateInfo().setState(TaskState.OPEN);
 		//this.calculator = calculator;
@@ -72,9 +73,7 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 			Layer layer = getStateInfo().getLayer();
 			chunk.setUpsample(layer.getUpsample());
 			
-			FractalsCalculator calculator = getContext().createCalculator();
-			
-			calculator.setContext(getContext());
+			calculator = getContext().createCalculator();
 			calculator.calculate(chunk, taskStats);
 			
 			if (calculator.isCancelled()) {
@@ -286,9 +285,7 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 
 	@Override
 	public FractalsCalculator getCalculator() {
-		if (thread == null)
-			return null;
-		return thread.getCalculator();
+		return calculator;
 	}
 	
 	@Override

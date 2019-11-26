@@ -105,7 +105,9 @@ public abstract class AbstractSystemContext<D extends ViewData, C extends ViewCo
 	@Override
 	public FractalsCalculator createCalculator() {
 		try {
-			return calculatorClass.getDeclaredConstructor().newInstance();
+			FractalsCalculator calculator = calculatorClass.getDeclaredConstructor().newInstance();
+			calculator.setContext(this);
+			return calculator;
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
 			throw new IllegalStateException("Failed to create calculator for class: "+calculatorClass.getName());

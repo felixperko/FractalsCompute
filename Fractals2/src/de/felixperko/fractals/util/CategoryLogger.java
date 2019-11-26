@@ -1,5 +1,6 @@
 package de.felixperko.fractals.util;
 
+@Deprecated
 public class CategoryLogger {
 	
 	public static CategoryLogger INFO = new CategoryLogger("info", new ColorContainer(0f, 0.5f, 0f));
