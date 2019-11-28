@@ -568,10 +568,12 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				Queue<BreadthFirstTask> queue = openTasks.get(polled.getStateInfo().getLayer().getId());
 				if (!queue.isEmpty()) {
 					BreadthFirstTask polledTask = queue.poll();
-					nextBufferedTasks.add(polledTask);
-					//new chunk at layer 0 taken -> generate neighbours, fill queues
-					if (polled.getStateInfo().getLayer().getId() == 0)
-						generateNeighbours(polledTask);
+					if (polledTask != null){
+						nextBufferedTasks.add(polledTask);
+						//new chunk at layer 0 taken -> generate neighbours, fill queues
+						if (polled.getStateInfo().getLayer().getId() == 0)
+							generateNeighbours(polledTask);
+					}
 				}
 			} else { //lower priority queues empty -> generate more tasks or stop
 				break;
