@@ -3,6 +3,9 @@ package de.felixperko.fractals.network.interfaces;
 import java.util.List;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.felixperko.fractals.data.shareddata.DataContainer;
 import de.felixperko.fractals.data.shareddata.MappedSharedDataUpdate;
 import de.felixperko.fractals.data.shareddata.SharedDataUpdate;
@@ -20,6 +23,8 @@ import de.felixperko.fractals.system.task.RemoteTaskProvider;
  * The ClientMessageInterface in case the client is a server as well
  */
 public class ServerMessageInterface extends ClientMessageInterface {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(ServerMessageInterface.class);
 	
 	public ServerMessageInterface(ServerConnection serverConnection) {
 		super(serverConnection);
@@ -59,7 +64,7 @@ public class ServerMessageInterface extends ClientMessageInterface {
 					for (TaskStateUpdate update : msdu.getUpdates()){
 						boolean updated = ((ServerManagers)serverConnection.getNetworkManager().getManagers()).getSystemManager().updateTaskState(update);
 						if (!updated){
-							System.err.println("Couldn't update TaskStateInfo");
+							LOG.error("Couldn't update TaskStateInfo");
 							Thread.dumpStack();
 						}
 					}

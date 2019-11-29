@@ -44,7 +44,7 @@ public abstract class MappedParamSupplier extends AbstractParamSupplier{
 //			//set parameter
 //			//ParamSupplier paramSupplier = parameters.get(name);
 //			//if (paramSupplier == null) {
-//			//	System.err.println("Couldn't resolve parameter: '"+name+"'");
+//			//	LOG.error("Couldn't resolve parameter: '"+name+"'");
 //			//} else {
 //			//	this.parameters[i] = paramSupplier;
 //			//}

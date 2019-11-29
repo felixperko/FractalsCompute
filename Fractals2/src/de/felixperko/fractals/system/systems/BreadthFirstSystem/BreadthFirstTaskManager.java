@@ -511,7 +511,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				try {
 					chunk = context.chunkFactory.createChunk(midpointChunkXFloor, midpointChunkYFloor);
 				} catch (IllegalStateException e){
-					System.err.println("IllegalStateException in while creating root task");
+					LOG.error("IllegalStateException in while creating root task");
 					e.printStackTrace();
 					return true;
 				}

@@ -20,8 +20,7 @@ import de.felixperko.fractals.system.thread.AbstractFractalsThread;
 public class ListenThread extends AbstractFractalsThread {
 	
 	static int ID_COUNTER = 0;
-
-	Logger log = LoggerFactory.getLogger(ListenThread.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ListenThread.class);
 	
 	WriteThread writeThread;
 	InputStream in;
@@ -63,7 +62,7 @@ public class ListenThread extends AbstractFractalsThread {
 						inObj = new ObjectInputStream(in);
 					}
 				} catch (IOException e) {
-					System.err.println("IOException for connection from "+writeThread.getSocket().getInetAddress().getHostAddress());
+					LOG.error("IOException for connection from "+writeThread.getSocket().getInetAddress().getHostAddress());
 					e.printStackTrace();
 					break mainLoop;
 				}
@@ -74,11 +73,11 @@ public class ListenThread extends AbstractFractalsThread {
 				Message msg = (Message) inObj.readUnshared();
 				setLifeCycleState(LifeCycleState.RUNNING);
 				INetworkManager net = managers.getNetworkManager();
-				msg.received(writeThread.getConnection(), log);
+				msg.received(writeThread.getConnection(), LOG);
 				if (writeThread instanceof ServerWriteThread)
 					((ServerWriteThread)writeThread).resetLastReachableTime();
 			} catch (SocketException e) {
-				log.warn("lost connection");
+				LOG.warn("lost connection");
 				setCloseConnection(true);
 				if (writeThread.getConnection() instanceof ClientConnection)
 					((ServerManagers)managers).getServerNetworkManager().removeClient(writeThread.getConnection());
@@ -112,10 +111,6 @@ public class ListenThread extends AbstractFractalsThread {
 	public void setCloseConnection(boolean closeConnection) {
 		this.closeConnection = closeConnection;
 		writeThread.closeConnection();
-	}
-
-	public void setLogger(Logger log) {
-		this.log = log;
 	}
 	
 	public void setCompressed(boolean compressed) {

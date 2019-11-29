@@ -136,12 +136,12 @@ public class SystemManager extends Manager{
 	private CalcSystem initSystem(ParamContainer data) {
 		ParamSupplier systemNameParam = data.getClientParameter("systemName");
 		if (systemNameParam == null) {
-			System.err.println("Invalid system request: systemName parameters not set.");
+			LOG.error("Invalid system request: systemName parameters not set.");
 			return null;
 		}
 		String systemName = (String) systemNameParam.get(null, null, 0, 0);
 		if (!availableSystems.containsKey(systemName)) {
-			System.err.println("Invalid system request: system for name doesn't exist: "+systemName);
+			LOG.error("Invalid system request: system for name doesn't exist: "+systemName);
 			return null;
 		}
 		
@@ -217,9 +217,10 @@ public class SystemManager extends Manager{
 			return null;
 		return sys.getContext();
 	}
+	
 //	public CalcSystem initSystem(String systemName) {
 //		if (!availableSystems.containsKey(systemName)) {
-//			System.err.println("[main] system not available: '"+systemName+"'");
+//			LOG.error("[main] system not available: '"+systemName+"'");
 //			System.exit(0);
 //		}
 //		systemFactory = new ClassSystemFactory(availableSystems.get(systemName));
