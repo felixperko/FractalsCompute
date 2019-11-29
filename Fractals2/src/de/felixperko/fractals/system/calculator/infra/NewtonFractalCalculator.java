@@ -6,6 +6,7 @@ import de.felixperko.fractals.system.numbers.impl.DoubleComplexNumber;
 import de.felixperko.fractals.system.statistics.IStats;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
 import de.felixperko.fractals.system.task.Layer;
+import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 
 public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator{
 
@@ -30,7 +31,7 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 	}
 
 	@Override
-	public void calculate(AbstractArrayChunk chunk, IStats taskStats) {
+	public void calculate(AbstractArrayChunk chunk, IStats taskStats, CalculateFractalsThread thread) {
 		this.taskStats = taskStats;
 		setRoots();
 		double limit = (Double) systemContext.getParamValue("limit", Double.class);
@@ -94,8 +95,10 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 				
 				if (i == -1 && sample == 0 && storeEndResults)
 					chunk.storeCurrentState(pixel, current, j+1);
-				else
+				else {
 					taskStats.addSample(j+1, i+1);
+					thread.addIterations(j);
+				}
 				
 				double sampleValue = i == -1 ? -1 : getRootValue(i, j, it);
 				chunk.addSample(pixel, sampleValue, upsample);

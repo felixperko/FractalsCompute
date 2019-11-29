@@ -6,9 +6,10 @@ import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.system.statistics.IStats;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.systems.infra.ViewContainer;
+import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 
 public interface FractalsCalculator extends Serializable{
-	public void calculate(AbstractArrayChunk chunk, IStats taskStats);
+	public void calculate(AbstractArrayChunk chunk, IStats taskStats, CalculateFractalsThread thread);
 	public boolean isCancelled();
 	public void setCancelled();
 	public void setContext(SystemContext<? extends ViewContainer<?>> systemContext);

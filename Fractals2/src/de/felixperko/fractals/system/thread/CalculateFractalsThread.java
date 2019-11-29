@@ -1,7 +1,11 @@
 package de.felixperko.fractals.system.thread;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
+import de.felixperko.fractals.system.statistics.TimesliceProvider;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.FractalsTask;
@@ -19,7 +23,11 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 	FractalsTask currentTask;
 	int abortedTaskId = -1;
 	
-	public CalculateFractalsThread(Managers managers, TaskProvider taskProvider){
+	TimesliceProvider timesliceProvider;
+	Map<Integer, Integer> iterations = new HashMap<>();
+	int iterationCounter = 0;
+	
+	public CalculateFractalsThread(Managers managers, TaskProvider taskProvider, TimesliceProvider timesliceProvider){
 		super(managers, "CALC_"+ID_COUNTER);
 		calcThreadId = ID_COUNTER++;
 		this.taskProvider = taskProvider;
@@ -125,6 +133,25 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 			FractalsCalculator calculator = currentTask.getCalculator();
 			if (calculator != null)
 				calculator.setCancelled();
+		}
+	}
+
+	public void addIterations(int iterations) {
+		Integer timeslice = timesliceProvider.getCurrentTimeslice();
+		synchronized (this.iterations) {
+			Integer it = this.iterations.getOrDefault(timeslice, 0);
+			it++;
+			this.iterations.put(timeslice, it);
+		}
+	}
+	
+	public int getTimesliceIterations(Integer timeslice, boolean removeOld) {
+		synchronized (this.iterations) {
+			Integer it = this.iterations.getOrDefault(timeslice, 0);
+			if (removeOld) {
+				this.iterations.entrySet().removeIf(e -> (e.getKey() < timeslice));
+			}
+			return it;
 		}
 	}
 }

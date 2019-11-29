@@ -10,6 +10,8 @@ import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.statistics.IStats;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
 import de.felixperko.fractals.system.task.Layer;
+import de.felixperko.fractals.system.thread.CalculateFractalsThread;
+import de.felixperko.fractals.system.thread.FractalsThread;
 
 public abstract class AbstractPreparedFractalCalculator extends AbstractFractalsCalculator{
 	
@@ -40,7 +42,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 	IStats taskStats;
 	
 	@Override
-	public void calculate(AbstractArrayChunk chunk, IStats taskStats) {
+	public void calculate(AbstractArrayChunk chunk, IStats taskStats, CalculateFractalsThread thread) {
 		
 		this.chunk = chunk;
 		this.taskStats = taskStats;
@@ -102,7 +104,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 				break loop;
 			
 			for (int sample = chunk.getSampleCount(pixel) ; sample < samples ; sample++){
-				calculateSample(pixel, sample);
+				calculateSample(pixel, sample, thread);
 			}
 			
 			chunk.getCurrentTask().getStateInfo().setProgress((pixel+1.-redo.size())/pixelCount);
@@ -118,7 +120,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 						redo.clear();
 						break redoLoop;
 					}
-					calculateSample(pixel, sample);
+					calculateSample(pixel, sample, thread);
 				}
 				chunk.getCurrentTask().getStateInfo().setProgress((pixelCount-redo.size())/pixelCount);
 			} catch (Exception e) {
@@ -128,7 +130,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 		}
 	}
 	
-	private void calculateSample(int pixel, int sample) {
+	private void calculateSample(int pixel, int sample, CalculateFractalsThread thread) {
 		double res = -1;
 		ComplexNumber<?, ?> current = ((ComplexNumber)p_current.get(systemContext, chunk.chunkPos, pixel, sample)).copy();
 		ComplexNumber<?, ?> c = ((ComplexNumber)p_c.get(systemContext, chunk.chunkPos, pixel, sample));
@@ -164,8 +166,10 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 		}
 		if (res == -1 && sample == 0 && storeEndResults)
 			chunk.storeCurrentState(pixel, current, k+1);
-		else 
+		else {
 			taskStats.addSample(k+1, res);
+			thread.addIterations(k+1);
+		}
 		
 		chunk.addSample(pixel, res, upsample);
 	}

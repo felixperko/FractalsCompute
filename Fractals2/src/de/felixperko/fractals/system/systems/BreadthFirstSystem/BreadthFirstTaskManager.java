@@ -22,6 +22,7 @@ import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.manager.server.ServerNetworkManager;
+import de.felixperko.fractals.manager.server.ServerThreadManager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.infra.connection.ClientLocalConnection;
 import de.felixperko.fractals.network.messages.ChunkUpdateMessage;
@@ -29,6 +30,7 @@ import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.statistics.SummedHistogramStats;
+import de.felixperko.fractals.system.statistics.TimesliceProvider;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.systems.infra.ViewData;
@@ -38,6 +40,7 @@ import de.felixperko.fractals.system.task.AbstractTaskManager;
 import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskProviderAdapter;
+import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 import de.felixperko.fractals.system.thread.CalculateThreadReference;
 import de.felixperko.fractals.util.NumberUtil;
 
@@ -187,6 +190,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	public boolean tick() {
 		boolean changed = false;
 		try {
+			if (updateStats())
+				changed = true;
 			if (fillQueues())
 				changed = true;
 			if (finishTasks())
@@ -201,6 +206,29 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				throw e;
 		}
 		return changed;
+	}
+
+	Integer lastTimeslice;
+	
+	private boolean updateStats() {
+		ServerThreadManager threadManager = ((ServerManagers)managers).getThreadManager();
+		TimesliceProvider timesliceProvider = threadManager.getTimesliceProvider();
+		Integer timeslice = timesliceProvider.getCurrentTimeslice();
+		if (timeslice <= lastTimeslice)
+			return false;
+		for (Integer i = lastTimeslice ; i < timeslice ; i++) {
+			int totalIterationsPerSecond = 0;
+			for (CalculateFractalsThread thread : threadManager.getCalculateThreads()) {
+				String name = thread.getName();
+				int iterations = thread.getTimesliceIterations(i, i == timeslice-1);
+				int iterationsPerSecond = iterations * (int)Math.round(1d/ServerThreadManager.TIMESLICE_INTERVAL);
+				totalIterationsPerSecond += iterationsPerSecond;
+				LOG.trace("IPS of "+name+" (slice "+timeslice+"): "+iterationsPerSecond);
+			}
+			LOG.debug("IPS "+timeslice+" (total):"+totalIterationsPerSecond);
+		}
+		lastTimeslice = timeslice-1;
+		return true;
 	}
 
 	@Override

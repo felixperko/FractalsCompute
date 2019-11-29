@@ -35,6 +35,8 @@ public class OrbitTask extends AbstractFractalsTask<OrbitTask> {
 	public transient AbstractArrayChunk chunk;
 	private transient CompressedChunk compressed_chunk;
 	
+	CalculateFractalsThread thread;
+	
 	List<ComplexNumber> traces = new ArrayList<>();
 
 	public OrbitTask(SystemContext context, Integer id, TaskManager<OrbitTask> taskManager, int jobId, Layer layer,
@@ -51,8 +53,7 @@ public class OrbitTask extends AbstractFractalsTask<OrbitTask> {
 
 	@Override
 	public void setThread(CalculateFractalsThread thread) {
-		// TODO Auto-generated method stub
-		
+		this.thread = thread;
 	}
 
 	@Override
@@ -87,7 +88,7 @@ public class OrbitTask extends AbstractFractalsTask<OrbitTask> {
 		calculator.setTrace(true);
 			
 		calculator.setContext(getContext());
-		calculator.calculate(chunk, taskStats);
+		calculator.calculate(chunk, taskStats, thread);
 		
 		calculator.removeTraceListener(traceListener);
 		calculator.setTrace(false);
