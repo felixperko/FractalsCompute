@@ -10,6 +10,9 @@ import static de.felixperko.fractals.system.systems.common.BFOrbitCommon.numberT
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.ClientConfiguration;
@@ -23,11 +26,10 @@ import de.felixperko.fractals.system.systems.infra.AbstractCalcSystem;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.task.ClassTaskFactory;
 import de.felixperko.fractals.system.task.TaskFactory;
-import de.felixperko.fractals.util.CategoryLogger;
 
 public class BreadthFirstSystem extends AbstractCalcSystem {
 	
-	CategoryLogger log;
+	private static final Logger LOG = LoggerFactory.getLogger(BreadthFirstSystem.class);
 	
 	TaskFactory factory_task = new ClassTaskFactory(BreadthFirstTask.class);
 	
@@ -35,7 +37,6 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 
 	public BreadthFirstSystem(ServerManagers managers) {
 		super(managers);
-		log = managers.getSystemManager().getLogger().createSubLogger(getNumber()+"_BF");
 	}
 
 	@Override
@@ -89,7 +90,7 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 	@Override
 	public boolean onInit(ParamContainer paramContainer) {
 		
-		log.log("initializing");
+		LOG.info("initializing");
 		taskManager = new BreadthFirstTaskManager(managers, this);
 		taskManager.setParameters(paramContainer);
 		
@@ -99,7 +100,7 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 	@Override
 	public boolean onStart() {
 
-		log.log("starting");
+		LOG.info("starting");
 		addThread(taskManager);
 		taskManager.start();
 		taskManager.startTasks();
@@ -120,7 +121,7 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		taskManager.stopThread();
 		taskManager.endTasks();
 		managers.getThreadManager().getTaskProvider().removeTaskManager(taskManager);
-		log.log("stopped");
+		LOG.info("stopped");
 		
 		return true;
 	}
@@ -142,10 +143,6 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 	@Override
 	public void reset() {
 		taskManager.reset();
-	}
-	
-	public CategoryLogger getLogger(){
-		return log;
 	}
 
 	

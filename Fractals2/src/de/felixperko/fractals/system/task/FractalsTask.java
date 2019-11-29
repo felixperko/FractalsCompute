@@ -9,7 +9,6 @@ import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
-import de.felixperko.fractals.system.thread.FractalsThread;
 
 public interface FractalsTask extends Serializable{
 

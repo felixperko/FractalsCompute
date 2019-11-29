@@ -8,21 +8,15 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.GroupLayout.Alignment;
-
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.BorderAlignment;
 import de.felixperko.fractals.data.Chunk;
-import de.felixperko.fractals.data.ChunkBorderData;
-import de.felixperko.fractals.data.ChunkBorderDataNullImpl;
 import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.data.ReducedNaiveChunk;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
-import de.felixperko.fractals.system.statistics.EmptyStats;
 import de.felixperko.fractals.system.statistics.HistogramStats;
 import de.felixperko.fractals.system.statistics.IHistogramStats;
-import de.felixperko.fractals.system.statistics.IStats;
 import de.felixperko.fractals.system.statistics.SummedHistogramStats;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
@@ -30,7 +24,6 @@ import de.felixperko.fractals.system.task.AbstractFractalsTask;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskManager;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
-import de.felixperko.fractals.system.thread.FractalsThread;
 
 public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> implements BreadthFirstQueueEntry {
 	

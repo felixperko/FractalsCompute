@@ -12,13 +12,10 @@ import de.felixperko.fractals.manager.server.ServerThreadManager;
 import de.felixperko.fractals.network.infra.connection.ClientRemoteConnection;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
-import de.felixperko.fractals.util.CategoryLogger;
-import de.felixperko.fractals.util.ColorContainer;
 
 public class ServerConnectThread extends AbstractFractalsThread{
-
-	//CategoryLogger log = new CategoryLogger("com/server", ColorContainer.MAGENTA);
-	Logger log = LoggerFactory.getLogger(ServerConnectThread.class);
+	
+	private static final Logger LOG = LoggerFactory.getLogger(ServerConnectThread.class);
 	
 	public ServerConnectThread(ServerManagers managers) {
 		super(managers, "COM_CONN");
@@ -30,7 +27,7 @@ public class ServerConnectThread extends AbstractFractalsThread{
 		try {
 			ServerSocket server = new ServerSocket(3141);
 			
-			log.info("Waiting for incoming connections...");
+			LOG.info("Waiting for incoming connections...");
 			while (getLifeCycleState() != LifeCycleState.STOPPED) {
 				
 				while (getLifeCycleState() == LifeCycleState.PAUSED) {

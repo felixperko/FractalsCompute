@@ -26,7 +26,7 @@ public class ServerLocalMessageable extends AbstractFractalsThread implements Me
 		super(managers, name);
 	}
 
-	Logger log = LoggerFactory.getLogger("com/toLocalServer");
+	Logger log = LoggerFactory.getLogger(ServerLocalMessageable.class);
 	
 	ServerConnection serverConnection;
 	ClientLocalConnection clientLocalConnection;

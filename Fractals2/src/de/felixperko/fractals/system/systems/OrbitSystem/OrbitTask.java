@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.felixperko.fractals.data.AbstractArrayChunk;
-import de.felixperko.fractals.data.ArrayChunkFactory;
 import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.data.ReducedNaiveChunk;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
@@ -20,7 +19,6 @@ import de.felixperko.fractals.system.task.AbstractFractalsTask;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskManager;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
-import de.felixperko.fractals.system.thread.FractalsThread;
 
 public class OrbitTask extends AbstractFractalsTask<OrbitTask> {
 

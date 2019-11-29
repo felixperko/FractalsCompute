@@ -5,6 +5,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.system.statistics.EmptyStats;
 import de.felixperko.fractals.system.statistics.IStats;
@@ -15,6 +18,7 @@ import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
 public abstract class AbstractFractalsTask<T> implements FractalsTask{
 	
 	private static final long serialVersionUID = -3755610537350804691L;
+	private static final Logger LOG = LoggerFactory.getLogger(AbstractFractalsTask.class);
 	
 	private ParamContainer context_params; //to serialize parameters without the whole context
 	transient SystemContext<?> context;
@@ -30,7 +34,7 @@ public abstract class AbstractFractalsTask<T> implements FractalsTask{
 	
 	public AbstractFractalsTask(SystemContext<?> context, Integer id, TaskManager<T> taskManager, int jobId, Layer layer) {
 		this.jobId = jobId;
-		System.out.println("Created Task with jobid "+jobId);
+		LOG.debug("Created Task with jobid "+jobId);
 		this.taskManager = taskManager;
 		this.context = context;
 		this.stateInfo = new TaskStateInfo(id, taskManager.getSystem().getId(), context);

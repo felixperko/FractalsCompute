@@ -21,7 +21,7 @@ public class ListenThread extends AbstractFractalsThread {
 	
 	static int ID_COUNTER = 0;
 
-	Logger log = LoggerFactory.getLogger("com/server/generic/in");
+	Logger log = LoggerFactory.getLogger(ListenThread.class);
 	
 	WriteThread writeThread;
 	InputStream in;

@@ -11,8 +11,6 @@ import de.felixperko.fractals.network.SenderInfo;
 import de.felixperko.fractals.network.infra.Message;
 import de.felixperko.fractals.network.infra.connection.Connection;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
-import de.felixperko.fractals.util.CategoryLogger;
-import de.felixperko.fractals.util.ColorContainer;
 
 public class ClientWriteThread extends WriteThread{
 	
@@ -20,8 +18,6 @@ public class ClientWriteThread extends WriteThread{
 	
 	public ClientWriteThread(Managers managers, Socket socket, ServerConnection serverConnection) throws UnknownHostException, IOException {
 		super(managers, socket);
-		log = LoggerFactory.getLogger("com/client/out");
-		setListenLogger(LoggerFactory.getLogger("com/client/in"));
 		setConnection(serverConnection);
 	}
 	

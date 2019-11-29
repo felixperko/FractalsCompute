@@ -20,8 +20,6 @@ import de.felixperko.fractals.util.NestedNull;
 public class BreadthFirstViewData extends AbstractBFViewData<BreadthFirstViewData> {
 	
 	private static final long serialVersionUID = -6980552871281336220L;
-
-//	CategoryLogger log = CategoryLogger.WARNING.createSubLogger("calc/taskmanager/bf_data");
 	
 	ParamContainer paramContainer;
 	

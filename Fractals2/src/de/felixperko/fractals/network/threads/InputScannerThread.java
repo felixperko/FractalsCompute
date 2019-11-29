@@ -2,6 +2,9 @@ package de.felixperko.fractals.network.threads;
 
 import java.util.Scanner;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.felixperko.fractals.manager.common.Managers;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
@@ -10,6 +13,7 @@ import de.felixperko.fractals.system.task.RemoteTaskProvider;
 public class InputScannerThread extends Thread {
 	
 	Managers managers;
+	private static final Logger LOG = LoggerFactory.getLogger(InputScannerThread.class);
 	
 	public InputScannerThread(Managers managers) {
 		this.managers = managers;
@@ -36,12 +40,12 @@ public class InputScannerThread extends Thread {
 		if (command.startsWith("connect")) { //connect ip:port grantThreads
 			String[] input = command.trim().split(" ");
 			if (input.length != 2 && input.length != 3) {
-				System.out.println(USAGE_CONNECT);
+				LOG.warn(USAGE_CONNECT);
 				return;
 			}
 			String[] to = input[1].split(":");
 			if (to.length != 2) {
-				System.out.println(USAGE_CONNECT);
+				LOG.warn(USAGE_CONNECT);
 				return;
 			}
 			String host = to[0];
@@ -65,7 +69,7 @@ public class InputScannerThread extends Thread {
 				}
 				provider.addServerConnection(connection);
 			} catch (NumberFormatException e) {
-				System.out.println(USAGE_CONNECT);
+				LOG.warn(USAGE_CONNECT);
 				return;
 			}
 		}

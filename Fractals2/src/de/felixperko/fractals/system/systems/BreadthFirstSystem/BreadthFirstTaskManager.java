@@ -39,7 +39,6 @@ import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskProviderAdapter;
 import de.felixperko.fractals.system.thread.CalculateThreadReference;
-import de.felixperko.fractals.util.CategoryLogger;
 import de.felixperko.fractals.util.NumberUtil;
 
 //first chunk at relative 0, 0
@@ -95,8 +94,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		}
 	};
 	
-	//CategoryLogger log;
-	Logger log = LoggerFactory.getLogger(BreadthFirstTaskManager.class);
+	private static final Logger LOG = LoggerFactory.getLogger(BreadthFirstTaskManager.class);
 	
 	List<Queue<BreadthFirstTask>> openTasks = new ArrayList<>();
 	Queue<BreadthFirstTask> nextOpenTasks = new PriorityQueue<>(comparator_priority);//highest priority chunk for each layer that isn't in nextBufferedTasks
@@ -596,7 +594,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		long t2 = System.nanoTime();
 		if (!newQueue.isEmpty()) {
 			double time = NumberUtil.getRoundedDouble(NumberUtil.NS_TO_MS*(t2-t1), 6);
-			log.trace("time to generate "+newQueue.size()+" Tasks: "+time+" ms");
+			LOG.trace("time to generate "+newQueue.size()+" Tasks: "+time+" ms");
 		}
 		//add new neigbours to storing queue
 		for (BreadthFirstTask newTask : newQueue) {

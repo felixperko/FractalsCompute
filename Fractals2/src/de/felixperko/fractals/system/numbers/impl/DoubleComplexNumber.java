@@ -3,6 +3,9 @@ package de.felixperko.fractals.system.numbers.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.felixperko.fractals.system.numbers.AbstractComplexNumber;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.parameters.suppliers.Copyable;
@@ -11,19 +14,20 @@ import de.felixperko.fractals.util.NumberUtil;
 public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, DoubleComplexNumber> implements Copyable<DoubleComplexNumber>{
 	
 	private static final long serialVersionUID = -6625226042922366712L;
+	private static final Logger LOG = LoggerFactory.getLogger(DoubleComplexNumber.class);
 	
 	public static void main(String[] args) {
 		DoubleComplexNumber val = new DoubleComplexNumber(1.1, 0);
 		DoubleComplexNumber pow = new DoubleComplexNumber(-2, 0);
-		System.out.println(val.toString()+" ^ ("+pow.toString()+")");
+		LOG.info(val.toString()+" ^ ("+pow.toString()+")");
 		int steps = 1 << 2;
-		System.out.println("steps: "+steps);
+		LOG.info("steps: "+steps);
 		long t1 = System.nanoTime();
 		for (int i = 0 ; i < steps ; i++)
 			val.pow(pow);
 		long t2 = System.nanoTime();
-		System.out.println(val.toString());
-		System.out.println("time: "+NumberUtil.NS_TO_MS*(t2-t1)+" ms");
+		LOG.info(val.toString());
+		LOG.info("time: "+NumberUtil.NS_TO_MS*(t2-t1)+" ms");
 	}
 	
 	double real, imag;

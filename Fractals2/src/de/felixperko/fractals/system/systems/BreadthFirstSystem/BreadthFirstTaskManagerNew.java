@@ -36,7 +36,6 @@ import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskProviderAdapter;
 import de.felixperko.fractals.system.thread.CalculateThreadReference;
-import de.felixperko.fractals.util.CategoryLogger;
 
 public class BreadthFirstTaskManagerNew extends AbstractTaskManager<BreadthFirstTask> {
 
@@ -78,8 +77,6 @@ public class BreadthFirstTaskManagerNew extends AbstractTaskManager<BreadthFirst
 	List<BreadthFirstTask> finishedTasks = new ArrayList<>();
 	
 	Map<Integer, Map<ClientConfiguration, ChunkUpdateMessage>> pendingUpdateMessages = new HashMap<>();
-	
-	CategoryLogger log;
 
 	public BreadthFirstTaskManagerNew(ServerManagers managers, CalcSystem system) {
 		super(managers, system);
@@ -182,7 +179,7 @@ public class BreadthFirstTaskManagerNew extends AbstractTaskManager<BreadthFirst
 	@Override
 	public boolean setParameters(Map<String, ParamSupplier> params) {
 		setLifeCycleState(LifeCycleState.PAUSED);
-		System.out.println("setting params... "+System.currentTimeMillis());
+		LOG.debug("setting params... "+System.currentTimeMillis());
 		boolean reset = false;
 		if (this.parameters != null) {
 			for (ParamSupplier supplier : params.values()) {
@@ -279,7 +276,7 @@ public class BreadthFirstTaskManagerNew extends AbstractTaskManager<BreadthFirst
 			generateRootTask();
 		
 		setLifeCycleState(LifeCycleState.RUNNING);
-		System.out.println("params set "+System.currentTimeMillis());
+		LOG.debug("params set "+System.currentTimeMillis());
 		return true;
 	}
 	

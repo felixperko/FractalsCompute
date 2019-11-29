@@ -1,20 +1,15 @@
 package de.felixperko.fractals.system;
 
-//import java.awt.Color;
-//import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Random;
 
-import javax.imageio.ImageIO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.NumberFactory;
 import de.felixperko.fractals.system.task.Layer;
-import de.felixperko.fractals.util.CategoryLogger;
-import de.felixperko.fractals.util.ColorContainer;
 import de.felixperko.fractals.util.NumberUtil;
 
 /**
@@ -25,7 +20,7 @@ import de.felixperko.fractals.util.NumberUtil;
 
 public class LayerConfiguration implements Serializable{
 	
-	static CategoryLogger log = new CategoryLogger("systems/LayerConfiguraton", new ColorContainer(1f, 1f, 0f));
+	private static final Logger LOG = LoggerFactory.getLogger(LayerConfiguration.class);
 	static long preparedTimeout = (long)(1./NumberUtil.NS_TO_MS);
 	
 //	public static void main(String[] args) {
@@ -216,7 +211,7 @@ public class LayerConfiguration implements Serializable{
 					continue;
 				}
 				if (debug)
-					System.out.println((lowestDist+"").replace('.', ','));
+					LOG.debug((lowestDist+"").replace('.', ','));
 			}
 			
 //			if (debug)

@@ -21,13 +21,13 @@ import de.felixperko.fractals.network.infra.connection.Connection;
 import de.felixperko.fractals.network.interfaces.Messageable;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.thread.AbstractFractalsThread;
-import de.felixperko.fractals.util.CategoryLogger;
 
 public abstract class WriteThread extends AbstractFractalsThread implements Messageable {
 	
 	static int ID_COUNTER = 0;
 	
-	Logger log = LoggerFactory.getLogger(WriteThread.class);
+	private static final Logger LOG = LoggerFactory.getLogger(WriteThread.class);
+	private static final Logger LOG_LISTEN = LoggerFactory.getLogger(ListenThread.class);
 	
 	ListenThread listenThread;
 	boolean closeConnection = false;
@@ -39,10 +39,6 @@ public abstract class WriteThread extends AbstractFractalsThread implements Mess
 	protected Socket socket;
 	
 	boolean compression = false;
-	
-//	Connection connection;
-	
-	private Logger listenLogger; //used to buffer logger for listen thread until its creation
 	
 	int writeThreadId;
 	
@@ -63,8 +59,6 @@ public abstract class WriteThread extends AbstractFractalsThread implements Mess
 			} else
 				out = new ObjectOutputStream(socket.getOutputStream());
 			listenThread = new ListenThread(managers, this, inStream);
-			if (listenLogger != null)
-				listenThread.setLogger(listenLogger);
 			listenThread.start();
 			
 			mainLoop:
@@ -113,7 +107,7 @@ public abstract class WriteThread extends AbstractFractalsThread implements Mess
 							if (msg.isCancelled())
 								continue;
 							prepareMessage(msg);
-							log.info("sending message: "+msg.getClass().getSimpleName());
+							LOG.info("sending message: "+msg.getClass().getSimpleName());
 							try {
 								out.writeUnshared(msg);
 								out.flush();
@@ -181,12 +175,6 @@ public abstract class WriteThread extends AbstractFractalsThread implements Mess
 	public boolean isCloseConnection() {
 		return closeConnection;
 	};
-	
-	public void setListenLogger(Logger log) {
-		listenLogger = log;
-		if (listenThread != null)
-			listenThread.setLogger(listenLogger);
-	}
 
 	@Override
 	public abstract Connection<?> getConnection();

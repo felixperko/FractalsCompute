@@ -24,30 +24,30 @@ public class Logger {
 		addMessages.add(message);
 	}
 	
-	public static int addNewMessages() {
-		if (addMessages.isEmpty())
-			return 0;
-		int c = 0;
-		Iterator<Message> it = addMessages.iterator();
-		while (it.hasNext()) {
-			Message message = it.next();
-			if (message == null)
-				continue;
-			String catName = message
-					.getCategory()
-					.getName();
-			List<Message> list = logMap.get(catName);
-			if (list == null) {
-				list = new ArrayList<>();
-				logMap.put(catName, list);
-			}
-			list.add(message);
-			log.add(message);
-			it.remove();
-			c++;
-		}
-		return c;
-	}
+//	public static int addNewMessages() {
+//		if (addMessages.isEmpty())
+//			return 0;
+//		int c = 0;
+//		Iterator<Message> it = addMessages.iterator();
+//		while (it.hasNext()) {
+//			Message message = it.next();
+//			if (message == null)
+//				continue;
+//			String catName = message
+//					.getCategory()
+//					.getName();
+//			List<Message> list = logMap.get(catName);
+//			if (list == null) {
+//				list = new ArrayList<>();
+//				logMap.put(catName, list);
+//			}
+//			list.add(message);
+//			log.add(message);
+//			it.remove();
+//			c++;
+//		}
+//		return c;
+//	}
 	
 	public static List<Message> getLog(){
 //		List<String> res = new ArrayList<>();

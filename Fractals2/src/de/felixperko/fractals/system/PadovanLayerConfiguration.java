@@ -1,13 +1,9 @@
 package de.felixperko.fractals.system;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.NumberFactory;
-import de.felixperko.fractals.system.numbers.impl.DoubleComplexNumber;
-import de.felixperko.fractals.system.numbers.impl.DoubleNumber;
-import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstLayer;
 import de.felixperko.fractals.system.task.Layer;
 
 /**

@@ -3,11 +3,15 @@ package de.felixperko.fractals.data;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.felixperko.fractals.system.systems.infra.ViewData;
 
 public class ArrayChunkFactory implements Serializable{
 	
 	private static final long serialVersionUID = 2001744194301335070L;
+	private static final Logger LOG = LoggerFactory.getLogger(ArrayChunkFactory.class);
 	
 	int dimensionSize;
 	Class<? extends AbstractArrayChunk> chunkClass;
@@ -20,7 +24,7 @@ public class ArrayChunkFactory implements Serializable{
 	
 	public AbstractArrayChunk createChunk(long chunkX, long chunkY) {
 		if (viewData == null) {
-			System.out.println("Exception at "+System.currentTimeMillis());
+			LOG.warn("Exception at "+System.currentTimeMillis());
 			throw new IllegalStateException("Couldn't create Chunk: ViewData is null");
 		}
 		try {

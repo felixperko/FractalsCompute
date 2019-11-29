@@ -3,8 +3,6 @@ package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.data.ReducedNaiveChunk;
-import de.felixperko.fractals.system.numbers.Number;
-import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.systems.infra.BufferedChunkedViewData;
 import de.felixperko.fractals.system.systems.infra.ViewContainer;
 import de.felixperko.fractals.util.NestedMap;

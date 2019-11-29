@@ -1,15 +1,16 @@
 package de.felixperko.fractals.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Message {
 	
 	String message;
-	CategoryLogger category;
 	String prefix;
 	
 	String logString = null;
 	
-	public Message(CategoryLogger category, String message){
-		this.category = category;
+	public Message(String message){
 		this.message = message;
 	}
 	
@@ -19,16 +20,6 @@ public class Message {
 	
 	public Message setMessage(String message) {
 		this.message = message;
-		return this;
-	}
-	
-	public CategoryLogger getCategory() {
-		return category;
-	}
-	
-	public Message setCategory(CategoryLogger category) {
-		this.category = category;
-		resetLogString();
 		return this;
 	}
 	
@@ -42,23 +33,17 @@ public class Message {
 		return this;
 	}
 	
-	public String getCategoryPrefix() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("[").append(category.category);
-		if (prefix != null){
-			sb.append("/").append(prefix);
-		}
-		sb.append("]");
-		return sb.toString();
-	}
+//	public String getCategoryPrefix() {
+//		StringBuilder sb = new StringBuilder();
+//		sb.append("[").append(category.category);
+//		if (prefix != null){
+//			sb.append("/").append(prefix);
+//		}
+//		sb.append("]");
+//		return sb.toString();
+//	}
 	
 	public String getLogString() {
-		return getLogString(false);
-	}
-	
-	public String getLogString(boolean reset) {
-		if (reset || logString == null)
-			logString = getCategoryPrefix()+" "+message;
 		return logString;
 	}
 	

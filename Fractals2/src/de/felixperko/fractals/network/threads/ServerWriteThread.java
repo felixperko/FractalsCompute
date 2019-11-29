@@ -9,13 +9,9 @@ import de.felixperko.fractals.network.infra.connection.ClientRemoteConnection;
 import de.felixperko.fractals.network.infra.connection.Connection;
 import de.felixperko.fractals.network.messages.ConnectedMessage;
 import de.felixperko.fractals.network.messages.ReachableRequestMessage;
-import de.felixperko.fractals.util.CategoryLogger;
-import de.felixperko.fractals.util.ColorContainer;
 import de.felixperko.fractals.util.NumberUtil;
 
 public class ServerWriteThread extends WriteThread {
-	
-	//final static CategoryLogger superLog = new CategoryLogger("com/server", ColorContainer.MAGENTA);
 	
 	ClientRemoteConnection clientConnection;
 	
@@ -51,8 +47,6 @@ public class ServerWriteThread extends WriteThread {
 		this.clientConnection = (ClientRemoteConnection)clientRemoteConnection;
 //		setListenLogger(superLog.createSubLogger(clientConnection.getSenderInfo().getClientId()+"/in"));
 //		this.log = superLog.createSubLogger(clientConnection.getSenderInfo().getClientId()+"/out");
-		setListenLogger(LoggerFactory.getLogger(clientConnection.getSenderInfo().getClientId()+"/in"));
-		this.log = LoggerFactory.getLogger(clientConnection.getSenderInfo().getClientId()+"/out");
 		writeMessage(new ConnectedMessage(clientConnection));
 	}
 }

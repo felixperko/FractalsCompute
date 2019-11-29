@@ -1,9 +1,5 @@
 package de.felixperko.fractals.data;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.systems.infra.ViewData;
 
 public class ReducedNaiveChunk extends AbstractArrayChunk {

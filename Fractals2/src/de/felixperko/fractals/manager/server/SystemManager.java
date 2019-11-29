@@ -8,6 +8,9 @@ import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.manager.common.Manager;
 import de.felixperko.fractals.network.ClientConfiguration;
@@ -22,14 +25,12 @@ import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateUpdate;
 import de.felixperko.fractals.system.task.FractalsTask;
-import de.felixperko.fractals.util.CategoryLogger;
-import de.felixperko.fractals.util.ColorContainer;
 
 public class SystemManager extends Manager{
 	
 	HashMap<UUID, WeakHashMap<Integer, FractalsTask>> tasks = new HashMap<>();
 	
-	CategoryLogger log = new CategoryLogger("systems", ColorContainer.YELLOW);
+	private static final Logger LOG = LoggerFactory.getLogger(SystemManager.class);
 	
 	Map<UUID, CalcSystem> activeSystems = new HashMap<>();
 	
@@ -146,18 +147,13 @@ public class SystemManager extends Manager{
 		
 		CalcSystem system = availableSystems.get(systemName).createSystem(managers); //TODO system not available -> error handling; reply to client
 		activeSystems.put(system.getId(), system);
-		log.log("initiating system "+systemName);
+		LOG.info("initiating system "+systemName);
 		return system;
 	}
 
 	public ServerStateInfo getStateInfo() {
 		return stateInfo;
 	}
-	
-	public CategoryLogger getLogger(){
-		return log;
-	}
-
 
 	public void clientRemoved(ClientConfiguration conf) {
 		for (UUID systemId : conf.getParamContainers().keySet()) {

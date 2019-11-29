@@ -13,16 +13,12 @@ import de.felixperko.fractals.network.messages.task.TaskAssignedMessage;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
-import de.felixperko.fractals.util.CategoryLogger;
-import de.felixperko.fractals.util.ColorContainer;
 
 /**
  * basic round robin implementation
  *
  */
 public class LocalTaskProvider implements TaskProvider {
-	
-	static CategoryLogger log = new CategoryLogger("taskprovider", new ColorContainer(0f, 1f, 1f));
 	
 	ServerManagers managers;
 

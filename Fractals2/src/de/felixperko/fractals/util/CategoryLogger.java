@@ -17,11 +17,11 @@ public class CategoryLogger {
 	}
 	
 	public void log(String msg) {
-		Logger.log(new Message(this, msg));
+		Logger.log(new Message(msg));
 	}
 	
 	public void log(String prefix, String msg) {
-		Logger.log(new Message(this, msg).setPrefix(prefix));
+		Logger.log(new Message(msg).setPrefix(prefix));
 	}
 
 	public ColorContainer getColor() {

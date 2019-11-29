@@ -3,6 +3,9 @@ package de.felixperko.fractals.manager.server;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.manager.common.INetworkManager;
 import de.felixperko.fractals.manager.common.NetworkManager;
@@ -18,8 +21,6 @@ import de.felixperko.fractals.network.messages.ChunkUpdateMessage;
 import de.felixperko.fractals.network.threads.ServerConnectThread;
 import de.felixperko.fractals.network.threads.ServerWriteThread;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
-import de.felixperko.fractals.util.CategoryLogger;
-import de.felixperko.fractals.util.ColorContainer;
 
 /**
  * Server class.
@@ -28,7 +29,7 @@ import de.felixperko.fractals.util.ColorContainer;
 
 public class ServerNetworkManager extends NetworkManager implements INetworkManager{
 	
-	CategoryLogger log = new CategoryLogger("com/server", ColorContainer.MAGENTA);
+	private static final Logger LOG = LoggerFactory.getLogger(ServerNetworkManager.class);
 	
 	ServerConnectThread serverConnectThread;
 	
@@ -54,7 +55,7 @@ public class ServerNetworkManager extends NetworkManager implements INetworkMana
 		ClientConfiguration configuration = new ClientConfiguration();
 		configuration.setConnection(clientConnection);
 		clients.put((Integer)clientConnection.getSenderInfo().getClientId(), configuration);
-		log.log("new client connected. ID="+info.getClientId());
+		LOG.info("new client connected. ID="+info.getClientId());
 		return clientConnection;
 	}
 	
