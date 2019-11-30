@@ -3,6 +3,8 @@ package de.felixperko.fractals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.util.StatusPrinter;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.infra.connection.ClientLocalConnection;
 import de.felixperko.fractals.network.interfaces.Messageable;
@@ -18,8 +20,8 @@ public class FractalsMain {
 //	public static int THREAD_COUNT = 2;
 	
 	public static void main(String[] args) {
-//		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-//		StatusPrinter.print(lc);
+		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+		StatusPrinter.print(lc);
 		
 		LOG.info("user.dir: "+System.getProperty("user.dir"));
 		managers = new ServerManagers();

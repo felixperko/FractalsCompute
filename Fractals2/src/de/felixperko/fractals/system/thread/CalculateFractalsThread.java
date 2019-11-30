@@ -31,6 +31,7 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 		super(managers, "CALC_"+ID_COUNTER);
 		calcThreadId = ID_COUNTER++;
 		this.taskProvider = taskProvider;
+		this.timesliceProvider = timesliceProvider;
 		setPriority(1);
 	}
 	
@@ -149,7 +150,7 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 		synchronized (this.iterations) {
 			Integer it = this.iterations.getOrDefault(timeslice, 0);
 			if (removeOld) {
-				this.iterations.entrySet().removeIf(e -> (e.getKey() < timeslice));
+				this.iterations.entrySet().removeIf(e -> (e.getKey() < timeslice-1));
 			}
 			return it;
 		}

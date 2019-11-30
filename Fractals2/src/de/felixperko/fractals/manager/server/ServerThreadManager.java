@@ -1,6 +1,7 @@
 package de.felixperko.fractals.manager.server;
 
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 
 import de.felixperko.fractals.manager.common.ThreadManager;
@@ -15,7 +16,7 @@ import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 
 public class ServerThreadManager extends ThreadManager{
 	
-	public static final double TIMESLICE_INTERVAL = 1;
+	public static final double TIMESLICE_INTERVAL = 0.1;
 	
 	LocalTaskProvider localTaskProvider;
 	RemoteTaskProvider remoteTaskProvider = null;
@@ -24,7 +25,7 @@ public class ServerThreadManager extends ThreadManager{
 	
 	TimesliceProvider timesliceProvider = new IntervalTimesliceProvider(TIMESLICE_INTERVAL);
 
-	private List<CalculateFractalsThread> calculateThreads;
+	private List<CalculateFractalsThread> calculateThreads = new ArrayList<>();
 	
 	public ServerThreadManager(ServerManagers managers) {
 		super(managers);

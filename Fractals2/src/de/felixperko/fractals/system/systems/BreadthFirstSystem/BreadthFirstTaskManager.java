@@ -29,6 +29,7 @@ import de.felixperko.fractals.network.messages.ChunkUpdateMessage;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
+import de.felixperko.fractals.system.statistics.HistogramStats;
 import de.felixperko.fractals.system.statistics.SummedHistogramStats;
 import de.felixperko.fractals.system.statistics.TimesliceProvider;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
@@ -208,7 +209,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		return changed;
 	}
 
-	Integer lastTimeslice;
+	Integer lastTimeslice = 0;
 	
 	private boolean updateStats() {
 		ServerThreadManager threadManager = ((ServerManagers)managers).getThreadManager();
@@ -216,18 +217,20 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		Integer timeslice = timesliceProvider.getCurrentTimeslice();
 		if (timeslice <= lastTimeslice)
 			return false;
-		for (Integer i = lastTimeslice ; i < timeslice ; i++) {
+		for (Integer i = lastTimeslice-1 ; i < timeslice ; i++) {
 			int totalIterationsPerSecond = 0;
 			for (CalculateFractalsThread thread : threadManager.getCalculateThreads()) {
 				String name = thread.getName();
-				int iterations = thread.getTimesliceIterations(i, i == timeslice-1);
+				//TODO just for debug
+				int iterations = thread.getTimesliceIterations(i, false);
+//				int iterations = thread.getTimesliceIterations(i, i == timeslice-1);
 				int iterationsPerSecond = iterations * (int)Math.round(1d/ServerThreadManager.TIMESLICE_INTERVAL);
 				totalIterationsPerSecond += iterationsPerSecond;
-				LOG.trace("IPS of "+name+" (slice "+timeslice+"): "+iterationsPerSecond);
+				LOG.debug("IPS "+timeslice+" of "+name+"): "+iterationsPerSecond);
 			}
-			LOG.debug("IPS "+timeslice+" (total):"+totalIterationsPerSecond);
+			LOG.info("IPS "+timeslice+" (total):"+totalIterationsPerSecond);
 		}
-		lastTimeslice = timeslice-1;
+		lastTimeslice = timeslice;
 		return true;
 	}
 
@@ -339,7 +342,9 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				continue;
 			
 			//update stats
-			stats.addHistogram(task.getTaskStats());
+			HistogramStats taskStats = task.getTaskStats();
+			if (taskStats != null)
+				stats.addHistogram(taskStats);
 			//TODO distribute stat update?
 			
 			boolean paused = task.isCancelled() && task.getState() == TaskState.BORDER;

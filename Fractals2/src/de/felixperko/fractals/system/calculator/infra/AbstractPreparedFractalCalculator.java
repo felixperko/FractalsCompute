@@ -116,11 +116,11 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 				phase = CalculatePhase.PHASE_REDO;
 				int pixel = redo.poll();
 				for (int sample = chunk.getSampleCount(pixel) ; sample < samples ; sample++) {
-					if (isCancelled()){
-						redo.clear();
-						break redoLoop;
-					}
 					calculateSample(pixel, sample, thread);
+				}
+				if (isCancelled()){
+					redo.clear();
+					break redoLoop;
 				}
 				chunk.getCurrentTask().getStateInfo().setProgress((pixelCount-redo.size())/pixelCount);
 			} catch (Exception e) {
