@@ -46,7 +46,7 @@ public class CompressedChunk implements Serializable{
 	List<ComplexNumber> storedPositions;
 	byte[] storedIterations;
 	
-	Logger log = LoggerFactory.getLogger(CompressedChunk.class);
+	final static transient Logger LOG = LoggerFactory.getLogger(CompressedChunk.class);
 	
 	public CompressedChunk(ReducedNaiveChunk chunk) {
 		FractalsTask task = chunk.getCurrentTask();
@@ -135,7 +135,7 @@ public class CompressedChunk implements Serializable{
 			int size_uncompressed = ((chunk.values.length*4)+(chunk.samples.length)+(chunk.failedSamples.length))/(upsample*upsample) + dimensionSize;
 			int size_compressed = values_compressed.length+samples_compressed.length+failedSamples_compressed.length + borderData_compressed.length;
 			String kbString = (size_compressed/1000.0)+" kb / "+(size_uncompressed/1000.0)+" kb";
-			log.debug("saved bytes: "+values_compressed.length+"/"+(chunk.values.length*4/(upsample*upsample))+" "+
+			LOG.debug("saved bytes: "+values_compressed.length+"/"+(chunk.values.length*4/(upsample*upsample))+" "+
 					(samples_compressed.length)+"/"+(chunk.samples.length/(upsample*upsample))+" "+
 					(failedSamples_compressed.length)+"/"+(chunk.failedSamples.length/(upsample*upsample))+" "+
 					kbString+" in "+t+"s");

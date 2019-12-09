@@ -16,7 +16,7 @@ import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 
 public class ServerThreadManager extends ThreadManager{
 	
-	public static final double TIMESLICE_INTERVAL = 0.1;
+	public static final double TIMESLICE_INTERVAL = 10;
 	
 	LocalTaskProvider localTaskProvider;
 	RemoteTaskProvider remoteTaskProvider = null;

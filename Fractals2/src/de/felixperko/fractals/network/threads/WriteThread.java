@@ -1,5 +1,6 @@
 package de.felixperko.fractals.network.threads;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
@@ -91,9 +92,9 @@ public abstract class WriteThread extends AbstractFractalsThread implements Mess
 					pendingMessages.addAll(newMessages);
 					newMessages.clear();
 				}
+				synchronized (pendingMessages) {
 				
 				try {
-					synchronized (pendingMessages) {
 						Iterator<Message> it = pendingMessages.iterator();
 	//					while (!pendingMessages.isEmpty()) {
 	//						Message msg = pendingMessages.poll();
@@ -114,7 +115,7 @@ public abstract class WriteThread extends AbstractFractalsThread implements Mess
 								if (outComp != null)
 									outComp.flush();
 								out.reset();
-							} catch (SocketException e) {
+							} catch (SocketException | FileNotFoundException e) {
 								try {
 									Thread.sleep(1);
 								} catch (InterruptedException e1) {
@@ -124,11 +125,11 @@ public abstract class WriteThread extends AbstractFractalsThread implements Mess
 									throw e;
 							}
 						}
+					} catch (Exception e){
+						if (closeConnection)
+							break mainLoop;
+						throw e;
 					}
-				} catch (Exception e){
-					if (closeConnection)
-						break mainLoop;
-					throw e;
 				}
 			}
 			

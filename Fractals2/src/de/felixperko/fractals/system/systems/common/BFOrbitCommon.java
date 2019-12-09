@@ -88,6 +88,7 @@ public class BFOrbitCommon {
 		parameterConfiguration.addCalculatorParameters("MandelbrotCalculator", mandelbrot_calculator_defs);
 		parameterConfiguration.addCalculatorParameters("BurningShipCalculator", mandelbrot_calculator_defs);
 		parameterConfiguration.addCalculatorParameters("TricornCalculator", mandelbrot_calculator_defs);
+		parameterConfiguration.addCalculatorParameters("FibonacciPowCalculator", mandelbrot_calculator_defs);
 		
 		List<ParameterDefinition> newton_calculator_defs = new ArrayList<>();
 		newton_calculator_defs.add(new ParameterDefinition("start", "Calculator", CoordinateBasicShiftParamSupplier.class, complexnumberType)
@@ -103,6 +104,8 @@ public class BFOrbitCommon {
 				+ "z = |a| + i*|b| before every step.");
 		calculatorSelection.addOption("Tricorn", "TricornCalculator", "A variation of the Mandelbrot set.\n"
 				+ "z = a - i*b before every step.");
+		calculatorSelection.addOption("Fibonacci", "FibonacciPowCalculator", "The fibonacci number of the iteration is used as the exponent.\n"
+				+ "f(z_n+1) = f(z_n) + (1+1/z)^fib + c");
 		calculatorSelection.addOption("Newton x^3 - 1", "NewtonThridPowerMinusOneCalculator", "Newton's method for f(x) = x^3 - 1");
 		calculatorSelection.addOption("Newton x^8 + 15x^4 - 16", "NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator", "Newton's method for f(x) = x^8 + 15x^4 - 16");
 		
