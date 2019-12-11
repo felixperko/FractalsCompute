@@ -1,5 +1,7 @@
 package de.felixperko.fractals.system.parameters.suppliers;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 
@@ -19,6 +21,22 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 		this.name = name;
 	}
 	
+	public boolean isViewRelevant() {
+		return viewRelevant;
+	}
+
+	public void setViewRelevant(boolean viewRelevant) {
+		this.viewRelevant = viewRelevant;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setChanged(boolean changed) {
+		this.changed = changed;
+	}
+
 	@Override
 	public String getName() {
 		return name;
@@ -56,12 +74,14 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 	public boolean isChanged() {
 		return changed;
 	}
-
+	
+	@JsonIgnore
 	@Override
 	public Object getGeneral() {
 		return get(null, null, 0, 0);
 	}
-	
+
+	@JsonIgnore
 	@Override
 	public <C> C getGeneral(Class<C> cls) {
 		return cast(getGeneral(), cls);

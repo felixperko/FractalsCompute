@@ -72,7 +72,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 		for (int pixel = 0 ; pixel < pixelCount ; pixel++) {
 			if (!layer.isActive(pixel)){
 				if (layer instanceof BreadthFirstUpsampleLayer)
-					pixel = ((BreadthFirstUpsampleLayer)layer).getEnabledBitSet().nextSetBit(pixel)-1;
+					pixel = ((BreadthFirstUpsampleLayer)layer).getEnabledPixels().nextSetBit(pixel)-1;
 				if (pixel == -2)
 					break;
 				continue;

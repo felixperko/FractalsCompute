@@ -2,22 +2,32 @@ package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
 import java.util.BitSet;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import de.felixperko.fractals.system.parameters.suppliers.JsonObjectDeserializer;
+
+@JsonTypeName("bfUpsampleLayer")
+@JsonDeserialize(as = BreadthFirstUpsampleLayer.class)
 public class BreadthFirstUpsampleLayer extends BreadthFirstLayer{
 	
-	private static final long serialVersionUID = -6818101684225388444L;
 	
+	private static final long serialVersionUID = -6818101684225388444L;
+	public static final String TYPE_NAME = "bfUpsampleLayer";
+	
+	int chunkSize;
 	int upsample;
 
 	public BreadthFirstUpsampleLayer(int upsample, int chunkSize) {
-		super();
-		this.upsample = upsample;
-		BitSet bitSet = new BitSet();
-		for (int x = upsample/2 ; x < chunkSize ; x += upsample) {
-			for (int y = upsample/2 ; y < chunkSize ; y += upsample) {
-				bitSet.set(x*chunkSize + y);
-			}
-		}
-		with_enabled_pixels(bitSet);
+		super(TYPE_NAME);
+		this.chunkSize = chunkSize;
+		setUpsample(upsample);
+	}
+	
+	public BreadthFirstUpsampleLayer() {
+		super(TYPE_NAME);
+		this.chunkSize = -1;
+		this.upsample = -1;
 	}
 	
 //	@Override
@@ -43,9 +53,33 @@ public class BreadthFirstUpsampleLayer extends BreadthFirstLayer{
 //		BreadthFirstUpsampleLayer o = (BreadthFirstUpsampleLayer) other;
 //		return (o.id == id && o.upsample == upsample);
 //	}
+	
+	public void setChunkSize(int chunkSize) {
+		this.chunkSize = chunkSize;
+	}
+	
+	public int getChunkSize() {
+		return chunkSize;
+	}
 
 	public int getUpsample() {
 		return upsample;
+	}
+	
+	public void setUpsample(int upsample) {
+		
+		if (this.chunkSize == -1)
+			throw new IllegalStateException("chunkSize is not set");
+		
+		this.upsample = upsample;
+
+		BitSet bitSet = new BitSet();
+		for (int x = upsample/2 ; x < chunkSize ; x += upsample) {
+			for (int y = upsample/2 ; y < chunkSize ; y += upsample) {
+				bitSet.set(x*chunkSize + y);
+			}
+		}
+		with_enabled_pixels(bitSet);
 	}
 
 	public BitSet getEnabledPixels() {

@@ -6,17 +6,82 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.io.StringReader;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.xerial.snappy.Snappy;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
+import de.felixperko.fractals.system.systems.BreadthFirstSystem.BfLayerList;
+import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstLayer;
+import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
+import de.felixperko.fractals.system.task.Layer;
 
 public class ParamContainer implements Serializable{
 	
 	final static String UTF8 = "UTF-8";
+	
+//	public static void main(String[] args) {
+//		ParamContainer container = new ParamContainer();
+//		container.addClientParameter(new StaticParamSupplier("midpoint", new DoubleComplexNumber(0.123, 0.246)));
+//		container.addClientParameter(new StaticParamSupplier("c", new DoubleComplexNumber(0.369, 0.482)));
+//		try {
+//			String serialized = container.serializeBase64();
+//			System.out.println(serialized);
+//			ParamContainer container2 = deserializeBase64(serialized);
+//			System.out.println(container2.getClientParameter("midpoint").getGeneral(DoubleComplexNumber.class).toString());
+//		} catch (IOException | ClassNotFoundException e) {
+//			e.printStackTrace();
+//		}
+//	}
+	
+	public static void main(String[] args) {
+		ParamContainer container = new ParamContainer();
+		List<Layer> layers = new ArrayList<>();
+		BreadthFirstLayer layer = new BreadthFirstLayer().with_culling(true).with_max_iterations(1000).with_priority_multiplier(3).with_priority_shift(20).with_samples(42);
+		BreadthFirstLayer layer2 = new BreadthFirstUpsampleLayer(4, 256).with_culling(true).with_rendering(true).with_priority_shift(10);
+		layers.add(layer);
+		layers.add(layer2);
+		BfLayerList layerList = new BfLayerList(layers);
+		container.addClientParameter(new StaticParamSupplier("layers", layerList));
+		
+		ObjectMapper mapper = new ObjectMapper();
+		
+		try {
+			
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+			mapper.writerWithDefaultPrettyPrinter().writeValue(outputStream, container);
+			
+			
+			String str = new String(outputStream.toByteArray());
+			StringReader umLayer2Reader = new StringReader(str);
+			
+			ParamContainer c2 = mapper.readValue(str.getBytes(), ParamContainer.class);
+			
+			System.out.println(str);
+			
+			byte[] arr = Snappy.compress(str, Charset.forName("UTF-8"));
+			System.out.println(str.length());
+			System.out.println(arr.length);
+			
+			System.out.println(new String(Base64.getEncoder().encode(arr)));
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
 	
 	public static ParamContainer deserializeBase64(String base64) throws IOException, ClassNotFoundException{
 		ByteArrayInputStream in = new ByteArrayInputStream(Base64.getDecoder().decode(base64));
@@ -29,7 +94,7 @@ public class ParamContainer implements Serializable{
 
 	private static final long serialVersionUID = 2325163791938639608L;
 	
-	protected Map<String, ParamSupplier> clientParameters;
+	private Map<String, ParamSupplier> clientParameters;
 
 	public ParamContainer() {
 		this.clientParameters = new HashMap<>();
@@ -117,6 +182,10 @@ public class ParamContainer implements Serializable{
 
 	public Map<String, ParamSupplier> getClientParameters() {
 		return clientParameters;
+	}
+
+	public void setClientParameters(Map<String, ParamSupplier> clientParameters) {
+		this.clientParameters = clientParameters;
 	}
 	
 	public String serializeBase64() throws IOException{

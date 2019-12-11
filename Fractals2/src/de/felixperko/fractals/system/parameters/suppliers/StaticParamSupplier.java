@@ -1,5 +1,7 @@
 package de.felixperko.fractals.system.parameters.suppliers;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 
@@ -7,7 +9,12 @@ public class StaticParamSupplier extends AbstractParamSupplier {
 	
 	private static final long serialVersionUID = 8842788371106789651L;
 	
+	@JsonDeserialize(using = JsonObjectDeserializer.class)
 	Object obj;
+	
+	public StaticParamSupplier() {
+		super(null);
+	}
 	
 	public StaticParamSupplier(String name, Object obj) {
 		super(name);
@@ -66,5 +73,13 @@ public class StaticParamSupplier extends AbstractParamSupplier {
 		} else if (!this.obj.equals(other.obj))
 			return false;
 		return true;
+	}
+
+	public Object getObj() {
+		return obj;
+	}
+
+	public void setObj(Object obj) {
+		this.obj = obj;
 	}
 }

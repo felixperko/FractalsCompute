@@ -1,18 +1,22 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
 import java.util.BitSet;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import de.felixperko.fractals.system.parameters.suppliers.JsonAbstractTypedObject;
 import de.felixperko.fractals.system.task.Layer;
 
-public class BreadthFirstLayer implements Layer {
+public class BreadthFirstLayer extends JsonAbstractTypedObject implements Layer {
+	
+	public static final String TYPE_NAME = "bfLayer";
 	
 	private static final long serialVersionUID = -2680536406773328635L;
 	
 	int id = -1;
-	double priority_multiplier = 1;
-	double priority_shift = 0;
-	BitSet enabledPixels = null;
-	int samples = 1;
+	double priorityMultiplier = 1;
+	double priorityShift = 0;
+	@JsonIgnore
+	transient BitSet enabledPixels = null;
+	int sampleCount = 1;
 	int maxIterations = -1;
 	
 	boolean culling = false;
@@ -20,10 +24,11 @@ public class BreadthFirstLayer implements Layer {
 	boolean rendering = true;
 	
 	public BreadthFirstLayer() {
+		super(TYPE_NAME);
 	}
 	
-	public BitSet getEnabledBitSet(){
-		return enabledPixels;
+	public BreadthFirstLayer(String subClassTypeName) {
+		super(subClassTypeName);
 	}
 	
 	public BreadthFirstLayer with_culling(boolean culling) {
@@ -48,12 +53,12 @@ public class BreadthFirstLayer implements Layer {
 	}
 	
 	public BreadthFirstLayer with_priority_multiplier(double priority_multiplier) {
-		this.priority_multiplier = priority_multiplier;
+		this.priorityMultiplier = priority_multiplier;
 		return this;
 	}
 
 	public BreadthFirstLayer with_priority_shift(double priority_shift) {
-		this.priority_shift = priority_shift;
+		this.priorityShift = priority_shift;
 		return this;
 	}
 
@@ -63,7 +68,7 @@ public class BreadthFirstLayer implements Layer {
 	}
 	
 	public BreadthFirstLayer with_samples(int sampleCount) {
-		this.samples = sampleCount;
+		this.sampleCount = sampleCount;
 		return this;
 	}
 	
@@ -105,17 +110,17 @@ public class BreadthFirstLayer implements Layer {
 
 	@Override
 	public double getPriorityMultiplier() {
-		return priority_multiplier;
+		return priorityMultiplier;
 	}
 	
 	@Override
 	public double getPriorityShift() {
-		return priority_shift;
+		return priorityShift;
 	}
 
 	@Override
 	public int getSampleCount() {
-		return samples;
+		return sampleCount;
 	}
 
 	
@@ -127,12 +132,12 @@ public class BreadthFirstLayer implements Layer {
 		result = prime * result + ((enabledPixels == null) ? 0 : enabledPixels.hashCode());
 		result = prime * result + id;
 		long temp;
-		temp = Double.doubleToLongBits(priority_multiplier);
+		temp = Double.doubleToLongBits(priorityMultiplier);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(priority_shift);
+		temp = Double.doubleToLongBits(priorityShift);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		result = prime * result + (rendering ? 1231 : 1237);
-		result = prime * result + samples;
+		result = prime * result + sampleCount;
 		return result;
 	}
 
@@ -155,13 +160,13 @@ public class BreadthFirstLayer implements Layer {
 			return false;
 		if (id != other.id)
 			return false;
-		if (Double.doubleToLongBits(priority_multiplier) != Double.doubleToLongBits(other.priority_multiplier))
+		if (Double.doubleToLongBits(priorityMultiplier) != Double.doubleToLongBits(other.priorityMultiplier))
 			return false;
-		if (Double.doubleToLongBits(priority_shift) != Double.doubleToLongBits(other.priority_shift))
+		if (Double.doubleToLongBits(priorityShift) != Double.doubleToLongBits(other.priorityShift))
 			return false;
 		if (rendering != other.rendering)
 			return false;
-		if (samples != other.samples)
+		if (sampleCount != other.sampleCount)
 			return false;
 		return true;
 	}
@@ -170,10 +175,59 @@ public class BreadthFirstLayer implements Layer {
 	public int getUpsample() {
 		return 1;
 	}
+	
+	public void setUpsample(int upsample) {
+		if (upsample != 1)
+			throw new IllegalArgumentException();
+	}
 
 	@Override
 	public int getMaxIterations() {
 		return maxIterations;
+	}
+
+	public void setPriorityMultiplier(double priorityMultiplier) {
+		this.priorityMultiplier = priorityMultiplier;
+	}
+
+	public void setPriorityShift(double priorityShift) {
+		this.priorityShift = priorityShift;
+	}
+
+	public BitSet getEnabledPixels() {
+		return enabledPixels;
+	}
+
+	public void setEnabledPixels(BitSet enabledPixels) {
+		this.enabledPixels = enabledPixels;
+	}
+
+	public int getSamples() {
+		return sampleCount;
+	}
+
+	public void setSamples(int samples) {
+		this.sampleCount = samples;
+	}
+
+	public boolean isCulling() {
+		return culling;
+	}
+
+	public void setCulling(boolean culling) {
+		this.culling = culling;
+	}
+
+	public boolean isRendering() {
+		return rendering;
+	}
+
+	public void setRendering(boolean rendering) {
+		this.rendering = rendering;
+	}
+
+	public void setMaxIterations(int maxIterations) {
+		this.maxIterations = maxIterations;
 	}
 	
 }
