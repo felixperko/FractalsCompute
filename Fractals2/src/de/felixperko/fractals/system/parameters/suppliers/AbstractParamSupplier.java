@@ -1,20 +1,31 @@
 package de.felixperko.fractals.system.parameters.suppliers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 
+@JsonPropertyOrder({"type", "name", "attr"})
 public abstract class AbstractParamSupplier implements ParamSupplier {
+
+	static final int ATTR_CHANGED = 1 << 0;
+	static final int ATTR_SYSTEM_RELEVANT = 1 << 2;
+	static final int ATTR_LAYER_RELEVANT = 1 << 3;
+	static final int ATTR_VIEW_RELEVANT = 1 << 4;
 	
 	private static final long serialVersionUID = -7127742325514423406L;
 	
 	String name;
 	
+	@JsonIgnore
 	boolean systemRelevant = false;
+	@JsonIgnore
 	boolean layerRelevant = false;
+	@JsonIgnore
 	boolean viewRelevant = false;
-	
+
+	@JsonIgnore
 	protected boolean changed = false;
 	
 	public AbstractParamSupplier(String name) {
@@ -102,5 +113,20 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 		if (cls.isInstance(object))
 			return (C)object;
 		throw new IllegalArgumentException("object can't be cast to class");
+	}
+	
+	public void setAttr(int state) {
+		changed = (state & ATTR_CHANGED) > 0 ? true : false;
+		systemRelevant = (state & ATTR_SYSTEM_RELEVANT) > 0 ? true : false;
+		layerRelevant = (state & ATTR_LAYER_RELEVANT) > 0 ? true : false;
+		viewRelevant = (state & ATTR_VIEW_RELEVANT) > 0 ? true : false;
+	}
+	
+	public int getAttr() {
+		int val = changed ? ATTR_CHANGED : 0;
+		val |= systemRelevant ? ATTR_SYSTEM_RELEVANT : 0;
+		val |= layerRelevant ? ATTR_LAYER_RELEVANT : 0;
+		val |= viewRelevant ? ATTR_VIEW_RELEVANT : 0;
+		return val;
 	}
 }

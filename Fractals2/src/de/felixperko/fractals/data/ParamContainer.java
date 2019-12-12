@@ -10,6 +10,7 @@ import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -18,6 +19,10 @@ import java.util.Map.Entry;
 
 import org.xerial.snappy.Snappy;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
@@ -55,41 +60,37 @@ public class ParamContainer implements Serializable{
 		BfLayerList layerList = new BfLayerList(layers);
 		container.addClientParameter(new StaticParamSupplier("layers", layerList));
 		
-		ObjectMapper mapper = new ObjectMapper();
-		
 		try {
-			
-			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-			mapper.writerWithDefaultPrettyPrinter().writeValue(outputStream, container);
-			
-			
-			String str = new String(outputStream.toByteArray());
-			StringReader umLayer2Reader = new StringReader(str);
-			
-			ParamContainer c2 = mapper.readValue(str.getBytes(), ParamContainer.class);
-			
-			System.out.println(str);
-			
-			byte[] arr = Snappy.compress(str, Charset.forName("UTF-8"));
-			System.out.println(str.length());
-			System.out.println(arr.length);
-			
-			System.out.println(new String(Base64.getEncoder().encode(arr)));
-			
-		} catch (Exception e) {
+			System.out.println(container.serializeJson(false));
+			System.out.println(container.serializeJson(true));
+			System.out.println(container.serializeJsonCompressedBase64());
+			System.out.println(deserializeJsonCompressedBase64(container.serializeJsonCompressedBase64()).serializeJson(true));
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
 	}
 	
-	public static ParamContainer deserializeBase64(String base64) throws IOException, ClassNotFoundException{
+	public static ParamContainer deserializeObjectBase64(String base64) throws IOException, ClassNotFoundException{
 		ByteArrayInputStream in = new ByteArrayInputStream(Base64.getDecoder().decode(base64));
 		ObjectInputStream ois = new ObjectInputStream(in);
 		Object object = ois.readObject();
 		if (!(object instanceof ParamContainer))
 			throw new IllegalArgumentException("Serialized object isn't ParamContainer but "+object.getClass().getName());
 		return (ParamContainer)object;
+	}
+	
+	public static ParamContainer deserializeJsonCompressedBase64(String jsonCompressedBase64) throws JsonParseException, JsonMappingException, IOException {
+		return deserializeJsonCompressed(Base64.getDecoder().decode(jsonCompressedBase64));
+	}
+	
+	public static ParamContainer deserializeJsonCompressed(byte[] compressedJson) throws JsonParseException, JsonMappingException, IOException {
+		String uncompressed = Snappy.uncompressString(compressedJson, Charset.forName(UTF8));
+		return deserializeJson(uncompressed);
+	}
+	
+	public static ParamContainer deserializeJson(String json) throws JsonParseException, JsonMappingException, IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		return mapper.readValue(json.getBytes(), ParamContainer.class);
 	}
 
 	private static final long serialVersionUID = 2325163791938639608L;
@@ -179,16 +180,27 @@ public class ParamContainer implements Serializable{
 	public ParamSupplier getClientParameter(String name) {
 		return clientParameters.get(name);
 	}
-
+	
+	@JsonIgnore
 	public Map<String, ParamSupplier> getClientParameters() {
 		return clientParameters;
 	}
 
+	@JsonIgnore
 	public void setClientParameters(Map<String, ParamSupplier> clientParameters) {
 		this.clientParameters = clientParameters;
 	}
 	
-	public String serializeBase64() throws IOException{
+	public Collection<ParamSupplier> getParameters(){
+		return clientParameters.values();
+	}
+	
+	public void setParameters(Collection<ParamSupplier> parameters) {
+		for (ParamSupplier supplier : parameters)
+			clientParameters.put(supplier.getName(), supplier);
+	}
+	
+	public String serializeObjectBase64() throws IOException{
 		ByteArrayOutputStream out = null;
         ObjectOutputStream oos = null;
         out = new ByteArrayOutputStream();
@@ -196,6 +208,21 @@ public class ParamContainer implements Serializable{
         oos.writeObject(this);
         oos.close();
 		return new String(Base64.getEncoder().encode(out.toByteArray()), UTF8);
+	}
+	
+	public String serializeJson(boolean pretty) throws JsonProcessingException {
+		ObjectMapper mapper = new ObjectMapper();
+		if (pretty)
+			return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
+		return mapper.writeValueAsString(this);
+	}
+	
+	public byte[] serializeJsonCompressed() throws IOException {
+		return Snappy.compress(serializeJson(false), Charset.forName(UTF8));
+	}
+	
+	public String serializeJsonCompressedBase64() throws IOException {
+		return new String(Base64.getEncoder().encode(serializeJsonCompressed()));
 	}
 
 }

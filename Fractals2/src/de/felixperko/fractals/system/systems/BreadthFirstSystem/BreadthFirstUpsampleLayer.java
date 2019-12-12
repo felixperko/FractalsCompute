@@ -5,7 +5,7 @@ import java.util.BitSet;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import de.felixperko.fractals.system.parameters.suppliers.JsonObjectDeserializer;
+import de.felixperko.fractals.util.serialization.jackson.JsonObjectDeserializer;
 
 @JsonTypeName("bfUpsampleLayer")
 @JsonDeserialize(as = BreadthFirstUpsampleLayer.class)

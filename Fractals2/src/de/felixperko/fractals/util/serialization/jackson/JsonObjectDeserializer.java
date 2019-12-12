@@ -1,7 +1,9 @@
-package de.felixperko.fractals.system.parameters.suppliers;
+package de.felixperko.fractals.util.serialization.jackson;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -41,8 +43,24 @@ public class JsonObjectDeserializer extends JsonDeserializer<Object> {
 			throws IOException, JsonProcessingException {
 		
 		ObjectCodec codec = jp.getCodec();
-		ObjectNode node = codec.readTree(jp);			
 		
+		JsonNode node = codec.readTree(jp);
+		
+		if (node instanceof ArrayNode) {
+			ArrayNode arrNode = (ArrayNode)node;
+			List<Object> objects = new ArrayList<>();
+			for (JsonNode n : node) {
+				objects.add(deserializeNode(n, codec, jp));
+			}
+			return objects;
+		}
+		
+		return deserializeNode(node, codec, jp);
+		
+	}
+	
+	private Object deserializeNode(JsonNode node, ObjectCodec codec, JsonParser jp) throws JsonProcessingException {
+
 		String type;
 		try {
 			//type = (String)jp.getValueAsString("type");

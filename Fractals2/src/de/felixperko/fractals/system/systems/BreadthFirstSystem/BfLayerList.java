@@ -17,22 +17,23 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import de.felixperko.fractals.system.parameters.suppliers.JsonAbstractTypedObject;
-import de.felixperko.fractals.system.parameters.suppliers.JsonTypedObject;
 import de.felixperko.fractals.system.task.Layer;
+import de.felixperko.fractals.util.serialization.jackson.JsonAbstractTypedObject;
+import de.felixperko.fractals.util.serialization.jackson.JsonObjectDeserializer;
+import de.felixperko.fractals.util.serialization.jackson.JsonTypedObject;
 
 public class BfLayerList extends JsonAbstractTypedObject{
 
 	public static final String TYPE_NAME = "bfLayerList";
 	
-	@JsonTypeInfo(
-		    use = JsonTypeInfo.Id.NAME,
-		    include = JsonTypeInfo.As.PROPERTY,
-		    property = "@type")
-	@JsonSubTypes({
-	    @Type(value = BreadthFirstLayer.class),
-	    @Type(value = BreadthFirstUpsampleLayer.class)})
-	@JsonDeserialize(using = BfLayerListDeserializer.class)
+//	@JsonTypeInfo(
+//		    use = JsonTypeInfo.Id.NAME,
+//		    include = JsonTypeInfo.As.PROPERTY,
+//		    property = "type")
+//	@JsonSubTypes({
+//	    @Type(value = BreadthFirstLayer.class, name = BreadthFirstLayer.TYPE_NAME),
+//	    @Type(value = BreadthFirstUpsampleLayer.class, name = BreadthFirstUpsampleLayer.TYPE_NAME)})
+	@JsonDeserialize(using = JsonObjectDeserializer.class)
 	List<Layer> layers;
 
 	public BfLayerList() {

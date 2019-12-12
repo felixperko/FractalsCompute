@@ -1,4 +1,4 @@
-package de.felixperko.fractals.system.parameters.suppliers;
+package de.felixperko.fractals.util.serialization.jackson;
 
 public interface JsonTypedObject {
 	

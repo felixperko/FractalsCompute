@@ -1,9 +1,11 @@
 package de.felixperko.fractals.system.parameters.suppliers;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
+import de.felixperko.fractals.util.serialization.jackson.JsonObjectDeserializer;
 
 public class StaticParamSupplier extends AbstractParamSupplier {
 	
@@ -47,7 +49,6 @@ public class StaticParamSupplier extends AbstractParamSupplier {
 			return !((StaticParamSupplier)old).obj.equals(obj);
 		}
 	}
-
 	
 	@Override
 	public int hashCode() {

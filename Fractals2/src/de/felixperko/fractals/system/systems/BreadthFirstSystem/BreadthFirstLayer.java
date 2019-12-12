@@ -2,8 +2,9 @@ package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
 import java.util.BitSet;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import de.felixperko.fractals.system.parameters.suppliers.JsonAbstractTypedObject;
+
 import de.felixperko.fractals.system.task.Layer;
+import de.felixperko.fractals.util.serialization.jackson.JsonAbstractTypedObject;
 
 public class BreadthFirstLayer extends JsonAbstractTypedObject implements Layer {
 	

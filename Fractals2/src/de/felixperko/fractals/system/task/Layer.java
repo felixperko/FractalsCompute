@@ -14,16 +14,6 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstLayer;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
 
-@JsonTypeInfo(
-	    use = JsonTypeInfo.Id.NAME,
-	    include = JsonTypeInfo.As.PROPERTY,
-	    property = "@type")
-@JsonSubTypes({
-    @Type(value = BreadthFirstLayer.class, name = "bfLayer"),
-    @Type(value = BreadthFirstUpsampleLayer.class, name = "bfUpsampleLayer") })
-//@JsonTypeInfo(
-//	    use = JsonTypeInfo.Id.NAME,
-//	    include = JsonTypeInfo.As.WRAPPER_OBJECT)
 public interface Layer extends Serializable{
 	
 	int getId();
