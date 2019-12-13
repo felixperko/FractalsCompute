@@ -3,14 +3,18 @@ package de.felixperko.fractals.system.numbers;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 
-public class NumberFactory implements Serializable{
+import de.felixperko.fractals.util.serialization.jackson.JsonAbstractTypedObject;
+
+public class NumberFactory extends JsonAbstractTypedObject implements Serializable{
 	
 	private static final long serialVersionUID = 2762024579658361740L;
+	public static final String TYPE_NAME = "numberFactory";
 	
 	Class<? extends Number> numberClass;
 	Class<? extends ComplexNumber> complexNumberClass;
 	
 	public NumberFactory(Class<? extends Number> numberClass, Class<? extends ComplexNumber> complexNumberClass) {
+		super(TYPE_NAME);
 		this.numberClass = numberClass;
 		this.complexNumberClass = complexNumberClass;
 	}

@@ -25,6 +25,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import de.felixperko.fractals.system.PadovanLayerConfiguration;
+import de.felixperko.fractals.system.numbers.impl.DoubleComplexNumber;
+import de.felixperko.fractals.system.numbers.impl.DoubleNumber;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BfLayerList;
@@ -57,8 +60,9 @@ public class ParamContainer implements Serializable{
 		BreadthFirstLayer layer2 = new BreadthFirstUpsampleLayer(4, 256).with_culling(true).with_rendering(true).with_priority_shift(10);
 		layers.add(layer);
 		layers.add(layer2);
-		BfLayerList layerList = new BfLayerList(layers);
-		container.addClientParameter(new StaticParamSupplier("layers", layerList));
+		PadovanLayerConfiguration layerConfig = new PadovanLayerConfiguration(layers);
+		container.addClientParameter(new StaticParamSupplier("midpoint", new DoubleComplexNumber(1,2)));
+		container.addClientParameter(new StaticParamSupplier("layerConfiguration", layerConfig));
 		
 		try {
 			System.out.println(container.serializeJson(false));

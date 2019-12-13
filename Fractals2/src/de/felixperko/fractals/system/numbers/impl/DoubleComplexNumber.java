@@ -12,11 +12,14 @@ import de.felixperko.fractals.system.numbers.AbstractComplexNumber;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.parameters.suppliers.Copyable;
 import de.felixperko.fractals.util.NumberUtil;
+import de.felixperko.fractals.util.serialization.jackson.JsonValueWrapper;
 
 public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, DoubleComplexNumber> implements Copyable<DoubleComplexNumber>{
 	
 	private static final long serialVersionUID = -6625226042922366712L;
 	private static final Logger LOG = LoggerFactory.getLogger(DoubleComplexNumber.class);
+	
+	private static final String SEPARATOR = ",";
 	
 	public static void main(String[] args) {
 		DoubleComplexNumber val = new DoubleComplexNumber(1.1, 0);
@@ -54,6 +57,12 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 	public DoubleComplexNumber(double real, double imag) {
 		this.real = real;
 		this.imag = imag;
+	}
+	
+	public DoubleComplexNumber(String valueString) {
+		String[] str = valueString.split(",");
+		this.real = Double.parseDouble(str[0]);
+		this.imag = Double.parseDouble(str[1]);
 	}
 
 	@Override
@@ -199,7 +208,7 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 	
 	@Override
 	public String toString() {
-		return real+","+imag;
+		return real+SEPARATOR+imag;
 	}
 
 	@Override
@@ -281,7 +290,6 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 		return real == other.real && imag == other.imag;
 	}
 
-	
 	@Override
 	public void complexConjugate() {
 		imag = -imag;

@@ -7,17 +7,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.felixperko.fractals.system.systems.infra.ViewData;
+import de.felixperko.fractals.util.serialization.jackson.JsonAbstractTypedObject;
 
-public class ArrayChunkFactory implements Serializable{
+public class ArrayChunkFactory extends JsonAbstractTypedObject implements Serializable{
 	
 	private static final long serialVersionUID = 2001744194301335070L;
 	private static final Logger LOG = LoggerFactory.getLogger(ArrayChunkFactory.class);
+	public static final String TYPE_NAME = "arrayChunkFactory";
 	
 	int dimensionSize;
 	Class<? extends AbstractArrayChunk> chunkClass;
 	transient ViewData viewData = null;
 	
 	public ArrayChunkFactory(Class<? extends AbstractArrayChunk> chunkClass, int dimensionSize) {
+		super(TYPE_NAME);
 		this.chunkClass = chunkClass;
 		this.dimensionSize = dimensionSize;
 	}

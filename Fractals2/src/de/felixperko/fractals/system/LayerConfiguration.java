@@ -7,10 +7,15 @@ import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.NumberFactory;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.util.NumberUtil;
+import de.felixperko.fractals.util.serialization.jackson.JsonAbstractTypedObject;
+import de.felixperko.fractals.util.serialization.jackson.JsonObjectDeserializer;
 
 /**
  * Manages layers for a system.
@@ -18,7 +23,7 @@ import de.felixperko.fractals.util.NumberUtil;
  * prepare() has to be called before getOffsets()
  */
 
-public class LayerConfiguration implements Serializable{
+public class LayerConfiguration extends JsonAbstractTypedObject implements Serializable{
 	
 	private static final Logger LOG = LoggerFactory.getLogger(LayerConfiguration.class);
 	static long preparedTimeout = (long)(1./NumberUtil.NS_TO_MS);
@@ -37,11 +42,16 @@ public class LayerConfiguration implements Serializable{
 //	}
 	
 	private static final long serialVersionUID = -5299508995009860459L;
+	public static final String TYPE_NAME = "layerConfig";
 
+	@JsonIgnore
 	boolean debug = false;
-	
+
+	@JsonIgnore
 	transient ComplexNumber[] offsets;
+	@JsonIgnore
 	NumberFactory numberFactory;
+	@JsonIgnore
 	transient boolean prepared = false;
 	
 	transient int[] firstSampleOfLayer;
@@ -49,18 +59,35 @@ public class LayerConfiguration implements Serializable{
 	
 	
 //	static Color[] layerColors = new Color[] {new Color(1f, 0, 0), new Color(0f, 1f, 0f), new Color(0.0f,1f,1f), new Color(1f, 0f, 1f), new Color(1f, 1f, 0f)};
-	
+
+	@JsonDeserialize(using = JsonObjectDeserializer.class)
 	List<Layer> layers;
 	double simStep;
 	int simCount;
 	long seed;
 	
-
 	public LayerConfiguration(List<Layer> layers, double simStep, int simCount, long seed) {
+		super(TYPE_NAME);
 		this.layers = layers;
 		this.simStep = simStep;
 		this.simCount = simCount;
 		this.seed = seed;
+	}
+	
+	public LayerConfiguration(String typename, List<Layer> layers, double simStep, int simCount, long seed) {
+		super(typename);
+		this.layers = layers;
+		this.simStep = simStep;
+		this.simCount = simCount;
+		this.seed = seed;
+	}
+	
+	public LayerConfiguration(String typename) {
+		super(typename);
+	}
+	
+	public LayerConfiguration() {
+		super(TYPE_NAME);
 	}
 	
 	public void setDebug(boolean debug) {
@@ -293,6 +320,10 @@ public class LayerConfiguration implements Serializable{
 		return layers;
 	}
 
+	public void setLayers(List<Layer> layers) {
+		setLayers(layers, false);
+	}
+
 	public void setLayers(List<Layer> layers, boolean prepare) {
 		this.prepared = false;
 		this.layers = layers;
@@ -327,7 +358,6 @@ public class LayerConfiguration implements Serializable{
 	public Layer getLayer(int layerId) {
 		return layers.get(layerId);
 	}
-
 	
 	public ComplexNumber getOffsetForSample(int sample) {
 		if (!prepared)

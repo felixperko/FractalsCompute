@@ -1,6 +1,7 @@
 package de.felixperko.fractals.system.numbers.impl;
 import de.felixperko.fractals.system.numbers.Number;
 import de.felixperko.fractals.system.parameters.suppliers.Copyable;
+import de.felixperko.fractals.util.serialization.jackson.JsonValueWrapper;
 
 public class DoubleNumber implements Number<DoubleNumber>, Copyable<DoubleNumber> {
 
@@ -76,5 +77,10 @@ public class DoubleNumber implements Number<DoubleNumber>, Copyable<DoubleNumber
 		if (!(obj instanceof Number))
 			return false;
 		return ((Number)obj).toDouble() == value;
+	}
+
+	@Override
+	public JsonValueWrapper toWrappedValue() {
+		return new JsonValueWrapper(this);
 	}
 }

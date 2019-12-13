@@ -13,6 +13,7 @@ import de.felixperko.fractals.system.task.Layer;
 public class PadovanLayerConfiguration extends LayerConfiguration {
 	
 	private static final long serialVersionUID = 7949407215148091003L;
+	public static final String TYPE_NAME = "padovanLayerConfig";
 	
 //	public static void main(String[] args) {
 //		List<Layer> list = new ArrayList<>();
@@ -29,7 +30,11 @@ public class PadovanLayerConfiguration extends LayerConfiguration {
 //	}
 
 	public PadovanLayerConfiguration(List<Layer> layers) {
-		super(layers, 0, 0, 0);
+		super(TYPE_NAME, layers, 0, 0, 0);
+	}
+	
+	public PadovanLayerConfiguration() {
+		super(TYPE_NAME);
 	}
 	
 	@Override

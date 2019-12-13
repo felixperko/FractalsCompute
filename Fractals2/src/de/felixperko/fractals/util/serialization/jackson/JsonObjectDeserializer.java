@@ -19,6 +19,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import de.felixperko.fractals.data.ArrayChunkFactory;
+import de.felixperko.fractals.system.LayerConfiguration;
+import de.felixperko.fractals.system.PadovanLayerConfiguration;
+import de.felixperko.fractals.system.numbers.Number;
+import de.felixperko.fractals.system.numbers.NumberFactory;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BfLayerList;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstLayer;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
@@ -31,7 +36,10 @@ public class JsonObjectDeserializer extends JsonDeserializer<Object> {
 	static {
 		addClass(BreadthFirstLayer.TYPE_NAME, BreadthFirstLayer.class);
 		addClass(BreadthFirstUpsampleLayer.TYPE_NAME, BreadthFirstUpsampleLayer.class);
-		addClass(BfLayerList.TYPE_NAME, BfLayerList.class);
+		addClass(LayerConfiguration.TYPE_NAME, LayerConfiguration.class);
+		addClass(PadovanLayerConfiguration.TYPE_NAME, PadovanLayerConfiguration.class);
+		addClass(ArrayChunkFactory.TYPE_NAME, ArrayChunkFactory.class);
+		addClass(NumberFactory.TYPE_NAME, NumberFactory.class);
 	}
 	
 	public static void addClass(String name, Class<? extends JsonTypedObject> cls) {
@@ -50,33 +58,40 @@ public class JsonObjectDeserializer extends JsonDeserializer<Object> {
 			ArrayNode arrNode = (ArrayNode)node;
 			List<Object> objects = new ArrayList<>();
 			for (JsonNode n : node) {
-				objects.add(deserializeNode(n, codec, jp));
+				objects.add(deserializeNode(n, codec, jp, ctxt));
 			}
 			return objects;
 		}
 		
-		return deserializeNode(node, codec, jp);
+		return deserializeNode(node, codec, jp, ctxt);
 		
 	}
 	
-	private Object deserializeNode(JsonNode node, ObjectCodec codec, JsonParser jp) throws JsonProcessingException {
+	private Object deserializeNode(JsonNode node, ObjectCodec codec, JsonParser jp, DeserializationContext ctxt) throws IOException {
 
 		String type;
 		try {
-			//type = (String)jp.getValueAsString("type");
 			type = (String)node.get("type").asText();
-			//node.get("layers").get("type").asText();
 		} catch (NullPointerException e) {
-			LOG.warn("couldn't deserialize object at "+jp.getCurrentValue().getClass().getName());
-			return codec.treeToValue(node, Object.class);
+			return decode(jp, codec, node, null);
+		}
+		
+		if (type.equals(JsonValueWrapper.TYPE_NAME)) {
+			//Class<?> clsName = (Class<?>) ctxt.readValue(jp, Class.class);
+			Class<?> cls = (Class<?>) decode(jp, codec, node.get("cls"), Class.class);
+			return decode(jp, codec, node.get("val"), cls);
 		}
 		
 		Class<? extends JsonTypedObject> cls = availableClasses.get(type);
-		if (cls != null) {
-			return codec.treeToValue(node, cls);
+		return decode(jp, codec, node, cls);
+	}
+	
+	private Object decode(JsonParser jp, ObjectCodec codec, JsonNode node, Class<?> cls) throws JsonProcessingException {
+		if (cls == null || cls == Object.class) {
+			LOG.warn("couldn't deserialize object at "+jp.getCurrentValue().getClass().getName());
+			return codec.treeToValue(node, Object.class);
 		}
-		LOG.warn("couldn't deserialize object at "+jp.getCurrentValue().getClass().getName());
-		return codec.treeToValue(node, Object.class);
+		return codec.treeToValue(node, cls);
 	}
 
 }

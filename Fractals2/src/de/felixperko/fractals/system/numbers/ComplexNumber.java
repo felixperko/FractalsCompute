@@ -2,6 +2,10 @@ package de.felixperko.fractals.system.numbers;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
+import de.felixperko.fractals.util.serialization.jackson.JsonValueWrapper;
+
 public interface ComplexNumber<NUMBER extends Number<NUMBER>, COMPLEX extends ComplexNumber<NUMBER, COMPLEX>> extends Serializable{
 	public NUMBER abs();
 	public double absDouble();
@@ -23,4 +27,6 @@ public interface ComplexNumber<NUMBER extends Number<NUMBER>, COMPLEX extends Co
 	public NUMBER getReal();
 	public NUMBER getImag();
 	public void square();
+	@JsonValue
+	public JsonValueWrapper toWrappedValue();
 }
