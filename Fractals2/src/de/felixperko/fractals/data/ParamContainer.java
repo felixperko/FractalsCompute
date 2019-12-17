@@ -6,17 +6,17 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xerial.snappy.Snappy;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -27,17 +27,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.felixperko.fractals.system.PadovanLayerConfiguration;
 import de.felixperko.fractals.system.numbers.impl.DoubleComplexNumber;
-import de.felixperko.fractals.system.numbers.impl.DoubleNumber;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
-import de.felixperko.fractals.system.systems.BreadthFirstSystem.BfLayerList;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstLayer;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
 import de.felixperko.fractals.system.task.Layer;
 
 public class ParamContainer implements Serializable{
 	
-	final static String UTF8 = "UTF-8";
+	private static final Logger LOG = LoggerFactory.getLogger(ParamContainer.class);
+	private final static String UTF8 = "UTF-8";
 	
 //	public static void main(String[] args) {
 //		ParamContainer container = new ParamContainer();
@@ -119,30 +118,32 @@ public class ParamContainer implements Serializable{
 			}
 		}
 	}
-	
+
+	/**
+	 * Applies the given parameters to this container. old values are overwritten and the changed property is updated.
+	 * @param paramContainer - the container to take the new values from
+	 * @param onlyOverrideExisting
+	 */
 	public void applyParams(ParamContainer copyContainer, boolean onlyOverrideExisting) {
 		for (Entry<String, ParamSupplier> e : copyContainer.getClientParameters().entrySet()) {
 			String name = e.getKey();
-			if (!onlyOverrideExisting || this.clientParameters.containsKey(name))
-				this.clientParameters.put(name, e.getValue().copy());
+			ParamSupplier oldSupplier = this.clientParameters.get(name);
+			ParamSupplier newSupplier = e.getValue().copy();
+			if (oldSupplier != null) {
+				newSupplier.updateChanged(oldSupplier);
+			}
+			if (oldSupplier != null || !onlyOverrideExisting) {
+				this.clientParameters.put(name, newSupplier);
+			}
 		}
 	}
 	
-	public void applyParams(ParamContainer copyContainer, HashSet<String> overrideParamNames) {
+	public void applyParams(ParamContainer copyContainer, Collection<String> overrideParamNames) {
 		for (Entry<String, ParamSupplier> e : copyContainer.getClientParameters().entrySet()) {
 			String name = e.getKey();
 			if (overrideParamNames.contains(name))
 				this.clientParameters.put(name, e.getValue().copy());
 		}
-	}
-	
-	public ParamContainer getSubContainer(HashSet<String> includeParamNames) {
-		HashMap<String, ParamSupplier> map = new HashMap<>();
-		for (String name : includeParamNames) {
-			if (clientParameters.containsKey(name))
-				map.put(name, clientParameters.get(name).copy());
-		}
-		return new ParamContainer(map);
 	}
 
 	public boolean needsReset(Map<String, ParamSupplier> oldParams){
@@ -159,12 +160,38 @@ public class ParamContainer implements Serializable{
 		return reset;
 	}
 	
+	/**
+	 * Creates a ParamContainer, applying values of includeParams; copies if newInstances is true
+	 * @param newInstances true -> copy ParamSuppliers; false -> applies the same ParamSupplier objects
+	 * @param includeParams The parameters to apply to the new ParamContainer
+	 * @return
+	 */
+	public ParamContainer createSubContainer(boolean newInstances, String... includeParams) {
+		ParamContainer container = new ParamContainer();
+		for (String paramName : includeParams) {
+			ParamSupplier paramSupplier = this.clientParameters.get(paramName);
+			if (paramSupplier != null) {
+				container.addClientParameter(newInstances ? paramSupplier.copy() : paramSupplier);
+			} else {
+				LOG.warn("Tried to include sub ParamCountainer with missing parameter "+paramName);
+			}
+		}
+		return container;
+	}
+	
 	public void applyParams(ParamContainer paramContainer) {
+		
 		Map<String, ParamSupplier> old = getClientParameters();
 		this.clientParameters = new HashMap<>(paramContainer.getClientParameters());
-		for (String key : old.keySet())
-			if (!this.clientParameters.containsKey(key))
-				this.clientParameters.put(key, old.get(key).copy());
+		
+		for (String key : old.keySet()) {
+			ParamSupplier oldSupplier = old.get(key);
+			ParamSupplier newSupplier = this.getClientParameter(key);
+			if (newSupplier != null)
+				newSupplier.updateChanged(oldSupplier);
+			else //readd old values
+				this.clientParameters.put(key, oldSupplier.copy());				
+		}
 	}
 	
 	public boolean applyParamsAndNeedsReset(ParamContainer paramContainer) {
