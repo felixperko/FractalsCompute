@@ -219,7 +219,10 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			return false;
 		for (Integer i = lastTimeslice-1 ; i < timeslice ; i++) {
 			int totalIterationsPerSecond = 0;
-			for (CalculateFractalsThread thread : threadManager.getCalculateThreads()) {
+			List<CalculateFractalsThread> threads = threadManager.getCalculateThreads();
+			int[] ips_threads = new int[threads.size()];
+			int i2 = 0;
+			for (CalculateFractalsThread thread : threads) {
 				String name = thread.getName();
 				//TODO just for debug
 				int iterations = thread.getTimesliceIterations(i, false);
@@ -227,8 +230,12 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				int iterationsPerSecond = iterations * (int)Math.round(1d/ServerThreadManager.TIMESLICE_INTERVAL);
 				totalIterationsPerSecond += iterationsPerSecond;
 				LOG.debug("IPS "+timeslice+" of "+name+"): "+iterationsPerSecond);
+				ips_threads[i2] = iterationsPerSecond;
+				i2++;
 			}
 			LOG.info("IPS "+timeslice+" (total):"+totalIterationsPerSecond);
+			getSystem().getSystemStateInfo().updateIterationsPerSecond(timeslice, 
+					timesliceProvider.getStartTime(timeslice), timesliceProvider.getEndTime(timeslice), totalIterationsPerSecond, ips_threads);
 		}
 		lastTimeslice = timeslice;
 		return true;

@@ -25,6 +25,7 @@ public class SystemStateInfo implements Serializable{
 	MappedSharedData<TaskStateUpdate> taskStateChanges = new MappedSharedData<TaskStateUpdate>("taskStates", true);
 	MappedSharedData<ComplexNumberUpdate> currentMidpointData = new MappedSharedData<ComplexNumberUpdate>("currentMidpoint", false);
 	ContinuousSharedData<ComplexNumberListUpdate> currentTraces = new ContinuousSharedData<ComplexNumberListUpdate>("currentTraces", true);
+	ContinuousSharedData<IterationsPerSecondUpdate> iterationsPerSecond = new ContinuousSharedData<IterationsPerSecondUpdate>("iterationsPerSecond", true);
 	
 	ServerStateInfo serverStateInfo;
 	
@@ -92,12 +93,17 @@ public class SystemStateInfo implements Serializable{
 	public void updateTraces(List<ComplexNumber> traces) {
 		currentTraces.update(new ComplexNumberListUpdate(traces));
 	}
+	
+	public void updateIterationsPerSecond(int timeslice, long startTime, long endTime, int ips_total, int[] ips_threads) {
+		iterationsPerSecond.update(new IterationsPerSecondUpdate(timeslice, startTime, endTime, ips_total, ips_threads));
+	}
 
 	public List<DataContainer> getSharedDataUpdates(Connection connection) {
 		List<DataContainer> list = new ArrayList<>();
 		taskStateChanges.getUpdatesAppendList(connection, list);
 		currentMidpointData.getUpdatesAppendList(connection, list);
 		currentTraces.getUpdatesAppendList(connection, list);
+		iterationsPerSecond.getUpdatesAppendList(connection, list);
 		return list;
 	}
 }
