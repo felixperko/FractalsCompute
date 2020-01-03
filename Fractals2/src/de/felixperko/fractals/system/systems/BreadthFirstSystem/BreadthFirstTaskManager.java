@@ -229,11 +229,11 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 //				int iterations = thread.getTimesliceIterations(i, i == timeslice-1);
 				int iterationsPerSecond = iterations * (int)Math.round(1d/ServerThreadManager.TIMESLICE_INTERVAL);
 				totalIterationsPerSecond += iterationsPerSecond;
-				LOG.debug("IPS "+timeslice+" of "+name+"): "+iterationsPerSecond);
+				LOG.debug("IPS "+timeslice+" of "+name+"):	"+iterationsPerSecond);
 				ips_threads[i2] = iterationsPerSecond;
 				i2++;
 			}
-			LOG.info("IPS "+timeslice+" (total):"+totalIterationsPerSecond);
+			LOG.info("IPS "+timeslice+" (total):	"+totalIterationsPerSecond);
 			getSystem().getSystemStateInfo().updateIterationsPerSecond(timeslice, 
 					timesliceProvider.getStartTime(timeslice), timesliceProvider.getEndTime(timeslice), totalIterationsPerSecond, ips_threads);
 		}

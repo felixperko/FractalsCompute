@@ -3,6 +3,7 @@ package de.felixperko.fractals.network.threads;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.io.StreamCorruptedException;
 import java.net.SocketException;
 
 import org.slf4j.Logger;
@@ -81,6 +82,8 @@ public class ListenThread extends AbstractFractalsThread {
 				setCloseConnection(true);
 				if (writeThread.getConnection() instanceof ClientConnection)
 					((ServerManagers)managers).getServerNetworkManager().removeClient(writeThread.getConnection());
+			} catch(StreamCorruptedException e) {
+				throw new IllegalStateException("Inputstream corrupted");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
