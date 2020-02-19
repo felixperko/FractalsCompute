@@ -17,7 +17,6 @@ import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xerial.snappy.Snappy;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -32,6 +31,7 @@ import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstLayer;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
 import de.felixperko.fractals.system.task.Layer;
+import de.felixperko.fractals.util.serialization.Compression;
 
 public class ParamContainer implements Serializable{
 	
@@ -87,7 +87,7 @@ public class ParamContainer implements Serializable{
 	}
 	
 	public static ParamContainer deserializeJsonCompressed(byte[] compressedJson) throws JsonParseException, JsonMappingException, IOException {
-		String uncompressed = Snappy.uncompressString(compressedJson, Charset.forName(UTF8));
+		String uncompressed = Compression.uncompressString(compressedJson, Charset.forName(UTF8));
 		return deserializeJson(uncompressed);
 	}
 	
@@ -249,7 +249,7 @@ public class ParamContainer implements Serializable{
 	}
 	
 	public byte[] serializeJsonCompressed() throws IOException {
-		return Snappy.compress(serializeJson(false), Charset.forName(UTF8));
+		return Compression.compress(serializeJson(false), Charset.forName(UTF8));
 	}
 	
 	public String serializeJsonCompressedBase64() throws IOException {
