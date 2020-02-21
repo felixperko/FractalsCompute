@@ -10,12 +10,11 @@ import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xerial.snappy.BitShuffle;
-import org.xerial.snappy.Snappy;
 
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.task.FractalsTask;
 import de.felixperko.fractals.util.NumberUtil;
+import de.felixperko.fractals.util.serialization.Compression;
 
 public class CompressedChunk implements Serializable{
 	
@@ -85,12 +84,12 @@ public class CompressedChunk implements Serializable{
 					storedIterationsArray[counter++] = e.getValue();
 				}
 			}
-			storedIndices = Snappy.compress(BitShuffle.shuffle(storedIndicesArray));
-			storedIterations = Snappy.compress(BitShuffle.shuffle(storedIterationsArray));
+			storedIndices = Compression.compress(Compression.shuffle(storedIndicesArray));
+			storedIterations = Compression.compress(Compression.shuffle(storedIterationsArray));
 			
-			values_compressed = Snappy.compress(BitShuffle.shuffle(getUpsampledFloatArray(chunk.values)));
-			samples_compressed = Snappy.compress(getUpsampledByteArray(chunk.samples));
-			failedSamples_compressed = Snappy.compress(getUpsampledByteArray(chunk.failedSamples));
+			values_compressed = Compression.compress(Compression.shuffle(getUpsampledFloatArray(chunk.values)));
+			samples_compressed = Compression.compress(getUpsampledByteArray(chunk.samples));
+			failedSamples_compressed = Compression.compress(getUpsampledByteArray(chunk.failedSamples));
 			
 			//
 			// BorderData
@@ -128,7 +127,7 @@ public class CompressedChunk implements Serializable{
 						borderData_bytes[i] += (1 << j);
 			}
 			
-			borderData_compressed = Snappy.compress(borderData_bytes);
+			borderData_compressed = Compression.compress(borderData_bytes);
 //			borderData_compressed = new byte[0];
 			
 			double t = NumberUtil.getElapsedTimeInS(t1, 5);
@@ -157,14 +156,14 @@ public class CompressedChunk implements Serializable{
 	
 	public ReducedNaiveChunk decompress() {
 		try {
-			float[] values = BitShuffle.unshuffleFloatArray(Snappy.uncompress((values_compressed)));
-			byte[] samples = Snappy.uncompress(samples_compressed);
-			byte[] failedSamples = Snappy.uncompress(failedSamples_compressed);
+			float[] values = Compression.unshuffleFloatArray(Compression.uncompress((values_compressed)));
+			byte[] samples = Compression.uncompress(samples_compressed);
+			byte[] failedSamples = Compression.uncompress(failedSamples_compressed);
 			ReducedNaiveChunk chunk = new ReducedNaiveChunk(chunkX, chunkY, dimensionSize, getFullFloatArray(values), getFullByteArray(samples), getFullByteArray(failedSamples));
 			chunk.setJobId(jobId);
 			chunk.chunkPos = chunkPos;
 			
-			int[] storedIterationsArray = BitShuffle.unshuffleIntArray(Snappy.uncompress(storedIterations));
+			int[] storedIterationsArray = Compression.unshuffleIntArray(Compression.uncompress(storedIterations));
 			if (storedIterationsArray.length > 0) {
 				chunk.storedPositions = new HashMap<>();
 				chunk.storedIterations = new HashMap<>();
@@ -192,9 +191,9 @@ public class CompressedChunk implements Serializable{
 	
 	public AbstractArrayChunk decompressPacked() {
 		try {
-			float[] values = BitShuffle.unshuffleFloatArray(Snappy.uncompress((values_compressed)));
-			byte[] samples = Snappy.uncompress(samples_compressed);
-			byte[] failedSamples = Snappy.uncompress(failedSamples_compressed);
+			float[] values = Compression.unshuffleFloatArray(Compression.uncompress((values_compressed)));
+			byte[] samples = Compression.uncompress(samples_compressed);
+			byte[] failedSamples = Compression.uncompress(failedSamples_compressed);
 			AbstractArrayChunk chunk = new ReducedNaivePackedChunk(chunkX, chunkY, dimensionSize, values, samples, failedSamples, upsample);
 			chunk.setJobId(jobId);
 			chunk.chunkPos = chunkPos;
@@ -250,7 +249,7 @@ public class CompressedChunk implements Serializable{
 	private void decompressBorderData(AbstractArrayChunk chunk){
 		byte[] borderDataBytes;
 		try {
-			borderDataBytes = Snappy.uncompress(borderData_compressed);
+			borderDataBytes = Compression.uncompress(borderData_compressed);
 		} catch (IOException e) {
 			throw new IllegalStateException("Error while decompressing border data.");
 		}
