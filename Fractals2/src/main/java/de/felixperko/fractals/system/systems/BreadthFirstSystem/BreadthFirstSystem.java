@@ -66,9 +66,9 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		List<ParameterDefinition> defs_bf = new ArrayList<>();
 		defs_bf.add(new ParameterDefinition("zoom", "Position", StaticParamSupplier.class, numberType)
 				.withDescription("The current default coordinate zoom factor."));
-		defs_bf.add(new ParameterDefinition("width", "Position", StaticParamSupplier.class, integerType)
+		defs_bf.add(new ParameterDefinition("width", "Automatic", StaticParamSupplier.class, integerType)
 				.withDescription("The calculation width."));
-		defs_bf.add(new ParameterDefinition("height", "Position", StaticParamSupplier.class, integerType)
+		defs_bf.add(new ParameterDefinition("height", "Automatic", StaticParamSupplier.class, integerType)
 				.withDescription("The calculation height."));
 		
 		defs_bf.add(new ParameterDefinition("limit", "Advanced", StaticParamSupplier.class, doubleType)

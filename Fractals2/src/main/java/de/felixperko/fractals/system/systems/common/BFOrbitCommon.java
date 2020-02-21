@@ -54,10 +54,10 @@ public class BFOrbitCommon {
 		varList.add(CoordinateBasicShiftParamSupplier.class);
 
 		List<ParameterDefinition> defs = new ArrayList<>();
-		defs.add(new ParameterDefinition("iterations", "Basic", StaticParamSupplier.class, integerType)
+		defs.add(new ParameterDefinition("iterations", "Calculator", StaticParamSupplier.class, integerType)
 				.withDescription("The maximum number of iterations until a sample is marked as unsuccessful.\n"
 						+ "Increase to allow more black regions to be filled at the cost of slower computation."));
-		defs.add(new ParameterDefinition("calculator", "Basic", StaticParamSupplier.class, selectionType)
+		defs.add(new ParameterDefinition("calculator", "Calculator", StaticParamSupplier.class, selectionType)
 				.withDescription("Choose the calculator to render different fractals."));
 		
 		defs.add(new ParameterDefinition("midpoint", "Position", StaticParamSupplier.class, complexnumberType)
@@ -67,7 +67,7 @@ public class BFOrbitCommon {
 		
 		defs.add(new ParameterDefinition("chunkFactory", "Advanced", StaticParamSupplier.class, arraychunkfactoryType)
 				.withDescription("Details about the chunks, e.g. the size of used chunks."));
-		defs.add(new ParameterDefinition("systemName", "Advanced", StaticParamSupplier.class, selectionType)
+		defs.add(new ParameterDefinition("systemName", "Automatic", StaticParamSupplier.class, selectionType)
 				.withDescription("The internal calculation system to use for task management."));
 		defs.add(new ParameterDefinition("view", "Automatic", StaticParamSupplier.class, integerType)
 				.withDescription("The current view to calculate for."));
