@@ -30,7 +30,7 @@ public class BFViewContainer extends AbstractViewContainer<BreadthFirstViewData>
 			return;
 		storeCurrentActiveViewData();
 		super.setActiveViewData(viewData);
-		if (oldViewData != null)
+		if (oldViewData != null && viewData != null)
 			copyData(oldViewData, viewData);
 	}
 	

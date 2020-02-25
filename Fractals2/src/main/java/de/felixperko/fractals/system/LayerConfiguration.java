@@ -344,7 +344,9 @@ public class LayerConfiguration extends JsonAbstractTypedObject implements Seria
 		if (layers.size() != other.layers.size())
 			return false;
 		for (int i = 0 ; i < layers.size() ; i++) {
-			if (!layers.get(0).equals(other.layers.get(0)))
+			Layer layer = layers.get(i);
+			Layer layer2 = other.layers.get(i);
+			if (!layer.equals(layer2))
 				return false;
 		}
 		return true;

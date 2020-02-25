@@ -91,7 +91,7 @@ public class ReducedNaiveChunk extends AbstractArrayChunk {
 			for (ChunkBorderData data : getIndexBorderData(x, y, upsample)) {
 				BorderAlignment alignment = data.getAlignment();
 				if (alignment.isHorizontal()) {
-					int lower = y-upsample/2-1;
+					int lower = y-upsample/2-1; //TODO double check...
 					int higher2 = lower+upsample;
 					data.set(hasValidValue, clampIndex(lower), clampIndex(higher2));
 				} else {

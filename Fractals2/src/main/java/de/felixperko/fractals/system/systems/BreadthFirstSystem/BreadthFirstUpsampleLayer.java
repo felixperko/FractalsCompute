@@ -15,8 +15,7 @@ public class BreadthFirstUpsampleLayer extends BreadthFirstLayer{
 	private static final long serialVersionUID = -6818101684225388444L;
 	public static final String TYPE_NAME = "bfUpsampleLayer";
 	
-	int chunkSize;
-	int upsample;
+	private int upsample;
 
 	public BreadthFirstUpsampleLayer(int upsample, int chunkSize) {
 		super(TYPE_NAME);
@@ -28,6 +27,11 @@ public class BreadthFirstUpsampleLayer extends BreadthFirstLayer{
 		super(TYPE_NAME);
 		this.chunkSize = -1;
 		this.upsample = -1;
+	}
+	
+	@Override
+	protected EnabledPixels initEnabledPixels() {
+		return new UpsampleEnabledPixels(chunkSize, upsample);
 	}
 	
 //	@Override
@@ -53,14 +57,6 @@ public class BreadthFirstUpsampleLayer extends BreadthFirstLayer{
 //		BreadthFirstUpsampleLayer o = (BreadthFirstUpsampleLayer) other;
 //		return (o.id == id && o.upsample == upsample);
 //	}
-	
-	public void setChunkSize(int chunkSize) {
-		this.chunkSize = chunkSize;
-	}
-	
-	public int getChunkSize() {
-		return chunkSize;
-	}
 
 	public int getUpsample() {
 		return upsample;
@@ -73,17 +69,13 @@ public class BreadthFirstUpsampleLayer extends BreadthFirstLayer{
 		
 		this.upsample = upsample;
 
-		BitSet bitSet = new BitSet();
-		for (int x = upsample/2 ; x < chunkSize ; x += upsample) {
-			for (int y = upsample/2 ; y < chunkSize ; y += upsample) {
-				bitSet.set(x*chunkSize + y);
-			}
-		}
-		with_enabled_pixels(bitSet);
-	}
-
-	public BitSet getEnabledPixels() {
-		return enabledPixels;
+//		BitSet bitSet = new BitSet();
+//		for (int x = upsample/2 ; x < chunkSize ; x += upsample) {
+//			for (int y = upsample/2 ; y < chunkSize ; y += upsample) {
+//				bitSet.set(x*chunkSize + y);
+//			}
+//		}
+//		with_enabled_pixels(bitSet);
 	}
 
 	public int getUpsampledIndex(int i, int chunkSize) {

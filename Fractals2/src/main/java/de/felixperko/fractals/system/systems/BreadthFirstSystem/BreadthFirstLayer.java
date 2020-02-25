@@ -16,9 +16,11 @@ public class BreadthFirstLayer extends JsonAbstractTypedObject implements Layer 
 	double priorityMultiplier = 1;
 	double priorityShift = 0;
 	@JsonIgnore
-	transient BitSet enabledPixels = null;
+	transient EnabledPixels enabledPixels = null;
 	int sampleCount = 1;
 	int maxIterations = -1;
+	
+	int chunkSize = -1;
 	
 	boolean culling = false;
 	
@@ -28,8 +30,18 @@ public class BreadthFirstLayer extends JsonAbstractTypedObject implements Layer 
 		super(TYPE_NAME);
 	}
 	
+	public BreadthFirstLayer(int chunkSize) {
+		super(TYPE_NAME);
+		this.chunkSize = chunkSize;
+	}
+	
 	public BreadthFirstLayer(String subClassTypeName) {
 		super(subClassTypeName);
+	}
+
+	public BreadthFirstLayer(String subClassTypeName, int chunkSize) {
+		super(subClassTypeName);
+		this.chunkSize = chunkSize;
 	}
 	
 	public BreadthFirstLayer with_culling(boolean culling) {
@@ -48,9 +60,7 @@ public class BreadthFirstLayer extends JsonAbstractTypedObject implements Layer 
 	
 	@Override
 	public boolean isActive(int pixel) {
-		if (enabledPixels == null)
-			return true;
-		return enabledPixels.get(pixel);
+		return getEnabledPixels().isEnabled(pixel);
 	}
 	
 	public BreadthFirstLayer with_priority_multiplier(double priority_multiplier) {
@@ -60,11 +70,6 @@ public class BreadthFirstLayer extends JsonAbstractTypedObject implements Layer 
 
 	public BreadthFirstLayer with_priority_shift(double priority_shift) {
 		this.priorityShift = priority_shift;
-		return this;
-	}
-
-	public BreadthFirstLayer with_enabled_pixels(BitSet enabledPixels) {
-		this.enabledPixels = enabledPixels;
 		return this;
 	}
 	
@@ -154,10 +159,12 @@ public class BreadthFirstLayer extends JsonAbstractTypedObject implements Layer 
 		BreadthFirstLayer other = (BreadthFirstLayer) obj;
 		if (culling != other.culling)
 			return false;
-		if (enabledPixels == null) {
-			if (other.enabledPixels != null)
+		EnabledPixels ep = getEnabledPixels();
+		EnabledPixels ep2 = other.getEnabledPixels();
+		if (ep == null) {
+			if (ep2 != null)
 				return false;
-		} else if (!enabledPixels.equals(other.enabledPixels))
+		} else if (!ep.equals(ep2))
 			return false;
 		if (id != other.id)
 			return false;
@@ -195,12 +202,14 @@ public class BreadthFirstLayer extends JsonAbstractTypedObject implements Layer 
 		this.priorityShift = priorityShift;
 	}
 
-	public BitSet getEnabledPixels() {
+	public EnabledPixels getEnabledPixels() {
+		if (enabledPixels == null)
+			enabledPixels = initEnabledPixels();
 		return enabledPixels;
 	}
 
-	public void setEnabledPixels(BitSet enabledPixels) {
-		this.enabledPixels = enabledPixels;
+	protected EnabledPixels initEnabledPixels() {
+		return new DefaultEnabledPixels(chunkSize);
 	}
 
 	public int getSamples() {
@@ -229,6 +238,14 @@ public class BreadthFirstLayer extends JsonAbstractTypedObject implements Layer 
 
 	public void setMaxIterations(int maxIterations) {
 		this.maxIterations = maxIterations;
+	}
+	
+	public void setChunkSize(int chunkSize) {
+		this.chunkSize = chunkSize;
+	}
+	
+	public int getChunkSize() {
+		return chunkSize;
 	}
 	
 }

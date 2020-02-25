@@ -98,13 +98,13 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 		int prevUpsample = prev.getUpsample();
 		if (prev instanceof BreadthFirstUpsampleLayer && prev.cullingEnabled()) {
 			BreadthFirstUpsampleLayer prevUpsampled = (BreadthFirstUpsampleLayer) prev;
-			BitSet activePixels = prevUpsampled.getEnabledPixels();
+			EnabledPixels activePixels = prevUpsampled.getEnabledPixels();
 			int currentUpsample = getStateInfo().getLayer().getUpsample();
 			//for (int i = 0 ; i < chunk.getArrayLength() ; i++) {
 			//}
 			
 			activePixelLoop:
-			for (int i = activePixels.nextSetBit(0) ; i != -1 ; i = activePixels.nextSetBit(i+1)) { //loop active pixels
+			for (int i = activePixels.nextEnabled(-1) ; i != -1 ; i = activePixels.nextEnabled(i)) { //loop active pixels
 				int x = i / dim;
 				int y = i % dim;
 				
@@ -263,7 +263,7 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	
 	@Override
 	public void updatePriorityAndDistance(double midpointChunkX, double midpointChunkY, Layer layer) {
-		updateDistance(midpointChunkX, midpointChunkX);
+		updateDistance(midpointChunkX, midpointChunkY);
 		priority = distance * layer.getPriorityMultiplier() + layer.getPriorityShift();
 	}
 	

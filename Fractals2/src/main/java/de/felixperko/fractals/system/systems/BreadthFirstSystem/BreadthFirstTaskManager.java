@@ -44,6 +44,7 @@ import de.felixperko.fractals.system.task.TaskProviderAdapter;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 import de.felixperko.fractals.system.thread.CalculateThreadReference;
 import de.felixperko.fractals.util.NumberUtil;
+import sun.util.logging.resources.logging;
 
 //first chunk at relative 0, 0
 //generate neighbours -> add to open queue
@@ -449,10 +450,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	
 	public void updatePredictedMidpoint() {
 		ComplexNumber delta = context.midpoint.copy();
-//		delta.sub(((BreadthFirstViewData)context.getActiveViewData()).anchor);
-		delta.multNumber(context.chunkZoom);
-//		midpointChunkX += delta.realDouble();
-//		midpointChunkY += delta.imagDouble();
+		delta.sub(((BreadthFirstViewData)context.getActiveViewData()).anchor);
+		delta.divNumber(context.chunkZoom);
 		midpointChunkX = delta.realDouble();
 		midpointChunkY = delta.imagDouble();
 	}
