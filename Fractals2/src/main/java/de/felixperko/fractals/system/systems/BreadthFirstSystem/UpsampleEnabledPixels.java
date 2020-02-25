@@ -121,5 +121,13 @@ public class UpsampleEnabledPixels implements EnabledPixels {
 	public void setUpsample(int upsample) {
 		this.upsample = upsample;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof UpsampleEnabledPixels))
+			return false;
+		UpsampleEnabledPixels other = (UpsampleEnabledPixels)obj;
+		return getChunkSize() == other.getChunkSize() && getUpsample() == other.getUpsample();
+	}
 
 }
