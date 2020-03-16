@@ -109,49 +109,49 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 		if (other.imag == 0) {
 			if (other.real == 2) //just squared
 				square();
-//			else if (other.real%1 == 0) { //faster integer exponentiation
-//				double powLeft = other.real;
-//				boolean negativePower = powLeft < 0;
-//				if (negativePower) {
-//					if (real == 0 && imag == 0) //Same principle as above but for this since x^-n = 1/x^n 
-//						return;
-//					powLeft = -powLeft;
-//				}
-//				
-//				int squarePow = 2;
-//				List<DoubleComplexNumber> pow2Buffer = new ArrayList<>();
-//				
-//				//square as long as possible
-//				for ( ; squarePow <= powLeft ; ) {
-//					pow2Buffer.add(copy());
-//					square();
-//					squarePow <<= 1;
-//				}
-//				
-//				powLeft -= squarePow >> 1;
-//				if (powLeft == 0) {
-//					if (negativePower) {
-//						reciprocal();
-//					}
-//					return;
-//				}
-//				
-//				//add intermediate results
-//				int powStep = 1 << (pow2Buffer.size()-1);
-//				for (int i = pow2Buffer.size()-1 ; i >= 0 ; i--) {
-//					if (powLeft >= powStep) {
-//						mult(pow2Buffer.get(i));
-//						powLeft -= powStep;
-//						if (powLeft == 0) {
-//							if (negativePower) {
-//								reciprocal();
-//							}
-//							return;
-//						}
-//					}
-//					powStep >>= 1;
-//				}
-//			}
+			else if (other.real%1 == 0) { //faster integer exponentiation
+				double powLeft = other.real;
+				boolean negativePower = powLeft < 0;
+				if (negativePower) {
+					if (real == 0 && imag == 0) //Same principle as above but for this since x^-n = 1/x^n 
+						return;
+					powLeft = -powLeft;
+				}
+				
+				int squarePow = 2;
+				List<DoubleComplexNumber> pow2Buffer = new ArrayList<>();
+				
+				//square as long as possible
+				for ( ; squarePow <= powLeft ; ) {
+					pow2Buffer.add(copy());
+					square();
+					squarePow <<= 1;
+				}
+				
+				powLeft -= squarePow >> 1;
+				if (powLeft == 0) {
+					if (negativePower) {
+						reciprocal();
+					}
+					return;
+				}
+				
+				//add intermediate results
+				int powStep = 1 << (pow2Buffer.size()-1);
+				for (int i = pow2Buffer.size()-1 ; i >= 0 ; i--) {
+					if (powLeft >= powStep) {
+						mult(pow2Buffer.get(i));
+						powLeft -= powStep;
+						if (powLeft == 0) {
+							if (negativePower) {
+								reciprocal();
+							}
+							return;
+						}
+					}
+					powStep >>= 1;
+				}
+			}
 			else {
 //				double abs = absDouble();
 //				double logAbs = Math.log(abs);
@@ -171,6 +171,8 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 				double logAbs = 0;
 				if (abs != 0)
 					logAbs = Math.log(abs);
+				else
+					return; //0*x = 0
 				double angle = Math.atan2(imag, real);
 				//mult
 				double temp = logAbs*other.real - angle*other.imag;
@@ -189,6 +191,8 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 			double logAbs = 0;
 			if (abs != 0)
 				logAbs = Math.log(abs);
+			else
+				return;
 			double angle = Math.atan2(imag, real);
 			//mult
 			double temp = logAbs*other.real - angle*other.imag;

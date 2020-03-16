@@ -133,7 +133,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 	private void calculateSample(int pixel, int sample, CalculateFractalsThread thread) {
 		double res = -1;
 		ComplexNumber<?, ?> current = ((ComplexNumber)p_current.get(systemContext, chunk.chunkPos, pixel, sample)).copy();
-		ComplexNumber<?, ?> c = ((ComplexNumber)p_c.get(systemContext, chunk.chunkPos, pixel, sample));
+		ComplexNumber<?, ?> c = ((ComplexNumber)p_c.get(systemContext, chunk.chunkPos, pixel, sample)).copy();
 		ComplexNumber<?, ?> pow = ((ComplexNumber)p_pow.get(systemContext, chunk.chunkPos, pixel, sample)).copy();
 		double logPow = Math.log(pow.absDouble());
 		if (logPow == 0)

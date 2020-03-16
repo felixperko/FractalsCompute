@@ -147,14 +147,14 @@ public class ParamContainer implements Serializable{
 	}
 
 	public boolean needsReset(Map<String, ParamSupplier> oldParams){
+		if (oldParams == null)
+			return true;
 		boolean reset = false;
-		if (oldParams != null) {
-			for (ParamSupplier supplier : clientParameters.values()) {
-				supplier.updateChanged(oldParams.get(supplier.getName()));
-				if (supplier.isChanged()) {
-					if (supplier.isSystemRelevant() || supplier.isLayerRelevant())
-						reset = true;
-				}
+		for (ParamSupplier supplier : clientParameters.values()) {
+			supplier.updateChanged(oldParams.get(supplier.getName()));
+			if (supplier.isChanged()) {
+				if (supplier.isSystemRelevant() || supplier.isLayerRelevant())
+					reset = true;
 			}
 		}
 		return reset;
