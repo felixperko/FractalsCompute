@@ -9,7 +9,7 @@
     <!-- encoders are assigned the type
          ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
     <encoder>
-      <pattern>%-5relative [%thread] %-5level %logger{0} - %msg%n</pattern>
+      <pattern>%-5relative [%thread] %logger{10} %-5level - %msg%n</pattern>
     </encoder>
   </appender>
   
@@ -27,19 +27,19 @@
 	</encoder>
   </appender>
 
-<!--   <root level="DEBUG"> -->
-<!--     <appender-ref ref="STDOUT" /> -->
-<!--     <appender-ref ref="FILE" /> -->
-<!--   </root> -->
+  <root level="WARN">
+    <appender-ref ref="STDOUT" />
+    <appender-ref ref="FILE" />
+  </root>
   
-<!--   <logger name="de.felixperko.fractals.network.threads.WriteThread" level="WARN"> -->
-<!--     <appender-ref ref="STDOUT" /> -->
-<!--     <appender-ref ref="FILE" /> -->
-<!--   </logger> -->
+  <logger name="de.felixperko.fractals.network.threads.WriteThread" level="WARN">
+    <appender-ref ref="STDOUT" />
+    <appender-ref ref="FILE" />
+  </logger>
   
-<!--   <logger name="de.felixperko.fractals.network.threads.ListenThread" level="WARN"> -->
-<!--     <appender-ref ref="STDOUT" /> -->
-<!--     <appender-ref ref="FILE" /> -->
-<!--   </logger> -->
+  <logger name="de.felixperko.fractals.network.threads.ListenThread" level="WARN">
+    <appender-ref ref="STDOUT" />
+    <appender-ref ref="FILE" />
+  </logger>
   
 </configuration>

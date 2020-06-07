@@ -6,6 +6,9 @@ import java.lang.reflect.InvocationTargetException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import de.felixperko.fractals.system.systems.infra.ViewData;
 import de.felixperko.fractals.util.serialization.jackson.JsonAbstractTypedObject;
 
@@ -19,7 +22,8 @@ public class ArrayChunkFactory extends JsonAbstractTypedObject implements Serial
 	Class<? extends AbstractArrayChunk> chunkClass;
 	transient ViewData viewData = null;
 	
-	public ArrayChunkFactory(Class<? extends AbstractArrayChunk> chunkClass, int dimensionSize) {
+	@JsonCreator
+	public ArrayChunkFactory(@JsonProperty("chunkClass") Class<? extends AbstractArrayChunk> chunkClass, @JsonProperty("chunkSize") int dimensionSize) {
 		super(TYPE_NAME);
 		this.chunkClass = chunkClass;
 		this.dimensionSize = dimensionSize;
@@ -43,6 +47,18 @@ public class ArrayChunkFactory extends JsonAbstractTypedObject implements Serial
 
 	public int getChunkSize() {
 		return dimensionSize;
+	}
+
+	public void setChunkSize(int dimensionSize) {
+		this.dimensionSize = dimensionSize;
+	}
+	
+	public Class<? extends AbstractArrayChunk> getChunkClass() {
+		return chunkClass;
+	}
+
+	public void setChunkClass(Class<? extends AbstractArrayChunk> chunkClass) {
+		this.chunkClass = chunkClass;
 	}
 	
 	public void setViewData(ViewData viewData) {

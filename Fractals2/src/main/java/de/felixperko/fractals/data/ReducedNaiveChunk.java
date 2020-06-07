@@ -7,26 +7,26 @@ public class ReducedNaiveChunk extends AbstractArrayChunk {
 	private static final long serialVersionUID = -8824365910389869969L;
 	
 	float[] values;
-	byte[] samples;
-	byte[] failedSamples;
+	int[] samples;
+	int[] failedSamples;
 	
 	// 32 bit + 2 * 8 bit -> 6 byte per pixel
 
 	ReducedNaiveChunk(ViewData viewData, int chunkX, int chunkY, int dimensionSize) {
 		super(null, chunkX, chunkY, dimensionSize);
 		this.values = new float[arrayLength];
-		this.samples = new byte[arrayLength];
-		this.failedSamples = new byte[arrayLength];
+		this.samples = new int[arrayLength];
+		this.failedSamples = new int[arrayLength];
 	}
 	
-	protected ReducedNaiveChunk(int chunkX, int chunkY, int dimensionSize, float[] values, byte[] samples, byte[] failedSamples) {
+	protected ReducedNaiveChunk(int chunkX, int chunkY, int dimensionSize, float[] values, int[] samples, int[] failedSamples) {
 		super(null, chunkX, chunkY, dimensionSize);
 		this.values = values;
 		this.samples = samples;
 		this.failedSamples = failedSamples;
 	}
 	
-	// 64 bit + 2 * 32 bit -> 16 byte per pixel
+	// 3 * 8 byte -> 24 byte per pixel
 	
 	@Override
 	public double getValue(int i) {
@@ -114,6 +114,11 @@ public class ReducedNaiveChunk extends AbstractArrayChunk {
 	@Override
 	public int getSampleCount(int i) {
 		return samples[i];
+	}
+	
+	@Override
+	public int getFailedSampleCount(int i) {
+		return failedSamples[i];
 	}
 
 	@Override

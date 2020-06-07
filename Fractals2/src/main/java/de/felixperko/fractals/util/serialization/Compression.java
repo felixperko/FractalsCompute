@@ -27,12 +27,20 @@ public class Compression {
 		return instance.compress(input);
 	}
 
+	public static byte[] compress(int[] input) throws IOException {
+		return instance.compress(input);
+	}
+
 	public static byte[] compress(String input, Charset encoding) throws IOException {
 		return instance.compress(input, encoding);
 	}
 
 	public static byte[] uncompress(byte[] input) throws IOException {
 		return instance.uncompress(input);
+	}
+	
+	public static int[] uncompressIntArray(byte[] input) throws IOException {
+		return instance.uncompressIntArray(input);
 	}
 
 	public static String uncompressString(byte[] input, Charset charset) throws IOException {

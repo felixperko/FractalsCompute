@@ -5,15 +5,15 @@ public class ReducedNaivePackedChunk extends AbstractArrayChunk{
 	private static final long serialVersionUID = -5680093357484529878L;
 	
 	float[] values;
-	byte[] samples;
-	byte[] failedSamples;
+	int[] samples;
+	int[] failedSamples;
 	
 	int chunkX;
 	int chunkY;
 	int dimensionSize;
 	int upsample;
 	
-	protected ReducedNaivePackedChunk(int chunkX, int chunkY, int dimensionSize, float[] values, byte[] samples, byte[] failedSamples, int upsample) {
+	protected ReducedNaivePackedChunk(int chunkX, int chunkY, int dimensionSize, float[] values, int[] samples, int[] failedSamples, int upsample) {
 		super(null, chunkX, chunkY, dimensionSize);
 		this.chunkX = chunkX;
 		this.chunkY = chunkY;
@@ -28,11 +28,11 @@ public class ReducedNaivePackedChunk extends AbstractArrayChunk{
 		return values;
 	}
 
-	public byte[] getSamples() {
+	public int[] getSamples() {
 		return samples;
 	}
 
-	public byte[] getFailedSamples() {
+	public int[] getFailedSamples() {
 		return failedSamples;
 	}
 	
@@ -103,5 +103,11 @@ public class ReducedNaivePackedChunk extends AbstractArrayChunk{
 	@Override
 	protected void removeFlag(int i) {
 		throw new IllegalStateException("ReducedNaivePackedChunk doesn't implement this method.");
+	}
+
+	@Override
+	public int getFailedSampleCount(int i) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

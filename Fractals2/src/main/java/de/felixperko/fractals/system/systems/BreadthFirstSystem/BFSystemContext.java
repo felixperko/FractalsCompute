@@ -17,6 +17,7 @@ import de.felixperko.fractals.system.ZoomableSystemContext;
 import de.felixperko.fractals.system.calculator.BurningShipCalculator;
 import de.felixperko.fractals.system.calculator.FibonacciPowCalculator;
 import de.felixperko.fractals.system.calculator.MandelbrotCalculator;
+import de.felixperko.fractals.system.calculator.MandelbrotGPUCalculator;
 import de.felixperko.fractals.system.calculator.NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator;
 import de.felixperko.fractals.system.calculator.NewtonThridPowerMinusOneCalculator;
 import de.felixperko.fractals.system.calculator.TricornCalculator;
@@ -38,6 +39,7 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 		availableCalculators.put("MandelbrotCalculator", MandelbrotCalculator.class);
 		availableCalculators.put("BurningShipCalculator", BurningShipCalculator.class);
 		availableCalculators.put("TricornCalculator", TricornCalculator.class);
+		availableCalculators.put("CustomCalculator", MandelbrotGPUCalculator.class);
 		availableCalculators.put("FibonacciPowCalculator", FibonacciPowCalculator.class);
 		availableCalculators.put("NewtonThridPowerMinusOneCalculator", NewtonThridPowerMinusOneCalculator.class);
 		availableCalculators.put("NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator", NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator.class);

@@ -3,6 +3,9 @@ package de.felixperko.fractals.system.numbers;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import de.felixperko.fractals.util.serialization.jackson.JsonAbstractTypedObject;
 
 public class NumberFactory extends JsonAbstractTypedObject implements Serializable{
@@ -13,7 +16,8 @@ public class NumberFactory extends JsonAbstractTypedObject implements Serializab
 	Class<? extends Number> numberClass;
 	Class<? extends ComplexNumber> complexNumberClass;
 	
-	public NumberFactory(Class<? extends Number> numberClass, Class<? extends ComplexNumber> complexNumberClass) {
+	@JsonCreator
+	public NumberFactory(@JsonProperty("numberClass") Class<? extends Number> numberClass, @JsonProperty("complexNumberClass") Class<? extends ComplexNumber> complexNumberClass) {
 		super(TYPE_NAME);
 		this.numberClass = numberClass;
 		this.complexNumberClass = complexNumberClass;
@@ -93,5 +97,21 @@ public class NumberFactory extends JsonAbstractTypedObject implements Serializab
 			return false;
 		return (((numberClass == null && other.numberClass == null) || numberClass.equals(other.numberClass))
 				&& ((complexNumberClass == null && other.complexNumberClass == null) || complexNumberClass.equals(other.complexNumberClass)));
+	}
+
+	public Class<? extends Number> getNumberClass() {
+		return numberClass;
+	}
+
+	public void setNumberClass(Class<? extends Number> numberClass) {
+		this.numberClass = numberClass;
+	}
+
+	public Class<? extends ComplexNumber> getComplexNumberClass() {
+		return complexNumberClass;
+	}
+
+	public void setComplexNumberClass(Class<? extends ComplexNumber> complexNumberClass) {
+		this.complexNumberClass = complexNumberClass;
 	}
 }

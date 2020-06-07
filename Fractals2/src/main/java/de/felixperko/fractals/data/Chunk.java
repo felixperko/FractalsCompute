@@ -27,6 +27,8 @@ public interface Chunk extends Serializable{
 //	void setDimensionSize(int dimensionSize);
 
 	int getSampleCount(int i);
+	
+	int getFailedSampleCount(int i);
 
 	void setChunkX(Integer chunkX);
 

@@ -14,7 +14,7 @@ public abstract class AbstractFractalsCalculator implements FractalsCalculator {
 
 	transient Map<String, Field> fields = null;
 	
-	SystemContext<? extends ViewContainer<?>> systemContext;
+	protected SystemContext<? extends ViewContainer<?>> systemContext;
 	
 	Class<? extends AbstractFractalsCalculator> fieldClass;
 	

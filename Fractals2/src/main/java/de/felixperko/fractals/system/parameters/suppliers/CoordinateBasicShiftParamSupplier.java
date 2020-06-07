@@ -1,5 +1,8 @@
 package de.felixperko.fractals.system.parameters.suppliers;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.Number;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
@@ -8,7 +11,8 @@ public class CoordinateBasicShiftParamSupplier extends MappedParamSupplier {
 	
 	private static final long serialVersionUID = 2317887367642326504L;
 	
-	public CoordinateBasicShiftParamSupplier(String name) {
+	@JsonCreator
+	public CoordinateBasicShiftParamSupplier(@JsonProperty("name") String name) {
 		super(name);
 	}
 	

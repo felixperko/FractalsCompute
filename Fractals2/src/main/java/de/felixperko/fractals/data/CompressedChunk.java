@@ -88,8 +88,8 @@ public class CompressedChunk implements Serializable{
 			storedIterations = Compression.compress(Compression.shuffle(storedIterationsArray));
 			
 			values_compressed = Compression.compress(Compression.shuffle(getUpsampledFloatArray(chunk.values)));
-			samples_compressed = Compression.compress(getUpsampledByteArray(chunk.samples));
-			failedSamples_compressed = Compression.compress(getUpsampledByteArray(chunk.failedSamples));
+			samples_compressed = Compression.compress(getUpsampledIntArray(chunk.samples));
+			failedSamples_compressed = Compression.compress(getUpsampledIntArray(chunk.failedSamples));
 			
 			//
 			// BorderData
@@ -157,9 +157,9 @@ public class CompressedChunk implements Serializable{
 	public ReducedNaiveChunk decompress() {
 		try {
 			float[] values = Compression.unshuffleFloatArray(Compression.uncompress((values_compressed)));
-			byte[] samples = Compression.uncompress(samples_compressed);
-			byte[] failedSamples = Compression.uncompress(failedSamples_compressed);
-			ReducedNaiveChunk chunk = new ReducedNaiveChunk(chunkX, chunkY, dimensionSize, getFullFloatArray(values), getFullByteArray(samples), getFullByteArray(failedSamples));
+			int[] samples = Compression.uncompressIntArray(samples_compressed);
+			int[] failedSamples = Compression.uncompressIntArray(failedSamples_compressed);
+			ReducedNaiveChunk chunk = new ReducedNaiveChunk(chunkX, chunkY, dimensionSize, getFullFloatArray(values), getFullIntArray(samples), getFullIntArray(failedSamples));
 			chunk.setJobId(jobId);
 			chunk.chunkPos = chunkPos;
 			
@@ -192,8 +192,8 @@ public class CompressedChunk implements Serializable{
 	public AbstractArrayChunk decompressPacked() {
 		try {
 			float[] values = Compression.unshuffleFloatArray(Compression.uncompress((values_compressed)));
-			byte[] samples = Compression.uncompress(samples_compressed);
-			byte[] failedSamples = Compression.uncompress(failedSamples_compressed);
+			int[] samples = Compression.uncompressIntArray(samples_compressed);
+			int[] failedSamples = Compression.uncompressIntArray(failedSamples_compressed);
 			AbstractArrayChunk chunk = new ReducedNaivePackedChunk(chunkX, chunkY, dimensionSize, values, samples, failedSamples, upsample);
 			chunk.setJobId(jobId);
 			chunk.chunkPos = chunkPos;
@@ -307,10 +307,10 @@ public class CompressedChunk implements Serializable{
 		chunk.setNeighbourBorderData(neighbourBorderData);
 	}
 
-	private byte[] getFullByteArray(byte[] arr) {
+	private int[] getFullIntArray(int[] arr) {
 		if (upsample == 1)
 			return arr;
-		byte[] ans = new byte[arr.length*upsample*upsample];
+		int[] ans = new int[arr.length*upsample*upsample];
 		int upsampleDim = (int)Math.sqrt(arr.length);
 		int dim = (int)Math.sqrt(ans.length);
 		int start = (upsample/2)*dim + upsample/2;
@@ -320,7 +320,7 @@ public class CompressedChunk implements Serializable{
 			int y = (i % upsampleDim)*upsample;
 			int startX = x;
 			int startY = y;
-			byte value = arr[i];
+			int value = arr[i];
 			for (int x2 = startX ; x2 < startX+upsample ; x2++) {
 				for (int y2 = startY ; y2 < startY+upsample ; y2++) {
 					int index = x2*dim + y2;
@@ -369,10 +369,10 @@ public class CompressedChunk implements Serializable{
 		return ans;
 	}
 
-	private byte[] getUpsampledByteArray(byte[] arr) {
+	private int[] getUpsampledIntArray(int[] arr) {
 		if (upsample == 1)
 			return Arrays.copyOf(arr, arr.length);
-		byte[] ans = new byte[arr.length/(upsample*upsample)];
+		int[] ans = new int[arr.length/(upsample*upsample)];
 		int dim = (int)Math.sqrt(arr.length);
 		int start = (upsample/2)*dim + upsample/2;
 		int rowCounter = dim/upsample;

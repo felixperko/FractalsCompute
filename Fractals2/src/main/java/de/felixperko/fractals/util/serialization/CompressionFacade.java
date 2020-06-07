@@ -9,9 +9,11 @@ public interface CompressionFacade {
 	public byte[] shuffle(float[] input) throws IOException;
 	
 	public byte[] compress(byte[] input) throws IOException;
+	public byte[] compress(int[] input) throws IOException;
 	public byte[] compress(String input, Charset encoding) throws IOException;
 	
 	public byte[] uncompress(byte[] input) throws IOException;
+	int[] uncompressIntArray(byte[] input) throws IOException;
 	public String uncompressString(byte[] input, Charset charset) throws IOException;
 	
 	public float[] unshuffleFloatArray(byte[] input) throws IOException;

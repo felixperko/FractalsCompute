@@ -1,6 +1,5 @@
 package de.felixperko.fractals.system.parameters.suppliers;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import de.felixperko.fractals.system.numbers.ComplexNumber;
@@ -82,5 +81,10 @@ public class StaticParamSupplier extends AbstractParamSupplier {
 
 	public void setObj(Object obj) {
 		this.obj = obj;
+	}
+	
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName()+" name="+getName()+" obj="+obj;
 	}
 }

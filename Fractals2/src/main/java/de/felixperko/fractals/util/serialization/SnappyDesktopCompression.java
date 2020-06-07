@@ -24,6 +24,11 @@ public class SnappyDesktopCompression implements CompressionFacade {
 	}
 
 	@Override
+	public byte[] compress(int[] input) throws IOException {
+		return Snappy.compress(input);
+	}
+
+	@Override
 	public byte[] compress(String input, Charset encoding) throws IOException {
 		return Snappy.compress(input, encoding);
 	}
@@ -31,6 +36,11 @@ public class SnappyDesktopCompression implements CompressionFacade {
 	@Override
 	public byte[] uncompress(byte[] input) throws IOException {
 		return Snappy.uncompress(input);
+	}
+
+	@Override
+	public int[] uncompressIntArray(byte[] input) throws IOException {
+		return Snappy.uncompressIntArray(input);
 	}
 
 	@Override

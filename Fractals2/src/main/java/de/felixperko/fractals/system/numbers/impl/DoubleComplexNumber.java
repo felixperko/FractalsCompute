@@ -297,22 +297,53 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 		return new DoubleNumber(imag);
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null)
-			return false;
-		if (!(obj instanceof DoubleComplexNumber)) {
-			if (obj instanceof ComplexNumber)
-				return getReal().equals(((ComplexNumber) obj).getReal()) && getImag().equals(((ComplexNumber) obj).getImag());
-			return false;
-		}
-		
-		DoubleComplexNumber other = (DoubleComplexNumber)obj;
-		return real == other.real && imag == other.imag;
-	}
+//ComplexNumber Implementation class agnostic equals(). Advantages? Disadvantages?
+//	@Override
+//	public boolean equals(Object obj) {
+//		if (obj == null)
+//			return false;
+//		if (!(obj instanceof DoubleComplexNumber)) {
+//			if (obj instanceof ComplexNumber)
+//				return getReal().equals(((ComplexNumber) obj).getReal()) && getImag().equals(((ComplexNumber) obj).getImag());
+//			return false;
+//		}
+//		
+//		DoubleComplexNumber other = (DoubleComplexNumber)obj;
+//		return real == other.real && imag == other.imag;
+//	}
+	
+	
 
 	@Override
 	public void complexConjugate() {
 		imag = -imag;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		long temp;
+		temp = Double.doubleToLongBits(imag);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(real);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DoubleComplexNumber other = (DoubleComplexNumber) obj;
+		if (Double.doubleToLongBits(imag) != Double.doubleToLongBits(other.imag))
+			return false;
+		if (Double.doubleToLongBits(real) != Double.doubleToLongBits(other.real))
+			return false;
+		return true;
 	}
 }

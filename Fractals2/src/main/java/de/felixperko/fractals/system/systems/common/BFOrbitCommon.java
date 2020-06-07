@@ -22,6 +22,7 @@ public class BFOrbitCommon {
 	public static ParamValueType integerType = new ParamValueType("integer");
 	public static ParamValueType doubleType = new ParamValueType("double");
 	public static ParamValueType booleanType = new ParamValueType("boolean");
+	public static ParamValueType stringType = new ParamValueType("string");
 	public static ParamValueType classType = new ParamValueType("class");
 	public static ParamValueType listType = new ParamValueType("list");
 	
@@ -44,8 +45,8 @@ public class BFOrbitCommon {
 		ParameterConfiguration parameterConfiguration = new ParameterConfiguration();
 		
 		ParamValueType[] types = new ParamValueType[] {
-				integerType, doubleType, booleanType, classType, listType, numberType, complexnumberType,
-				numberfactoryType, arraychunkfactoryType, selectionType
+				integerType, doubleType, booleanType, stringType, classType, listType,
+				numberType, complexnumberType, numberfactoryType, arraychunkfactoryType, selectionType
 		};
 		parameterConfiguration.addValueTypes(types);
 		
@@ -84,10 +85,16 @@ public class BFOrbitCommon {
 		mandelbrot_calculator_defs.add(new ParameterDefinition("start", "Calculator", varList, complexnumberType)
 				.withDescription("The input number parameter that is used for the first calculation step.")
 				.withHints("ui-element[default]:plane soft-min=-2 soft-max=2", "ui-element:fields"));
+
+		List<ParameterDefinition> custom_calculator_defs = new ArrayList<>();
+		custom_calculator_defs.add(new ParameterDefinition("f(z)=", "Calculator", StaticParamSupplier.class, stringType)
+				.withDescription("'The formula of the fractal"));
+		custom_calculator_defs.addAll(mandelbrot_calculator_defs);
 		
 		parameterConfiguration.addCalculatorParameters("MandelbrotCalculator", mandelbrot_calculator_defs);
 		parameterConfiguration.addCalculatorParameters("BurningShipCalculator", mandelbrot_calculator_defs);
 		parameterConfiguration.addCalculatorParameters("TricornCalculator", mandelbrot_calculator_defs);
+		parameterConfiguration.addCalculatorParameters("CustomCalculator", custom_calculator_defs);
 		parameterConfiguration.addCalculatorParameters("FibonacciPowCalculator", mandelbrot_calculator_defs);
 		
 		List<ParameterDefinition> newton_calculator_defs = new ArrayList<>();
@@ -98,16 +105,24 @@ public class BFOrbitCommon {
 		parameterConfiguration.addCalculatorParameters("NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator", newton_calculator_defs);	//
 		
 		Selection<String> calculatorSelection = new Selection<>("calculator");
-		calculatorSelection.addOption("Mandelbrot", "MandelbrotCalculator", "The famous Mandelbrot set.\n"
+		calculatorSelection.addOption("Mandelbrot", "MandelbrotCalculator",
+				"The famous Mandelbrot set.\n"
 				+ "f(z_n+1) = f(z_n)^pow + c; z_0 = start");
-		calculatorSelection.addOption("BurningShip", "BurningShipCalculator", "A variation of the Mandelbrot set.\n"
+		calculatorSelection.addOption("BurningShip", "BurningShipCalculator",
+				"A variation of the Mandelbrot set.\n"
 				+ "z = |a| + i*|b| before every step.");
-		calculatorSelection.addOption("Tricorn", "TricornCalculator", "A variation of the Mandelbrot set.\n"
+		calculatorSelection.addOption("Tricorn", "TricornCalculator",
+				"A variation of the Mandelbrot set.\n"
 				+ "z = a - i*b before every step.");
-		calculatorSelection.addOption("Fibonacci", "FibonacciPowCalculator", "The fibonacci number of the iteration is used as the exponent.\n"
+		calculatorSelection.addOption("Custom", "CustomCalculator",
+				"Enter a custom formula.");
+		calculatorSelection.addOption("Fibonacci", "FibonacciPowCalculator",
+				"The fibonacci number of the iteration is used as the exponent.\n"
 				+ "f(z_n+1) = f(z_n) + (1+1/z)^fib + c");
-		calculatorSelection.addOption("Newton x^3 - 1", "NewtonThridPowerMinusOneCalculator", "Newton's method for f(x) = x^3 - 1");
-		calculatorSelection.addOption("Newton x^8 + 15x^4 - 16", "NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator", "Newton's method for f(x) = x^8 + 15x^4 - 16");
+		calculatorSelection.addOption("Newton x^3 - 1", "NewtonThridPowerMinusOneCalculator",
+				"Newton's method for f(x) = x^3 - 1");
+		calculatorSelection.addOption("Newton x^8 + 15x^4 - 16", "NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator",
+				"Newton's method for f(x) = x^8 + 15x^4 - 16");
 		
 		parameterConfiguration.addSelection(calculatorSelection);
 		

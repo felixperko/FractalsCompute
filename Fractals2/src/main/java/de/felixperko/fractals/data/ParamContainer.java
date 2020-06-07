@@ -35,6 +35,11 @@ import de.felixperko.fractals.util.serialization.Compression;
 
 public class ParamContainer implements Serializable{
 	
+	//
+	// STATIC
+	//
+
+	private static final long serialVersionUID = 2325163791938639608L;
 	private static final Logger LOG = LoggerFactory.getLogger(ParamContainer.class);
 	private final static String UTF8 = "UTF-8";
 	
@@ -95,13 +100,24 @@ public class ParamContainer implements Serializable{
 		ObjectMapper mapper = new ObjectMapper();
 		return mapper.readValue(json.getBytes(), ParamContainer.class);
 	}
-
-	private static final long serialVersionUID = 2325163791938639608L;
+	
+	//
+	// CLASS
+	//
 	
 	private Map<String, ParamSupplier> clientParameters;
 
 	public ParamContainer() {
 		this.clientParameters = new HashMap<>();
+	}
+	
+	public ParamContainer(List<ParamSupplier> params){
+		this.clientParameters = new HashMap<>();
+		for (ParamSupplier supp : params){
+			if (supp.getName() == null)
+				throw new IllegalStateException("ParamSupplier doesn't has a name");
+			this.clientParameters.put(supp.getName(), supp);
+		}
 	}
 
 	public ParamContainer(Map<String, ParamSupplier> clientParameters) {

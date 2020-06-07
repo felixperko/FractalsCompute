@@ -44,7 +44,6 @@ import de.felixperko.fractals.system.task.TaskProviderAdapter;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 import de.felixperko.fractals.system.thread.CalculateThreadReference;
 import de.felixperko.fractals.util.NumberUtil;
-import sun.util.logging.resources.logging;
 
 //first chunk at relative 0, 0
 //generate neighbours -> add to open queue
