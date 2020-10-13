@@ -12,6 +12,7 @@ import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.network.messages.ChunkUpdateMessage;
+import de.felixperko.fractals.system.calculator.infra.DeviceType;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
@@ -28,9 +29,9 @@ public class OrbitTaskManager extends AbstractTaskManager<OrbitTask> {
 
 	public OrbitTaskManager(ServerManagers managers, CalcSystem system) {
 		super(managers, system);
-		context = new OrbitSystemContext(this);
+		context = new OrbitSystemContext(this, system.getParameterConfiguration());
 		
-		task = new OrbitTask(context, 0, this, context.getViewId(), context.getLayer(0), context.createCalculator(), context.createChunk(0,0));
+		task = new OrbitTask(context, 0, this, context.getViewId(), context.getLayer(0), context.createCalculator(DeviceType.CPU), context.createChunk(0,0));
 	}
 
 	@Override
@@ -51,7 +52,7 @@ public class OrbitTaskManager extends AbstractTaskManager<OrbitTask> {
 
 	@Override
 	public void reset() {
-		task = new OrbitTask(context, 0, this, context.getViewId(), context.getLayer(0), context.createCalculator(), context.createChunk(0, 0));
+		task = new OrbitTask(context, 0, this, context.getViewId(), context.getLayer(0), context.createCalculator(DeviceType.CPU), context.createChunk(0, 0));
 		sentIndices.clear();
 	}
 
@@ -78,7 +79,9 @@ public class OrbitTaskManager extends AbstractTaskManager<OrbitTask> {
 	}
 
 	@Override
-	public List<? extends FractalsTask> getTasks(int count) {
+	public List<? extends FractalsTask> getTasks(DeviceType deviceType, int count) {
+		if (deviceType != DeviceType.CPU)
+			return null;
 		if (task.getState() != TaskState.OPEN)
 			return null;
 		List<OrbitTask> list = new ArrayList();

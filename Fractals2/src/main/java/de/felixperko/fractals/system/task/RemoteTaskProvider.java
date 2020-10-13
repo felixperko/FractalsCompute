@@ -11,11 +11,16 @@ import de.felixperko.fractals.network.infra.connection.ServerConnection;
 import de.felixperko.fractals.network.messages.task.TaskFinishedMessage;
 import de.felixperko.fractals.network.messages.task.TaskRequestMessage;
 import de.felixperko.fractals.network.messages.task.TaskStateChangedMessage;
+import de.felixperko.fractals.system.calculator.infra.DeviceType;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 
 public class RemoteTaskProvider extends Thread implements TaskProvider {
 	
 	int bufferSize;
+	
+	//TODO RemoteTaskProvider: device types!
+	float cpuTasksPriority;
+	float gpuTasksPriority;
 	
 	Queue<FractalsTask> bufferedTasks = new LinkedList<>();
 	List<ServerConnection> serverConnections = new ArrayList<>();
@@ -50,10 +55,10 @@ public class RemoteTaskProvider extends Thread implements TaskProvider {
 		int connCount = serverConnections.size();
 		//TODO client at multiple connections -> balance requests
 		for (ServerConnection serverConnection : serverConnections) {
-			int amount2 = amount/connCount;
-			amount -= amount2;
+			int amountPerConnection = amount/connCount;
+			amount -= amountPerConnection;
 			connCount--;
-			serverConnection.writeMessage(new TaskRequestMessage(amount2));
+			serverConnection.writeMessage(new TaskRequestMessage(amountPerConnection, cpuTasksPriority, gpuTasksPriority));
 		}
 	}
 	
@@ -66,8 +71,8 @@ public class RemoteTaskProvider extends Thread implements TaskProvider {
 	}
 
 	@Override
-	public FractalsTask getTask() {
-		FractalsTask task = bufferedTasks.poll();
+	public FractalsTask getTask(DeviceType deviceType) {
+		FractalsTask task = bufferedTasks.poll(); //TODO remote task provider: different device types!
 		return task;
 	}
 	

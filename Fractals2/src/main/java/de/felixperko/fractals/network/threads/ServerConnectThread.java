@@ -17,15 +17,18 @@ public class ServerConnectThread extends AbstractFractalsThread{
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ServerConnectThread.class);
 	
-	public ServerConnectThread(ServerManagers managers) {
+	int port;
+	
+	public ServerConnectThread(ServerManagers managers, int port) {
 		super(managers, "COM_CONN");
+		this.port = port;
 	}
 	
 	@Override
 	public void run() {
 
 		try {
-			ServerSocket server = new ServerSocket(3141);
+			ServerSocket server = new ServerSocket(port);
 			
 			LOG.info("Waiting for incoming connections...");
 			while (getLifeCycleState() != LifeCycleState.STOPPED) {

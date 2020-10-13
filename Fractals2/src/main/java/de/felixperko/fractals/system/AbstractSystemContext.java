@@ -10,9 +10,12 @@ import de.felixperko.fractals.data.ArrayChunkFactory;
 import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.data.shareddata.MappedSharedDataUpdate;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
+import de.felixperko.fractals.system.calculator.infra.DeviceType;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.NumberFactory;
+import de.felixperko.fractals.system.parameters.ParamConfiguration;
+import de.felixperko.fractals.system.parameters.ParamDefinition;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
@@ -38,7 +41,7 @@ public abstract class AbstractSystemContext<D extends ViewData, C extends ViewCo
 	public abstract boolean setParameters(ParamContainer paramContainer);
 
 	public transient ParamContainer paramContainer;
-	public transient Class<? extends FractalsCalculator> calculatorClass;
+	protected transient ParamConfiguration paramConfiguration;
 	public transient NumberFactory numberFactory;
 	public transient ArrayChunkFactory chunkFactory;
 	public transient ComplexNumber midpoint;
@@ -49,8 +52,9 @@ public abstract class AbstractSystemContext<D extends ViewData, C extends ViewCo
 	protected transient ServerConnection serverConnection;
 	protected transient Integer viewId;
 
-	public AbstractSystemContext(TaskManager<?> taskManager, C viewContainer) {
+	public AbstractSystemContext(TaskManager<?> taskManager, C viewContainer, ParamConfiguration paramConfiguration) {
 		this.taskManager = taskManager;
+		this.paramConfiguration = paramConfiguration;
 		this.viewContainer = viewContainer;
 	}
 
@@ -84,6 +88,21 @@ public abstract class AbstractSystemContext<D extends ViewData, C extends ViewCo
 		}
 	}
 
+	protected void updateLayerConfig(ParamContainer paramContainer, String layerConfigParamName, Map<String, ParamSupplier> oldParams,
+			Map<String, ParamSupplier> newParams) {
+		LayerConfiguration oldLayerConfig = null;
+		if (oldParams != null)
+			oldLayerConfig = oldParams.get(layerConfigParamName).getGeneral(LayerConfiguration.class);
+		ParamSupplier newLayerConfigSupplier = paramContainer.getClientParameter(layerConfigParamName);
+		LayerConfiguration newLayerConfig = newLayerConfigSupplier.getGeneral(LayerConfiguration.class);
+		if (oldLayerConfig == null || newLayerConfigSupplier.isChanged()) {
+			layerConfig = newLayerConfig;
+			layerConfig.prepare(numberFactory);
+		} else {
+			newParams.put(layerConfigParamName, oldParams.get(layerConfigParamName));
+		}
+	}
+
 	@Override
 	public Layer getLayer(int layerId) {
 		return layerConfig.getLayer(layerId);
@@ -100,18 +119,6 @@ public abstract class AbstractSystemContext<D extends ViewData, C extends ViewCo
 
 	public void setActiveViewData(D viewData) {
 		viewContainer.setActiveViewData(viewData);
-	}
-
-	@Override
-	public FractalsCalculator createCalculator() {
-		try {
-			FractalsCalculator calculator = calculatorClass.getDeclaredConstructor().newInstance();
-			calculator.setContext(this);
-			return calculator;
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
-			throw new IllegalStateException("Failed to create calculator for class: "+calculatorClass.getName());
-		}
 	}
 
 	@Override
@@ -136,17 +143,26 @@ public abstract class AbstractSystemContext<D extends ViewData, C extends ViewCo
 
 	@Override
 	public synchronized <T> T getParamValue(String parameterKey, Class<T> valueCls) {
-		return paramContainer.getClientParameter(parameterKey).get(this, valueCls, null, 0, 0);
+		ParamSupplier supp = paramContainer.getClientParameter(parameterKey);
+		if (supp == null)
+			return null;
+		return supp.get(this, valueCls, null, 0, 0);
 	}
 
 	@Override
 	public synchronized Object getParamValue(String parameterKey) {
-		return paramContainer.getClientParameter(parameterKey).get(this, null, 0, 0);
+		ParamSupplier supp = paramContainer.getClientParameter(parameterKey);
+		if (supp == null)
+			return null;
+		return supp.get(this, null, 0, 0);
 	}
 
 	@Override
 	public synchronized <T> T getParamValue(String parameterKey, Class<T> valueCls, ComplexNumber chunkPos, int pixel, int sample) {
-		return paramContainer.getClientParameter(parameterKey).get(this, valueCls, chunkPos, pixel, sample);
+		ParamSupplier supp = paramContainer.getClientParameter(parameterKey);
+		if (supp == null)
+			return null;
+		return supp.get(this, valueCls, chunkPos, pixel, sample);
 	}
 
 	private void writeObject(ObjectOutputStream oos) throws IOException {
@@ -203,6 +219,16 @@ public abstract class AbstractSystemContext<D extends ViewData, C extends ViewCo
 	@Override
 	public SystemStateInfo getSystemStateInfo() {
 		return systemStateInfo;
+	}
+
+	@Override
+	public ParamConfiguration getParamConfiguration() {
+		return paramConfiguration;
+	}
+	
+	@Override
+	public void setParamConfiguration(ParamConfiguration paramConfiguration) {
+		this.paramConfiguration = paramConfiguration;
 	}
 
 }

@@ -4,12 +4,12 @@ import java.util.UUID;
 
 import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.data.ParamContainer;
-import de.felixperko.fractals.system.parameters.ParameterConfiguration;
+import de.felixperko.fractals.system.parameters.ParamConfiguration;
 
 public interface ClientSystemInterface {
 	public UUID getSystemId();
 	public void chunkUpdated(CompressedChunk chunk);
 	public void chunksCleared();
-	public ParameterConfiguration getParamConfiguration();
-	public void updateParameterConfiguration(ParamContainer paramContainer, ParameterConfiguration parameterConfiguration);
+	public ParamConfiguration getParamConfiguration();
+	public void updateParameterConfiguration(ParamContainer paramContainer, ParamConfiguration parameterConfiguration);
 }

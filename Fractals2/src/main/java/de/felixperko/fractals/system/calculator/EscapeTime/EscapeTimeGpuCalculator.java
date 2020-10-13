@@ -1,4 +1,4 @@
-package de.felixperko.fractals.system.calculator;
+package de.felixperko.fractals.system.calculator.EscapeTime;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -13,12 +13,14 @@ import com.aparapi.internal.kernel.KernelManager;
 import com.aparapi.internal.kernel.KernelPreferences;
 import com.aparapi.internal.model.CacheEnabler;
 
+import de.felixperko.fractals.FractalsMain;
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.BorderAlignment;
+import de.felixperko.fractals.manager.server.ResourceManager;
+import de.felixperko.fractals.system.calculator.ComputeExpression;
+import de.felixperko.fractals.system.calculator.ComputeKernelParameters;
 import de.felixperko.fractals.system.calculator.infra.AbstractFractalsCalculator;
-import de.felixperko.fractals.system.calculator.infra.AbstractPreparedFractalCalculator;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
-import de.felixperko.fractals.system.numbers.NumberFactory;
 import de.felixperko.fractals.system.parameters.suppliers.CoordinateBasicShiftParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
@@ -26,21 +28,21 @@ import de.felixperko.fractals.system.statistics.IStats;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
-import de.felixperko.fractals.util.expressions.GPUExpressionBuilder;
+import de.felixperko.fractals.util.NumberUtil;
+import de.felixperko.fractals.util.expressions.ComputeExpressionBuilder;
 
-public class MandelbrotGPUCalculator extends AbstractFractalsCalculator{
+public class EscapeTimeGpuCalculator extends AbstractFractalsCalculator{
 	
 	private static final long serialVersionUID = 1290699650814977951L;
 	
 	final static double LOG_2 = Math.log(2);
 	
-	public MandelbrotGPUCalculator() {
-		super(AbstractPreparedFractalCalculator.class);
+	public EscapeTimeGpuCalculator() {
 	}
 	
 	int maxIterations;
-	int maxIterationsGlobal;
 	boolean storeEndResults;
+	int maxIterationsGlobal;
 	
 	double limit;
 	int upsample;
@@ -51,12 +53,6 @@ public class MandelbrotGPUCalculator extends AbstractFractalsCalculator{
 	CalculatePhase phase = null;
 	
 	IStats taskStats;
-	
-	int arrFillCounter = 0;
-	
-	
-	static ThreadLocal<GPUExpressionKernel> tl_kernel = new ThreadLocal<>();
-	
 	
 	@Override
 	public void calculate(AbstractArrayChunk chunk, IStats taskStats, CalculateFractalsThread thread) {
@@ -82,7 +78,7 @@ public class MandelbrotGPUCalculator extends AbstractFractalsCalculator{
 		
 		List<Layer> layers = systemContext.getLayerConfiguration().getLayers();
 		
-		GPUExpressionKernel kernel = getCurrentKernel(pixelCount, layers);
+		EscapeTimeGpuKernelAbstract kernel = getCurrentKernel(pixelCount, layers);
 		
 		int samples = layer.getSampleCount();
 		int chunkSize = chunk.getChunkDimensions();
@@ -90,76 +86,45 @@ public class MandelbrotGPUCalculator extends AbstractFractalsCalculator{
 		prepareKernel(chunk, kernel, chunkSize, samples, layers.get(layers.size()-1).getSampleCount());
 		executeKernel(chunk, layer, samples, pixelCount, kernel);
 		
+		FractalsMain.getManagers().getResourceManager().getGpuKernelManager().kernelNoLongerInUse(kernel, systemContext.getParamContainer());
 	}
 	
-	private GPUExpressionKernel getCurrentKernel(int pixelCount, List<Layer> layers) {
-		GPUExpressionKernel kernel = tl_kernel.get();
+	private EscapeTimeGpuKernelAbstract getCurrentKernel(int pixelCount, List<Layer> layers) {
 		
 		String new_expression = systemContext.getParamContainer().getClientParameter("f(z)=").getGeneral(String.class);
 		
-		if (kernel == null || kernel.hasExpressionChanged(new_expression) || kernel.pixelItArr.length != pixelCount){
-			
-			if (kernel != null)
-				kernel.dispose();
-			
-//			expressions.add(new GPUExpression(GPUExpression.EXPR_WRITE_COMPLEX, 0, 1, 6, 7));
-//			expressions.add(new GPUExpression(GPUExpression.EXPR_SQUARE, 6, 7, 2, 3));
-//			expressions.add(new GPUExpression(GPUExpression.EXPR_ADD, 6, 7, 4, 5));
-//			expressions.add(new GPUExpression(GPUExpression.EXPR_WRITE_COMPLEX, 6, 7, 0, 1));
-			
-			
-//			List<GPUInstruction> instructions = new ArrayList<>();
-////			instructions.add(new GPUInstruction(GPUInstruction.EXPR_ABS, 7, 7, 7, 7));
-////			instructions.add(new GPUInstruction(GPUInstruction.EXPR_POW, 6, 7, 8, 9));
-//////			expressions.add(new GPUExpression(GPUExpression.EXPR_ABS, 0, 1, 0, 1));
-//			instructions.add(new GPUInstruction(GPUInstruction.EXPR_ABS, 0, 1, 0, 1));
-//			instructions.add(new GPUInstruction(GPUInstruction.EXPR_POW, 0, 1, 2, 3));
-//			instructions.add(new GPUInstruction(GPUInstruction.EXPR_ADD, 0, 1, 4, 5));
-////			instructions.add(new GPUInstruction(GPUInstruction.EXPR_ADD, 0, 1, 6, 7));
-////			instructions.add(new GPUInstruction(GPUInstruction.EXPR_WRITE_COMPLEX, 0, 1, 6, 7));
-//			
-//			Map<ParamSupplier, Integer> supplierMapping = new HashMap<>();
-//			ParamContainer helperContainer = new ParamContainer(paramSuppliers);
-////			supplierMapping.put(helperContainer.getClientParameter("start"), 0);
-//			supplierMapping.put(helperContainer.getClientParameter("pow"), 2);
-//			supplierMapping.put(helperContainer.getClientParameter("c"), 4);
-////			supplierMapping.put(helperContainer.getClientParameter("placeholder_prev"), 6);
-////			supplierMapping.put(helperContainer.getClientParameter("placeholder_prev_pow"), 8);
-//			GPUExpression expression = new GPUExpression(instructions, supplierMapping);
-			
-			
-//			Map<String, ParamSupplier> suppliers = new HashMap<>();
-//			for (ParamSupplier supp : paramSuppliers)
-//				suppliers.put(supp.getName(), supp);
-			String formula = systemContext.getParamContainer().getClientParameter("f(z)=").getGeneral(String.class);
-//			String formula = "z^pow+c";
-			
-//			GPUExpression expression = FractalsPolynomParser.parsePolynom(formula, suppliers, systemContext.getNumberFactory()).getGpuInstructions();
-			String inputVarName = null;
-			if (new_expression.contains("X")) inputVarName = "X";
-			if (new_expression.contains("x")) inputVarName = "x";
-			if (new_expression.contains("Z")) inputVarName = "Z";
-			if (new_expression.contains("z")) inputVarName = "z";
-			
-			GPUExpressionBuilder expressionBuilder = new GPUExpressionBuilder(new_expression, inputVarName, systemContext.getParamContainer().getClientParameters());
-			GPUExpression expression = expressionBuilder.getGpuExpression();
-			
-			if (expression == null)
-				throw new InvalidParameterException("The input expression can't be parsed");
-//			expression.instructions.add(0, new GPUInstruction(GPUInstruction.EXPR_ABS, 1, 1, 1, 1));
-			NumberFactory nf = systemContext.getNumberFactory();
-//			GPUExpression expression = new GPUExpression(instructions, paramSuppliers);
-			
-			kernel = GPUExpressionKernel.createKernel(new GpuAsmExpressionKernelFactory(), expression, layers, pixelCount);
- 			tl_kernel.set(kernel);
-			
-			CacheEnabler.setCachesEnabled(false);
-//			CacheEnabler.setCachesEnabled(true);
+		String inputVarName = null;
+		if (new_expression.contains("X")) inputVarName = "X";
+		if (new_expression.contains("x")) inputVarName = "x";
+		if (new_expression.contains("Z")) inputVarName = "Z";
+		if (new_expression.contains("z")) inputVarName = "z";
+		
+		ComputeExpressionBuilder expressionBuilder = new ComputeExpressionBuilder(new_expression, inputVarName, systemContext.getParamContainer().getClientParameters());
+		ComputeExpression expression = expressionBuilder.getComputeExpression();
+		
+		if (expression == null)
+			throw new InvalidParameterException("The input expression can't be parsed");
+		
+		String precisionString = systemContext.getParamValue("precision", String.class);
+		int precision = -1;
+		if (precisionString.equalsIgnoreCase("auto"))
+			precision = 32;
+		else {
+			try {
+				precision = Integer.parseInt(precisionString);
+			} catch (NumberFormatException e){
+				throw new IllegalArgumentException("Specified precision not valid");
+			}
 		}
+		
+		ComputeKernelParameters kernelParams = new ComputeKernelParameters(expression, layers, pixelCount, precision);
+		EscapeTimeGpuKernelAbstract kernel = FractalsMain.getManagers().getResourceManager().getGpuKernelManager().getKernel(kernelParams, systemContext.getParamContainer());
+		
+//		CacheEnabler.setCachesEnabled(false);
 		return kernel;
 	}
 	
-	private void prepareKernel(AbstractArrayChunk chunk, GPUExpressionKernel kernel, int chunkSize, int samples, int layerSampleCount) {
+	private void prepareKernel(AbstractArrayChunk chunk, EscapeTimeGpuKernelAbstract kernel, int chunkSize, int samples, int layerSampleCount) {
 		kernel.optionsInt[0] = maxIterations;
 		kernel.optionsInt[1] = chunkSize;
 		kernel.optionsInt[2] = samples;
@@ -175,25 +140,15 @@ public class MandelbrotGPUCalculator extends AbstractFractalsCalculator{
 			for (int i = 0 ; i < kernel.paramNames.length ; i++){
 				String name = kernel.paramNames[i];
 				ParamSupplier supp = systemContext.getParamContainer().getClientParameter(name);
-//			for (int j = 0 ; j < paramSuppliers.size(); j++){
-//				if (paramSuppliers.get(j).getName().equalsIgnoreCase(name)){
-//					supp = paramSuppliers.get(j);
-//					break;
-//				}
-//			}
+				
 				if (supp == null){
 					//search constant
-					for (int j = 0 ; j < kernel.constantNames.length ; j++){
-						if (kernel.constantNames[j].equalsIgnoreCase(name)){
-							kernel.params[i*3  ] = kernel.constants[j*2  ];
-							kernel.params[i*3+1] = kernel.constants[j*2+1];
-							kernel.params[i*3+2] = 0;
-							continue paramLoop;
-						}
-					}
+					supp = kernel.constantSuppliers.get(name);
 					//no constant found -> missing supplier
-					throw new IllegalStateException("Missing ParamSupplier "+name);
+					if (supp == null)
+						throw new IllegalStateException("Missing ParamSupplier "+name);
 				}
+				
 				if (supp instanceof StaticParamSupplier){
 					ComplexNumber val = (ComplexNumber)((StaticParamSupplier)supp).getObj();
 					kernel.params[i*3] = (float) val.realDouble();
@@ -212,13 +167,12 @@ public class MandelbrotGPUCalculator extends AbstractFractalsCalculator{
 	}
 
 	private void executeKernel(AbstractArrayChunk chunk, Layer layer, int samples, int pixelCount,
-			GPUExpressionKernel kernel) {
+			EscapeTimeGpuKernelAbstract kernel) {
 		phase = CalculatePhase.PHASE_MAINLOOP;
 		
 		//get max amount of samples that have to be completed for any pixel
 		int currentMinSamples = Integer.MAX_VALUE;
 		for (int sample = 0 ; sample < samples ; sample++) {
-//			GPUSampleDataBuilder sampleDataBuilder = new GPUSampleDataBuilder(maxIterations);
 			
 			if (isCancelled())
 				break;
@@ -248,10 +202,14 @@ public class MandelbrotGPUCalculator extends AbstractFractalsCalculator{
 		KernelPreferences preferences = KernelManager.instance().getDefaultPreferences();
 		List<Device> devices = new ArrayList<>(preferences.getPreferredDevices(null));
 		KernelManager.instance().setDefaultPreferredDevices(new LinkedHashSet<>(devices));
-		for (int sample = currentMinSamples ; sample < samples ; sample++){
+
+		ResourceManager resourceManager = FractalsMain.getManagers().getResourceManager();
+		resourceManager.kernelActiveOnDevice(kernel.device);
+		
+		for (int sample = 0 ; sample < samples ; sample++){
 			boolean noChange = true;
 			if (isCancelled())
-				return;
+				break;
 			Range range = kernel.device.createRange((int) (Math.ceil(pixelCount/256d)*256), 256);
 			kernel.setExplicit(false);
 //				kernel.put(currentRealArr);
@@ -266,14 +224,19 @@ public class MandelbrotGPUCalculator extends AbstractFractalsCalculator{
 				kernel.pixelSamples[i] = layer.isActive(i) ? chunk.getSampleCount(index) : samples;
 				kernel.pixelWasSampled[i] = 0;
 			}
+			
 			kernel.execute(range);
+			
 //				kernel.get(resultsArr);
-//				kernel.dispose();
 			
 			for (int i = 0 ; i < pixelCount ; i++){
+				float result = kernel.resultsArr[i];
+				if (chunk.getChunkX() == 1 && chunk.getChunkY() == 0 && i == 0){
+					System.out.println(result);
+				}
 				int sucessfulSamples = kernel.pixelWasSampled[i];
 				if (sucessfulSamples > 0){
-					chunk.addSample(i, kernel.resultsArr[i], upsample);
+					chunk.addSample(i, result, upsample);
 					sample_success(i);
 					noChange = false;
 				}
@@ -283,9 +246,26 @@ public class MandelbrotGPUCalculator extends AbstractFractalsCalculator{
 			if (noChange)
 				break;
 		}
-//			}
-		
-		arrFillCounter = 0;
+
+		resourceManager.kernelInactiveOnDevice(kernel.device);
+		//idle time to save power
+		while (true){
+			long predictedYieldTime = resourceManager.getPredictedCooldownEnd(kernel.device)-System.nanoTime();
+			if (predictedYieldTime <= 100)
+				break;
+			long yieldMs = (long) (NumberUtil.NS_TO_MS*predictedYieldTime);
+			try {
+				if (yieldMs > 1)
+					Thread.sleep(1);
+				else {
+					int yieldNs = (int) (predictedYieldTime - yieldMs/NumberUtil.NS_TO_MS);
+					Thread.sleep(0, yieldNs);
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				break;
+			}
+		}
 	}
 	private void sample_success(int pixel) {
 //		if (chunk.getValue(pixel, true) <= 0)

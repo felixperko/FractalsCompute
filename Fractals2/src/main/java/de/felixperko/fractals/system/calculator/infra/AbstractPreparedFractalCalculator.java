@@ -20,7 +20,6 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 	final static double LOG_2 = Math.log(2);
 	
 	public AbstractPreparedFractalCalculator() {
-		super(AbstractPreparedFractalCalculator.class);
 	}
 	
 	int maxIterations;

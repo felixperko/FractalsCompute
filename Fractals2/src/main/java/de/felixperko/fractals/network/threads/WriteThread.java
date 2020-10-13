@@ -49,17 +49,23 @@ public abstract class WriteThread extends AbstractFractalsThread implements Mess
 		super(managers, "COM_"+ID_COUNTER+"_OUT");
 		this.writeThreadId = ID_COUNTER++;
 		this.socket = socket;
-	}
-
-	public void run() {
+		
+		InputStream inStream;
 		try {
-			InputStream inStream = socket.getInputStream();
+			inStream = socket.getInputStream();
 			if (compression) {
 				outComp = new SnappyOutputStream(socket.getOutputStream());
 				out = new ObjectOutputStream(outComp);
 			} else
 				out = new ObjectOutputStream(socket.getOutputStream());
 			listenThread = new ListenThread(managers, this, inStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void run() {
+		try {
 			listenThread.start();
 			
 			mainLoop:
@@ -115,7 +121,7 @@ public abstract class WriteThread extends AbstractFractalsThread implements Mess
 								if (outComp != null)
 									outComp.flush();
 								out.reset();
-							} catch (SocketException | FileNotFoundException e) {
+							} catch (SocketException e) {
 								try {
 									Thread.sleep(1);
 								} catch (InterruptedException e1) {

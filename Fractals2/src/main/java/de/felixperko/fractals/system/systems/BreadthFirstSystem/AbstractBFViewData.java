@@ -41,7 +41,7 @@ public abstract class AbstractBFViewData<VIEWDATA extends AbstractBFViewData<VIE
 	@Override
 	public void tick() {
 		Long time = System.nanoTime();
-		Long timedOutTime = time+(long)(bufferTimeout/NumberUtil.NS_TO_S);
+		Long timedOutTime = time-(long)(bufferTimeout/NumberUtil.NS_TO_S);
 		
 		for (Chunk bufferedChunk : getBufferedChunks()) {
 			Integer x = bufferedChunk.getChunkX();

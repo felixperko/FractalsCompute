@@ -44,8 +44,8 @@ public class ServerNetworkManager extends NetworkManager implements INetworkMana
 		this.managers = managers;
 	}
 	
-	public void startServerConnectThread() {
-		serverConnectThread = new ServerConnectThread((ServerManagers) managers);
+	public void startServerConnectThread(int port) {
+		serverConnectThread = new ServerConnectThread((ServerManagers) managers, port);
 		serverConnectThread.start();
 	}
 	

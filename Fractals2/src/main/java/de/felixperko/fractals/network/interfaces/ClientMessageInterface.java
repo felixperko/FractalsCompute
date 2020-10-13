@@ -9,7 +9,8 @@ import java.util.UUID;
 import de.felixperko.fractals.data.shareddata.DataContainer;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
-import de.felixperko.fractals.system.parameters.ParameterConfiguration;
+import de.felixperko.fractals.network.messages.ResourceRequestMessage;
+import de.felixperko.fractals.system.parameters.ParamConfiguration;
 import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
 import de.felixperko.fractals.system.task.FractalsTask;
 
@@ -17,6 +18,10 @@ public abstract class ClientMessageInterface {
 	
 	Map<UUID, ClientSystemInterface> systemInterfaces = new HashMap<>();
 	ServerConnection serverConnection;
+	
+	protected int resourceCpuCores = 0;
+	protected int resourceMaxCpuCores = 0;
+	protected Map<String, Float> resourceGpus = new HashMap<>();
 	
 	public ClientMessageInterface(ServerConnection serverConnection) {
 		this.serverConnection = serverConnection;
@@ -32,7 +37,7 @@ public abstract class ClientMessageInterface {
 		return systemInterfaces.get(systemId);
 	}
 	
-	public void createdSystem(UUID systemId, ClientConfiguration clientConfiguration, ParameterConfiguration parameterConfiguration) {
+	public void createdSystem(UUID systemId, ClientConfiguration clientConfiguration, ParamConfiguration parameterConfiguration) {
 		ClientSystemInterface systemInterface = createSystemInterface(clientConfiguration);
 		addSystemInterface(systemId, systemInterface);
 		systemInterface.updateParameterConfiguration(clientConfiguration.getParamContainer(systemId), parameterConfiguration);
@@ -67,4 +72,24 @@ public abstract class ClientMessageInterface {
 	public ServerConnection getServerConnection() {
 		return serverConnection;
 	}
+
+	public void changedResources(int cpuCores, int maxCpuCores, Map<String, Float> gpus) {
+		resourceCpuCores = cpuCores;
+		resourceMaxCpuCores = maxCpuCores;
+		resourceGpus = gpus;
+	}
+
+	public int getResourceCpuCores() {
+		return resourceCpuCores;
+	}
+
+	public int getResourceMaxCpuCores() {
+		return resourceMaxCpuCores;
+	}
+
+	public Map<String, Float> getResourceGpus() {
+		return resourceGpus;
+	}
+
+	public abstract ResourceRequestMessage requestResources();
 }

@@ -26,6 +26,7 @@ import de.felixperko.fractals.manager.server.ServerThreadManager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.infra.connection.ClientLocalConnection;
 import de.felixperko.fractals.network.messages.ChunkUpdateMessage;
+import de.felixperko.fractals.system.calculator.infra.DeviceType;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
@@ -112,7 +113,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	
 	boolean updatedPredictedMidpoint = false;
 
-	BFSystemContext context = new BFSystemContext(this);
+	BFSystemContext context;
 	
 	boolean done = false;
 	
@@ -130,6 +131,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 
 	public BreadthFirstTaskManager(ServerManagers managers, CalcSystem system) {
 		super(managers, system);
+		context = new BFSystemContext(this, system.getParameterConfiguration());
 		//log = ((BreadthFirstSystem)system).getLogger().createSubLogger("tm");
 	}
 
@@ -210,6 +212,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	}
 
 	Integer lastTimeslice = 0;
+	int timesliceTasksFinished = 0;
 	
 	private boolean updateStats() {
 		ServerThreadManager threadManager = ((ServerManagers)managers).getThreadManager();
@@ -222,7 +225,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			List<CalculateFractalsThread> threads = threadManager.getCalculateThreads();
 			int[] ips_threads = new int[threads.size()];
 			int i2 = 0;
-			for (CalculateFractalsThread thread : threads) {
+			for (CalculateFractalsThread thread : new ArrayList<>(threads)) {
 				String name = thread.getName();
 				//TODO just for debug
 				int iterations = thread.getTimesliceIterations(i, false);
@@ -233,7 +236,8 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				ips_threads[i2] = iterationsPerSecond;
 				i2++;
 			}
-			LOG.info("IPS "+timeslice+" (total):	"+totalIterationsPerSecond);
+			LOG.info("IPS "+timeslice+" (total):	"+totalIterationsPerSecond+" tasks finished: "+timesliceTasksFinished);
+			timesliceTasksFinished = 0;
 			getSystem().getSystemStateInfo().updateIterationsPerSecond(timeslice, 
 					timesliceProvider.getStartTime(timeslice), timesliceProvider.getEndTime(timeslice), totalIterationsPerSecond, ips_threads);
 		}
@@ -263,10 +267,16 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	}
 
 	@Override
-	public List<? extends FractalsTask> getTasks(int count) {
+	public List<? extends FractalsTask> getTasks(DeviceType deviceType, int count) {
+		
+		if (deviceType == DeviceType.CPU && context.getCpuCalculatorClass() == null)
+			return null;
+		if (deviceType == DeviceType.GPU && context.getGpuCalculatorClass() == null)
+			return null;
+		
 		List<BreadthFirstTask> tasks = new ArrayList<>();
-		for (int i = 0 ; i < count ; i++) {
-			synchronized (this){
+		synchronized (this){
+			for (int i = 0 ; i < count ; i++) {
 				
 				//TODO remove
 //				BreadthFirstTask task = null;
@@ -365,13 +375,15 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 					
 					//send update messages
 					synchronized (clients) {
+						int sent = 0;
 						for (ClientConfiguration client : clients) {
 							if (!(client.getConnection() instanceof ClientLocalConnection)) {
 								ChunkUpdateMessage msg = ((ServerNetworkManager)managers.getNetworkManager()).updateChunk(client, system, compressedChunk);
-								msg.addSentCallback(() -> {
-									if (msg.getChunk().getJobId() != context.getViewId())
-										msg.setCancelled(true);
-								});
+								sent++;
+//								msg.addSentCallback(() -> {
+//									if (msg.getChunk().getJobId() != context.getViewId())
+//										msg.setCancelled(true);
+//								});
 //									List<ChunkUpdateMessage> clientMsgs = pendingUpdateMessages.get(client);
 //									if (clientMsgs == null) {
 //										clientMsgs = new ArrayList<>();
@@ -382,8 +394,11 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 //									msg.addSentCallback(() -> {finalList.remove(msg);});
 							}
 						}
+						LOG.debug("sent chunkUpdate to "+sent+" clients.");
 					}
 				}
+				
+				timesliceTasksFinished++;
 			}
 		
 			//update layer and re-add or dispose
@@ -440,7 +455,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		stats.reset();
 		BreadthFirstViewData viewData = context.getActiveViewData();
 		if (viewData != null) {
-//			viewData.dispose();
+			viewData.dispose();
 			context.setActiveViewData(null); //TODO does that make sense?
 		}
 		for (TaskProviderAdapter adapter : taskProviders)
@@ -469,7 +484,15 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				FractalsCalculator calculator = task.getCalculator();
 				//TODO wip
 				if (calculator != null) {
-					task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, task.getStateInfo().getLayer());
+					try {
+						Layer layer = task.getStateInfo().getLayer();
+						task.updatePriorityAndDistance(midpointChunkX, midpointChunkY, layer);
+					} catch (IndexOutOfBoundsException e){
+						task.setCancelled(true);
+						assignedIt.remove();
+						LOG.info("removed task: layerId="+task.getStateInfo().getLayerId()+" not valid.");
+						continue;
+					}
 					if (context.getDrawRegionDistance(task.getChunk()) > context.border_generation) {
 						calculator.setCancelled();
 						assignedIt.remove();
@@ -500,7 +523,12 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			Iterator<BreadthFirstTask> borderIt = borderTasks.iterator();
 			while (borderIt.hasNext()) {
 				BreadthFirstTask borderTask = borderIt.next();
-				if (context.getDrawRegionDistance(borderTask.getChunk()) <= context.border_generation) {
+				double drawRegionDistance = context.getDrawRegionDistance(borderTask.getChunk());
+				if (drawRegionDistance > context.border_dispose){
+					borderTask.getStateInfo().setState(TaskState.REMOVED);
+					borderIt.remove();
+				}
+				else if (drawRegionDistance <= context.border_generation) {
 					borderTask.getStateInfo().setState(TaskState.OPEN);
 					openTasks.get(borderTask.getStateInfo().getLayer().getId()).add(borderTask);
 					borderIt.remove();
@@ -619,6 +647,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	}
 
 	private void generateNeighbours(BreadthFirstTask polledTask) {
+		//TODO use variable?
 		double highestDistance = context.width >= context.height ? context.width : context.height;
 		highestDistance *= 0.5 * Math.sqrt(2);
 //		highestDistance += chunkSize;
@@ -686,5 +715,9 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		newQueue.add(task);
 		context.getActiveViewData().insertBufferedChunk(chunk, true);
 		return true;
+	}
+
+	public BFSystemContext getSystemContext() {
+		return context;
 	}
 }

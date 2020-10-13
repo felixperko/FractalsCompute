@@ -1,15 +1,20 @@
 package de.felixperko.fractals.manager.common;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import de.felixperko.fractals.FractalsMain;
 import de.felixperko.fractals.network.threads.LocalServerThread;
+import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 import de.felixperko.fractals.system.thread.FractalsThread;
 
 public abstract class ThreadManager extends Manager {
 
 	protected List<FractalsThread> threads = new CopyOnWriteArrayList<>();
+	
+	protected LocalServerThread localServerThread;
 
 	public ThreadManager(Managers managers) {
 		super(managers);
@@ -35,10 +40,26 @@ public abstract class ThreadManager extends Manager {
 		}
 		return null;
 	}
+	
+	public List<CalculateFractalsThread> getCalculateThreads(){
+		List<CalculateFractalsThread> calculateThreads = new ArrayList<>();
+		for (FractalsThread thread : threads){
+			if (thread instanceof CalculateFractalsThread)
+				calculateThreads.add((CalculateFractalsThread) thread);
+		}
+		return calculateThreads;
+	}
 
 	public void startLocalServer() {
-		LocalServerThread lst = new LocalServerThread(managers, "SERVER_LOCAL_MAIN", 100);
-		lst.start();
+		localServerThread = new LocalServerThread(managers, "SERVER_LOCAL_MAIN", 100);
+		threads.add(localServerThread);
+		localServerThread.start();
+	}
+	
+	public void stopLocalServer() {
+		if (localServerThread != null){
+			FractalsMain.stopInstance();
+		}
 	}
 
 }

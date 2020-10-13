@@ -10,7 +10,6 @@ public class ClientRemoteConnection extends AbstractConnection<ServerNetworkMana
 	SenderInfo clientInfo;
 	ServerWriteThread writeThread;
 	ServerNetworkManager networkManager;
-	boolean closed;
 	
 	public ClientRemoteConnection(ServerNetworkManager networkManager, SenderInfo info, ServerWriteThread writeThread) {
 		this.networkManager = networkManager;

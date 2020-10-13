@@ -46,7 +46,14 @@ public abstract class AbstractFractalsThread extends Thread implements FractalsT
 	
 	@Override
 	public void setLifeCycleState(LifeCycleState state) {
+		setLifeCycleState(state, false);
+	}
+	
+	@Override
+	public void setLifeCycleState(LifeCycleState state, boolean force) {
 		if (this.state == state)
+			return;
+		if (!force && this.state == LifeCycleState.STOPPED)
 			return;
 		synchronized (lock) {
 			lifeCycleHistory.add(new LifeCycleStateChange(this.state, state));

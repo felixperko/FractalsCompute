@@ -1,5 +1,8 @@
 package de.felixperko.fractals.network.messages;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.felixperko.fractals.network.infra.ServerMessage;
 
 public class SessionInitResponseMessage extends ServerMessage{
@@ -8,6 +11,8 @@ public class SessionInitResponseMessage extends ServerMessage{
 
 	@Override
 	protected void process() {
-		// TODO session initiation successful
+		ResourceRequestMessage resourceRequestMessage = getClientMessageInterface().requestResources();
+		if (resourceRequestMessage != null)
+			answer(resourceRequestMessage);
 	}
 }

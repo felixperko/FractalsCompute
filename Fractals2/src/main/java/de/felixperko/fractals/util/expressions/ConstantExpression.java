@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.felixperko.fractals.system.calculator.GPUInstruction;
+import de.felixperko.fractals.system.calculator.ComputeInstruction;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.NumberFactory;
 
@@ -50,7 +50,7 @@ public class ConstantExpression extends AbstractExpression {
 //	}
 
 	@Override
-	public void registerSymbolUses(GPUExpressionBuilder expressionBuilder, NumberFactory numberFactory,
+	public void registerSymbolUses(ComputeExpressionBuilder expressionBuilder, NumberFactory numberFactory,
 			boolean copyVariable) {
 		
 		complexNumber = numberFactory.createComplexNumber(real, imag);
@@ -60,15 +60,27 @@ public class ConstantExpression extends AbstractExpression {
 		expressionBuilder.setExplicitValue(name, complexNumber);
 		varSymbol.addOccurence();
 		if (copyVariable)
-			symbolSlot = varSymbol.getSlot();
+			symbolSlot = varSymbol.getSlot(true, true);
 	}
 
 	@Override
-	public void addInstructions(List<GPUInstruction> instructions, GPUExpressionBuilder expressionBuilder) {
+	public void addInitInstructions(List<ComputeInstruction> instructions, ComputeExpressionBuilder expressionBuilder) {
 		ExpressionSymbol symbol = expressionBuilder.getValueExpressionSymbol(name);
-		symbol.initCopiesIfNeeded(instructions);
 		resultIndexReal = symbol.getIndexReal(symbolSlot);
 		resultIndexImag = symbol.getIndexImag(symbolSlot);
+		//not using pristine slot -> init copy
+		if (symbol.getPristineIndexReal() != resultIndexReal || symbol.getPristineIndexImag() != resultIndexImag){
+			initCopy(instructions, symbol);
+		}
+	}
+
+	protected void initCopy(List<ComputeInstruction> instructions, ExpressionSymbol symbol){
+		instructions.add(new ComputeInstruction(ComputeInstruction.INSTR_COPY_COMPLEX, symbol.getPristineIndexReal(), symbol.getPristineIndexImag(), resultIndexReal, resultIndexImag));
+	}
+
+	@Override
+	public void addInstructions(List<ComputeInstruction> instructions, ComputeExpressionBuilder expressionBuilder) {
+		ExpressionSymbol symbol = expressionBuilder.getValueExpressionSymbol(name);
 		symbol.removeOccurenceAndIsLast();
 	}
 
@@ -85,6 +97,26 @@ public class ConstantExpression extends AbstractExpression {
 	@Override
 	public int getResultIndexImag() {
 		return resultIndexImag;
+	}
+	
+	@Override
+	public boolean isComplexExpression() {
+		return true;
+	}
+
+	@Override
+	public boolean isSingleRealExpression() {
+		return false;
+	}
+
+	@Override
+	public boolean isSingleImagExpression() {
+		return false;
+	}
+
+	@Override
+	public double getSmoothstepConstant(ComputeExpressionBuilder expressionBuilder) {
+		return 0;
 	}
 
 }

@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.felixperko.fractals.system.PadovanLayerConfiguration;
 import de.felixperko.fractals.system.numbers.impl.DoubleComplexNumber;
+import de.felixperko.fractals.system.parameters.ParamConfiguration;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstLayer;
@@ -106,6 +107,7 @@ public class ParamContainer implements Serializable{
 	//
 	
 	private Map<String, ParamSupplier> clientParameters;
+	private ParamConfiguration paramConfiguration;
 
 	public ParamContainer() {
 		this.clientParameters = new HashMap<>();
@@ -133,6 +135,24 @@ public class ParamContainer implements Serializable{
 				this.clientParameters.put(e.getKey(), e.getValue().copy());
 			}
 		}
+	}
+	
+	public boolean updateChangedFlag(Map<String, ParamSupplier> oldParams){
+		boolean changed = false;
+		if (oldParams != null) {
+			for (ParamSupplier supplier : clientParameters.values()) {
+				supplier.updateChanged(oldParams.get(supplier.getName()));
+				if (supplier.isChanged()) {
+					if (supplier.isSystemRelevant() || supplier.isLayerRelevant())
+						changed = true;
+				}
+			}
+		}
+		return changed;
+	}
+	
+	public void setParamConfiguration(ParamConfiguration paramConfiguration){
+		this.paramConfiguration = paramConfiguration;
 	}
 
 	/**
@@ -225,7 +245,13 @@ public class ParamContainer implements Serializable{
 	}
 
 	public ParamSupplier getClientParameter(String name) {
-		return clientParameters.get(name);
+		ParamSupplier supp = clientParameters.get(name);
+		if (supp == null && paramConfiguration != null){
+			ParamSupplier calcNameSupp = clientParameters.get("calculator");
+			String calcName = calcNameSupp == null ? null : calcNameSupp.getGeneral(String.class);
+			supp = paramConfiguration.getDefaultValue(calcName, name);
+		}
+		return supp;
 	}
 	
 	@JsonIgnore
@@ -242,7 +268,9 @@ public class ParamContainer implements Serializable{
 		return clientParameters.values();
 	}
 	
-	public void setParameters(Collection<ParamSupplier> parameters) {
+	public void setParameters(Collection<ParamSupplier> parameters, boolean clearExisting) {
+		if (clearExisting)
+			clientParameters.clear();
 		for (ParamSupplier supplier : parameters)
 			clientParameters.put(supplier.getName(), supplier);
 	}

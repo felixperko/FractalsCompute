@@ -16,7 +16,7 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 	
 	private static final long serialVersionUID = -7127742325514423406L;
 	
-	String name;
+	protected String name;
 	
 	@JsonIgnore
 	boolean systemRelevant = false;

@@ -1,5 +1,6 @@
 package de.felixperko.fractals.manager.common;
 
+import java.io.IOException;
 import java.util.List;
 
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
@@ -13,5 +14,5 @@ public interface INetworkManager {
 	
 	public List<ServerConnection> getServerConnections();
 	
-	public ServerConnection connectToServer(String host, int port);
+	public ServerConnection connectToServer(String host, int port) throws IOException;
 }

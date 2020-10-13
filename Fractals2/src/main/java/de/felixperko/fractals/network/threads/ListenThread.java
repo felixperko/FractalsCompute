@@ -1,10 +1,13 @@
 package de.felixperko.fractals.network.threads;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.StreamCorruptedException;
 import java.net.SocketException;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +35,8 @@ public class ListenThread extends AbstractFractalsThread {
 	boolean compressed = false;
 	
 	int listenThreadId;
+	
+	List<Runnable> connectionClosedRunnables = new ArrayList<>();
 
 	public ListenThread(Managers managers, WriteThread writeThread, InputStream in) {
 		super(managers, "COM_"+ID_COUNTER+"_IN");
@@ -77,11 +82,12 @@ public class ListenThread extends AbstractFractalsThread {
 				msg.received(writeThread.getConnection(), LOG);
 				if (writeThread instanceof ServerWriteThread)
 					((ServerWriteThread)writeThread).resetLastReachableTime();
-			} catch (SocketException e) {
+			} catch (SocketException | EOFException e) {
 				LOG.warn("lost connection");
 				setCloseConnection(true);
 				if (writeThread.getConnection() instanceof ClientConnection)
 					((ServerManagers)managers).getServerNetworkManager().removeClient(writeThread.getConnection());
+				connectionClosedRunnables.forEach(runnable -> runnable.run());
 			} catch(StreamCorruptedException e) {
 				throw new IllegalStateException("Inputstream corrupted");
 			} catch (Exception e) {
@@ -118,5 +124,13 @@ public class ListenThread extends AbstractFractalsThread {
 	
 	public void setCompressed(boolean compressed) {
 		this.compressed = compressed;
+	}
+	
+	public void addConnectionClosedRunnable(Runnable runnable){
+		this.connectionClosedRunnables.add(runnable);
+	}
+	
+	public void removeConnectionClosedRunnable(Runnable runnable){
+		this.connectionClosedRunnables.remove(runnable);
 	}
 }

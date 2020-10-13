@@ -7,11 +7,11 @@ import java.util.List;
 
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 
-public class ParameterDefinition implements Serializable{
+public class ParamDefinition implements Serializable{
 	
 	private static final long serialVersionUID = 7667944768022310166L;
 
-	ParameterConfiguration configuration;
+	ParamConfiguration configuration;
 	
 	String name;
 	String description;
@@ -24,7 +24,7 @@ public class ParameterDefinition implements Serializable{
 	
 	Object defaultValue = null;
 	
-	public ParameterDefinition(String name, String category, Class<? extends ParamSupplier> cls, ParamValueType... possibleValueTypes) {
+	public ParamDefinition(String name, String category, Class<? extends ParamSupplier> cls, ParamValueType... possibleValueTypes) {
 		this.name = name;
 		this.category = category;
 		this.possibleClasses = new ArrayList<>();
@@ -32,14 +32,14 @@ public class ParameterDefinition implements Serializable{
 		this.possibleClasses.add(cls);
 	}
 	
-	public ParameterDefinition(String name, String category, List<Class<? extends ParamSupplier>> classes, ParamValueType... possibleValueTypes) {
+	public ParamDefinition(String name, String category, List<Class<? extends ParamSupplier>> classes, ParamValueType... possibleValueTypes) {
 		this.name = name;
 		this.category = category;
 		this.possibleClasses = classes;
 		this.possibleValueTypes = Arrays.asList(possibleValueTypes);
 	}
 	
-	public ParameterDefinition(String name, String category, ParamValueType possibleValue, Class<? extends ParamSupplier>... classes) {
+	public ParamDefinition(String name, String category, ParamValueType possibleValue, Class<? extends ParamSupplier>... classes) {
 		this.name = name;
 		this.category = category;
 		this.possibleClasses = Arrays.asList(classes);
@@ -55,11 +55,11 @@ public class ParameterDefinition implements Serializable{
 		return possibleValueTypes;
 	}
 
-	public ParameterConfiguration getConfiguration() {
+	public ParamConfiguration getConfiguration() {
 		return configuration;
 	}
 
-	public void setConfiguration(ParameterConfiguration configuration) {
+	public void setConfiguration(ParamConfiguration configuration) {
 		this.configuration = configuration;
 	}
 
@@ -71,12 +71,12 @@ public class ParameterDefinition implements Serializable{
 		return description;
 	}
 	
-	public ParameterDefinition withDescription(String description) {
+	public ParamDefinition withDescription(String description) {
 		this.description = description;
 		return this;
 	}
 	
-	public ParameterDefinition withHints(String... hints) {
+	public ParamDefinition withHints(String... hints) {
 		for (String hint : hints)
 			this.hints.add(hint);
 		return this;

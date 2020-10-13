@@ -9,7 +9,7 @@ import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.network.messages.SystemConnectedMessage;
-import de.felixperko.fractals.system.parameters.ParameterConfiguration;
+import de.felixperko.fractals.system.parameters.ParamConfiguration;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.systems.stateinfo.SystemStateInfo;
 import de.felixperko.fractals.system.thread.FractalsThread;
@@ -18,7 +18,7 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	
 	static int CALC_SYSTEM_COUNTER = 0;
 	
-	protected UUID id = UUID.randomUUID();
+	protected UUID id;
 	int number = 0;
 	
 	List<ClientConfiguration> clients = new ArrayList<>();
@@ -30,9 +30,10 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	
 	SystemStateInfo systemStateInfo;
 	
-	ParameterConfiguration parameterConfiguration;
+	ParamConfiguration parameterConfiguration;
 	
-	public AbstractCalcSystem(ServerManagers managers) {
+	public AbstractCalcSystem(UUID systemId, ServerManagers managers) {
+		this.id = systemId;
 		this.managers = managers;
 		this.number = CALC_SYSTEM_COUNTER++;
 		this.systemStateInfo = new SystemStateInfo(id);
@@ -83,6 +84,7 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	
 	@Override
 	public void addClient(ClientConfiguration newConfiguration, ParamContainer paramContainer) {
+		
 		synchronized (clients) {
 			clients.add(newConfiguration);
 			newConfiguration.getSystemRequests().remove(paramContainer);
@@ -152,7 +154,7 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	}
 	
 	@Override
-	public ParameterConfiguration getParameterConfiguration() {
+	public ParamConfiguration getParameterConfiguration() {
 		return parameterConfiguration;
 	}
 	
@@ -163,6 +165,15 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 	
 	@Override
 	public void setLifeCycleState(LifeCycleState state) {
+		setLifeCycleState(state, false);
+	}
+	
+	@Override
+	public void setLifeCycleState(LifeCycleState state, boolean force) {
+		if (this.state == state)
+			return;
+		if (!force && this.state == LifeCycleState.STOPPED)
+			return;
 		this.state = state;
 	}
 	

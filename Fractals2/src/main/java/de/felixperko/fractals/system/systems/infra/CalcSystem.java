@@ -6,7 +6,7 @@ import java.util.UUID;
 import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
-import de.felixperko.fractals.system.parameters.ParameterConfiguration;
+import de.felixperko.fractals.system.parameters.ParamConfiguration;
 import de.felixperko.fractals.system.systems.stateinfo.SystemStateInfo;
 
 public interface CalcSystem extends LifeCycleComponent{
@@ -23,8 +23,8 @@ public interface CalcSystem extends LifeCycleComponent{
 	public void removeClient(ClientConfiguration oldConfiguration);
 	public List<ClientConfiguration> getClients();
 
-	public ParameterConfiguration getParameterConfiguration();
-	public ParameterConfiguration createParameterConfiguration();
+	public ParamConfiguration getParameterConfiguration();
+	public ParamConfiguration createParameterConfiguration();
 	public boolean isApplicable(ClientConnection connection, ParamContainer paramContainer);
 	
 	public SystemStateInfo getSystemStateInfo();

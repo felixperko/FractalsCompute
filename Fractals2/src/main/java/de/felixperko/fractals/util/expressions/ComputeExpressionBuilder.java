@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import de.felixperko.fractals.system.calculator.GPUExpression;
-import de.felixperko.fractals.system.calculator.GPUInstruction;
+import de.felixperko.fractals.system.calculator.ComputeExpression;
+import de.felixperko.fractals.system.calculator.ComputeInstruction;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.NumberFactory;
 import de.felixperko.fractals.system.numbers.impl.DoubleComplexNumber;
@@ -14,7 +14,7 @@ import de.felixperko.fractals.system.numbers.impl.DoubleNumber;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 
-public class GPUExpressionBuilder {
+public class ComputeExpressionBuilder {
 	
 	FractalsExpression expression;
 	
@@ -29,15 +29,19 @@ public class GPUExpressionBuilder {
 	
 	private LinkedHashMap<String, ExpressionSymbol> allSymbols = new LinkedHashMap<>();
 	
-	List<GPUInstruction> instructions;
+	List<ComputeInstruction> instructions;
 	
-	public GPUExpressionBuilder(String input, String inputVarName, Map<String, ParamSupplier> parameters){
+	Map<String, ComplexNumber> fixedValues = new HashMap<>();
+	
+	double smoothstepConstant;
+	
+	public ComputeExpressionBuilder(String input, String inputVarName, Map<String, ParamSupplier> parameters){
 		this.input = input;
 		this.inputVarName = inputVarName;
 		this.parameters = parameters;
 	}
 	
-	public GPUExpression getGpuExpression(){
+	public ComputeExpression getComputeExpression(){
 		
 		Map<ParamSupplier, Integer> mappedParams = new HashMap<>();
 		
@@ -61,7 +65,8 @@ public class GPUExpressionBuilder {
 				mappedParams.put(param, (Integer)copyCounter);
 			} else { //is raw value
 				ComplexNumber constant = explicitValues.get(symbolName);
-				mappedParams.put(new StaticParamSupplier(symbolName, constant), (Integer)copyCounter);
+				ParamSupplier supp = new StaticParamSupplier(symbolName, constant);
+				mappedParams.put(supp, (Integer)copyCounter);
 			}
 			copyCounter = symbol.assignPristineIndex(copyCounter);
 		};
@@ -71,8 +76,10 @@ public class GPUExpressionBuilder {
 		}
 		
 		instructions = new ArrayList<>();
+		expression.addInitInstructions(instructions, this);
 		expression.addInstructions(instructions, this);
-		return new GPUExpression(input, instructions, mappedParams, copyCounter);
+		smoothstepConstant = Math.log(expression.getSmoothstepConstant(this));
+		return new ComputeExpression(input, instructions, mappedParams, copyCounter, fixedValues, smoothstepConstant);
 	}
 	
 	public ExpressionSymbol getReferenceExpressionSymbol(String name){
@@ -95,5 +102,9 @@ public class GPUExpressionBuilder {
 
 	public void setExplicitValue(String name, ComplexNumber complexNumber) {
 		explicitValues.put(name, complexNumber);
+	}
+
+	public double getSmoothstepConstant() {
+		return smoothstepConstant;
 	}
 }

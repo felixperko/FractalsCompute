@@ -66,7 +66,7 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 			Layer layer = getStateInfo().getLayer();
 			chunk.setUpsample(layer.getUpsample());
 			
-			calculator = getContext().createCalculator();
+			calculator = getContext().createCalculator(thread.getDeviceType());
 			calculator.calculate(chunk, taskStats, thread);
 			
 			if (calculator.isCancelled()) {
@@ -74,7 +74,7 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 				setCancelled(true);
 				int prevLayerId = getStateInfo().getLayerId()-1;
 				if (prevLayerId >= 0) {
-					Layer prevLayer = getContext().getLayer(prevLayerId);
+					Layer prevLayer = getLayer(prevLayerId);
 					if (prevLayer != null)
 						chunk.setUpsample(prevLayer.getUpsample());	
 				}
@@ -89,7 +89,9 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 
 	private void preprocess() {
 		if (isPreviousLayerCullingEnabled()){
-			preprocess_culling((BreadthFirstLayer) getContext().getLayer(getStateInfo().getLayerId()-1));
+			BreadthFirstLayer layer = (BreadthFirstLayer)getLayer(getStateInfo().getLayerId()-1);
+			if (layer != null)
+				preprocess_culling(layer);
 		}
 	}
 
@@ -252,8 +254,17 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 		int previousLayerId = getStateInfo().getLayerId()-1;
 		if (previousLayerId == -1)
 			return false;
-		Layer layer = getContext().getLayer(previousLayerId);
-		return layer.cullingEnabled();
+		Layer layer = getLayer(previousLayerId);
+		return layer == null ? false : layer.cullingEnabled();
+	}
+	
+	protected Layer getLayer(int id){
+		try {
+			return getContext().getLayer(id);
+		} catch (IndexOutOfBoundsException e){
+			setCancelled(true);
+			return null;
+		}
 	}
 	
 	@Override

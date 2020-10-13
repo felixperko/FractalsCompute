@@ -49,4 +49,14 @@ public class ServerWriteThread extends WriteThread {
 //		this.log = superLog.createSubLogger(clientConnection.getSenderInfo().getClientId()+"/out");
 		writeMessage(new ConnectedMessage(clientConnection));
 	}
+
+	@Override
+	public void addConnectionClosedRunnable(Runnable runnable) {
+		this.listenThread.addConnectionClosedRunnable(runnable);
+	}
+
+	@Override
+	public void removeConnectionClosedRunnable(Runnable runnable) {
+		this.listenThread.addConnectionClosedRunnable(runnable);
+	}
 }

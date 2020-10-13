@@ -45,7 +45,7 @@ public class SystemManager extends Manager{
 		super(managers);
 	}
 	
-	public void insertAvailableSystems() {
+	public void registerAvailableSystems() {
 		//availableSystems.put("BasicSystem", new ClassSystemFactory(BasicSystem.class));
 		availableSystems.put("BreadthFirstSystem", new ClassSystemFactory(BreadthFirstSystem.class));
 	}
@@ -112,19 +112,26 @@ public class SystemManager extends Manager{
 		}
 		
 		//process system requests
-		List<ParamContainer> requests = new ArrayList<>(newConfiguration.getSystemRequests());
+		Map<UUID, ParamContainer> requests = new HashMap<>(newConfiguration.getSystemRequests());
 		requestLoop :
-		for (ParamContainer data : requests) {
-			//search systems if applicable
-			for (CalcSystem system : activeSystems.values()) {
-				if ((system.getLifeCycleState() == LifeCycleState.IDLE || system.getLifeCycleState() == LifeCycleState.RUNNING)
-					&& system.isApplicable(newConfiguration.getConnection(), data)) {
-					system.addClient(newConfiguration, data);
-					continue requestLoop;
-				}
-			}
+		for (Entry<UUID, ParamContainer> e : requests.entrySet()) {
+			UUID systemId = e.getKey();
+			ParamContainer data = e.getValue();
+			
+			//skip existing
+			if (activeSystems.containsKey(systemId))
+				continue;
+			
+//			//search systems if applicable
+//			for (CalcSystem system : activeSystems.values()) {
+//				if ((system.getLifeCycleState() == LifeCycleState.IDLE || system.getLifeCycleState() == LifeCycleState.RUNNING)
+//					&& system.isApplicable(newConfiguration.getConnection(), data)) {
+//					system.addClient(newConfiguration, data);
+//					continue requestLoop;
+//				}
+//			}
 			//no existing system applicable -> create new
-			CalcSystem system = initSystem(data);
+			CalcSystem system = initSystem(systemId, data);
 			if (system != null) {
 				system.init(data);
 				system.addClient(newConfiguration, data);
@@ -133,22 +140,29 @@ public class SystemManager extends Manager{
 		}
 	}
 
-	private CalcSystem initSystem(ParamContainer data) {
+	private CalcSystem initSystem(UUID systemId, ParamContainer data) {
 		ParamSupplier systemNameParam = data.getClientParameter("systemName");
 		if (systemNameParam == null) {
+			//TODO reply to client
 			LOG.error("Invalid system request: systemName parameters not set.");
 			return null;
 		}
 		String systemName = (String) systemNameParam.get(null, null, 0, 0);
 		if (!availableSystems.containsKey(systemName)) {
+			//TODO reply to client
 			LOG.error("Invalid system request: system for name doesn't exist: "+systemName);
 			return null;
 		}
 		
-		CalcSystem system = availableSystems.get(systemName).createSystem(managers); //TODO system not available -> error handling; reply to client
+		ClassSystemFactory systemFactory = availableSystems.get(systemName);
+		CalcSystem system = systemFactory.createSystem(systemId, managers); 
 		activeSystems.put(system.getId(), system);
 		LOG.info("initiating system "+systemName);
 		return system;
+	}
+	
+	public void removeSystem(CalcSystem system){
+		activeSystems.remove(system);
 	}
 
 	public ServerStateInfo getStateInfo() {
@@ -158,7 +172,8 @@ public class SystemManager extends Manager{
 	public void clientRemoved(ClientConfiguration conf) {
 		for (UUID systemId : conf.getParamContainers().keySet()) {
 			CalcSystem system = activeSystems.get(systemId);
-			system.removeClient(conf);
+			if (system != null)
+				system.removeClient(conf);
 			//TODO stop connection (i/o!)		
 		}
 	}

@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.infra.connection.ClientConnection;
 import de.felixperko.fractals.network.messages.task.TaskAssignedMessage;
+import de.felixperko.fractals.system.calculator.infra.DeviceType;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
@@ -62,11 +63,11 @@ public class LocalTaskProvider implements TaskProvider {
 	}
 	
 	@Override
-	public FractalsTask getTask() {
-		return getNextTask();
+	public FractalsTask getTask(DeviceType deviceType) {
+		return getNextTask(deviceType);
 	}
 	
-	protected synchronized FractalsTask getNextTask() {
+	protected synchronized FractalsTask getNextTask(DeviceType deviceType) {
 		
 //		List<TaskManager> priorityList = new ArrayList<>();
 //		List<Long> times = new ArrayList<>();
@@ -78,7 +79,7 @@ public class LocalTaskProvider implements TaskProvider {
 			if (roundRobinIndex >= taskManagers.size())
 				roundRobinIndex = 0;
 			TaskManager<?> manager = taskManagers.get(roundRobinIndex++);
-			List<? extends FractalsTask> tasks = manager.getTasks(1);
+			List<? extends FractalsTask> tasks = manager.getTasks(deviceType, 1);
 			if (tasks != null && tasks.size() == 1)
 				return tasks.get(0);
 		}
@@ -118,32 +119,33 @@ public class LocalTaskProvider implements TaskProvider {
 		}
 		
 		//distribute to remote if not locally assigned
-		ClientConnection connection = null;
-		int left = 0;
-		for (Entry<ClientConnection, Integer> e : requestedTasks.entrySet()) {
-			if (e.getValue() > left) {
-				connection = e.getKey();
-				left = e.getValue();
-			}
-		}
-		if (connection != null) {
-			FractalsTask task = getNextTask();
-			if (task == null)
-				return;
-			List<FractalsTask> list = new ArrayList<>();
-			list.add(task);
-			
-			assignRemoteTasks(connection, list);
-			
-			if (left == 1) {
-				requestedTasks.remove(connection);
-			} else {
-				requestedTasks.put(connection, left-1);
-			}
-		}
+		//TODO remote task distribution: device type support!
+//		ClientConnection connection = null;
+//		int left = 0;
+//		for (Entry<ClientConnection, Integer> e : requestedTasks.entrySet()) {
+//			if (e.getValue() > left) {
+//				connection = e.getKey();
+//				left = e.getValue();
+//			}
+//		}
+//		if (connection != null) {
+//			FractalsTask task = getNextTask();
+//			if (task == null)
+//				return;
+//			List<FractalsTask> list = new ArrayList<>();
+//			list.add(task);
+//			
+//			assignRemoteTasks(connection, list);
+//			
+//			if (left == 1) {
+//				requestedTasks.remove(connection);
+//			} else {
+//				requestedTasks.put(connection, left-1);
+//			}
+//		}
 	}
 	
-	public void assignRemoteTasks(ClientConnection connection, int amount) {
+	public void assignRemoteTasks(ClientConnection connection, int amount, float cpuTasksPriority, float gpuTasksPriority) {
 		
 		//updated requested count
 		Integer left = requestedTasks.get(connection);
@@ -156,7 +158,7 @@ public class LocalTaskProvider implements TaskProvider {
 		//get tasks
 		List<FractalsTask> tasks = new ArrayList<>();
 		for (int i = 0 ; i < left ; i++) {
-			FractalsTask task = getTask();
+			FractalsTask task = getTask(decideCpuGpuTask(cpuTasksPriority, gpuTasksPriority));
 			if (task == null)
 				break;
 			tasks.add(task);
@@ -166,6 +168,12 @@ public class LocalTaskProvider implements TaskProvider {
 		
 	}
 	
+	private DeviceType decideCpuGpuTask(float cpuTasksPriority, float gpuTasksPriority) {
+		float sum = cpuTasksPriority+gpuTasksPriority;
+		float rand = (float) (Math.random()*(cpuTasksPriority+gpuTasksPriority));
+		return rand < cpuTasksPriority ? DeviceType.CPU : DeviceType.GPU;
+	}
+
 	protected void assignRemoteTasks(ClientConnection connection, List<FractalsTask> tasks) {
 		if (tasks.isEmpty())
 			return;

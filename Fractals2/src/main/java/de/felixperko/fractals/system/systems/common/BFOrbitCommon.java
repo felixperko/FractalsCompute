@@ -3,21 +3,25 @@ package de.felixperko.fractals.system.systems.common;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.felixperko.fractals.data.ArrayChunkFactory;
 import de.felixperko.fractals.data.ReducedNaiveChunk;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.Number;
+import de.felixperko.fractals.system.numbers.NumberFactory;
 import de.felixperko.fractals.system.numbers.impl.DoubleComplexNumber;
 import de.felixperko.fractals.system.numbers.impl.DoubleNumber;
 import de.felixperko.fractals.system.parameters.ParamValueField;
 import de.felixperko.fractals.system.parameters.ParamValueType;
-import de.felixperko.fractals.system.parameters.ParameterConfiguration;
-import de.felixperko.fractals.system.parameters.ParameterDefinition;
+import de.felixperko.fractals.system.parameters.ParamConfiguration;
+import de.felixperko.fractals.system.parameters.ParamDefinition;
 import de.felixperko.fractals.system.parameters.suppliers.CoordinateBasicShiftParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.infra.Selection;
 
 public class BFOrbitCommon {
+	
+	public static final int DEFAULT_CHUNK_SIZE = 256;
 	
 	public static ParamValueType integerType = new ParamValueType("integer");
 	public static ParamValueType doubleType = new ParamValueType("double");
@@ -40,9 +44,10 @@ public class BFOrbitCommon {
 	public static ParamValueType selectionType = new ParamValueType("selection");
 	
 	
-	public static ParameterConfiguration getCommonParameterConfiguration() {
+	public static ParamConfiguration getCommonParameterConfiguration() {
 		
-		ParameterConfiguration parameterConfiguration = new ParameterConfiguration();
+		ParamConfiguration parameterConfiguration = new ParamConfiguration();
+		NumberFactory nf = new NumberFactory(DoubleNumber.class, DoubleComplexNumber.class);
 		
 		ParamValueType[] types = new ParamValueType[] {
 				integerType, doubleType, booleanType, stringType, classType, listType,
@@ -54,55 +59,68 @@ public class BFOrbitCommon {
 		varList.add(StaticParamSupplier.class);
 		varList.add(CoordinateBasicShiftParamSupplier.class);
 
-		List<ParameterDefinition> defs = new ArrayList<>();
-		defs.add(new ParameterDefinition("iterations", "Calculator", StaticParamSupplier.class, integerType)
+		List<ParamDefinition> defs = new ArrayList<>();
+		List<ParamSupplier> defaultValues = new ArrayList<>();
+		defs.add(new ParamDefinition("iterations", "Calculator", StaticParamSupplier.class, integerType)
 				.withDescription("The maximum number of iterations until a sample is marked as unsuccessful.\n"
 						+ "Increase to allow more black regions to be filled at the cost of slower computation."));
-		defs.add(new ParameterDefinition("calculator", "Calculator", StaticParamSupplier.class, selectionType)
+		defs.add(new ParamDefinition("calculator", "Calculator", StaticParamSupplier.class, selectionType)
 				.withDescription("Choose the calculator to render different fractals."));
+		defaultValues.add(new StaticParamSupplier("calculator", "CustomCalculator"));
 		
-		defs.add(new ParameterDefinition("midpoint", "Position", StaticParamSupplier.class, complexnumberType)
+		defs.add(new ParamDefinition("midpoint", "Position", StaticParamSupplier.class, complexnumberType)
 				.withDescription("The current default coordinate center."));
-		defs.add(new ParameterDefinition("numberFactory", "Position", StaticParamSupplier.class, numberfactoryType)
+		defs.add(new ParamDefinition("numberFactory", "Position", StaticParamSupplier.class, numberfactoryType)
 				.withDescription("Manages the used number and complex number class."));
+		defaultValues.add(new StaticParamSupplier("numberFactory", nf));
 		
-		defs.add(new ParameterDefinition("chunkFactory", "Advanced", StaticParamSupplier.class, arraychunkfactoryType)
+		defs.add(new ParamDefinition("chunkFactory", "Advanced", StaticParamSupplier.class, arraychunkfactoryType)
 				.withDescription("Details about the chunks, e.g. the size of used chunks."));
-		defs.add(new ParameterDefinition("systemName", "Automatic", StaticParamSupplier.class, selectionType)
+		defaultValues.add(new StaticParamSupplier("chunkFactory", new ArrayChunkFactory(ReducedNaiveChunk.class, DEFAULT_CHUNK_SIZE)));
+		defs.add(new ParamDefinition("systemName", "Automatic", StaticParamSupplier.class, selectionType)
 				.withDescription("The internal calculation system to use for task management."));
-		defs.add(new ParameterDefinition("view", "Automatic", StaticParamSupplier.class, integerType)
+		defaultValues.add(new StaticParamSupplier("systemName", "BreadthFirstSystem"));
+		defs.add(new ParamDefinition("view", "Automatic", StaticParamSupplier.class, integerType)
 				.withDescription("The current view to calculate for."));
+		defaultValues.add(new StaticParamSupplier("view", 1));
 		
 		parameterConfiguration.addParameterDefinitions(defs);
+		parameterConfiguration.addDefaultValues(defaultValues);
 
-		List<ParameterDefinition> mandelbrot_calculator_defs = new ArrayList<>();
-		mandelbrot_calculator_defs.add(new ParameterDefinition("pow", "Calculator", varList, complexnumberType)
+		List<ParamDefinition> mandelbrot_calculator_defs = new ArrayList<>();
+		mandelbrot_calculator_defs.add(new ParamDefinition("pow", "Calculator", varList, complexnumberType)
 				.withDescription("The exponent parameter that is applied at every calculation step.")
 				.withHints("ui-element[default]: fields", "ui-element:plane soft-min=-2 soft-max=2"));
-		mandelbrot_calculator_defs.add(new ParameterDefinition("c", "Calculator", varList, complexnumberType)
+		mandelbrot_calculator_defs.add(new ParamDefinition("c", "Calculator", varList, complexnumberType)
 				.withDescription("The shift parameter that is applied at every calculation step.")
 				.withHints("ui-element[default]:plane soft-min=-2 soft-max=2", "ui-element:fields"));
-		mandelbrot_calculator_defs.add(new ParameterDefinition("start", "Calculator", varList, complexnumberType)
+		mandelbrot_calculator_defs.add(new ParamDefinition("start", "Calculator", varList, complexnumberType)
 				.withDescription("The input number parameter that is used for the first calculation step.")
 				.withHints("ui-element[default]:plane soft-min=-2 soft-max=2", "ui-element:fields"));
 
-		List<ParameterDefinition> custom_calculator_defs = new ArrayList<>();
-		custom_calculator_defs.add(new ParameterDefinition("f(z)=", "Calculator", StaticParamSupplier.class, stringType)
-				.withDescription("'The formula of the fractal"));
+		List<ParamDefinition> custom_calculator_defs = new ArrayList<>();
+		List<ParamSupplier> custom_calculator_defaults = new ArrayList<>();
+		custom_calculator_defs.add(new ParamDefinition("f(z)=", "Calculator", StaticParamSupplier.class, stringType)
+				.withDescription("The formula of the fractal"));
+		custom_calculator_defs.add(new ParamDefinition("precision", "Calculator", StaticParamSupplier.class, selectionType)
+				.withDescription("Bits of precision. Increase if image becomes pixelated."));
 		custom_calculator_defs.addAll(mandelbrot_calculator_defs);
 		
-		parameterConfiguration.addCalculatorParameters("MandelbrotCalculator", mandelbrot_calculator_defs);
-		parameterConfiguration.addCalculatorParameters("BurningShipCalculator", mandelbrot_calculator_defs);
-		parameterConfiguration.addCalculatorParameters("TricornCalculator", mandelbrot_calculator_defs);
-		parameterConfiguration.addCalculatorParameters("CustomCalculator", custom_calculator_defs);
-		parameterConfiguration.addCalculatorParameters("FibonacciPowCalculator", mandelbrot_calculator_defs);
+		custom_calculator_defaults.add(new StaticParamSupplier("precision", "32"));
+		custom_calculator_defaults.add(new StaticParamSupplier("pow", nf.createComplexNumber(2.0, 0.0)));
 		
-		List<ParameterDefinition> newton_calculator_defs = new ArrayList<>();
-		newton_calculator_defs.add(new ParameterDefinition("start", "Calculator", CoordinateBasicShiftParamSupplier.class, complexnumberType)
+		parameterConfiguration.addCalculatorParameters("MandelbrotCalculator", mandelbrot_calculator_defs, null);
+		parameterConfiguration.addCalculatorParameters("BurningShipCalculator", mandelbrot_calculator_defs, null);
+		parameterConfiguration.addCalculatorParameters("TricornCalculator", mandelbrot_calculator_defs, null);
+		parameterConfiguration.addCalculatorParameters("CustomCalculator", custom_calculator_defs, custom_calculator_defaults);
+		parameterConfiguration.addCalculatorParameters("FibonacciPowCalculator", mandelbrot_calculator_defs, null);
+		
+		List<ParamDefinition> newton_calculator_defs = new ArrayList<>();
+		newton_calculator_defs.add(new ParamDefinition("start", "Calculator", CoordinateBasicShiftParamSupplier.class, complexnumberType)
 				.withDescription("The start position for Newton's method."));
 		
-		parameterConfiguration.addCalculatorParameters("NewtonThridPowerMinusOneCalculator", newton_calculator_defs);									//TODO test -> newton_calculator_defs!
-		parameterConfiguration.addCalculatorParameters("NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator", newton_calculator_defs);	//
+		parameterConfiguration.addCalculatorParameters("NewtonThridPowerMinusOneCalculator", newton_calculator_defs, null);									//TODO test -> newton_calculator_defs!
+		parameterConfiguration.addCalculatorParameters("NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator", newton_calculator_defs, null);	//
 		
 		Selection<String> calculatorSelection = new Selection<>("calculator");
 		calculatorSelection.addOption("Mandelbrot", "MandelbrotCalculator",
@@ -137,6 +155,12 @@ public class BFOrbitCommon {
 		Selection<Class<? extends ComplexNumber<?, ?>>> complexNumberClassSelection = new Selection<>("complexNumberClass");
 		complexNumberClassSelection.addOption("double-complex", DoubleComplexNumber.class, "A complex number wrapping two Java double primitives.");
 		parameterConfiguration.addSelection(complexNumberClassSelection);
+		
+		Selection<String> precisionSelection = new Selection<>("precision");
+		precisionSelection.addOption("Auto", "Auto", "Uses default precision or a value based on the zoom level.");
+		precisionSelection.addOption("32 bit", "32", "");
+		precisionSelection.addOption("64 bit", "64", "");
+		parameterConfiguration.addSelection(precisionSelection);
 		return parameterConfiguration;
 	}
 }

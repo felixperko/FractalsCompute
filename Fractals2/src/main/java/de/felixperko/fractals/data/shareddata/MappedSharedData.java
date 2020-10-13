@@ -83,7 +83,7 @@ public class MappedSharedData<T> extends SharedData<MappedSharedDataUpdate<T>> {
 							otherConnections = new HashSet<>(pendingConnectionUpdates.keySet());
 							otherConnections.remove(connection);
 						}
-						if (otherConnections != null) {
+						if (keySet != null && otherConnections != null) {
 							for (String key : keySet) {
 								boolean lastDistribution = true;
 								for (Connection<?> conn : otherConnections) {

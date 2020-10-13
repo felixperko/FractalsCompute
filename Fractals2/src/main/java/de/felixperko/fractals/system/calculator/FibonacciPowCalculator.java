@@ -4,6 +4,7 @@ import de.felixperko.fractals.system.calculator.infra.AbstractPreparedFractalCal
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.impl.DoubleComplexNumber;
 
+@Deprecated
 public class FibonacciPowCalculator extends AbstractPreparedFractalCalculator{
 
 	private static final long serialVersionUID = 5404872334354603997L;

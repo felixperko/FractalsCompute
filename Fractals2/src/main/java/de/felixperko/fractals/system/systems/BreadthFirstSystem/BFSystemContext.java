@@ -1,5 +1,6 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,14 +18,18 @@ import de.felixperko.fractals.system.ZoomableSystemContext;
 import de.felixperko.fractals.system.calculator.BurningShipCalculator;
 import de.felixperko.fractals.system.calculator.FibonacciPowCalculator;
 import de.felixperko.fractals.system.calculator.MandelbrotCalculator;
-import de.felixperko.fractals.system.calculator.MandelbrotGPUCalculator;
 import de.felixperko.fractals.system.calculator.NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator;
 import de.felixperko.fractals.system.calculator.NewtonThridPowerMinusOneCalculator;
 import de.felixperko.fractals.system.calculator.TricornCalculator;
+import de.felixperko.fractals.system.calculator.EscapeTime.EscapeTimeCpuCalculator;
+import de.felixperko.fractals.system.calculator.EscapeTime.EscapeTimeCpuCalculatorNew;
+import de.felixperko.fractals.system.calculator.EscapeTime.EscapeTimeGpuCalculator;
+import de.felixperko.fractals.system.calculator.infra.DeviceType;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.Number;
 import de.felixperko.fractals.system.numbers.NumberFactory;
+import de.felixperko.fractals.system.parameters.ParamConfiguration;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.infra.DrawRegion;
@@ -34,15 +39,18 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 	
 	private static final long serialVersionUID = -6082120140942989559L;
 
-	protected transient static Map<String, Class<? extends FractalsCalculator>> availableCalculators = new HashMap<>();
+	protected transient static Map<String, Class<? extends FractalsCalculator>> availableCpuCalculators = new HashMap<>();
+	protected transient static Map<String, Class<? extends FractalsCalculator>> availableGpuCalculators = new HashMap<>();
 	static {
-		availableCalculators.put("MandelbrotCalculator", MandelbrotCalculator.class);
-		availableCalculators.put("BurningShipCalculator", BurningShipCalculator.class);
-		availableCalculators.put("TricornCalculator", TricornCalculator.class);
-		availableCalculators.put("CustomCalculator", MandelbrotGPUCalculator.class);
-		availableCalculators.put("FibonacciPowCalculator", FibonacciPowCalculator.class);
-		availableCalculators.put("NewtonThridPowerMinusOneCalculator", NewtonThridPowerMinusOneCalculator.class);
-		availableCalculators.put("NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator", NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator.class);
+		availableCpuCalculators.put("MandelbrotCalculator", MandelbrotCalculator.class);
+		availableCpuCalculators.put("BurningShipCalculator", BurningShipCalculator.class);
+		availableCpuCalculators.put("TricornCalculator", TricornCalculator.class);
+		availableCpuCalculators.put("CustomCalculator", EscapeTimeCpuCalculatorNew.class);
+		availableCpuCalculators.put("FibonacciPowCalculator", FibonacciPowCalculator.class);
+		availableCpuCalculators.put("NewtonThridPowerMinusOneCalculator", NewtonThridPowerMinusOneCalculator.class);
+		availableCpuCalculators.put("NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator", NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator.class);
+		
+		availableGpuCalculators.put("CustomCalculator", EscapeTimeGpuCalculator.class);
 	}
 	
 	public transient Number zoom;
@@ -59,7 +67,9 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 	public transient int chunksHeight;
 	
 	public transient ComplexNumber relativeStartShift;
-
+	
+	private transient Class<? extends FractalsCalculator> cpuCalculatorClass = null;
+	private transient Class<? extends FractalsCalculator> gpuCalculatorClass = null;
 	
 	transient BFScreenDrawRegion drawRegion;
 	
@@ -67,11 +77,37 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 	
 	transient Logger log = LoggerFactory.getLogger(BFSystemContext.class);
 	
-	public BFSystemContext(TaskManager<?> taskManager) {
-		super(taskManager, new BFViewContainer(0));
+	public BFSystemContext(TaskManager<?> taskManager, ParamConfiguration paramConfiguration) {
+		super(taskManager, new BFViewContainer(0), paramConfiguration);
+//        RendererContext rendererContext = renderer.getRendererContext();
+//        if (rendererContext.getParamContainer() != null){
+//            this.paramContainer = rendererContext.getParamContainer();
+//        } else {
+//            rendererContext.setParamContainer(this.paramContainer);
+//        }
+		setParamConfiguration(paramConfiguration);
 		viewContainer.setContext(this);
 		if (taskManager != null)
 			systemStateInfo = taskManager.getSystem().getSystemStateInfo();
+	}
+
+	@Override
+	public FractalsCalculator createCalculator(DeviceType deviceType) {
+		Class<? extends FractalsCalculator> cls = null;
+		try {
+			if (deviceType == DeviceType.CPU)
+				cls = cpuCalculatorClass;
+			else if (deviceType == DeviceType.GPU)
+				cls = gpuCalculatorClass;
+			if (cls == null)
+				return null;
+			FractalsCalculator calculator = cls.getDeclaredConstructor().newInstance();
+			calculator.setContext(this);
+			return calculator;
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
+			throw new IllegalStateException("Failed to create calculator for class: "+cls.getName());
+		}
 	}
 	
 	public AbstractArrayChunk generateChunk(long chunkX, long chunkY, boolean generateTaskIfLocal) {
@@ -113,37 +149,30 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 		
 		synchronized (this) {
 			this.paramContainer = paramContainer;
-			Map<String, ParamSupplier> parameters = paramContainer.getClientParameters();
+			paramContainer.setParamConfiguration(paramConfiguration);
+//			Map<String, ParamSupplier> parameters = paramContainer.getClientParameters();
 			
-			calculatorClass = availableCalculators.get(getParamValue("calculator", String.class));
-			if (calculatorClass == null)
-				throw new IllegalStateException("Couldn't find calculator for name: "+getParamValue("calculator", String.class));
+			String calculatorName = getParamValue("calculator", String.class);
+			cpuCalculatorClass = availableCpuCalculators.get(calculatorName);
+			gpuCalculatorClass = availableGpuCalculators.get(calculatorName);
+			if (cpuCalculatorClass == null && gpuCalculatorClass == null)
+				throw new IllegalStateException("Couldn't find calculator for name: "+calculatorName);
 			
-			chunkSize = parameters.get("chunkSize").getGeneral(Integer.class);
-			midpoint = parameters.get("midpoint").getGeneral(ComplexNumber.class);
-			zoom = parameters.get("zoom").getGeneral(Number.class);
+			chunkSize = paramContainer.getClientParameter("chunkFactory").getGeneral(ArrayChunkFactory.class).getChunkSize();
+			midpoint = paramContainer.getClientParameter("midpoint").getGeneral(ComplexNumber.class);
+			zoom = paramContainer.getClientParameter("zoom").getGeneral(Number.class);
 			
-			numberFactory = parameters.get("numberFactory").getGeneral(NumberFactory.class);
-			chunkFactory = parameters.get("chunkFactory").getGeneral(ArrayChunkFactory.class);
+			numberFactory = paramContainer.getClientParameter("numberFactory").getGeneral(NumberFactory.class);
+			chunkFactory = paramContainer.getClientParameter("chunkFactory").getGeneral(ArrayChunkFactory.class);
 			
-			LayerConfiguration oldLayerConfig = null;
-			if (oldParams != null)
-				oldLayerConfig = oldParams.get("layerConfiguration").getGeneral(LayerConfiguration.class);
-			ParamSupplier newLayerConfigSupplier = paramContainer.getClientParameter("layerConfiguration");
-			LayerConfiguration newLayerConfig = newLayerConfigSupplier.getGeneral(LayerConfiguration.class);
-			if (oldLayerConfig == null || newLayerConfigSupplier.isChanged()) {
-				layerConfig = newLayerConfig;
-				layerConfig.prepare(numberFactory);
-			} else {
-				parameters.put("layerConfiguration", oldParams.get("layerConfiguration"));
-			}
+			updateLayerConfig(paramContainer, "layerConfiguration", oldParams, paramContainer.getClientParameters());
 		
-			width = parameters.get("width").getGeneral(Integer.class);
-			height = parameters.get("height").getGeneral(Integer.class);
+			width = paramContainer.getClientParameter("width").getGeneral(Integer.class);
+			height = paramContainer.getClientParameter("height").getGeneral(Integer.class);
 			
-			border_generation = parameters.get("border_generation").getGeneral(Double.class);
-			border_dispose = parameters.get("border_dispose").getGeneral(Double.class);
-			buffer = parameters.get("task_buffer").getGeneral(Integer.class);
+			border_generation = paramContainer.getClientParameter("border_generation").getGeneral(Double.class);
+			border_dispose = paramContainer.getClientParameter("border_dispose").getGeneral(Double.class);
+			buffer = paramContainer.getClientParameter("task_buffer").getGeneral(Integer.class);
 	
 			if (getActiveViewData() == null || reset) {
 				chunksWidth = (int)Math.ceil(width/(double)chunkSize);
@@ -182,7 +211,7 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 			} else {
 				activeViewData.setParams(paramContainer);
 			}
-			ParamSupplier jobIdSupplier = parameters.get("view");
+			ParamSupplier jobIdSupplier = paramContainer.getClientParameter("view");
 			if (jobIdSupplier == null)
 				viewId = 0;
 			else
@@ -205,7 +234,7 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 		return reset;
 	}
 	
-	public static boolean needsReset(Map<String, ParamSupplier> newParams, Map<String, ParamSupplier> oldParams){ //TODO merge with method in SystemClientData
+	public static boolean needsReset(Map<String, ParamSupplier> newParams, Map<String, ParamSupplier> oldParams){
 		boolean reset = false;
 		if (oldParams != null) {
 			for (ParamSupplier supplier : newParams.values()) {
@@ -294,5 +323,13 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 
 	public DrawRegion<BFSystemContext> getDrawRegion() {
 		return drawRegion;
+	}
+
+	public Class<? extends FractalsCalculator> getCpuCalculatorClass() {
+		return cpuCalculatorClass;
+	}
+
+	public Class<? extends FractalsCalculator> getGpuCalculatorClass() {
+		return gpuCalculatorClass;
 	}
 }

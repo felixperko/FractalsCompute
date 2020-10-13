@@ -3,6 +3,7 @@ package de.felixperko.fractals.system.calculator;
 import de.felixperko.fractals.system.calculator.infra.AbstractPreparedFractalCalculator;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 
+@Deprecated
 public class TricornCalculator extends AbstractPreparedFractalCalculator {
 	
 	@Override

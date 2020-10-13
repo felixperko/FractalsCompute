@@ -13,7 +13,8 @@ import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.manager.server.ServerNetworkManager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.infra.connection.ServerConnection;
-import de.felixperko.fractals.system.parameters.ParameterConfiguration;
+import de.felixperko.fractals.network.messages.ResourceRequestMessage;
+import de.felixperko.fractals.system.parameters.ParamConfiguration;
 import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateUpdate;
 import de.felixperko.fractals.system.task.FractalsTask;
@@ -37,7 +38,7 @@ public class ServerMessageInterface extends ClientMessageInterface {
 	
 	@Override
 	public void createdSystem(UUID systemId, ClientConfiguration clientConfiguration,
-			ParameterConfiguration parameterConfiguration) {
+			ParamConfiguration parameterConfiguration) {
 		throw new IllegalStateException("Server to Server connections shouldn't be system specific");
 	}
 
@@ -71,5 +72,11 @@ public class ServerMessageInterface extends ClientMessageInterface {
 				}
 			}
 		}
+	}
+
+	@Override
+	public ResourceRequestMessage requestResources(){
+		//TODO
+		return new ResourceRequestMessage(0, null, null);
 	}
 }

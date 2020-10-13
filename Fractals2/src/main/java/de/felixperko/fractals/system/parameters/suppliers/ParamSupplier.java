@@ -20,8 +20,21 @@ public interface ParamSupplier extends Serializable{
 	
 	public String getName();
 
+	/**
+	 * Retrieves the object based on the default input parameters.
+	 * @param cls
+	 * @return
+	 */
 	public Object getGeneral();
+	
+	/**
+	 * Retrieves the object based on the default input parameters and casts it.
+	 * Throws an IllegalArgumentException if there is a type mismatch between the specified class and the retrieved object.
+	 * @param cls
+	 * @return
+	 */
 	public <C> C getGeneral(Class<C> cls);
+	
 	public Object get(SystemContext systemContext, ComplexNumber chunkPos, int pixel, int sample);
 	public <C> C get(SystemContext systemContext, Class<C> valueCls, ComplexNumber chunkPos, int pixel, int sample);
 	

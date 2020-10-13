@@ -29,17 +29,17 @@
 
   <root level="DEBUG">
     <appender-ref ref="STDOUT" />
-    <appender-ref ref="FILE" />
+<!--     <appender-ref ref="FILE" /> -->
   </root>
   
   <logger name="de.felixperko.fractals.network.threads.WriteThread" level="WARN">
     <appender-ref ref="STDOUT" />
-    <appender-ref ref="FILE" />
+<!--     <appender-ref ref="FILE" /> -->
   </logger>
   
   <logger name="de.felixperko.fractals.network.threads.ListenThread" level="WARN">
     <appender-ref ref="STDOUT" />
-    <appender-ref ref="FILE" />
+<!--     <appender-ref ref="FILE" /> -->
   </logger>
   
 </configuration>

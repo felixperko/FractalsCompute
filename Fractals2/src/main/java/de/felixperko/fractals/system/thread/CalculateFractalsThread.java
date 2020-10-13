@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.felixperko.fractals.manager.common.Managers;
+import de.felixperko.fractals.system.calculator.infra.DeviceType;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.statistics.TimesliceProvider;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
@@ -16,6 +17,8 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 	
 	static int ID_COUNTER = 0;
 	
+	private DeviceType deviceType;
+	
 	TaskProvider taskProvider;
 	
 	int calcThreadId = 0;
@@ -27,9 +30,10 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 	Map<Integer, Integer> iterations = new HashMap<>();
 	int iterationCounter = 0;
 	
-	public CalculateFractalsThread(Managers managers, TaskProvider taskProvider, TimesliceProvider timesliceProvider){
+	public CalculateFractalsThread(Managers managers, DeviceType deviceType, TaskProvider taskProvider, TimesliceProvider timesliceProvider){
 		super(managers, "CALC_"+ID_COUNTER);
 		calcThreadId = ID_COUNTER++;
+		this.deviceType = deviceType;
 		this.taskProvider = taskProvider;
 		this.timesliceProvider = timesliceProvider;
 		setPriority(1);
@@ -80,9 +84,9 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 					try {
 						Thread.sleep(1);
 					} catch (InterruptedException e) {
-						if (state == LifeCycleState.STOPPED)
-							break mainLoop;
 					}
+					if (state == LifeCycleState.STOPPED)
+						break mainLoop;
 				}
 			}
 			
@@ -105,7 +109,7 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 	private FractalsTask getTask() {
 		if (taskProvider == null)
 			return null;
-		return taskProvider.getTask();
+		return taskProvider.getTask(deviceType);
 	}
 
 	public void abortTask() {
@@ -154,5 +158,9 @@ public class CalculateFractalsThread extends AbstractFractalsThread{
 			}
 			return it;
 		}
+	}
+
+	public DeviceType getDeviceType() {
+		return deviceType;
 	}
 }

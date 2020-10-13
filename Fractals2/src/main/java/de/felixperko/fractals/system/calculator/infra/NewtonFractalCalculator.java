@@ -27,7 +27,6 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 	IStats taskStats;
 	
 	public NewtonFractalCalculator() {
-		super(NewtonFractalCalculator.class);
 	}
 
 	@Override

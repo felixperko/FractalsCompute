@@ -13,10 +13,12 @@ import de.felixperko.fractals.system.calculator.MandelbrotCalculator;
 import de.felixperko.fractals.system.calculator.NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator;
 import de.felixperko.fractals.system.calculator.NewtonThridPowerMinusOneCalculator;
 import de.felixperko.fractals.system.calculator.TricornCalculator;
+import de.felixperko.fractals.system.calculator.infra.DeviceType;
 import de.felixperko.fractals.system.calculator.infra.FractalsCalculator;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.Number;
 import de.felixperko.fractals.system.numbers.NumberFactory;
+import de.felixperko.fractals.system.parameters.ParamConfiguration;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
@@ -27,6 +29,8 @@ public class OrbitSystemContext extends AbstractSystemContext<OrbitViewData, Orb
 
 	private static final long serialVersionUID = 1713313107508895848L;
 	
+	transient Class<? extends FractalsCalculator> calculatorClass;
+	
 	protected transient static Map<String, Class<? extends FractalsCalculator>> availableCalculators = new HashMap<>();
 	static {
 		availableCalculators.put("MandelbrotCalculator", MandelbrotCalculator.class);
@@ -36,8 +40,8 @@ public class OrbitSystemContext extends AbstractSystemContext<OrbitViewData, Orb
 		availableCalculators.put("NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator", NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator.class);
 	}
 
-	public OrbitSystemContext(TaskManager<?> taskManager) {
-		super(taskManager, new OrbitViewContainer());
+	public OrbitSystemContext(TaskManager<?> taskManager, ParamConfiguration paramConfiguration) {
+		super(taskManager, new OrbitViewContainer(), paramConfiguration);
 		
 //		layer = new OrbitLayer();
 //		
@@ -102,6 +106,12 @@ public class OrbitSystemContext extends AbstractSystemContext<OrbitViewData, Orb
 	@Override
 	public AbstractArrayChunk createChunk(int chunkX, int chunkY) {
 		return chunkFactory.createChunk(chunkX, chunkY);
+	}
+
+	@Override
+	public FractalsCalculator createCalculator(DeviceType deviceType) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

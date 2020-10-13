@@ -17,7 +17,7 @@ public class ClientConfiguration implements Serializable{
 	private static final long serialVersionUID = -5403520207176226669L;
 	
 	Map<UUID, ParamContainer> instances = new HashMap<>();
-	List<ParamContainer> systemRequests = new ArrayList<>();
+	Map<UUID, ParamContainer> systemRequests = new HashMap<>();
 	transient ClientConnection connectionToClient;
 	
 	public ClientConfiguration() {
@@ -27,8 +27,8 @@ public class ClientConfiguration implements Serializable{
 		for (Entry<UUID, ParamContainer> e : cloneConfig.instances.entrySet()){
 			this.instances.put(e.getKey(), new ParamContainer(e.getValue(), newInstances));
 		}
-		for (ParamContainer scd : cloneConfig.systemRequests){
-			this.systemRequests.add(new ParamContainer(scd, newInstances));
+		for (Entry<UUID, ParamContainer> e : cloneConfig.systemRequests.entrySet()){
+			this.systemRequests.put(e.getKey(), new ParamContainer(e.getValue(), newInstances));
 		}
 		this.connectionToClient = cloneConfig.connectionToClient;
 	}
@@ -62,12 +62,12 @@ public class ClientConfiguration implements Serializable{
 		return getParameter(systemId, name).get(null, cls, null, 0, 0);
 	}
 	
-	public List<ParamContainer> getSystemRequests(){
+	public Map<UUID, ParamContainer> getSystemRequests(){
 		return systemRequests;
 	}
 
-	public void addRequest(ParamContainer systemClientData) {
-		systemRequests.add(systemClientData);
+	public void addRequest(UUID systemId, ParamContainer systemClientData) {
+		systemRequests.put(systemId, systemClientData);
 	}
 
 	

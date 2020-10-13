@@ -1,9 +1,10 @@
 package de.felixperko.fractals.system.task;
 
+import de.felixperko.fractals.system.calculator.infra.DeviceType;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 
 public interface TaskProvider {
-	public FractalsTask getTask();
+	public FractalsTask getTask(DeviceType deviceType);
 
 	public void finishedTask(FractalsTask currentTask);
 	

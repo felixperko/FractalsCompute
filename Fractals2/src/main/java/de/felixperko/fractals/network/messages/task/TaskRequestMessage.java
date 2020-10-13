@@ -10,9 +10,12 @@ public class TaskRequestMessage extends ClientMessage {
 	private static final long serialVersionUID = 4764129702185799026L;
 	
 	int amount;
+	float cpuTasksPriority, gpuTasksPriority;
 
-	public TaskRequestMessage(int amount) {
+	public TaskRequestMessage(int amount, float cpuTasksPriority, float gpuTasksPriority) {
 		this.amount = amount;
+		this.cpuTasksPriority = cpuTasksPriority;
+		this.gpuTasksPriority = gpuTasksPriority;
 	}
 	
 	@Override
@@ -21,7 +24,7 @@ public class TaskRequestMessage extends ClientMessage {
 		ServerThreadManager threadManager = managers.getThreadManager();
 		LocalTaskProvider taskProvider = threadManager.getTaskProvider();
 		
-		taskProvider.assignRemoteTasks(getBackConnection(), amount);
+		taskProvider.assignRemoteTasks(getBackConnection(), amount, cpuTasksPriority, gpuTasksPriority);
 	}
 
 }

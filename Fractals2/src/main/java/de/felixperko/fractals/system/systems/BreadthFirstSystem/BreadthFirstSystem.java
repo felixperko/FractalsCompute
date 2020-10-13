@@ -9,6 +9,7 @@ import static de.felixperko.fractals.system.systems.common.BFOrbitCommon.numberT
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,13 +19,16 @@ import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.system.parameters.ParamValueField;
 import de.felixperko.fractals.system.parameters.ParamValueType;
-import de.felixperko.fractals.system.parameters.ParameterConfiguration;
-import de.felixperko.fractals.system.parameters.ParameterDefinition;
+import de.felixperko.fractals.system.PadovanLayerConfiguration;
+import de.felixperko.fractals.system.parameters.ParamConfiguration;
+import de.felixperko.fractals.system.parameters.ParamDefinition;
+import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.common.BFOrbitCommon;
 import de.felixperko.fractals.system.systems.infra.AbstractCalcSystem;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.task.ClassTaskFactory;
+import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskFactory;
 
 public class BreadthFirstSystem extends AbstractCalcSystem {
@@ -35,13 +39,13 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 	
 	BreadthFirstTaskManager taskManager;
 
-	public BreadthFirstSystem(ServerManagers managers) {
-		super(managers);
+	public BreadthFirstSystem(UUID systemId, ServerManagers managers) {
+		super(systemId, managers);
 	}
 
 	@Override
-	public ParameterConfiguration createParameterConfiguration() {
-		ParameterConfiguration config = BFOrbitCommon.getCommonParameterConfiguration();
+	public ParamConfiguration createParameterConfiguration() {
+		ParamConfiguration config = BFOrbitCommon.getCommonParameterConfiguration();
 		
 		ParamValueType layerType = new ParamValueType("BreadthFirstLayer",
 				new ParamValueField("priority_shift", doubleType, 0d),
@@ -63,25 +67,36 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		config.addValueType(upsampleLayerType);
 		config.addValueType(layerconfigurationType);
 		
-		List<ParameterDefinition> defs_bf = new ArrayList<>();
-		defs_bf.add(new ParameterDefinition("zoom", "Position", StaticParamSupplier.class, numberType)
+		List<ParamDefinition> defs_bf = new ArrayList<>();
+		List<ParamSupplier> defaultValues = new ArrayList<>();
+		defs_bf.add(new ParamDefinition("zoom", "Position", StaticParamSupplier.class, numberType)
 				.withDescription("The current default coordinate zoom factor."));
-		defs_bf.add(new ParameterDefinition("width", "Automatic", StaticParamSupplier.class, integerType)
+		defs_bf.add(new ParamDefinition("width", "Automatic", StaticParamSupplier.class, integerType)
 				.withDescription("The calculation width."));
-		defs_bf.add(new ParameterDefinition("height", "Automatic", StaticParamSupplier.class, integerType)
+		defs_bf.add(new ParamDefinition("height", "Automatic", StaticParamSupplier.class, integerType)
 				.withDescription("The calculation height."));
 		
-		defs_bf.add(new ParameterDefinition("limit", "Advanced", StaticParamSupplier.class, doubleType)
+		defs_bf.add(new ParamDefinition("limit", "Advanced", StaticParamSupplier.class, doubleType)
 				.withDescription("Bailout radius. Increase to reduce coloring artifacts, Decrease to improve performance."));
-		defs_bf.add(new ParameterDefinition("border_generation", "Advanced", StaticParamSupplier.class, doubleType)
+		defs_bf.add(new ParamDefinition("border_generation", "Advanced", StaticParamSupplier.class, doubleType)
 				.withDescription("The chunk distance from rendered area for which chunk calculation should continue."));
-		defs_bf.add(new ParameterDefinition("border_dispose", "Advanced", StaticParamSupplier.class, doubleType)
+		defs_bf.add(new ParamDefinition("border_dispose", "Advanced", StaticParamSupplier.class, doubleType)
 				.withDescription("The chunk distance at which chunks are deleted to preserve memory."));
-		defs_bf.add(new ParameterDefinition("task_buffer", "Advanced", StaticParamSupplier.class, integerType)
+		defs_bf.add(new ParamDefinition("task_buffer", "Advanced", StaticParamSupplier.class, integerType)
 				.withDescription("The amount of tasks that should be buffered for the calculation workers."));
-		defs_bf.add(new ParameterDefinition("layerConfiguration", "Advanced", StaticParamSupplier.class, layerconfigurationType)
+		defs_bf.add(new ParamDefinition("layerConfiguration", "Advanced", StaticParamSupplier.class, layerconfigurationType)
 				.withDescription("Manages the layer order in which the calculation is performed."));
+
+		defaultValues.add(new StaticParamSupplier("limit", 256.0));
+		defaultValues.add(new StaticParamSupplier("border_generation", 0.0));
+		defaultValues.add(new StaticParamSupplier("border_dispose", 7.0));
+		defaultValues.add(new StaticParamSupplier("task_buffer", 5));
+        List<Layer> layers = new ArrayList<>();
+        layers.add(new BreadthFirstLayer(BFOrbitCommon.DEFAULT_CHUNK_SIZE).with_samples(1).with_rendering(true).with_priority_shift(0));
+		defaultValues.add(new StaticParamSupplier("layerConfiguration", new PadovanLayerConfiguration(layers)));
+		
 		config.addParameterDefinitions(defs_bf);
+		config.addDefaultValues(defaultValues);
 		
 		config.addListTypes("layers", layerType, upsampleLayerType);
 		return config;
@@ -92,6 +107,7 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		
 		LOG.info("initializing");
 		taskManager = new BreadthFirstTaskManager(managers, this);
+		taskManager.getSystemContext().setParamConfiguration(getParameterConfiguration());
 		taskManager.setParameters(paramContainer);
 		
 		return true;
@@ -121,6 +137,7 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		taskManager.stopThread();
 		taskManager.endTasks();
 		managers.getThreadManager().getTaskProvider().removeTaskManager(taskManager);
+		managers.getSystemManager().removeSystem(this);
 		LOG.info("stopped");
 		
 		return true;

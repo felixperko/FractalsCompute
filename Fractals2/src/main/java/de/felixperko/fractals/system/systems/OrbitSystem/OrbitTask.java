@@ -64,7 +64,7 @@ public class OrbitTask extends AbstractFractalsTask<OrbitTask> {
 	@Override
 	public void setContext(SystemContext context) {
 		super.setContext(context);
-		this.calculator = context.createCalculator();
+		this.calculator = context.createCalculator(thread.getDeviceType());
 	}
 
 	@Override

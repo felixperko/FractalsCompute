@@ -9,11 +9,13 @@ public class ServerManagers implements Managers {
 	SystemManager systemManager;
 	ServerThreadManager threadManager;
 	ServerNetworkManager networkManager;
+	ResourceManager resourceManager;
 	
 	public ServerManagers() {
 		systemManager = new SystemManager(this);
 		threadManager = new ServerThreadManager(this);
 		networkManager = new ServerNetworkManager(this, new NetworkInterfaceFactory(ServerMessageInterface.class, null));
+		resourceManager = new ResourceManager(this);
 	}
 	
 	public SystemManager getSystemManager() {
@@ -33,6 +35,8 @@ public class ServerManagers implements Managers {
 	public ServerNetworkManager getServerNetworkManager() {
 		return (ServerNetworkManager) networkManager;
 	}
-	
-	
+
+	public ResourceManager getResourceManager() {
+		return resourceManager;
+	}
 }

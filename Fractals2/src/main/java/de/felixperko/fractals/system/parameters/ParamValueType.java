@@ -8,7 +8,7 @@ public class ParamValueType implements Serializable{
 	
 	private static final long serialVersionUID = -1932439926056557969L;
 	
-	ParameterConfiguration configuration;
+	ParamConfiguration configuration;
 	String name;
 	List<ParamValueField> fields = null;
 	
@@ -22,11 +22,11 @@ public class ParamValueType implements Serializable{
 		}
 	}
 
-	public ParameterConfiguration getConfiguration() {
+	public ParamConfiguration getConfiguration() {
 		return configuration;
 	}
 
-	public void setConfiguration(ParameterConfiguration configuration) {
+	public void setConfiguration(ParamConfiguration configuration) {
 		this.configuration = configuration;
 	}
 

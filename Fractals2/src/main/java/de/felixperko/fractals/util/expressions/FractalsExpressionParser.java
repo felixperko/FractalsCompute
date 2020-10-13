@@ -5,22 +5,37 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import static de.felixperko.fractals.system.calculator.GPUInstruction.*;
+import java.util.stream.Stream;
+
+import static de.felixperko.fractals.system.calculator.ComputeInstruction.*;
 
 public class FractalsExpressionParser {
 	
-	final static Map<String, Integer> singleFunctionExpressions = new HashMap<String, Integer>(){
+	static LinkedHashMap<String, Integer> complexFunctionExpressions = new LinkedHashMap<String, Integer>(){
 		{
 			put("", -1);
-			put("sin", INSTR_SIN);
-			put("cos", INSTR_COS);
-			put("tan", INSTR_TAN);
-			put("sinh", INSTR_SINH);
-			put("cosh", INSTR_COSH);
-			put("tanh", INSTR_TANH);
-			put("abs", INSTR_ABS);
-			put("conj", INSTR_CONJ);
+			put("sin", INSTR_SIN_COMPLEX);
+			put("cos", INSTR_COS_COMPLEX);
+			put("tan", INSTR_TAN_COMPLEX);
+			put("sinh", INSTR_SINH_COMPLEX);
+			put("cosh", INSTR_COSH_COMPLEX);
+			put("tanh", INSTR_TANH_COMPLEX);
+			put("abs", INSTR_ABS_COMPLEX);
+			put("negate", INSTR_NEGATE_COMPLEX);
+			//put("conj", INSTR_NEGATE_PART);//TODO which part?!
+		}
+	};
+	static LinkedHashMap<String, Integer> singleFunctionExpressions = new LinkedHashMap<String, Integer>(){
+		{
+			put("", -1);
+			put("sin", INSTR_SIN_PART);
+			put("cos", INSTR_COS_PART);
+			put("tan", INSTR_TAN_PART);
+			put("sinh", INSTR_SINH_PART);
+			put("cosh", INSTR_COSH_PART);
+			put("tanh", INSTR_TANH_PART);
+			put("abs", INSTR_ABS_PART);
+			put("negate", INSTR_NEGATE_PART);
 		}
 	};
 	
@@ -28,11 +43,51 @@ public class FractalsExpressionParser {
 		
 		input = input.trim();
 		
-		if (input == "")
+		if (input.length() == 0)
 			input = "0";
 		
-		LinkedHashMap<String, Integer> dashParts = new LinkedHashMap<>(); //split at '+', '-'
-		LinkedHashMap<String, Integer> pointParts = new LinkedHashMap<>(); //split at '*', '/'
+		//try double constant
+		Double val = null;
+		try {
+			val = Double.parseDouble(input);
+			return new ConstantExpression(val, 0);
+		} catch (NumberFormatException e){
+			boolean imag = input.endsWith("i");
+			if (imag) {
+				try {
+					if (input.length() == 1) //input == 'i'
+						val = 1.;
+					else
+						val = Double.parseDouble(input.substring(0, input.length()-1).trim());
+					return new ConstantExpression(0, val);
+				} catch (NumberFormatException e2){
+				}
+			}
+		}
+		
+		//try variable
+		if (val == null){
+//			if (input.matches("[a-zA-Z]+_n(-[1-9][0-9]*)")){
+//				return new VariablePastIterationExpression(input);
+//			}
+			if (input.matches("[a-zA-Z]+")){
+				if (input.equalsIgnoreCase("pi"))
+					return new ConstantExpression(Math.PI, 0);
+				return new VariableExpression(input);
+			}
+		}
+		
+		if (input.startsWith("-")){
+			FractalsExpression subExpr = parse(input.substring(1));
+			return new NegateExpression(subExpr);
+		}
+
+		List<String> dashParts = new ArrayList<>(); //split at '+', '-'
+		List<Integer> dashPartSingleInstructions = new ArrayList<>();
+		List<Integer> dashPartComplexInstructions = new ArrayList<>();
+		List<String> pointParts = new ArrayList<>(); //split at '*', '/'
+		List<Integer> pointPartSingleInstructions = new ArrayList<>();
+		List<Integer> pointPartComplexInstructions = new ArrayList<>();
 		List<String> expParts = new ArrayList<>(); //split at '^'
 		int bracketLayer = 0;
 		int startDashPart = 0;
@@ -51,19 +106,27 @@ public class FractalsExpressionParser {
 			} else {
 				switch (c){
 				case '+': 
-					dashParts.put(input.substring(startDashPart, i), INSTR_ADD);
+					dashParts.add(input.substring(startDashPart, i));
+					dashPartSingleInstructions.add(INSTR_ADD_PART);
+					dashPartComplexInstructions.add(INSTR_ADD_COMPLEX);
 					startDashPart = i+1;
 					break;
 				case '-': 
-					dashParts.put(input.substring(startDashPart, i), INSTR_SUB);
+					dashParts.add(input.substring(startDashPart, i));
+					dashPartSingleInstructions.add(INSTR_SUB_PART);
+					dashPartComplexInstructions.add(INSTR_SUB_COMPLEX);
 					startDashPart = i+1;
 					break;
 				case '*':
-					pointParts.put(input.substring(startPointPart, i), INSTR_ADD);
+					pointParts.add(input.substring(startPointPart, i));
+					pointPartSingleInstructions.add(INSTR_MULT_PART);
+					pointPartComplexInstructions.add(INSTR_MULT_COMPLEX);
 					startPointPart = i+1;
 					break;
 				case '/':
-					pointParts.put(input.substring(startPointPart, i), INSTR_ADD);
+					pointParts.add(input.substring(startPointPart, i));
+					pointPartSingleInstructions.add(INSTR_DIV_PART);
+					pointPartComplexInstructions.add(INSTR_DIV_COMPLEX);
 					startPointPart = i+1;
 					break;
 				case '^':
@@ -77,26 +140,29 @@ public class FractalsExpressionParser {
 		}
 		
 		if (dashParts.size() > 0){
-			dashParts.put(input.substring(startDashPart), null); //add remainder
-			LinkedHashMap<FractalsExpression, Integer> dashPartExpressions = new LinkedHashMap<>(); //subexpression, operator
-			for (Entry<String, Integer> e : dashParts.entrySet()){
-				FractalsExpression dashSubExpression = parse(e.getKey());
+			//add remainder
+			dashParts.add(input.substring(startDashPart));
+			
+			List<FractalsExpression> dashPartExpressions = new ArrayList<>();
+			for (String subExprString : dashParts){
+				FractalsExpression dashSubExpression = parse(subExprString);
 				if (dashSubExpression == null)
-					throw new IllegalArgumentException("Couldn't parse '"+e.getKey()+"'");
-				dashPartExpressions.put(dashSubExpression, e.getValue());
+					throw new IllegalArgumentException("Couldn't parse '"+subExprString+"'");
+				dashPartExpressions.add(dashSubExpression);
 			}
-			return new SumExpression(dashPartExpressions);
+			return new ChainExpression(dashPartExpressions, dashPartSingleInstructions, dashPartComplexInstructions);
 		}
 //		
-//		else if (pointParts.size() > 0){
-//			pointParts.put(input.substring(startPointPart), null); //add remainder
-//			LinkedHashMap<FractalsExpression, Integer> pointPartExpressions = new LinkedHashMap<>(); //subexpression, operator
-//			for (Entry<String, Integer> e : pointParts.entrySet()){
-//				FractalsExpression dashSubExpression = parse(e.getKey());
-//				pointPartExpressions.put(dashSubExpression, e.getValue());
-//			}
-//			return new FactorExpression(pointPartExpressions);
-//		}
+		else if (pointParts.size() > 0){
+			//add remainder
+			pointParts.add(input.substring(startPointPart)); 
+			
+			List<FractalsExpression> pointPartExpressions = new ArrayList<>();
+			for (String pointPart : pointParts){
+				pointPartExpressions.add(parse(pointPart));
+			}
+			return new MultExpression(pointPartExpressions, pointPartSingleInstructions, pointPartComplexInstructions);
+		}
 		
 //		else
 		if (expParts.size() > 0){
@@ -119,57 +185,44 @@ public class FractalsExpressionParser {
 			if (absParts.size() == 2){
 				String prefix = absParts.get(0).trim();
 				String bracketContent = absParts.get(1);
-				for (String singleFunctionPrefix : singleFunctionExpressions.keySet()){
-					if (prefix.equalsIgnoreCase(singleFunctionPrefix)){
-						FractalsExpression subExpr = parse(bracketContent);
-						if (subExpr == null)
-							throw new IllegalArgumentException("Couldn't parse '"+bracketContent+"'");
-						return new NestedExpression(subExpr, singleFunctionExpressions.get(singleFunctionPrefix));
+				FractalsExpression subExpr = parse(bracketContent);
+				if (subExpr == null)
+					throw new IllegalArgumentException("Couldn't parse '"+bracketContent+"'");
+				
+				if (prefix.equalsIgnoreCase("re") || prefix.equalsIgnoreCase("real")){
+					if (subExpr == null)
+						return null;
+					return new VariablePartExpression(bracketContent, true, false);
+				}
+				if (prefix.equalsIgnoreCase("im") || prefix.equalsIgnoreCase("imag") || prefix.equalsIgnoreCase("imaginary")){
+					if (subExpr == null)
+						return null;
+					return new VariablePartExpression(bracketContent, false, true);
+				}
+				
+				Map<String, Integer> prefixMapping = subExpr.isComplexExpression() ? complexFunctionExpressions : singleFunctionExpressions;
+				for (String functionPrefix : prefixMapping.keySet()){
+					if (prefix.equalsIgnoreCase(functionPrefix)){
+						return new NestedExpression(subExpr, singleFunctionExpressions.get(functionPrefix), complexFunctionExpressions.get(functionPrefix));
 					}
 				}
-//				if (prefix.equalsIgnoreCase("re") || prefix.equalsIgnoreCase("real")){
-//					FractalsExpression subExpr = parse(bracketContent);
-//					if (subExpr == null)
-//						return null;
-//					return new VariablePartExpression(subExpr, true, false);
-//				}
-//				if (prefix.equalsIgnoreCase("im") || prefix.equalsIgnoreCase("imag") || prefix.equalsIgnoreCase("imaginary")){
-//					FractalsExpression subExpr = parse(bracketContent);
-//					if (subExpr == null)
-//						return null;
-//					return new VariablePartExpression(subExpr, false, true);
-//				}
+				
+				boolean iPartCandidate = prefix.endsWith("i") && prefix.length() > 1;
+				boolean rPartCandidate = prefix.endsWith("r") && prefix.length() > 1;
+				if (iPartCandidate || rPartCandidate){
+					prefix = prefix.substring(0, prefix.length()-1); //clear function name of part information
+					for (String functionPrefix : prefixMapping.keySet()){
+						if (prefix.equalsIgnoreCase(functionPrefix)){
+							NestedExpression nestedExpression = new NestedExpression(subExpr, singleFunctionExpressions.get(functionPrefix),
+									complexFunctionExpressions.get(functionPrefix));
+							nestedExpression.setComplexFilterOutReal(iPartCandidate);
+							nestedExpression.setComplexFilterOutImag(rPartCandidate);
+							return nestedExpression;
+						}
+					}
+				}
 			} else
 				throw new IllegalArgumentException("Tried to parse ...(...), but has suffix");
-		}
-		
-		//try double constant
-		Double val = null;
-		try {
-			val = Double.parseDouble(input);
-			return new ConstantExpression(val, 0);
-		} catch (NumberFormatException e){
-			boolean imag = input.endsWith("i");
-			if (imag) {
-				try {
-					if (input.length() == 1) //input == 'i'
-						val = 1.;
-					else
-						val = Double.parseDouble(input.substring(0, input.length()-2).trim());
-					return new ConstantExpression(0, val);
-				} catch (NumberFormatException e2){
-				}
-			}
-		}
-		
-		//try variable
-		if (val == null){
-//			if (input.matches("[a-zA-Z]+_n(-[1-9][0-9]*)")){
-//				return new VariablePastIterationExpression(input);
-//			}
-			if (input.matches("[a-zA-Z]+")){
-				return new VariableExpression(input);
-			}
 		}
 
 //		int index = 0;

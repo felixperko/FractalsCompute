@@ -1,9 +1,11 @@
 package de.felixperko.fractals.system.systems.OrbitSystem;
 
+import java.util.UUID;
+
 import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.ClientConfiguration;
-import de.felixperko.fractals.system.parameters.ParameterConfiguration;
+import de.felixperko.fractals.system.parameters.ParamConfiguration;
 import de.felixperko.fractals.system.systems.common.BFOrbitCommon;
 import de.felixperko.fractals.system.systems.infra.AbstractCalcSystem;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
@@ -12,8 +14,8 @@ public class OrbitSystem extends AbstractCalcSystem {
 	
 	OrbitTaskManager taskManager;
 
-	public OrbitSystem(ServerManagers managers) {
-		super(managers);
+	public OrbitSystem(UUID systemId, ServerManagers managers) {
+		super(systemId, managers);
 		this.taskManager = new OrbitTaskManager(managers, this);
 	}
 
@@ -23,9 +25,9 @@ public class OrbitSystem extends AbstractCalcSystem {
 	}
 
 	@Override
-	public ParameterConfiguration createParameterConfiguration() {
+	public ParamConfiguration createParameterConfiguration() {
 		//iterations, calculator, midpoint, numberFactory, chunkFactory, systemName, view, calculator specifics
-		ParameterConfiguration config = BFOrbitCommon.getCommonParameterConfiguration();
+		ParamConfiguration config = BFOrbitCommon.getCommonParameterConfiguration();
 		return config;
 	}
 

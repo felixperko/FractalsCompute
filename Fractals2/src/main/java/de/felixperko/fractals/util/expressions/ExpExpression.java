@@ -4,9 +4,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.felixperko.fractals.system.calculator.GPUInstruction;
+import de.felixperko.fractals.system.calculator.ComputeInstruction;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.NumberFactory;
+import de.felixperko.fractals.system.parameters.suppliers.CoordinateBasicShiftParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.MappedParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 
 /**
  * e.g.
@@ -37,9 +41,14 @@ public class ExpExpression extends AbstractExpression {
 	int resIndexReal;
 	int resIndexImag;
 	
+	boolean complexExpression = true;
+	boolean singleRealExpression = false;
+	boolean singleImagExpression = false;
+	
 	public ExpExpression(FractalsExpression base, FractalsExpression exponent) {
 		this.baseExpr = base;
 		this.expExpr = exponent;
+		
 //		this.baseTempResult = baseExpr.hasTempResult();
 //		this.expTempResult = expExpr.hasTempResult();
 //		this.reverseIndices = expTempResult && !baseTempResult;
@@ -97,21 +106,123 @@ public class ExpExpression extends AbstractExpression {
 //	}
 
 	@Override
-	public void registerSymbolUses(GPUExpressionBuilder expressionBuilder, NumberFactory numberFactory,
+	public void registerSymbolUses(ComputeExpressionBuilder expressionBuilder, NumberFactory numberFactory,
 			boolean copyVariable) {
 		baseExpr.registerSymbolUses(expressionBuilder, numberFactory, true);
 		expExpr.registerSymbolUses(expressionBuilder, numberFactory, false);
 	}
 
 	@Override
-	public void addInstructions(List<GPUInstruction> instructions, GPUExpressionBuilder expressionBuilder) {
+	public void addInitInstructions(List<ComputeInstruction> instructions, ComputeExpressionBuilder expressionBuilder) {
+		baseExpr.addInitInstructions(instructions, expressionBuilder);
+		expExpr.addInitInstructions(instructions, expressionBuilder);
+	}
+
+	@Override
+	public void addInstructions(List<ComputeInstruction> instructions, ComputeExpressionBuilder expressionBuilder) {
 		baseExpr.addInstructions(instructions, expressionBuilder);
 		expExpr.addInstructions(instructions, expressionBuilder);
+		
+		complexExpression = baseExpr.isComplexExpression();
+		if (expExpr.isComplexExpression() != complexExpression)
+			throw new IllegalArgumentException("Can't combine part and complex expressions (yet)");
+		if (baseExpr.isSingleRealExpression() != expExpr.isSingleRealExpression())
+			throw new IllegalArgumentException("Can't combine part and complex expressions (yet)");
+		this.singleRealExpression = baseExpr.isSingleRealExpression();
+		this.singleImagExpression = baseExpr.isSingleImagExpression();
 		
 		resIndexReal = baseExpr.getResultIndexReal();
 		resIndexImag = baseExpr.getResultIndexImag();
 		
-		instructions.add(new GPUInstruction(GPUInstruction.INSTR_POW, resIndexReal, resIndexImag, expExpr.getResultIndexReal(), expExpr.getResultIndexImag()));
+		//Optimize?
+		ComplexNumber value = null;
+		String expParamName = null;
+		if (expExpr instanceof ConstantExpression){
+			value = ((ConstantExpression)expExpr).complexNumber;
+			expParamName = ((ConstantExpression)expExpr).name;
+		}
+		else if (expExpr instanceof VariableExpression){
+			String variableName = ((VariableExpression)expExpr).name;
+			ParamSupplier supp = expressionBuilder.parameters.get(variableName);
+			if (supp instanceof StaticParamSupplier){
+				Object obj = ((StaticParamSupplier) supp).getObj();
+				if (obj instanceof ComplexNumber){
+					value = (ComplexNumber) obj;
+					expParamName = variableName;
+				}
+			}
+		}
+		
+		boolean optimized = false;
+		if (value != null){ //optimize
+			if (value.imagDouble() == 0.){
+				double real = value.realDouble();
+				if (real == 2.){
+					addSquareInstruction(instructions);
+					optimized = true;
+				}
+				else if (real == 4.){
+					addSquareInstruction(instructions);
+					addSquareInstruction(instructions);
+					optimized = true;
+				}
+//				else if (real == -2){
+//					// z^(-2) = (1/z)^2
+//					// 1/z = a - bi / (a^2 * b^2)
+//					// z = a - bi
+//					if (complexExpression)
+//						instructions.add(new ComputeInstruction(ComputeInstruction.INSTR_NEGATE_PART, resIndexReal, -1, -1, -1));
+//					//TODO a^2 * b^2 in temp variable
+//					addSquareInstruction(instructions);
+//					optimized = true;
+//				}
+		}
+		}
+		if (optimized)
+			expressionBuilder.fixedValues.put(expParamName, value);
+		else { //default case
+			if (complexExpression)
+				instructions.add(new ComputeInstruction(ComputeInstruction.INSTR_POW_COMPLEX, resIndexReal, resIndexImag, expExpr.getResultIndexReal(), expExpr.getResultIndexImag()));
+			else
+				instructions.add(new ComputeInstruction(ComputeInstruction.INSTR_POW_PART, resIndexReal, expExpr.getResultIndexReal(), -1, -1));
+		}
+	}
+
+	private void addSquareInstruction(List<ComputeInstruction> instructions) {
+		addInstruction(instructions, ComputeInstruction.INSTR_SQUARE_COMPLEX, ComputeInstruction.INSTR_SQUARE_PART);
+	}
+	
+	private void addInstruction(List<ComputeInstruction> instructions, int complexInstruction, int partInstruction) {
+		if (complexExpression)
+			instructions.add(new ComputeInstruction(complexInstruction, resIndexReal, resIndexImag, -1, -1));
+		else
+			instructions.add(new ComputeInstruction(partInstruction, resIndexReal, -1, -1, -1));
+	}
+
+	@Override
+	public double getSmoothstepConstant(ComputeExpressionBuilder expressionBuilder) {
+		ParamSupplier supplier = null;
+		if (expExpr instanceof VariableExpression){
+			supplier = expressionBuilder.parameters.get(((VariableExpression)expExpr).name);
+		}
+		if (expExpr instanceof ConstantExpression){
+			return ((ConstantExpression)expExpr).complexNumber.absDouble();
+		}
+		
+		if (supplier == null)
+			return 0;
+		if (supplier instanceof MappedParamSupplier)
+			return 2; //TODO smoothstep for mapped power possible?
+		if (supplier instanceof StaticParamSupplier){
+			StaticParamSupplier supp = ((StaticParamSupplier)supplier);
+			Object obj = supp.getGeneral();
+			if (obj instanceof ComplexNumber){
+				double r = ((ComplexNumber)obj).realDouble();
+				double i = ((ComplexNumber)obj).imagDouble();
+				return Math.sqrt(r*r + i*i);
+			}
+		}
+		return 0;
 	}
 
 	@Override
@@ -128,5 +239,21 @@ public class ExpExpression extends AbstractExpression {
 	public int getResultIndexImag() {
 		return resIndexImag;
 	}
+
+	@Override
+	public boolean isComplexExpression() {
+		return complexExpression;
+	}
+
+	@Override
+	public boolean isSingleRealExpression() {
+		return singleRealExpression;
+	}
+
+	@Override
+	public boolean isSingleImagExpression() {
+		return singleImagExpression;
+	}
+	
 
 }

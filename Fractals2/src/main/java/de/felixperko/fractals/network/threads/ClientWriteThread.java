@@ -44,4 +44,14 @@ public class ClientWriteThread extends WriteThread{
 		this.serverConnection = (ServerConnection) serverConnection;
 		this.serverConnection.setWriteToServer(this);
 	}
+
+	@Override
+	public void addConnectionClosedRunnable(Runnable runnable) {
+		this.listenThread.addConnectionClosedRunnable(runnable);
+	}
+
+	@Override
+	public void removeConnectionClosedRunnable(Runnable runnable) {
+		this.listenThread.addConnectionClosedRunnable(runnable);
+	}
 }

@@ -20,4 +20,7 @@ public interface Messageable {
 	 * Called for initialization, e.g. start of thread if the implementation extends Thread
 	 */
 	void start();
+	
+	void addConnectionClosedRunnable(Runnable runnable);
+	void removeConnectionClosedRunnable(Runnable runnable);
 }

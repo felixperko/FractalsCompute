@@ -45,19 +45,21 @@ public class StaticParamSupplier extends AbstractParamSupplier {
 		} else if (!(old instanceof StaticParamSupplier)) {
 			return true;
 		} else {
-			return !((StaticParamSupplier)old).obj.equals(obj);
+			StaticParamSupplier oldStatic = (StaticParamSupplier)old;
+			Object oldObj = oldStatic.getGeneral();
+			return !obj.equals(oldObj);
 		}
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((obj == null) ? 0 : obj.hashCode());
 		return result;
 	}
 
-	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -67,6 +69,11 @@ public class StaticParamSupplier extends AbstractParamSupplier {
 		if (getClass() != obj.getClass())
 			return false;
 		StaticParamSupplier other = (StaticParamSupplier) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
 		if (this.obj == null) {
 			if (other.obj != null)
 				return false;

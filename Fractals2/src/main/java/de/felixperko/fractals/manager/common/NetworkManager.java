@@ -1,6 +1,7 @@
 package de.felixperko.fractals.manager.common;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,34 +29,36 @@ public class NetworkManager extends Manager implements INetworkManager{
 	}
 	
 	@Override
-	public ServerConnection connectToServer(String host, int port) {
-		Socket socket;
-		try {
-			socket = new Socket(host, port);
-			ServerConnection serverConnection = new ServerConnection(this);
-			serverConnections.add(serverConnection);
-			ClientMessageInterface clientMessageInterface = networkInterfaceFactory.createMessageInterface(serverConnection);
-			messageInterfaces.put(serverConnection, clientMessageInterface);
-			ClientWriteThread clientWriteThread = new ClientWriteThread(managers, socket, serverConnection);
-			writeThreadsToServers.add(clientWriteThread);
-			clientWriteThread.start();
-			return serverConnection;
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(0);
-		}
-		return null;
+	public ServerConnection connectToServer(String host, int port) throws IOException{
+		Socket socket = new Socket(host, port);
+		ServerConnection serverConnection = new ServerConnection(this);
+		serverConnections.add(serverConnection);
+		ClientMessageInterface clientMessageInterface = networkInterfaceFactory.createMessageInterface(serverConnection);
+		messageInterfaces.put(serverConnection, clientMessageInterface);
+		ClientWriteThread clientWriteThread = new ClientWriteThread(managers, socket, serverConnection);
+		writeThreadsToServers.add(clientWriteThread);
+		clientWriteThread.start();
+		return serverConnection;
 	}
 	
 	public ServerConnection connectToLocalServer(Messageable messageable, boolean startUp){
-		if (startUp)
+		if (startUp){
+			managers.getThreadManager().stopLocalServer();
 			managers.getThreadManager().startLocalServer();
+		}
 		ServerConnection serverConnection = new ServerConnection(this);
 		serverConnections.add(serverConnection);
 		ClientMessageInterface clientMessageInterface = networkInterfaceFactory.createMessageInterface(serverConnection);
 		messageInterfaces.put(serverConnection, clientMessageInterface);
 		writeThreadsToServers.add(messageable);
 		messageable.start();
+		
+		try {
+			Thread.sleep(50);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
 		Messageable serverMessageable = FractalsMain.registerLocalClient(messageable);
 		serverConnection.setWriteToServer(serverMessageable);
 		return serverConnection;

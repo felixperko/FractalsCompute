@@ -1,5 +1,7 @@
 package de.felixperko.fractals.network.interfaces;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -33,6 +35,8 @@ public class ServerLocalMessageable extends AbstractFractalsThread implements Me
 	boolean closeConnection;
 	
 	SharedDataController sharedDataController = new SharedDataController();
+	
+	List<Runnable> connectionClosedRunnables = new ArrayList<>();
 	
 	public void setClientLocalConnection(ClientLocalConnection clientLocalConnection) {
 		this.clientLocalConnection = clientLocalConnection;
@@ -103,5 +107,13 @@ public class ServerLocalMessageable extends AbstractFractalsThread implements Me
 	
 	public boolean unregisterViewContainerListener(UUID systemId, ViewContainerListener listener) {
 		return ((ServerManagers)managers).getSystemManager().unregisterViewContainerListener(systemId, listener);
+	}
+	
+	public void addConnectionClosedRunnable(Runnable runnable){
+		this.connectionClosedRunnables.add(runnable);
+	}
+	
+	public void removeConnectionClosedRunnable(Runnable runnable){
+		this.connectionClosedRunnables.remove(runnable);
 	}
 }
