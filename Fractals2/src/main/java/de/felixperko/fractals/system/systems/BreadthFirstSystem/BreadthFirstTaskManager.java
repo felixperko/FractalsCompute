@@ -1,6 +1,7 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -137,14 +138,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 
 	@Override
 	public void startTasks() {
-		
-		
-		//TODO readd when layerConfig changes?!
-		for (int i = 0 ; i < context.layerConfig.getLayers().size() ; i++) {
-			openTasks.add(new PriorityQueue<>(comparator_distance));
-			tempList.add(new ArrayList<>());
-		}
-
+		reset();
 		generateRootTask();
 	}
 	
@@ -192,7 +186,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	
 	public boolean tick() {
 		boolean changed = false;
-		try {
+//		try {
 			if (updateStats())
 				changed = true;
 			if (fillQueues())
@@ -204,10 +198,10 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			ViewData activeViewData = context.getActiveViewData();
 			if (activeViewData != null)
 				activeViewData.tick();
-		} catch (Exception e) {
-			if (system.getLifeCycleState() != LifeCycleState.STOPPED)
-				throw e;
-		}
+//		} catch (Exception e) {
+//			if (system.getLifeCycleState() != LifeCycleState.STOPPED)
+//				throw e;
+//		}
 		return changed;
 	}
 
@@ -254,14 +248,22 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		Map<String, ParamSupplier> params = paramContainer.getClientParameters();
 		if (params.get("midpoint").isChanged() || params.get("width").isChanged() || params.get("height").isChanged() || params.get("zoom").isChanged()) {
 			updatePredictedMidpoint();
-			if (!reset)
+//			if (!reset)
 				updatedPredictedMidpoint = true;
 		}
 		
 		setLifeCycleState(LifeCycleState.RUNNING);
 		
-		if (reset)
-			generateRootTask();
+		if (reset){
+			List<String> changed = new ArrayList<>();
+			for (ParamSupplier supp : params.values())
+				if (supp.isChanged())
+					changed.add(supp.getName());
+			LOG.info("resetting with changed parameters "+Arrays.toString(changed.toArray()));
+//			reset();
+			updatePredictedMidpoint();
+//			generateRootTask();
+		}
 		
 		return reset;
 	}
@@ -441,11 +443,22 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				msgs.clear();
 			}
 //		}
+		
+			
 		pendingUpdateMessages.clear();
+		
 		for (Queue<BreadthFirstTask> openQueue : openTasks)
 			openQueue.clear();
+//		openTasks.clear();
+		
 		for (List<BreadthFirstTask> temp : tempList)
 			temp.clear();
+		for (int i = 0 ; i < context.layerConfig.getLayers().size() ; i++) {
+			if (openTasks.size() <= i)
+				openTasks.add(new PriorityQueue<>(comparator_distance));
+			if (tempList.size() <= i)
+				tempList.add(new ArrayList<>());
+		}
 		assignedTasks.clear();
 		nextOpenTasks.clear();
 		nextBufferedTasks.clear();
@@ -456,7 +469,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		BreadthFirstViewData viewData = context.getActiveViewData();
 		if (viewData != null) {
 			viewData.dispose();
-			context.setActiveViewData(null); //TODO does that make sense?
+//			context.setActiveViewData(null); //TODO does that make sense?
 		}
 		for (TaskProviderAdapter adapter : taskProviders)
 			adapter.cancelTasks();
@@ -524,11 +537,12 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			while (borderIt.hasNext()) {
 				BreadthFirstTask borderTask = borderIt.next();
 				double drawRegionDistance = context.getDrawRegionDistance(borderTask.getChunk());
-				if (drawRegionDistance > context.border_dispose){
-					borderTask.getStateInfo().setState(TaskState.REMOVED);
-					borderIt.remove();
-				}
-				else if (drawRegionDistance <= context.border_generation) {
+//				if (drawRegionDistance > context.border_dispose){
+//					borderTask.getStateInfo().setState(TaskState.REMOVED);
+//					borderIt.remove();
+//				}
+//				else
+				if (drawRegionDistance <= context.border_generation) {
 					borderTask.getStateInfo().setState(TaskState.OPEN);
 					openTasks.get(borderTask.getStateInfo().getLayer().getId()).add(borderTask);
 					borderIt.remove();
@@ -614,7 +628,10 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				for (int l = 0 ; l < layers.size() ; l++) {
 					if  (layerInNextTasks[l])
 						continue;
-					BreadthFirstTask task = openTasks.get(l).poll();
+					Queue<BreadthFirstTask> taskQueue = openTasks.size() > l ? openTasks.get(l) : null;
+					if (taskQueue == null)
+						continue;
+					BreadthFirstTask task = taskQueue.poll();
 					if (task == null)
 						continue;
 					changed = true;

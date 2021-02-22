@@ -29,13 +29,11 @@ public abstract class ClientMessageInterface {
 
 	protected abstract ClientSystemInterface createSystemInterface(ClientConfiguration clientConfiguration);
 	
-	public Set<UUID> getRegisteredSystems(){
-		return systemInterfaces.keySet();
-	}
+	public abstract void serverStateUpdated(ServerStateInfo serverStateInfo);
 	
-	public ClientSystemInterface getSystemInterface(UUID systemId) {
-		return systemInterfaces.get(systemId);
-	}
+	public abstract void assignedTasks(List<FractalsTask> tasks);
+
+	public abstract void updateSharedData(DataContainer container);
 	
 	public void createdSystem(UUID systemId, ClientConfiguration clientConfiguration, ParamConfiguration parameterConfiguration) {
 		ClientSystemInterface systemInterface = createSystemInterface(clientConfiguration);
@@ -57,26 +55,32 @@ public abstract class ClientMessageInterface {
 		systemInterfaces.remove(systemId);
 		return true;
 	}
-	
-	public abstract void serverStateUpdated(ServerStateInfo serverStateInfo);
-	
-	public abstract void assignedTasks(List<FractalsTask> tasks);
-
-	public abstract void updateSharedData(DataContainer container);
 
 	public void sharedDataUpdated(List<DataContainer> sharedDataStateUpdates) {
 		for (DataContainer dataContainer : sharedDataStateUpdates)
 			updateSharedData(dataContainer);
-	}
-	
-	public ServerConnection getServerConnection() {
-		return serverConnection;
 	}
 
 	public void changedResources(int cpuCores, int maxCpuCores, Map<String, Float> gpus) {
 		resourceCpuCores = cpuCores;
 		resourceMaxCpuCores = maxCpuCores;
 		resourceGpus = gpus;
+	}
+	
+	public Set<UUID> getRegisteredSystems(){
+		return systemInterfaces.keySet();
+	}
+	
+	public ClientSystemInterface getSystemInterface(UUID systemId) {
+		return systemInterfaces.get(systemId);
+	}
+	
+	public Map<UUID, ClientSystemInterface> getSystemInterfaces(){
+		return systemInterfaces;
+	}
+	
+	public ServerConnection getServerConnection() {
+		return serverConnection;
 	}
 
 	public int getResourceCpuCores() {

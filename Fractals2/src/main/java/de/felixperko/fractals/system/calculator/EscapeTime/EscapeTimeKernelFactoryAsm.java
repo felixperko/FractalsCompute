@@ -220,6 +220,9 @@ public class EscapeTimeKernelFactoryAsm implements IGpuKernelFactory{
 			case (ComputeInstruction.INSTR_NEGATE_PART):
 				iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_negate_part", "(I)V", false);
 				break;
+			case (ComputeInstruction.INSTR_RECIPROCAL_PART):
+				iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_reciprocal_part", "(I)V", false);
+				break;
 			default:
 				iterate.visitLdcInsn(instruction.fromImag);
 				iterate.visitVarInsn(ILOAD, 1);
@@ -251,6 +254,9 @@ public class EscapeTimeKernelFactoryAsm implements IGpuKernelFactory{
 					break;
 				case (ComputeInstruction.INSTR_NEGATE_COMPLEX):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_negate_complex", "(II)V", false);
+					break;
+				case (ComputeInstruction.INSTR_RECIPROCAL_COMPLEX):
+					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_reciprocal_complex", "(II)V", false);
 					break;
 				case (ComputeInstruction.INSTR_POW_PART):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_pow_part", "(II)V", false);

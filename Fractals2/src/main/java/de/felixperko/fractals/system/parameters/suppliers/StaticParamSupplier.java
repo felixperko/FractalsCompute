@@ -92,6 +92,6 @@ public class StaticParamSupplier extends AbstractParamSupplier {
 	
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName()+" name="+getName()+" obj="+obj;
+		return this.getClass().getSimpleName()+" (name="+getName()+" obj="+obj+")";
 	}
 }

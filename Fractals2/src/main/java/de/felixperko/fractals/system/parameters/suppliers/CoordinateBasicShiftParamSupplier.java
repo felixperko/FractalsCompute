@@ -50,4 +50,8 @@ public class CoordinateBasicShiftParamSupplier extends MappedParamSupplier {
 			return false;
 		return true;
 	}
+	
+	public String toString() {
+		return this.getClass().getSimpleName()+" (name="+getName()+")";
+	};
 }

@@ -61,6 +61,7 @@ public class ComputeInstruction {
 	public static final int INSTR_TANH_COMPLEX = 12;
 	public static final int INSTR_SQUARE_COMPLEX = 13;
 	public static final int INSTR_NEGATE_COMPLEX = 14;
+	public static final int INSTR_RECIPROCAL_COMPLEX = 30;
 
 	public static final int INSTR_ADD_PART = 15;
 	public static final int INSTR_SUB_PART = 16;
@@ -77,6 +78,7 @@ public class ComputeInstruction {
 	public static final int INSTR_TANH_PART = 27;
 	public static final int INSTR_SQUARE_PART = 28;
 	public static final int INSTR_NEGATE_PART = 29;
+	public static final int INSTR_RECIPROCAL_PART = 31;
 	
 	//
 	//CLASS

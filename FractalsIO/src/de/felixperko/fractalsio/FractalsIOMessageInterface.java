@@ -6,7 +6,7 @@ import de.felixperko.fractals.manager.client.ClientManagers;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.network.interfaces.ClientMessageInterface;
 import de.felixperko.fractals.network.interfaces.ClientSystemInterface;
-import de.felixperko.fractals.system.parameters.ParameterConfiguration;
+import de.felixperko.fractals.system.parameters.ParamConfiguration;
 import de.felixperko.fractals.system.systems.stateinfo.ServerStateInfo;
 import de.felixperko.fractals.system.systems.stateinfo.SystemStateInfo;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
@@ -31,7 +31,7 @@ public class FractalsIOMessageInterface extends ClientMessageInterface {
 	}
 	
 	@Override
-	public void createdSystem(UUID systemId, ClientConfiguration clientConfiguration, ParameterConfiguration parameterConfiguration) {
+	public void createdSystem(UUID systemId, ClientConfiguration clientConfiguration, ParamConfiguration parameterConfiguration) {
 		if (managers == null)
 			throw new IllegalStateException();
 		FractalsIOSystemInterface systemInterface = new FractalsIOSystemInterface(managers);
@@ -68,7 +68,7 @@ public class FractalsIOMessageInterface extends ClientMessageInterface {
 
 	
 	@Override
-	public void recievedParameterConfiguration(ParameterConfiguration parameterConfiguration) {
+	public void recievedParameterConfiguration(ParamConfiguration parameterConfiguration) {
 		// TODO Auto-generated method stub
 		
 	}

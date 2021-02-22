@@ -1,4 +1,4 @@
-package de.felixperko.fractals.util.expressions;
+package de.felixperko.expressions;
 
 import java.util.LinkedHashMap;
 import java.util.List;

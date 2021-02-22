@@ -1,4 +1,4 @@
-package de.felixperko.fractals.util.expressions;
+package de.felixperko.expressions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,7 +98,7 @@ public class ExpressionSymbol {
 			return getPristineIndexReal();
 		boolean pristine = outputVar;
 		if (pristine){
-			for (int i = 0 ; i < symbolSlot-1 ; i++){
+			for (int i = 0 ; i < symbolSlot ; i++){
 				if (slotReal.get(i)){
 					pristine = false;
 					break;
@@ -115,7 +115,7 @@ public class ExpressionSymbol {
 			return getPristineIndexImag();
 		boolean pristine = outputVar;
 		if (pristine){
-			for (int i = 0 ; i < symbolSlot-1 ; i++){
+			for (int i = 0 ; i < symbolSlot ; i++){
 				if (slotImag.get(i)){
 					pristine = false;
 					break;

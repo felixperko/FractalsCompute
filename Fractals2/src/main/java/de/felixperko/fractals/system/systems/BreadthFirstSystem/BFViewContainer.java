@@ -163,7 +163,8 @@ public class BFViewContainer extends AbstractViewContainer<BreadthFirstViewData>
 	void storeCurrentActiveViewData() {
 		if (activeViewData == null)
 			return;
-		oldViewData.addFirst(activeViewData);
+		if (oldViewBufferSize != 0)
+			oldViewData.addFirst(activeViewData);
 		activeViewData.clearBufferedChunks();
 		enforceBufferSize();
 	}

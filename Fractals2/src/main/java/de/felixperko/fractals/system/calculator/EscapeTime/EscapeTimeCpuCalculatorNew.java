@@ -2,6 +2,7 @@ package de.felixperko.fractals.system.calculator.EscapeTime;
 
 import java.util.List;
 
+import de.felixperko.expressions.ComputeExpressionBuilder;
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.BorderAlignment;
 import de.felixperko.fractals.system.calculator.ComputeExpression;
@@ -14,7 +15,6 @@ import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.statistics.IStats;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
-import de.felixperko.fractals.util.expressions.ComputeExpressionBuilder;
 
 public class EscapeTimeCpuCalculatorNew extends AbstractFractalsCalculator{
 	
@@ -99,12 +99,24 @@ public class EscapeTimeCpuCalculatorNew extends AbstractFractalsCalculator{
 			
 			for (int sample = currentSamples ; sample < samples ; sample++) {
 				
-				float result = kernel.run(pixel, params, sampleOffsets, chunk.getChunkDimensions(), currentSamples, maxIterations, limitSq);
+				calcPixel(chunk, kernel, upsample, maxIterations, limitSq, sampleOffsets, params, pixel,
+						currentSamples);
 				
-				chunk.addSample(pixel, result, upsample);
-//				sample_success(pixel); //TODO only if >= 0
+				
 			}
 		}
+	}
+
+	protected void calcPixel(AbstractArrayChunk chunk, EscapeTimeCpuKernelNew kernel, int upsample, int maxIterations,
+			double limitSq, float[] sampleOffsets, double[] params, int pixel, int currentSamples) {
+		
+		float result = kernel.run(pixel, params, sampleOffsets, chunk.getChunkDimensions(), currentSamples, maxIterations, limitSq);
+		
+		chunk.addSample(pixel, result, upsample);
+		
+		if (chunk.getValue(pixel, true) <= 0 && result >= 0)
+			sample_first_success(chunk, kernel, upsample, maxIterations, limitSq, sampleOffsets, params, pixel,
+					currentSamples);
 	}
 	
 	private EscapeTimeCpuKernelNew getCurrentKernel() {
@@ -142,65 +154,66 @@ public class EscapeTimeCpuCalculatorNew extends AbstractFractalsCalculator{
 		getCurrentKernel().setTraces(traceCount);
 	}
 	
-//	private void sample_first_success(AbstractArrayChunk chunk, int pixel) {
-//		final int chunkDimensions = chunk.getChunkDimensions();
-//		final int upsample = chunk.getUpsample();
-//		final int chunkArrayLength = chunk.getArrayLength();
-//		int thisX = pixel / chunkDimensions;
-//		int thisY = pixel % chunkDimensions;
-//		//disable culling of surrounding pixels
-//		for (int dx = -1 ; dx <= 1 ; dx++) {
-//			for (int dy = -1 ; dy <= 1 ; dy++) {
-//				
-//				if (dx == 0 && dy == 0)
-//					continue;
-//				
-//				int x = thisX + dx*upsample;
-//				int y = thisY + dy*upsample;
-//				
-//				//determine if in neighbour chunk
-//				boolean local = true;
-//				if (x < 0){
-//					int low = thisY - thisY % (upsample);
-//					int high = low+upsample-1;
-//					local = false;
-//					if (y > 0 && y < chunkDimensions)
-//						chunk.getBorderData(BorderAlignment.LEFT).set(true, low, high);
-//				} else if (x >= chunkDimensions){
-//					int low = thisY - thisY % (upsample);
-//					int high = low+upsample-1;
-//					local = false;
-//					if (y > 0 && y < chunkDimensions)
-//						chunk.getBorderData(BorderAlignment.RIGHT).set(true, low, high);
-//				}
-//				
-//				if (y < 0){
-//					int low = thisX - thisX % (upsample);
-//					int high = low+upsample-1;
-//					local = false;
-//					if (x > 0 && x < chunkDimensions)
-//						chunk.getBorderData(BorderAlignment.UP).set(true, low, high);
-//				} else if (y >= chunkDimensions){
-//					int low = thisX - thisX % (upsample);
-//					int high = low+upsample-1;
-//					local = false;
-//					if (x > 0 && x < chunkDimensions)
-//						chunk.getBorderData(BorderAlignment.DOWN).set(true, low, high);
-//				}
-//				
-//				//local -> add to redo queue
-//				if (local){
-//					int pixel2 = x*chunkDimensions + y;
-//					if (chunk.getValue(pixel2, true) == AbstractArrayChunk.FLAG_CULL) {
-//						chunk.setCullFlags(pixel2, 1, false);
+	private void sample_first_success(AbstractArrayChunk chunk, EscapeTimeCpuKernelNew kernel, int upsample, int maxIterations,
+			double limitSq, float[] sampleOffsets, double[] params, int pixel, int currentSamples) {
+		final int chunkDimensions = chunk.getChunkDimensions();
+		final int chunkArrayLength = chunk.getArrayLength();
+		int thisX = pixel / chunkDimensions;
+		int thisY = pixel % chunkDimensions;
+		//disable culling of surrounding pixels
+		for (int dx = -1 ; dx <= 1 ; dx++) {
+			for (int dy = -1 ; dy <= 1 ; dy++) {
+				
+				if (dx == 0 && dy == 0)
+					continue;
+				
+				int x = thisX + dx*upsample;
+				int y = thisY + dy*upsample;
+				
+				//determine if in neighbour chunk
+				boolean local = true;
+				if (x < 0){
+					int low = thisY - thisY % (upsample);
+					int high = low+upsample-1;
+					local = false;
+					if (y > 0 && y < chunkDimensions)
+						chunk.getBorderData(BorderAlignment.LEFT).set(true, low, high);
+				} else if (x >= chunkDimensions){
+					int low = thisY - thisY % (upsample);
+					int high = low+upsample-1;
+					local = false;
+					if (y > 0 && y < chunkDimensions)
+						chunk.getBorderData(BorderAlignment.RIGHT).set(true, low, high);
+				}
+				
+				if (y < 0){
+					int low = thisX - thisX % (upsample);
+					int high = low+upsample-1;
+					local = false;
+					if (x > 0 && x < chunkDimensions)
+						chunk.getBorderData(BorderAlignment.UP).set(true, low, high);
+				} else if (y >= chunkDimensions){
+					int low = thisX - thisX % (upsample);
+					int high = low+upsample-1;
+					local = false;
+					if (x > 0 && x < chunkDimensions)
+						chunk.getBorderData(BorderAlignment.DOWN).set(true, low, high);
+				}
+				
+				//local -> add to redo queue
+				if (local){
+					int pixel2 = x*chunkDimensions + y;
+					if (chunk.getValue(pixel2, true) == AbstractArrayChunk.FLAG_CULL) {
+						chunk.setCullFlags(pixel2, 1, false);
+						calcPixel(chunk, getCurrentKernel(), upsample, maxIterations, limitSq, sampleOffsets, params, pixel2, currentSamples);
 //						if (phase == CalculatePhase.PHASE_REDO || pixel > pixel2) {
 //							redo.add(pixel2);
 //						}
-//					}
-//				}
-//			}
-//		}
-//	}
+					}
+				}
+			}
+		}
+	}
 
 }
 

@@ -3,11 +3,15 @@ package de.felixperko.fractals.system.calculator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
+import de.felixperko.fractals.system.parameters.ParamConfiguration;
+import de.felixperko.fractals.system.parameters.ParamDefinition;
 import de.felixperko.fractals.system.parameters.suppliers.MappedParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
@@ -18,23 +22,27 @@ public class ComputeExpression {
 	List<ComputeInstruction> instructions;
 	Map<ParamSupplier, Integer> constants = new HashMap<>(); //idx_real == value; idx_imag == value+1
 	Map<ParamSupplier, Integer> variables = new HashMap<>(); //see above
-	
+	List<Integer> copySlots = new ArrayList<>();
+
 	String text;
 
 	ParamSupplier[] params;
 	
 	Map<String, ComplexNumber> fixedValues;
+	Map<String, ComplexNumber> explicitValues;
 	
 	int requiredVariableSlots;
 	
 	double smoothstepConstant;
 	
-	public ComputeExpression(String text, List<ComputeInstruction> instructions, Map<ParamSupplier, Integer> parameters, int requiredVariableSlots, Map<String, ComplexNumber> fixedValues, double smoothstepConstant) {
+	public ComputeExpression(String text, List<ComputeInstruction> instructions, Map<ParamSupplier, Integer> parameters, int requiredVariableSlots,
+			Map<String, ComplexNumber> fixedValues, Map<String, ComplexNumber> explicitValues, double smoothstepConstant) {
 		this.text = text;
 		this.instructions = instructions;
 		this.requiredVariableSlots = requiredVariableSlots;
 		this.params = new ParamSupplier[parameters.size()];
 		this.fixedValues = fixedValues;
+		this.explicitValues = explicitValues;
 		this.smoothstepConstant = smoothstepConstant;
 		for (Entry<ParamSupplier, Integer> e : parameters.entrySet()){
 			ParamSupplier supp = e.getKey();
@@ -48,6 +56,9 @@ public class ComputeExpression {
 				throw new IllegalArgumentException(ComputeExpression.class.getName()+" only supports "+
 				StaticParamSupplier.class.getName()+" and "+MappedParamSupplier.class.getName()+" as parameters.\nGot "+supp == null ? "null" : supp.getClass().getName());
 			}
+		}
+		for (int i = parameters.size()*2 ; i < requiredVariableSlots ; i+=2){
+			this.copySlots.add(i);
 		}
 	}
 	
@@ -64,6 +75,19 @@ public class ComputeExpression {
 
 	public List<ParamSupplier> getParameterList() {
 		return Arrays.asList(params);
+	}
+	
+	public List<ParamSupplier> getMissingParams(ParamConfiguration paramConfiguration){
+		HashSet<String> definedSet = new HashSet<>();
+		for (ParamDefinition definition : paramConfiguration.getParameters()){
+			definedSet.add(definition.getName());
+		}
+		List<ParamSupplier> list = new ArrayList<>();
+        for (ParamSupplier exprParam : params){
+            if (!definedSet.contains(exprParam.getName()))
+            	list.add(exprParam);
+        }
+        return list;
 	}
 
 	public List<String> getConstantNames() {
@@ -101,12 +125,20 @@ public class ComputeExpression {
 		return fixedValues;
 	}
 
+	public Map<String, ComplexNumber> getExplicitValues() {
+		return explicitValues;
+	}
+
 	public double getSmoothstepConstant() {
 		return smoothstepConstant;
 	}
 
 	public void setSmoothstepConstant(double smoothstepConstant) {
 		this.smoothstepConstant = smoothstepConstant;
+	}
+	
+	public List<Integer> getCopySlots() {
+		return copySlots;
 	}
 
 	@Override

@@ -142,12 +142,11 @@ public class SystemManager extends Manager{
 
 	private CalcSystem initSystem(UUID systemId, ParamContainer data) {
 		ParamSupplier systemNameParam = data.getClientParameter("systemName");
-		if (systemNameParam == null) {
-			//TODO reply to client
-			LOG.error("Invalid system request: systemName parameters not set.");
-			return null;
-		}
-		String systemName = (String) systemNameParam.get(null, null, 0, 0);
+//		if (systemNameParam == null) {
+//			LOG.error("Invalid system request: systemName parameters not set.");
+//			return null;
+//		}
+		String systemName = systemNameParam == null ? defaultSystem : (String) systemNameParam.get(null, null, 0, 0);
 		if (!availableSystems.containsKey(systemName)) {
 			//TODO reply to client
 			LOG.error("Invalid system request: system for name doesn't exist: "+systemName);

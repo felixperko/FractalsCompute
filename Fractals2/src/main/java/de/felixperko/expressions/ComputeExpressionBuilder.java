@@ -1,4 +1,4 @@
-package de.felixperko.fractals.util.expressions;
+package de.felixperko.expressions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,7 +61,8 @@ public class ComputeExpressionBuilder {
 					symbolName = "start"; //get "start" instead of inputVarName (e.g. "z")
 				ParamSupplier param = parameters.get(symbolName);
 				if (param == null)
-					throw new IllegalStateException("didnt find parameter "+symbolName); 
+					param = new StaticParamSupplier(symbolName, nf.createComplexNumber(0, 0));
+//					throw new IllegalStateException("didnt find parameter "+symbolName); 
 				mappedParams.put(param, (Integer)copyCounter);
 			} else { //is raw value
 				ComplexNumber constant = explicitValues.get(symbolName);
@@ -79,7 +80,7 @@ public class ComputeExpressionBuilder {
 		expression.addInitInstructions(instructions, this);
 		expression.addInstructions(instructions, this);
 		smoothstepConstant = Math.log(expression.getSmoothstepConstant(this));
-		return new ComputeExpression(input, instructions, mappedParams, copyCounter, fixedValues, smoothstepConstant);
+		return new ComputeExpression(input, instructions, mappedParams, copyCounter, fixedValues, explicitValues, smoothstepConstant);
 	}
 	
 	public ExpressionSymbol getReferenceExpressionSymbol(String name){

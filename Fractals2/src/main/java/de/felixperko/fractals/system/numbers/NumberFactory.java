@@ -40,7 +40,15 @@ public class NumberFactory extends JsonAbstractTypedObject implements Serializab
 			throw new IllegalStateException("NumberFactory has no numberClass configured");
 		try {
 			return numberClass.getDeclaredConstructor(String.class).newInstance(value);
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+		} catch (InvocationTargetException e){
+			if ((e.getCause() instanceof NumberFormatException)){
+				throw (NumberFormatException)e.getCause();
+			}
+			else {
+				e.printStackTrace();
+				return null;
+			}
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 				| NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
 			return null;
@@ -79,8 +87,16 @@ public class NumberFactory extends JsonAbstractTypedObject implements Serializab
 			throw new IllegalStateException("NumberFactory has no complexNumberClass configured");
 		try {
 			return complexNumberClass.getDeclaredConstructor(String.class, String.class).newInstance(r, i);
+		} catch (InvocationTargetException e){
+			if ((e.getCause() instanceof NumberFormatException)){
+				throw (NumberFormatException)e.getCause();
+			}
+			else {
+				e.printStackTrace();
+				return null;
+			}
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				| NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
 			return null;
 		}

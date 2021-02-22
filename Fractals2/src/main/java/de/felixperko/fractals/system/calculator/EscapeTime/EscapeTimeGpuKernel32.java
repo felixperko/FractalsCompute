@@ -254,7 +254,7 @@ public abstract class EscapeTimeGpuKernel32 extends EscapeTimeGpuKernelAbstract{
 		float temp2;
 		float temp3;
 		temp3 = sqrt(data[r1]*data[r1]+data[i1]*data[i1]);
-		if (temp3 != 0){
+		if (temp3 != 0f){
 			temp3 = log(temp3);
 			temp1 = atan2(data[i1], data[r1]);
 			//mult
@@ -272,5 +272,17 @@ public abstract class EscapeTimeGpuKernel32 extends EscapeTimeGpuKernelAbstract{
 	
 	protected void instr_pow_part(int p1, int p2){
 		data[p1] = pow(data[p1], data[p2]);
+	}
+	
+	protected void instr_reciprocal_complex(int r1, int i1){
+		float temp = data[r1]*data[r1] + data[i1]*data[i1];
+		if (temp != 0f){
+			data[r1] =   data[r1]/temp;
+			data[i1] = - data[i1]/temp;
+		}
+	}
+	
+	protected void instr_reciprocal_part(int p1){
+		data[p1] = 1f/data[p1];
 	}
 }

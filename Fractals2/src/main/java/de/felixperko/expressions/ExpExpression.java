@@ -1,4 +1,4 @@
-package de.felixperko.fractals.util.expressions;
+package de.felixperko.expressions;
 
 import java.util.List;
 import java.util.Map;
@@ -137,6 +137,10 @@ public class ExpExpression extends AbstractExpression {
 		//Optimize?
 		ComplexNumber value = null;
 		String expParamName = null;
+		
+		while (expExpr instanceof NestedExpression)
+			expExpr = ((NestedExpression)expExpr).contentExpression;
+		
 		if (expExpr instanceof ConstantExpression){
 			value = ((ConstantExpression)expExpr).complexNumber;
 			expParamName = ((ConstantExpression)expExpr).name;
@@ -166,16 +170,17 @@ public class ExpExpression extends AbstractExpression {
 					addSquareInstruction(instructions);
 					optimized = true;
 				}
-//				else if (real == -2){
-//					// z^(-2) = (1/z)^2
-//					// 1/z = a - bi / (a^2 * b^2)
-//					// z = a - bi
-//					if (complexExpression)
-//						instructions.add(new ComputeInstruction(ComputeInstruction.INSTR_NEGATE_PART, resIndexReal, -1, -1, -1));
-//					//TODO a^2 * b^2 in temp variable
-//					addSquareInstruction(instructions);
-//					optimized = true;
-//				}
+				else if (real == -2.){
+					// z^(-2) = (1/z)^2
+					// 1/z = a - bi / (a^2 * b^2)
+					// z = a - bi
+					if (complexExpression)
+						instructions.add(new ComputeInstruction(ComputeInstruction.INSTR_RECIPROCAL_COMPLEX, resIndexReal, resIndexImag, -1, -1));
+					else
+						instructions.add(new ComputeInstruction(ComputeInstruction.INSTR_RECIPROCAL_PART, resIndexReal, -1, -1, -1));
+					addSquareInstruction(instructions);
+					optimized = true;
+				}
 		}
 		}
 		if (optimized)

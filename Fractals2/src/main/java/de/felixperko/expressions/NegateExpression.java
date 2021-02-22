@@ -1,4 +1,4 @@
-package de.felixperko.fractals.util.expressions;
+package de.felixperko.expressions;
 
 import java.util.List;
 
@@ -38,22 +38,22 @@ public class NegateExpression implements FractalsExpression {
 
 	@Override
 	public boolean isComplexExpression() {
-		return subExpr.isComplexExpression();
+		return subExpr == null || subExpr.isComplexExpression();
 	}
 
 	@Override
 	public boolean isSingleRealExpression() {
-		return !subExpr.isSingleRealExpression();
+		return subExpr != null && !subExpr.isSingleRealExpression();
 	}
 
 	@Override
 	public boolean isSingleImagExpression() {
-		return !subExpr.isSingleImagExpression();
+		return subExpr != null && !subExpr.isSingleImagExpression();
 	}
 
 	@Override
 	public boolean hasTempResult() {
-		return subExpr.hasTempResult();
+		return subExpr != null && subExpr.hasTempResult();
 	}
 
 	@Override

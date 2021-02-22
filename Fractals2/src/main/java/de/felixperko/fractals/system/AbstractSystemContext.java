@@ -88,7 +88,7 @@ public abstract class AbstractSystemContext<D extends ViewData, C extends ViewCo
 		}
 	}
 
-	protected void updateLayerConfig(ParamContainer paramContainer, String layerConfigParamName, Map<String, ParamSupplier> oldParams,
+	protected boolean updateLayerConfig(ParamContainer paramContainer, String layerConfigParamName, Map<String, ParamSupplier> oldParams,
 			Map<String, ParamSupplier> newParams) {
 		LayerConfiguration oldLayerConfig = null;
 		if (oldParams != null)
@@ -98,8 +98,10 @@ public abstract class AbstractSystemContext<D extends ViewData, C extends ViewCo
 		if (oldLayerConfig == null || newLayerConfigSupplier.isChanged()) {
 			layerConfig = newLayerConfig;
 			layerConfig.prepare(numberFactory);
+			return true;
 		} else {
 			newParams.put(layerConfigParamName, oldParams.get(layerConfigParamName));
+			return false;
 		}
 	}
 

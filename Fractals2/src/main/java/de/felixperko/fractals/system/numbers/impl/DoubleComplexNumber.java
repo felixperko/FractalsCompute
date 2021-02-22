@@ -207,7 +207,7 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 	
 	@Override
 	public DoubleNumber abs() {
-		return new DoubleNumber(real*real + imag*imag);
+		return new DoubleNumber(absDouble());
 	}
 	
 	@Override
@@ -263,8 +263,6 @@ public class DoubleComplexNumber extends AbstractComplexNumber<DoubleNumber, Dou
 	public void reciprocal() {
 		double scale = real*real + imag*imag;
 		if (scale == 0) {
-			real = real == 0 ? 0 : real > 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
-			imag = imag == 0 ? 0 : imag > 0 ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
 			return;
 		}
 		real /= scale;

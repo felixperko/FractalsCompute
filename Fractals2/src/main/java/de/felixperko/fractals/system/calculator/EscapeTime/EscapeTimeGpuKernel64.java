@@ -262,4 +262,16 @@ public abstract class EscapeTimeGpuKernel64 extends EscapeTimeGpuKernelAbstract{
 	protected void instr_pow_part(int p1, int p2){
 		data[p1] = pow(data[p1], data[p2]);
 	}
+	
+	protected void instr_reciprocal_complex(int r1, int i1){
+		double temp = data[r1]*data[r1] + data[i1]*data[i1];
+		if (temp != 0.){
+			data[r1] =   data[r1]/temp;
+			data[i1] = - data[i1]/temp;
+		}
+	}
+	
+	protected void instr_reciprocal_part(int p1){
+		data[p1] = 1./data[p1];
+	}
 }

@@ -93,6 +93,16 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		defaultValues.add(new StaticParamSupplier("task_buffer", 5));
         List<Layer> layers = new ArrayList<>();
         layers.add(new BreadthFirstLayer(BFOrbitCommon.DEFAULT_CHUNK_SIZE).with_samples(1).with_rendering(true).with_priority_shift(0));
+//        layers.add(new BreadthFirstUpsampleLayer(16, BFOrbitCommon.DEFAULT_CHUNK_SIZE).with_samples(1).with_rendering(true).with_priority_shift(0));
+//        layers.add(new BreadthFirstUpsampleLayer(8, BFOrbitCommon.DEFAULT_CHUNK_SIZE).with_samples(1).with_rendering(true).with_priority_shift(10));
+//        layers.add(new BreadthFirstUpsampleLayer(4, BFOrbitCommon.DEFAULT_CHUNK_SIZE).with_samples(1).with_rendering(true).with_priority_shift(20));
+//        layers.add(new BreadthFirstUpsampleLayer(2, BFOrbitCommon.DEFAULT_CHUNK_SIZE).with_samples(1).with_rendering(true).with_priority_shift(30));
+//        layers.add(new BreadthFirstLayer(BFOrbitCommon.DEFAULT_CHUNK_SIZE).with_samples(1).with_rendering(true).with_priority_shift(40));
+//        layers.add(new BreadthFirstLayer(BFOrbitCommon.DEFAULT_CHUNK_SIZE).with_samples(4).with_rendering(true).with_priority_shift(50));
+//        layers.add(new BreadthFirstLayer(BFOrbitCommon.DEFAULT_CHUNK_SIZE).with_samples(16).with_rendering(true).with_priority_shift(60));
+//        layers.add(new BreadthFirstLayer(BFOrbitCommon.DEFAULT_CHUNK_SIZE).with_samples(49).with_rendering(true).with_priority_shift(70));
+//        layers.add(new BreadthFirstLayer(BFOrbitCommon.DEFAULT_CHUNK_SIZE).with_samples(100).with_rendering(true).with_priority_shift(80));
+//        layers.add(new BreadthFirstLayer(BFOrbitCommon.DEFAULT_CHUNK_SIZE).with_samples(400).with_rendering(true).with_priority_shift(90));
 		defaultValues.add(new StaticParamSupplier("layerConfiguration", new PadovanLayerConfiguration(layers)));
 		
 		config.addParameterDefinitions(defs_bf);

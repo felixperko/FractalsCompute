@@ -94,10 +94,11 @@ public abstract class EscapeTimeCpuKernelNew implements ComputeKernel {
 			finished = data[0]*data[0] + data[1]*data[1] > limitSq;
 			if (finished){
 				result = (float) (pixelIt + 1 - Math.log(Math.log(data[0]*data[0] + data[1]*data[1])*0.5 / Math.log(2)) /smoothstepConstant);
-				if (pixelIt < tracesCount && pixelIt < maxIterations-1){
-
-					tracesReal[pixelIt] = data[0];
-					tracesImag[pixelIt] = data[1];
+				
+				//trace end position
+				if (pixelIt+1 < tracesCount){
+					tracesReal[pixelIt+1] = data[0];
+					tracesImag[pixelIt+1] = data[1];
 				}
 				break;
 			}
@@ -297,13 +298,25 @@ public abstract class EscapeTimeCpuKernelNew implements ComputeKernel {
 			data[r1] = temp2 * Math.cos(temp1);
 			data[i1] = temp2 * Math.sin(temp1);
 		} else {
-			data[r1] = data[r1]; //Workaround for "child list broken" in nested if-clause without else
+			data[r1] = data[r1]; //Workaround for "child list broken" in nested if-clause without else (aparapi)
 		}
 	}
 	
 	@Override
 	public void instr_pow_part(int p1, int p2){
 		data[p1] = Math.pow(data[p1], data[p2]);
+	}
+	
+	protected void instr_reciprocal_complex(int r1, int i1){
+		double temp = data[r1]*data[r1] + data[i1]*data[i1];
+		if (temp != 0.){
+			data[r1] =   data[r1]/temp;
+			data[i1] = - data[i1]/temp;
+		}
+	}
+	
+	protected void instr_reciprocal_part(int p1){
+		data[p1] = 1./data[p1];
 	}
 
 }

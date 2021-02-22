@@ -1,4 +1,4 @@
-package de.felixperko.fractals.util.expressions;
+package de.felixperko.expressions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,7 +70,7 @@ public class FractalsExpressionParser {
 //			if (input.matches("[a-zA-Z]+_n(-[1-9][0-9]*)")){
 //				return new VariablePastIterationExpression(input);
 //			}
-			if (input.matches("[a-zA-Z]+")){
+			if (input.matches("[a-zA-Z]([a-zA-Z0-9]*)")){
 				if (input.equalsIgnoreCase("pi"))
 					return new ConstantExpression(Math.PI, 0);
 				return new VariableExpression(input);

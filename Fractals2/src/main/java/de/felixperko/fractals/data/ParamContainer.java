@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -110,11 +111,11 @@ public class ParamContainer implements Serializable{
 	private ParamConfiguration paramConfiguration;
 
 	public ParamContainer() {
-		this.clientParameters = new HashMap<>();
+		this.clientParameters = new LinkedHashMap<>();
 	}
 	
 	public ParamContainer(List<ParamSupplier> params){
-		this.clientParameters = new HashMap<>();
+		this.clientParameters = new LinkedHashMap<>();
 		for (ParamSupplier supp : params){
 			if (supp.getName() == null)
 				throw new IllegalStateException("ParamSupplier doesn't has a name");
@@ -122,7 +123,7 @@ public class ParamContainer implements Serializable{
 		}
 	}
 
-	public ParamContainer(Map<String, ParamSupplier> clientParameters) {
+	public ParamContainer(LinkedHashMap<String, ParamSupplier> clientParameters) {
 		this.clientParameters = clientParameters;
 	}
 
@@ -130,7 +131,7 @@ public class ParamContainer implements Serializable{
 		if (!newInstances)
 			this.clientParameters = parent.getClientParameters();
 		else {
-			this.clientParameters = new HashMap<String, ParamSupplier>();
+			this.clientParameters = new LinkedHashMap<String, ParamSupplier>();
 			for (Entry<String, ParamSupplier> e : parent.getClientParameters().entrySet()){
 				this.clientParameters.put(e.getKey(), e.getValue().copy());
 			}

@@ -3,6 +3,7 @@ package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -130,7 +131,7 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 		if (reset) {
 			Collection<BreadthFirstViewData> oldViews = viewContainer.getInactiveViews();
 			if (!oldViews.isEmpty()) {
-				ParamContainer temp = new ParamContainer(new HashMap<>(paramContainer.getClientParameters()));
+				ParamContainer temp = new ParamContainer(new LinkedHashMap<>(paramContainer.getClientParameters()));
 				for (BreadthFirstViewData oldViewData : oldViews) {
 					ParamContainer oldParams = oldViewData.getParams();
 					if (oldParams != null){ //TODO should these be buffered at all? shouldn't contain chunks anyways
@@ -165,7 +166,9 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 			numberFactory = paramContainer.getClientParameter("numberFactory").getGeneral(NumberFactory.class);
 			chunkFactory = paramContainer.getClientParameter("chunkFactory").getGeneral(ArrayChunkFactory.class);
 			
-			updateLayerConfig(paramContainer, "layerConfiguration", oldParams, paramContainer.getClientParameters());
+			boolean layersChanged = updateLayerConfig(paramContainer, "layerConfiguration", oldParams, paramContainer.getClientParameters());
+			if (layersChanged)
+				reset = true;
 		
 			width = paramContainer.getClientParameter("width").getGeneral(Integer.class);
 			height = paramContainer.getClientParameter("height").getGeneral(Integer.class);
@@ -314,7 +317,9 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 	public void toPos(ComplexNumber gridPos) {
 		gridPos.add(relativeStartShift);
 		gridPos.multNumber(chunkZoom);
-		gridPos.add(((BreadthFirstViewData)getActiveViewData()).anchor);
+		BreadthFirstViewData activeViewData = (BreadthFirstViewData)getActiveViewData();
+		ComplexNumber anchor = activeViewData.anchor;
+		gridPos.add(anchor);
 	}
 
 	public Number getChunkZoom() {

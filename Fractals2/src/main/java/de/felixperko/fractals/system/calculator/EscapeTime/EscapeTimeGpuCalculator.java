@@ -13,6 +13,7 @@ import com.aparapi.internal.kernel.KernelManager;
 import com.aparapi.internal.kernel.KernelPreferences;
 import com.aparapi.internal.model.CacheEnabler;
 
+import de.felixperko.expressions.ComputeExpressionBuilder;
 import de.felixperko.fractals.FractalsMain;
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.BorderAlignment;
@@ -29,7 +30,6 @@ import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsa
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 import de.felixperko.fractals.util.NumberUtil;
-import de.felixperko.fractals.util.expressions.ComputeExpressionBuilder;
 
 public class EscapeTimeGpuCalculator extends AbstractFractalsCalculator{
 	
@@ -231,9 +231,9 @@ public class EscapeTimeGpuCalculator extends AbstractFractalsCalculator{
 			
 			for (int i = 0 ; i < pixelCount ; i++){
 				float result = kernel.resultsArr[i];
-				if (chunk.getChunkX() == 1 && chunk.getChunkY() == 0 && i == 0){
-					System.out.println(result);
-				}
+//				if (chunk.getChunkX() == 1 && chunk.getChunkY() == 0 && i == 0){
+//					System.out.println(result);
+//				}
 				int sucessfulSamples = kernel.pixelWasSampled[i];
 				if (sucessfulSamples > 0){
 					chunk.addSample(i, result, upsample);

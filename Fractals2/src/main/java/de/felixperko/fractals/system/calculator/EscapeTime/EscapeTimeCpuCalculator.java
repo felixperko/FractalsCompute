@@ -13,6 +13,7 @@ import com.aparapi.internal.kernel.KernelManager;
 import com.aparapi.internal.kernel.KernelPreferences;
 import com.aparapi.internal.model.CacheEnabler;
 
+import de.felixperko.expressions.ComputeExpressionBuilder;
 import de.felixperko.fractals.FractalsMain;
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.BorderAlignment;
@@ -30,8 +31,8 @@ import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsa
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 import de.felixperko.fractals.util.NumberUtil;
-import de.felixperko.fractals.util.expressions.ComputeExpressionBuilder;
 
+@Deprecated
 public class EscapeTimeCpuCalculator
 //extends AbstractFractalsCalculator
 {
