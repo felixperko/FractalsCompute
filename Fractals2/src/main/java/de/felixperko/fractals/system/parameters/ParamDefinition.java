@@ -22,6 +22,8 @@ public class ParamDefinition implements Serializable{
 	List<Class<? extends ParamSupplier>> possibleClasses;
 	List<ParamValueType> possibleValueTypes;
 	
+	boolean resetRendererOnChange = true;
+	
 	Object defaultValue = null;
 	
 	public ParamDefinition(String name, String category, Class<? extends ParamSupplier> cls, ParamValueType... possibleValueTypes) {
@@ -122,5 +124,13 @@ public class ParamDefinition implements Serializable{
 		if (hintAttribute == null)
 			return null;
 		return Double.parseDouble(hintAttribute);
+	}
+	
+	public boolean isResetRendererOnChange(){
+		return resetRendererOnChange;
+	}
+	
+	public void setResetRendererOnChange(boolean resetOnChange){
+		this.resetRendererOnChange = resetOnChange;
 	}
 }

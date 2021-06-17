@@ -22,6 +22,7 @@ import de.felixperko.fractals.system.calculator.ComputeExpression;
 import de.felixperko.fractals.system.calculator.ComputeKernelParameters;
 import de.felixperko.fractals.system.calculator.infra.AbstractFractalsCalculator;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
+import de.felixperko.fractals.system.numbers.Number;
 import de.felixperko.fractals.system.parameters.suppliers.CoordinateBasicShiftParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
@@ -60,7 +61,7 @@ public class EscapeTimeGpuCalculator extends AbstractFractalsCalculator{
 		this.chunk = chunk;
 		this.taskStats = taskStats;
 		
-		limit = systemContext.getParamValue("limit", Double.class);
+		limit = systemContext.getParamValue("limit", Number.class).toDouble();
 //		p_current = systemContext.getParameters().get("start");
 //		p_pow = systemContext.getParameters().get("pow");
 //		p_c = systemContext.getParameters().get("c");
@@ -128,7 +129,7 @@ public class EscapeTimeGpuCalculator extends AbstractFractalsCalculator{
 		kernel.optionsInt[0] = maxIterations;
 		kernel.optionsInt[1] = chunkSize;
 		kernel.optionsInt[2] = samples;
-		kernel.optionsFloat[0] = (float)(double)systemContext.getParamValue("limit", Double.class);
+		kernel.optionsFloat[0] = (float)(double)systemContext.getParamValue("limit", Number.class).toDouble();
 
 		for (int i = 0 ; i < layerSampleCount ; i++){
 			ComplexNumber offset = systemContext.getLayerConfiguration().getOffsetForSample(i);

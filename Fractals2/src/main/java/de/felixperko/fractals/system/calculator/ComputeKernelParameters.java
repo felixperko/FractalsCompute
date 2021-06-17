@@ -37,11 +37,10 @@ public class ComputeKernelParameters {
 			if (!this.expression.instructions.get(i).equals(other.expression.instructions.get(i)))
 				return false;
 		}
-		
+
+		//check fixed values against the given parameters
 		Map<String, ComplexNumber> fixedValues = getFixedValues();
-		
 		if (fixedValues != null){
-			//check fixed values against the given parameters
 			for (Entry<String, ComplexNumber> e : fixedValues.entrySet()){
 				String name = e.getKey();
 				ParamSupplier supp = params.getClientParameter(name);
@@ -66,6 +65,8 @@ public class ComputeKernelParameters {
 					return false;
 			}
 		}
+		
+		//TODO check static subexpressions
 		
 		//check individual layers
 		for (int i = 0 ; i < this.layers.size() ; i++){

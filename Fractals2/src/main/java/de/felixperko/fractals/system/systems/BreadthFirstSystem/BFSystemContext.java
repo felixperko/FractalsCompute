@@ -251,16 +251,32 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 		return reset;
 	}
 	
+//	public double getChunkX(ComplexNumber pos) {
+//		Number value = midpoint.getReal().copy();
+//		value.sub(pos.getReal());
+//		value.div(chunkZoom);
+//		return value.toDouble();
+//	}
+//	
+//	public double getChunkY(ComplexNumber pos) {
+//		Number value = midpoint.getImag().copy();
+//		value.sub(pos.getImag());
+//		value.div(chunkZoom);
+//		return value.toDouble();
+//	}
+	
 	public double getChunkX(ComplexNumber pos) {
 		Number value = pos.getReal();
-		value.sub(getCurrentAnchor().getReal());
+		ComplexNumber anchor = getCurrentAnchor();
+		value.sub(anchor.getReal());
 		value.div(chunkZoom);
 		return value.toDouble();
 	}
 	
 	public double getChunkY(ComplexNumber pos) {
 		Number value = pos.getImag();
-		value.sub(getCurrentAnchor().getImag());
+		ComplexNumber anchor = getCurrentAnchor();
+		value.sub(anchor.getImag());
 		value.div(chunkZoom);
 		return value.toDouble();
 	}
@@ -317,9 +333,10 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 	public void toPos(ComplexNumber gridPos) {
 		gridPos.add(relativeStartShift);
 		gridPos.multNumber(chunkZoom);
-		BreadthFirstViewData activeViewData = (BreadthFirstViewData)getActiveViewData();
-		ComplexNumber anchor = activeViewData.anchor;
-		gridPos.add(anchor);
+//		BreadthFirstViewData activeViewData = (BreadthFirstViewData)getActiveViewData();
+//		ComplexNumber anchor = activeViewData.anchor;
+//		gridPos.add(anchor);
+		gridPos.add(((BreadthFirstViewData)getActiveViewData()).anchor);
 	}
 
 	public Number getChunkZoom() {

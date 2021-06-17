@@ -68,8 +68,9 @@ public class FractalsExpressionParser {
 		//try variable
 		if (val == null){
 //			if (input.matches("[a-zA-Z]+_n(-[1-9][0-9]*)")){
-//				return new VariablePastIterationExpression(input);
-//			}
+			if (input.matches("[a-zA-Z]+_\\(n-1\\)")){
+				return new VariablePastIterationExpression(input);
+			}
 			if (input.matches("[a-zA-Z]([a-zA-Z0-9]*)")){
 				if (input.equalsIgnoreCase("pi"))
 					return new ConstantExpression(Math.PI, 0);

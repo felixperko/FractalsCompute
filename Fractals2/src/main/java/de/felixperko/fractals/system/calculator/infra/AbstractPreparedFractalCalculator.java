@@ -6,6 +6,7 @@ import java.util.Queue;
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.BorderAlignment;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
+import de.felixperko.fractals.system.numbers.Number;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.statistics.IStats;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
@@ -46,7 +47,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 		this.chunk = chunk;
 		this.taskStats = taskStats;
 		
-		limit = systemContext.getParamValue("limit", Double.class);
+		limit = systemContext.getParamValue("limit", Number.class).toDouble();
 		p_current = systemContext.getParameters().get("start");
 		p_pow = systemContext.getParameters().get("pow");
 		p_c = systemContext.getParameters().get("c");

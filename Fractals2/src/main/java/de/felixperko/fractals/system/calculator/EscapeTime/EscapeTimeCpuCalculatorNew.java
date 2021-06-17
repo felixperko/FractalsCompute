@@ -15,6 +15,7 @@ import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.statistics.IStats;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
+import de.felixperko.fractals.system.numbers.Number;
 
 public class EscapeTimeCpuCalculatorNew extends AbstractFractalsCalculator{
 	
@@ -41,7 +42,7 @@ public class EscapeTimeCpuCalculatorNew extends AbstractFractalsCalculator{
 		int maxIterations = layer.getMaxIterations();
 		if (maxIterations < 0)
 			maxIterations = (int)systemContext.getParamValue("iterations", Integer.class);
-		double limit = (float)(double)systemContext.getParamValue("limit", Double.class);
+		double limit = systemContext.getParamValue("limit", Number.class).toDouble();
 		double limitSq = limit*limit;
 
 		List<Layer> layers = systemContext.getLayerConfiguration().getLayers();
@@ -100,7 +101,7 @@ public class EscapeTimeCpuCalculatorNew extends AbstractFractalsCalculator{
 			for (int sample = currentSamples ; sample < samples ; sample++) {
 				
 				calcPixel(chunk, kernel, upsample, maxIterations, limitSq, sampleOffsets, params, pixel,
-						currentSamples);
+						sample);
 				
 				
 			}
@@ -114,7 +115,7 @@ public class EscapeTimeCpuCalculatorNew extends AbstractFractalsCalculator{
 		
 		chunk.addSample(pixel, result, upsample);
 		
-		if (chunk.getValue(pixel, true) <= 0 && result >= 0)
+		if (result >= 0.0f && chunk.getValue(pixel, true) <= 0.0)
 			sample_first_success(chunk, kernel, upsample, maxIterations, limitSq, sampleOffsets, params, pixel,
 					currentSamples);
 	}

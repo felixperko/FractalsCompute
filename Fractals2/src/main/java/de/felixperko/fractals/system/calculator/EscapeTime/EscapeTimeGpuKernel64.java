@@ -85,7 +85,8 @@ public abstract class EscapeTimeGpuKernel64 extends EscapeTimeGpuKernelAbstract{
 			}
 
 			if (finished){
-				pixelIt = (float) (pixelIt + 1 - log(log(data[IDX_Z_R + dataOffset]*data[IDX_Z_R + dataOffset]+data[IDX_Z_I + dataOffset]*data[IDX_Z_I + dataOffset])*0.5/log(2))
+				//implicit pixelIt -= 1;
+				pixelIt = (float) (pixelIt - log(log(data[IDX_Z_R + dataOffset]*data[IDX_Z_R + dataOffset]+data[IDX_Z_I + dataOffset]*data[IDX_Z_I + dataOffset])*0.5/log(2))
 					/smoothstepConstant); //TODO why 2*?
 				resultsArr[i] = pixelIt;
 			}
@@ -223,8 +224,12 @@ public abstract class EscapeTimeGpuKernel64 extends EscapeTimeGpuKernelAbstract{
 	protected void instr_mult_complex(int r1, int i1, int r2, int i2) {
 		double temp1;
 		temp1 = data[r1]*data[r2] - data[i1]*data[i2];
-		data[i1] = (data[r1]+data[i1])*(data[r2]+data[i2]) - temp1;
+		data[i1] = data[r1]*data[i2] + data[i1]*data[r2];
 		data[r1] = temp1;
+//		double temp1;
+//		temp1 = data[r1]*data[r2] - data[i1]*data[i2];
+//		data[i1] = (data[r1]+data[i1])*(data[r2]+data[i2]) - temp1;
+//		data[r1] = temp1;
 	}
 
 	protected void instr_mult_part(int p1, int p2) {

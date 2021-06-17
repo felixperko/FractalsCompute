@@ -20,6 +20,8 @@ import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.system.parameters.ParamValueField;
 import de.felixperko.fractals.system.parameters.ParamValueType;
 import de.felixperko.fractals.system.PadovanLayerConfiguration;
+import de.felixperko.fractals.system.numbers.ComplexNumber;
+import de.felixperko.fractals.system.numbers.NumberFactory;
 import de.felixperko.fractals.system.parameters.ParamConfiguration;
 import de.felixperko.fractals.system.parameters.ParamDefinition;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
@@ -30,6 +32,7 @@ import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.task.ClassTaskFactory;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.task.TaskFactory;
+import de.felixperko.fractals.system.numbers.Number;
 
 public class BreadthFirstSystem extends AbstractCalcSystem {
 	
@@ -76,7 +79,7 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		defs_bf.add(new ParamDefinition("height", "Automatic", StaticParamSupplier.class, integerType)
 				.withDescription("The calculation height."));
 		
-		defs_bf.add(new ParamDefinition("limit", "Advanced", StaticParamSupplier.class, doubleType)
+		defs_bf.add(new ParamDefinition("limit", "Advanced", StaticParamSupplier.class, numberType)
 				.withDescription("Bailout radius. Increase to reduce coloring artifacts, Decrease to improve performance."));
 		defs_bf.add(new ParamDefinition("border_generation", "Advanced", StaticParamSupplier.class, doubleType)
 				.withDescription("The chunk distance from rendered area for which chunk calculation should continue."));
@@ -86,8 +89,9 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 				.withDescription("The amount of tasks that should be buffered for the calculation workers."));
 		defs_bf.add(new ParamDefinition("layerConfiguration", "Advanced", StaticParamSupplier.class, layerconfigurationType)
 				.withDescription("Manages the layer order in which the calculation is performed."));
-
-		defaultValues.add(new StaticParamSupplier("limit", 256.0));
+			
+		NumberFactory nf = new NumberFactory(Number.class, ComplexNumber.class);
+		defaultValues.add(new StaticParamSupplier("limit", nf.createNumber(256.0)));
 		defaultValues.add(new StaticParamSupplier("border_generation", 0.0));
 		defaultValues.add(new StaticParamSupplier("border_dispose", 7.0));
 		defaultValues.add(new StaticParamSupplier("task_buffer", 5));
@@ -107,6 +111,9 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		
 		config.addParameterDefinitions(defs_bf);
 		config.addDefaultValues(defaultValues);
+
+		for (ParamDefinition def : config.getParameters())
+			def.setResetRendererOnChange(false);
 		
 		config.addListTypes("layers", layerType, upsampleLayerType);
 		return config;

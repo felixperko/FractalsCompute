@@ -15,6 +15,7 @@ public class ParamConfiguration implements Serializable{
 	private static final long serialVersionUID = -6181978740061515601L;
 	
 	List<ParamDefinition> parameters = new ArrayList<>();
+	Map<String, ParamDefinition> definitionMap = new HashMap<>();
 	Map<String, ParamSupplier> defaultValues = new HashMap<>();
 	Map<String, List<ParamDefinition>> calculatorParameters = new HashMap<>();
 	Map<String, Map<String, ParamSupplier>> calculatorDefaultValues = new HashMap<>();
@@ -24,6 +25,7 @@ public class ParamConfiguration implements Serializable{
 	
 	public void addParameterDefinition(ParamDefinition definition, ParamSupplier defaultValue) {
 		parameters.add(definition);
+		definitionMap.put(definition.getName(), definition);
 		definition.setConfiguration(this);
 		if (defaultValue != null)
 			addDefaultValue(defaultValue);
@@ -115,5 +117,9 @@ public class ParamConfiguration implements Serializable{
 			return supp;
 		Map<String, ParamSupplier> map = calculatorDefaultValues.get(calculator);
 		return map == null ? null : map.get(name);
+	}
+	
+	public ParamDefinition getParamDefinition(String name){
+		return definitionMap.get(name);
 	}
 }

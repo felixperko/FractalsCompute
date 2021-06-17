@@ -443,6 +443,13 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				msgs.clear();
 			}
 //		}
+			
+		midpointChunkX = 0.0;
+		midpointChunkY = 0.0;
+		
+		BreadthFirstViewData activeViewData = context.getActiveViewData();
+		if (activeViewData != null)
+			activeViewData.anchor = context.getMidpoint().copy();
 		
 			
 		pendingUpdateMessages.clear();
@@ -466,7 +473,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		borderTasks.clear();
 		newQueue.clear();
 		stats.reset();
-		BreadthFirstViewData viewData = context.getActiveViewData();
+		BreadthFirstViewData viewData = activeViewData;
 		if (viewData != null) {
 			viewData.dispose();
 //			context.setActiveViewData(null); //TODO does that make sense?
@@ -476,11 +483,14 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 	}
 	
 	public void updatePredictedMidpoint() {
-		ComplexNumber delta = context.midpoint.copy();
-		delta.sub(((BreadthFirstViewData)context.getActiveViewData()).anchor);
-		delta.divNumber(context.chunkZoom);
-		midpointChunkX = delta.realDouble();
-		midpointChunkY = delta.imagDouble();
+//		ComplexNumber delta = context.midpoint.copy();
+//		delta.sub(((BreadthFirstViewData)context.getActiveViewData()).anchor);
+//		delta.divNumber(context.chunkZoom);
+//		midpointChunkX = delta.realDouble();
+//		midpointChunkY = delta.imagDouble();
+		
+		midpointChunkX = context.getChunkX(context.midpoint);
+		midpointChunkY = context.getChunkY(context.midpoint);
 	}
 
 	public boolean predictedMidpointUpdated() {
@@ -628,7 +638,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 				for (int l = 0 ; l < layers.size() ; l++) {
 					if  (layerInNextTasks[l])
 						continue;
-					Queue<BreadthFirstTask> taskQueue = openTasks.size() > l ? openTasks.get(l) : null;
+					Queue<BreadthFirstTask> taskQueue = openTasks.size() >= l ? openTasks.get(l) : null;
 					if (taskQueue == null)
 						continue;
 					BreadthFirstTask task = taskQueue.poll();

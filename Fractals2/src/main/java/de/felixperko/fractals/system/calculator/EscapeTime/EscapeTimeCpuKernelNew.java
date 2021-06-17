@@ -261,10 +261,13 @@ public abstract class EscapeTimeCpuKernelNew implements ComputeKernel {
 
 	@Override
 	public void instr_mult_complex(int r1, int i1, int r2, int i2) {
-		double temp1;
-		temp1 = data[r1]*data[r2] - data[i1]*data[i2];
-		data[i1] = (data[r1]+data[i1])*(data[r2]+data[i2]) - temp1;
-		data[r1] = temp1;
+		double temp = data[r1]*data[r2] - data[i1]*data[i2];
+		data[i1] = data[r1]*data[i2] + data[i1]*data[r2];
+		data[r1] = temp;
+//		double temp1;
+//		temp1 = data[r1]*data[r2] - data[i1]*data[i2];
+//		data[i1] = (data[r1]+data[i1])*(data[r2]+data[i2]) - temp1;
+//		data[r1] = temp1;
 	}
 
 	@Override
