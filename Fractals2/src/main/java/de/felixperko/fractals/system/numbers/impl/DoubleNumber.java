@@ -40,6 +40,11 @@ public class DoubleNumber implements Number<DoubleNumber>, Copyable<DoubleNumber
 	public void div(DoubleNumber other) {
 		value /= other.value;
 	}
+	
+	@Override
+	public void mod(DoubleNumber other) {
+		value %= other.value;
+	}
 
 	@Override
 	public void square() {
