@@ -13,6 +13,7 @@ public interface Number<N extends Number<N>> extends Serializable{
 	public void mult(N other);
 	public void div(N other);
 	public void pow(N other);
+	public void mod(N other);
 	public void square();
 	
 	public double toDouble();
