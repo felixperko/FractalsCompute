@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.aparapi.device.Device;
+import com.aparapi.device.Device.TYPE;
 import com.aparapi.device.OpenCLDevice;
 import com.aparapi.internal.kernel.KernelManager;
 import com.aparapi.internal.kernel.KernelPreferences;
@@ -48,6 +49,7 @@ public class ResourceManager extends Manager{
 	      List<OpenCLPlatform> platforms = (new OpenCLPlatform()).getOpenCLPlatforms();
 	      System.out.println("Machine contains " + platforms.size() + " OpenCL platforms");
 	      int platformc = 0;
+	      int totalGpuCounter = 1;
 	      for (OpenCLPlatform platform : platforms) {
 	         System.out.println("Platform " + platformc + "{");
 	         System.out.println("   Name    : \"" + platform.getName() + "\"");
@@ -65,10 +67,13 @@ public class ResourceManager extends Manager{
 	            System.out.println("       MaxWorkGroupSizes     : " + device.getMaxWorkGroupSize());
 	            System.out.println("       MaxWorkItemDimensions : " + device.getMaxWorkItemDimensions());
 	            System.out.println("   }");
-		    	gpus.put(device, 0F);
-		    	String name = "GPU" + devicec + " ("+device.getName()+")";
-		    	namesOfGpus.put(device, name);
-		    	gpusForName.put(name, device);
+	            if (device.getType() == TYPE.GPU) {
+			    	gpus.put(device, 0F);
+			    	String name = "GPU" + totalGpuCounter + " ("+device.getName()+")";
+			    	namesOfGpus.put(device, name);
+			    	gpusForName.put(name, device);
+		            totalGpuCounter++;
+	            }
 	            devicec++;
 	         }
 	         System.out.println("}");

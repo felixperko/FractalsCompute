@@ -48,7 +48,8 @@ public class FractalsMain {
 	}
 	
 	public static void stopInstance(){
-		managers.getThreadManager().stopThreads();
+		if (managers != null && managers.getThreadManager() != null)
+			managers.getThreadManager().stopThreads();
 	}
 	
 	public static ServerManagers getManagers(){
