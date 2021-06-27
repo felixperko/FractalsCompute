@@ -37,6 +37,10 @@ public class VariableExpression extends AbstractExpression {
 		}
 	}
 
+	@Override
+	public void addEndInstructions(List<ComputeInstruction> instructions, ComputeExpressionBuilder expressionBuilder) {
+	}
+
 	protected void initCopy(List<ComputeInstruction> instructions, ExpressionSymbol symbol){
 		instructions.add(new ComputeInstruction(ComputeInstruction.INSTR_COPY_COMPLEX, symbol.getPristineIndexReal(), symbol.getPristineIndexImag(), resultIndexReal, resultIndexImag));
 	}
@@ -87,7 +91,7 @@ public class VariableExpression extends AbstractExpression {
 
 	@Override
 	public double getSmoothstepConstant(ComputeExpressionBuilder expressionBuilder) {
-		return 0;
+		return 1;
 	}
 
 }

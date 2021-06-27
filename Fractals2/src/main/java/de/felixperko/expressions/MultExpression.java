@@ -57,5 +57,14 @@ public class MultExpression extends ChainExpression {
 	public boolean isSingleImagExpression() {
 		return imagResult;
 	}
+	
+	@Override
+	public double getSmoothstepConstant(ComputeExpressionBuilder expressionBuilder) {
+		double sum = 0;
+		for (FractalsExpression subExpr : subExpressions) {
+			sum += subExpr.getSmoothstepConstant(expressionBuilder);
+		}
+		return sum;
+	}
 
 }

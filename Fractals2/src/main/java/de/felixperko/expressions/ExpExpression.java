@@ -119,6 +119,12 @@ public class ExpExpression extends AbstractExpression {
 	}
 
 	@Override
+	public void addEndInstructions(List<ComputeInstruction> instructions, ComputeExpressionBuilder expressionBuilder) {
+		this.baseExpr.addEndInstructions(instructions, expressionBuilder);
+		this.expExpr.addEndInstructions(instructions, expressionBuilder);
+	}
+
+	@Override
 	public void addInstructions(List<ComputeInstruction> instructions, ComputeExpressionBuilder expressionBuilder) {
 		baseExpr.addInstructions(instructions, expressionBuilder);
 		expExpr.addInstructions(instructions, expressionBuilder);

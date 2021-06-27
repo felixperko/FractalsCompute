@@ -57,6 +57,11 @@ public class NestedExpression extends AbstractExpression {
 	}
 
 	@Override
+	public void addEndInstructions(List<ComputeInstruction> instructions, ComputeExpressionBuilder expressionBuilder) {
+		contentExpression.addEndInstructions(instructions, expressionBuilder);
+	}
+
+	@Override
 	public void addInstructions(List<ComputeInstruction> instructions, ComputeExpressionBuilder expressionBuilder) {
 		contentExpression.addInstructions(instructions, expressionBuilder);
 		boolean complex = contentExpression.isComplexExpression();

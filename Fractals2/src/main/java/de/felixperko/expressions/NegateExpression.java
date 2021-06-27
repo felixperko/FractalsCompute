@@ -27,6 +27,11 @@ public class NegateExpression implements FractalsExpression {
 	}
 
 	@Override
+	public void addEndInstructions(List<ComputeInstruction> instructions, ComputeExpressionBuilder expressionBuilder) {
+		this.subExpr.addEndInstructions(instructions, expressionBuilder);
+	}
+
+	@Override
 	public void addInstructions(List<ComputeInstruction> instructions, ComputeExpressionBuilder expressionBuilder) {
 		this.subExpr.addInstructions(instructions, expressionBuilder);
 		if (subExpr.isComplexExpression()){

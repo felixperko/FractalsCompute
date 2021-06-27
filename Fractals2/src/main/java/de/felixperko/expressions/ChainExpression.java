@@ -48,6 +48,11 @@ public class ChainExpression extends AbstractExpression {
 	}
 
 	@Override
+	public void addEndInstructions(List<ComputeInstruction> instructions, ComputeExpressionBuilder expressionBuilder) {
+		this.subExpressions.forEach(expr -> expr.addEndInstructions(instructions, expressionBuilder));
+	}
+
+	@Override
 	public void addInstructions(List<ComputeInstruction> instructions, ComputeExpressionBuilder expressionBuilder) {
 		int i = 0;
 		boolean[] addedSubInstructions = new boolean[subExpressions.size()];
@@ -164,8 +169,11 @@ public class ChainExpression extends AbstractExpression {
 	@Override
 	public double getSmoothstepConstant(ComputeExpressionBuilder expressionBuilder) {
 		double smoothstepConstant = 0;
-		for (FractalsExpression expr : subExpressions)
-			smoothstepConstant += expr.getSmoothstepConstant(expressionBuilder); //TODO probably wrong (x^2 + x^2 = 2*x^2 != x^4)
+		for (FractalsExpression expr : subExpressions) {
+			double exprSmoothstepConstant = expr.getSmoothstepConstant(expressionBuilder);
+			if (exprSmoothstepConstant > smoothstepConstant)
+				smoothstepConstant = exprSmoothstepConstant; //TODO overwrite for div!
+		}
 		return smoothstepConstant;
 	}
 	

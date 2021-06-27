@@ -7,8 +7,10 @@ import de.felixperko.fractals.system.numbers.NumberFactory;
 public interface FractalsExpression {
 
 	public void registerSymbolUses(ComputeExpressionBuilder expressionBuilder, NumberFactory numberFactory, boolean copyVariable);
+	
 	public void addInitInstructions(List<ComputeInstruction> instructions, ComputeExpressionBuilder expressionBuilder);
 	public void addInstructions(List<ComputeInstruction> instructions, ComputeExpressionBuilder expressionBuilder);
+	public void addEndInstructions(List<ComputeInstruction> instructions, ComputeExpressionBuilder expressionBuilder);
 	
 	public double getSmoothstepConstant(ComputeExpressionBuilder expressionBuilder);
 	

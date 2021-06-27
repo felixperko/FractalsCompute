@@ -79,6 +79,7 @@ public class ComputeExpressionBuilder {
 		instructions = new ArrayList<>();
 		expression.addInitInstructions(instructions, this);
 		expression.addInstructions(instructions, this);
+		expression.addEndInstructions(instructions, this);
 		smoothstepConstant = Math.log(expression.getSmoothstepConstant(this));
 		return new ComputeExpression(input, instructions, mappedParams, copyCounter, fixedValues, explicitValues, smoothstepConstant);
 	}

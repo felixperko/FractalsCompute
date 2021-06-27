@@ -73,6 +73,11 @@ public class ConstantExpression extends AbstractExpression {
 			initCopy(instructions, symbol);
 		}
 	}
+	
+	@Override
+	public void addEndInstructions(List<ComputeInstruction> instructions, ComputeExpressionBuilder expressionBuilder) {
+		
+	}
 
 	protected void initCopy(List<ComputeInstruction> instructions, ExpressionSymbol symbol){
 		instructions.add(new ComputeInstruction(ComputeInstruction.INSTR_COPY_COMPLEX, symbol.getPristineIndexReal(), symbol.getPristineIndexImag(), resultIndexReal, resultIndexImag));
