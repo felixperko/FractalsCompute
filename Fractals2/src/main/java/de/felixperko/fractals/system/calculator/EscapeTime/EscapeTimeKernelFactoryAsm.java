@@ -187,11 +187,13 @@ public class EscapeTimeKernelFactoryAsm implements IGpuKernelFactory{
 		iterate.visitParameter("dataOffset", ACC_FINAL);
 		
 		for (ComputeInstruction instruction : expression.getInstructions()){
+				
 			iterate.visitVarInsn(ALOAD, 0);
 			iterate.visitLdcInsn(instruction.fromReal);
 			iterate.visitVarInsn(ILOAD, 1);
 			iterate.visitInsn(IADD);
-
+			
+			//1 param
 			switch (instruction.type){
 			case (ComputeInstruction.INSTR_SQUARE_PART):
 				iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_square_part", "(I)V", false);
@@ -223,10 +225,14 @@ public class EscapeTimeKernelFactoryAsm implements IGpuKernelFactory{
 			case (ComputeInstruction.INSTR_RECIPROCAL_PART):
 				iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_reciprocal_part", "(I)V", false);
 				break;
+			case (ComputeInstruction.INSTR_LOG_PART):
+				iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_log_part", "(I)V", false);
+				break;
 			default:
 				iterate.visitLdcInsn(instruction.fromImag);
 				iterate.visitVarInsn(ILOAD, 1);
 				iterate.visitInsn(IADD);
+				//2 params
 				switch (instruction.type){
 				case (ComputeInstruction.INSTR_SQUARE_COMPLEX):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_square", "(II)V", false);
@@ -258,6 +264,9 @@ public class EscapeTimeKernelFactoryAsm implements IGpuKernelFactory{
 				case (ComputeInstruction.INSTR_RECIPROCAL_COMPLEX):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_reciprocal_complex", "(II)V", false);
 					break;
+				case (ComputeInstruction.INSTR_LOG_COMPLEX):
+					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_log_complex", "(II)V", false);
+					break;
 				case (ComputeInstruction.INSTR_POW_PART):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_pow_part", "(II)V", false);
 					break;
@@ -273,11 +282,6 @@ public class EscapeTimeKernelFactoryAsm implements IGpuKernelFactory{
 				case (ComputeInstruction.INSTR_COPY_PART):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_copy_part", "(II)V", false);
 					break;
-					//TEST
-//				case (GPUInstruction.INSTR_POW_COMPLEX):
-//					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_square", "(II)V", false);
-//					break;
-					//TEST END
 				default:
 					iterate.visitLdcInsn(instruction.toReal);
 					iterate.visitVarInsn(ILOAD, 1);
@@ -285,6 +289,7 @@ public class EscapeTimeKernelFactoryAsm implements IGpuKernelFactory{
 					iterate.visitLdcInsn(instruction.toImag);
 					iterate.visitVarInsn(ILOAD, 1);
 					iterate.visitInsn(IADD);
+					//4 params
 					switch (instruction.type){
 					case (ComputeInstruction.INSTR_POW_COMPLEX):
 						//if(r2 == 2 && i2 == 0) instr = "instr_square"

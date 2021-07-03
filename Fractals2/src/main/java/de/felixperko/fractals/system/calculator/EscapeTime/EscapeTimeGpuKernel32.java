@@ -286,4 +286,18 @@ public abstract class EscapeTimeGpuKernel32 extends EscapeTimeGpuKernelAbstract{
 	protected void instr_reciprocal_part(int p1){
 		data[p1] = 1f/data[p1];
 	}
+	
+	protected void instr_log_part(int p1) {
+		data[p1] = log(data[p1]);
+	}
+	
+	protected void instr_log_complex(int r1, int i1) {
+		//log(z) = ln(sqrt(r^2+i^2)) + i * atan2(i, r)
+		float newI = atan2(data[i1], data[r1]);
+		data[r1] = data[r1]*data[r1];
+		data[i1] = data[i1]*data[i1];
+		data[r1] = log(sqrt(data[r1]+data[i1]));
+		data[i1] = newI;
+	}
+
 }

@@ -9,40 +9,46 @@ public class ComputeInstruction {
 	//STATIC
 	//
 	
+	public static final int OFFSET_INSTR_PART = 256;
+	
 	@SuppressWarnings("serial")
 	public static final Map<Integer, String> CONSTANT_NAMES = new HashMap<Integer, String>(){
 		{
-			put(0, "INSTR_ADD_COMPLEX");
-			put(1, "INSTR_SUB_COMPLEX");
-			put(2, "INSTR_MULT_COMPLEX");
-			put(3, "INSTR_DIV_COMPLEX");
-			put(4, "INSTR_POW_COMPLEX");
-			put(5, "INSTR_COPY_COMPLEX");
-			put(6, "INSTR_ABS_COMPLEX");
-			put(7, "INSTR_SIN_COMPLEX");
-			put(8, "INSTR_COS_COMPLEX");
-			put(9, "INSTR_TAN_COMPLEX");
-			put(10, "INSTR_SINH_COMPLEX");
-			put(11, "INSTR_COSH_COMPLEX");
-			put(12, "INSTR_TANH_COMPLEX");
-			put(13, "INSTR_SQUARE_COMPLEX");
-			put(14, "INSTR_NEGATE_COMPLEX");
-
-			put(15, "INSTR_ADD_PART");
-			put(16, "INSTR_SUB_PART");
-			put(17, "INSTR_MULT_PART");
-			put(18, "INSTR_DIV_PART");
-			put(19, "INSTR_POW_PART");
-			put(20, "INSTR_COPY_PART");
-			put(21, "INSTR_ABS_PART");
-			put(22, "INSTR_SIN_PART");
-			put(23, "INSTR_COS_PART");
-			put(24, "INSTR_TAN_PART");
-			put(25, "INSTR_SINH_PART");
-			put(26, "INSTR_COSH_PART");
-			put(27, "INSTR_TANH_PART");;
-			put(28, "INSTR_SQUARE_PART");
-			put(29, "INSTR_NEGATE_PART");
+			int counter = 0;
+			put(counter++, "INSTR_ADD_COMPLEX");
+			put(counter++, "INSTR_SUB_COMPLEX");
+			put(counter++, "INSTR_MULT_COMPLEX");
+			put(counter++, "INSTR_DIV_COMPLEX");
+			put(counter++, "INSTR_POW_COMPLEX");
+			put(counter++, "INSTR_COPY_COMPLEX");
+			put(counter++, "INSTR_ABS_COMPLEX");
+			put(counter++, "INSTR_SIN_COMPLEX");
+			put(counter++, "INSTR_COS_COMPLEX");
+			put(counter++, "INSTR_TAN_COMPLEX");
+			put(counter++, "INSTR_SINH_COMPLEX");
+			put(counter++, "INSTR_COSH_COMPLEX");
+			put(counter++, "INSTR_TANH_COMPLEX");
+			put(counter++, "INSTR_SQUARE_COMPLEX");
+			put(counter++, "INSTR_NEGATE_COMPLEX");
+			put(counter++, "INSTR_LOG_COMPLEX");
+			
+			counter = OFFSET_INSTR_PART;
+			put(counter++, "INSTR_ADD_PART");
+			put(counter++, "INSTR_SUB_PART");
+			put(counter++, "INSTR_MULT_PART");
+			put(counter++, "INSTR_DIV_PART");
+			put(counter++, "INSTR_POW_PART");
+			put(counter++, "INSTR_COPY_PART");
+			put(counter++, "INSTR_ABS_PART");
+			put(counter++, "INSTR_SIN_PART");
+			put(counter++, "INSTR_COS_PART");
+			put(counter++, "INSTR_TAN_PART");
+			put(counter++, "INSTR_SINH_PART");
+			put(counter++, "INSTR_COSH_PART");
+			put(counter++, "INSTR_TANH_PART");;
+			put(counter++, "INSTR_SQUARE_PART");
+			put(counter++, "INSTR_NEGATE_PART");
+			put(counter++, "INSTR_LOG_PART");
 		}
 	};
 
@@ -61,24 +67,26 @@ public class ComputeInstruction {
 	public static final int INSTR_TANH_COMPLEX = 12;
 	public static final int INSTR_SQUARE_COMPLEX = 13;
 	public static final int INSTR_NEGATE_COMPLEX = 14;
-	public static final int INSTR_RECIPROCAL_COMPLEX = 30;
+	public static final int INSTR_RECIPROCAL_COMPLEX = 15;
+	public static final int INSTR_LOG_COMPLEX = 16;
 
-	public static final int INSTR_ADD_PART = 15;
-	public static final int INSTR_SUB_PART = 16;
-	public static final int INSTR_MULT_PART = 17;
-	public static final int INSTR_DIV_PART = 18;
-	public static final int INSTR_POW_PART = 19;
-	public static final int INSTR_COPY_PART = 20;
-	public static final int INSTR_ABS_PART = 21;
-	public static final int INSTR_SIN_PART = 22;
-	public static final int INSTR_COS_PART = 23;
-	public static final int INSTR_TAN_PART = 24;
-	public static final int INSTR_SINH_PART = 25;
-	public static final int INSTR_COSH_PART = 26;
-	public static final int INSTR_TANH_PART = 27;
-	public static final int INSTR_SQUARE_PART = 28;
-	public static final int INSTR_NEGATE_PART = 29;
-	public static final int INSTR_RECIPROCAL_PART = 31;
+	public static final int INSTR_ADD_PART = OFFSET_INSTR_PART+0;
+	public static final int INSTR_SUB_PART = OFFSET_INSTR_PART+1;
+	public static final int INSTR_MULT_PART = OFFSET_INSTR_PART+2;
+	public static final int INSTR_DIV_PART = OFFSET_INSTR_PART+3;
+	public static final int INSTR_POW_PART = OFFSET_INSTR_PART+4;
+	public static final int INSTR_COPY_PART = OFFSET_INSTR_PART+5;
+	public static final int INSTR_ABS_PART = OFFSET_INSTR_PART+6;
+	public static final int INSTR_SIN_PART = OFFSET_INSTR_PART+7;
+	public static final int INSTR_COS_PART = OFFSET_INSTR_PART+8;
+	public static final int INSTR_TAN_PART = OFFSET_INSTR_PART+9;
+	public static final int INSTR_SINH_PART = OFFSET_INSTR_PART+10;
+	public static final int INSTR_COSH_PART = OFFSET_INSTR_PART+11;
+	public static final int INSTR_TANH_PART = OFFSET_INSTR_PART+12;
+	public static final int INSTR_SQUARE_PART = OFFSET_INSTR_PART+13;
+	public static final int INSTR_NEGATE_PART = OFFSET_INSTR_PART+14;
+	public static final int INSTR_RECIPROCAL_PART = OFFSET_INSTR_PART+15;
+	public static final int INSTR_LOG_PART = OFFSET_INSTR_PART+16;
 	
 	//
 	//CLASS

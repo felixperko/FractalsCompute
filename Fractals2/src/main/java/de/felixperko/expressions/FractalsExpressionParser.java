@@ -22,6 +22,7 @@ public class FractalsExpressionParser {
 			put("tanh", INSTR_TANH_COMPLEX);
 			put("abs", INSTR_ABS_COMPLEX);
 			put("negate", INSTR_NEGATE_COMPLEX);
+			put("log", INSTR_LOG_COMPLEX);
 			//put("conj", INSTR_NEGATE_PART);//TODO which part?!
 		}
 	};
@@ -36,6 +37,7 @@ public class FractalsExpressionParser {
 			put("tanh", INSTR_TANH_PART);
 			put("abs", INSTR_ABS_PART);
 			put("negate", INSTR_NEGATE_PART);
+			put("log", INSTR_LOG_PART);
 		}
 	};
 	
