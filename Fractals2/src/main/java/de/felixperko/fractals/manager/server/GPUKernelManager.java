@@ -13,7 +13,6 @@ import com.aparapi.device.OpenCLDevice;
 import com.aparapi.internal.kernel.KernelManager;
 import com.aparapi.internal.kernel.KernelPreferences;
 import com.aparapi.internal.opencl.OpenCLPlatform;
-import com.sun.prism.Texture.Usage;
 
 import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.system.calculator.ComputeExpression;

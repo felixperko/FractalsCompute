@@ -1,5 +1,6 @@
 package de.felixperko.fractals.system.calculator.EscapeTime;
 
+import static de.felixperko.fractals.system.calculator.ComputeInstruction.*;
 import static org.objectweb.asm.Opcodes.*;
 
 import java.io.File;
@@ -195,37 +196,37 @@ public class EscapeTimeKernelFactoryAsm implements IGpuKernelFactory{
 			
 			//1 param
 			switch (instruction.type){
-			case (ComputeInstruction.INSTR_SQUARE_PART):
+			case (INSTR_SQUARE_PART):
 				iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_square_part", "(I)V", false);
 				break;
-			case (ComputeInstruction.INSTR_ABS_PART):
+			case (INSTR_ABS_PART):
 				iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_abs_part", "(I)V", false);
 				break;
-			case (ComputeInstruction.INSTR_SIN_PART):
+			case (INSTR_SIN_PART):
 				iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_sin_part", "(I)V", false);
 				break;
-			case (ComputeInstruction.INSTR_COS_PART):
+			case (INSTR_COS_PART):
 				iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_cos_part", "(I)V", false);
 				break;
-			case (ComputeInstruction.INSTR_TAN_PART):
+			case (INSTR_TAN_PART):
 				iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_tan_part", "(I)V", false);
 				break;
-			case (ComputeInstruction.INSTR_SINH_PART):
+			case (INSTR_SINH_PART):
 				iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_sinh_part", "(I)V", false);
 				break;
-			case (ComputeInstruction.INSTR_COSH_PART):
+			case (INSTR_COSH_PART):
 				iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_cosh_part", "(I)V", false);
 				break;
-			case (ComputeInstruction.INSTR_TANH_PART):
+			case (INSTR_TANH_PART):
 				iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_tanh_part", "(I)V", false);
 				break;
-			case (ComputeInstruction.INSTR_NEGATE_PART):
+			case (INSTR_NEGATE_PART):
 				iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_negate_part", "(I)V", false);
 				break;
-			case (ComputeInstruction.INSTR_RECIPROCAL_PART):
+			case (INSTR_RECIPROCAL_PART):
 				iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_reciprocal_part", "(I)V", false);
 				break;
-			case (ComputeInstruction.INSTR_LOG_PART):
+			case (INSTR_LOG_PART):
 				iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_log_part", "(I)V", false);
 				break;
 			default:
@@ -234,52 +235,55 @@ public class EscapeTimeKernelFactoryAsm implements IGpuKernelFactory{
 				iterate.visitInsn(IADD);
 				//2 params
 				switch (instruction.type){
-				case (ComputeInstruction.INSTR_SQUARE_COMPLEX):
+				case (INSTR_SQUARE_COMPLEX):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_square", "(II)V", false);
 					break;
-				case (ComputeInstruction.INSTR_ABS_COMPLEX):
+				case (INSTR_ABS_COMPLEX):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_abs_complex", "(II)V", false);
 					break;
-				case (ComputeInstruction.INSTR_SIN_COMPLEX):
+				case (INSTR_SIN_COMPLEX):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_sin_complex", "(II)V", false);
 					break;
-				case (ComputeInstruction.INSTR_COS_COMPLEX):
+				case (INSTR_COS_COMPLEX):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_cos_complex", "(II)V", false);
 					break;
-				case (ComputeInstruction.INSTR_TAN_COMPLEX):
+				case (INSTR_TAN_COMPLEX):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_tan_complex", "(II)V", false);
 					break;
-				case (ComputeInstruction.INSTR_SINH_COMPLEX):
+				case (INSTR_SINH_COMPLEX):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_sinh_complex", "(II)V", false);
 					break;
-				case (ComputeInstruction.INSTR_COSH_COMPLEX):
+				case (INSTR_COSH_COMPLEX):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_cosh_complex", "(II)V", false);
 					break;
-				case (ComputeInstruction.INSTR_TANH_COMPLEX):
+				case (INSTR_TANH_COMPLEX):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_tanh_complex", "(II)V", false);
 					break;
-				case (ComputeInstruction.INSTR_NEGATE_COMPLEX):
+				case (INSTR_NEGATE_COMPLEX):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_negate_complex", "(II)V", false);
 					break;
-				case (ComputeInstruction.INSTR_RECIPROCAL_COMPLEX):
+				case (INSTR_RECIPROCAL_COMPLEX):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_reciprocal_complex", "(II)V", false);
 					break;
-				case (ComputeInstruction.INSTR_LOG_COMPLEX):
+				case (INSTR_LOG_COMPLEX):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_log_complex", "(II)V", false);
 					break;
-				case (ComputeInstruction.INSTR_POW_PART):
+				case (INSTR_POW_PART):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_pow_part", "(II)V", false);
 					break;
-				case (ComputeInstruction.INSTR_MULT_PART):
+				case (INSTR_MULT_PART):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_mult_part", "(II)V", false);
 					break;
-				case (ComputeInstruction.INSTR_ADD_PART):
+				case (INSTR_DIV_PART):
+					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_div_part", "(II)V", false);
+					break;
+				case (INSTR_ADD_PART):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_add_part", "(II)V", false);
 					break;
-				case (ComputeInstruction.INSTR_SUB_PART):
+				case (INSTR_SUB_PART):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_sub_part", "(II)V", false);
 					break;
-				case (ComputeInstruction.INSTR_COPY_PART):
+				case (INSTR_COPY_PART):
 					iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_copy_part", "(II)V", false);
 					break;
 				default:
@@ -291,25 +295,28 @@ public class EscapeTimeKernelFactoryAsm implements IGpuKernelFactory{
 					iterate.visitInsn(IADD);
 					//4 params
 					switch (instruction.type){
-					case (ComputeInstruction.INSTR_POW_COMPLEX):
+					case (INSTR_POW_COMPLEX):
 						//if(r2 == 2 && i2 == 0) instr = "instr_square"
 						//else instr = "instr_pow"
 						iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_pow_complex", "(IIII)V", false);
 						break;
-					case (ComputeInstruction.INSTR_MULT_COMPLEX):
+					case (INSTR_MULT_COMPLEX):
 						iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_mult_complex", "(IIII)V", false);
 						break;
-					case (ComputeInstruction.INSTR_ADD_COMPLEX):
+					case (INSTR_DIV_COMPLEX):
+						iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_div_complex", "(IIII)V", false);
+						break;
+					case (INSTR_ADD_COMPLEX):
 						iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_add_complex", "(IIII)V", false);
 						break;
-					case (ComputeInstruction.INSTR_SUB_COMPLEX):
+					case (INSTR_SUB_COMPLEX):
 						iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_sub_complex", "(IIII)V", false);
 						break;
-					case (ComputeInstruction.INSTR_COPY_COMPLEX):
+					case (INSTR_COPY_COMPLEX):
 						iterate.visitMethodInsn(INVOKEVIRTUAL, superClassName, "instr_copy_complex", "(IIII)V", false);
 						break;
 					default:
-						String type = ComputeInstruction.CONSTANT_NAMES.get(instruction.type);
+						String type = CONSTANT_NAMES.get(instruction.type);
 						if (type == null)
 							type = ""+instruction.type;
 						throw new IllegalArgumentException("Unsupported instruction: "+type);

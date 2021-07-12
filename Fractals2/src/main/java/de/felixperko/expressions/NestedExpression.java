@@ -48,6 +48,8 @@ public class NestedExpression extends AbstractExpression {
 	@Override
 	public void registerSymbolUses(ComputeExpressionBuilder expressionBuilder, NumberFactory numberFactory,
 			boolean copyVariable) {
+		if (!copyVariable)
+			copyVariable = instructionPart != -1 || instructionComplex != -1;
 		contentExpression.registerSymbolUses(expressionBuilder, numberFactory, copyVariable);
 	}
 

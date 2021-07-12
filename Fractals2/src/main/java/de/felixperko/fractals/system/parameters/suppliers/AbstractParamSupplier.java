@@ -99,11 +99,6 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 	}
 	
 	@Override
-	public Object get(SystemContext systemContext, ComplexNumber chunkPos, int pixel, int sample) {
-		return get(systemContext, chunkPos, pixel, sample);
-	}
-	
-	@Override
 	public <C> C get(SystemContext systemContext, Class<C> valueCls, ComplexNumber chunkPos, int pixel, int sample) {
 		return cast(get(systemContext, chunkPos, pixel, sample), valueCls);
 	}
@@ -128,5 +123,30 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 		val |= layerRelevant ? ATTR_LAYER_RELEVANT : 0;
 		val |= viewRelevant ? ATTR_VIEW_RELEVANT : 0;
 		return val;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		AbstractParamSupplier other = (AbstractParamSupplier) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		return true;
 	}
 }

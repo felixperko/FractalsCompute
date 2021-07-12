@@ -36,7 +36,7 @@ public class ChainExpression extends AbstractExpression {
 			boolean copyVariable) {
 		boolean first = true;
 		for (FractalsExpression subExpr : subExpressions){
-			subExpr.registerSymbolUses(expressionBuilder, numberFactory, first);
+			subExpr.registerSymbolUses(expressionBuilder, numberFactory, !first);
 			if (first)
 				first = false;
 		}

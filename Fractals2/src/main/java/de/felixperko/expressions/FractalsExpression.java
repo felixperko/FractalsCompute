@@ -22,4 +22,7 @@ public interface FractalsExpression {
 	
 	public int getResultIndexReal();
 	public int getResultIndexImag();
+	
+//	FractalsExpression getDerivative(String derivativeVariableName);
+//	FractalsExpression simplify();
 }

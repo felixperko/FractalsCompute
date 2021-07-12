@@ -69,14 +69,22 @@ public class FractalsExpressionParser {
 		
 		//try variable
 		if (val == null){
-//			if (input.matches("[a-zA-Z]+_n(-[1-9][0-9]*)")){
 			if (input.matches("[a-zA-Z]+_\\(n-1\\)")){
 				return new VariablePastIterationExpression(input);
 			}
-			if (input.matches("[a-zA-Z]([a-zA-Z0-9]*)")){
-				if (input.equalsIgnoreCase("pi"))
-					return new ConstantExpression(Math.PI, 0);
-				return new VariableExpression(input);
+			try {
+				//TODO remove risk of stack overflow, no clue under which conditions it occurs, but it has something to do with the '*'...
+				if (input.matches("[a-zA-Z]([a-zA-Z0-9]*)")){
+					if (input.equalsIgnoreCase("pi"))
+						return new ConstantExpression(Math.PI, 0);
+					if (input.equalsIgnoreCase("e"))
+						return new ConstantExpression(Math.E, 0);
+					return new VariableExpression(input);
+				}
+			} catch (StackOverflowError e) {
+				System.err.println("Stackoverflow while parsing expression");
+				System.err.println(e.getMessage());
+				return null;
 			}
 		}
 		
