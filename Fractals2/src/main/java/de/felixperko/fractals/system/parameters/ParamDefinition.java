@@ -23,6 +23,7 @@ public class ParamDefinition implements Serializable{
 	List<ParamValueType> possibleValueTypes;
 	
 	boolean resetRendererOnChange = true;
+	boolean visible = true;
 	
 	Object defaultValue = null;
 	
@@ -132,5 +133,18 @@ public class ParamDefinition implements Serializable{
 	
 	public void setResetRendererOnChange(boolean resetOnChange){
 		this.resetRendererOnChange = resetOnChange;
+	}
+
+	public boolean isVisible() {
+		return visible;
+	}
+
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+	}
+	
+	public ParamDefinition withVisible(boolean visible) {
+		setVisible(visible);
+		return this;
 	}
 }
