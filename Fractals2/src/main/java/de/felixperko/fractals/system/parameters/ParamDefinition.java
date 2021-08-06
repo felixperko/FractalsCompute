@@ -147,4 +147,71 @@ public class ParamDefinition implements Serializable{
 		setVisible(visible);
 		return this;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((category == null) ? 0 : category.hashCode());
+		result = prime * result + ((defaultValue == null) ? 0 : defaultValue.hashCode());
+		result = prime * result + ((description == null) ? 0 : description.hashCode());
+		result = prime * result + ((hints == null) ? 0 : hints.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((possibleClasses == null) ? 0 : possibleClasses.hashCode());
+		result = prime * result + ((possibleValueTypes == null) ? 0 : possibleValueTypes.hashCode());
+		result = prime * result + (resetRendererOnChange ? 1231 : 1237);
+		result = prime * result + (visible ? 1231 : 1237);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ParamDefinition other = (ParamDefinition) obj;
+		if (category == null) {
+			if (other.category != null)
+				return false;
+		} else if (!category.equals(other.category))
+			return false;
+		if (defaultValue == null) {
+			if (other.defaultValue != null)
+				return false;
+		} else if (!defaultValue.equals(other.defaultValue))
+			return false;
+		if (description == null) {
+			if (other.description != null)
+				return false;
+		} else if (!description.equals(other.description))
+			return false;
+		if (hints == null) {
+			if (other.hints != null)
+				return false;
+		} else if (!hints.equals(other.hints))
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (possibleClasses == null) {
+			if (other.possibleClasses != null)
+				return false;
+		} else if (!possibleClasses.equals(other.possibleClasses))
+			return false;
+		if (possibleValueTypes == null) {
+			if (other.possibleValueTypes != null)
+				return false;
+		} else if (!possibleValueTypes.equals(other.possibleValueTypes))
+			return false;
+		if (resetRendererOnChange != other.resetRendererOnChange)
+			return false;
+		if (visible != other.visible)
+			return false;
+		return true;
+	}
 }

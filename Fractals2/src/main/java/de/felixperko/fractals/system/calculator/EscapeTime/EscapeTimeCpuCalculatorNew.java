@@ -13,6 +13,7 @@ import de.felixperko.fractals.system.parameters.suppliers.CoordinateBasicShiftPa
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.statistics.IStats;
+import de.felixperko.fractals.system.systems.common.BFOrbitCommon;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 import de.felixperko.fractals.system.numbers.Number;
@@ -122,7 +123,7 @@ public class EscapeTimeCpuCalculatorNew extends AbstractFractalsCalculator{
 	
 	private EscapeTimeCpuKernelNew getCurrentKernel() {
 			
-		String new_expression = systemContext.getParamContainer().getClientParameter("f(z)=").getGeneral(String.class);
+		String new_expression = systemContext.getParamContainer().getClientParameter(BFOrbitCommon.PARAM_EXPRESSION).getGeneral(String.class);
 		
 		String inputVarName = null;
 		if (new_expression.contains("X")) inputVarName = "X";

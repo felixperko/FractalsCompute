@@ -28,6 +28,7 @@ import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.statistics.IStats;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
+import de.felixperko.fractals.system.systems.common.BFOrbitCommon;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 import de.felixperko.fractals.util.NumberUtil;
@@ -68,7 +69,7 @@ public class EscapeTimeCpuCalculator
 //		this.taskStats = taskStats;
 //		
 //		limit = systemContext.getParamValue("limit", Double.class);
-////		p_current = systemContext.getParameters().get("start");
+////		p_current = systemContext.getParameters().get(BFOrbitCommon.PARAM_ZSTART);
 ////		p_pow = systemContext.getParameters().get("pow");
 ////		p_c = systemContext.getParameters().get("c");
 //		Layer layer = chunk.getCurrentTask().getStateInfo().getLayer();
@@ -96,7 +97,7 @@ public class EscapeTimeCpuCalculator
 //	
 //	private EscapeTimeCpuKernel getCurrentKernel(int pixelCount, List<Layer> layers) {
 //		
-//		String new_expression = systemContext.getParamContainer().getClientParameter("f(z)=").getGeneral(String.class);
+//		String new_expression = systemContext.getParamContainer().getClientParameter(BFOrbitCommon.PARAM_EXPRESSION).getGeneral(String.class);
 //		
 //		String inputVarName = null;
 //		if (new_expression.contains("X")) inputVarName = "X";

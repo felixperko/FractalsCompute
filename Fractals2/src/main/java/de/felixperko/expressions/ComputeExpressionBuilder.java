@@ -13,6 +13,7 @@ import de.felixperko.fractals.system.numbers.impl.DoubleComplexNumber;
 import de.felixperko.fractals.system.numbers.impl.DoubleNumber;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
+import de.felixperko.fractals.system.systems.common.BFOrbitCommon;
 
 public class ComputeExpressionBuilder {
 	
@@ -54,21 +55,7 @@ public class ComputeExpressionBuilder {
 		int copyCounter = 0;
 		
 		for (ExpressionSymbol symbol : allSymbols.values()){
-			String symbolName = symbol.getName();
-			boolean isReference = referenceSymbols.containsKey(symbolName);
-			if (isReference){
-				if (symbolName.equalsIgnoreCase(inputVarName))
-					symbolName = "start"; //get "start" instead of inputVarName (e.g. "z")
-				ParamSupplier param = parameters.get(symbolName);
-				if (param == null)
-					param = new StaticParamSupplier(symbolName, nf.createComplexNumber(0, 0));
-//					throw new IllegalStateException("didnt find parameter "+symbolName); 
-				mappedParams.put(param, (Integer)copyCounter);
-			} else { //is raw value
-				ComplexNumber constant = explicitValues.get(symbolName);
-				ParamSupplier supp = new StaticParamSupplier(symbolName, constant);
-				mappedParams.put(supp, (Integer)copyCounter);
-			}
+			mapParamToSymbol(mappedParams, nf, copyCounter, symbol);
 			copyCounter = symbol.assignPristineIndex(copyCounter);
 		};
 		
@@ -83,7 +70,25 @@ public class ComputeExpressionBuilder {
 		smoothstepConstant = Math.log(expression.getSmoothstepConstant(this));
 		return new ComputeExpression(input, instructions, mappedParams, copyCounter, fixedValues, explicitValues, smoothstepConstant);
 	}
-	
+
+	public void mapParamToSymbol(Map<ParamSupplier, Integer> mappedParams, NumberFactory nf, Integer copyCounter, ExpressionSymbol symbol) {
+		String symbolName = symbol.getName();
+		boolean isReference = referenceSymbols.containsKey(symbolName);
+		if (isReference){
+			if (symbolName.equalsIgnoreCase(inputVarName))
+				symbolName = BFOrbitCommon.PARAM_ZSTART; //get start param instead of inputVarName (e.g. "z")
+			ParamSupplier param = parameters.get(symbolName);
+			if (param == null)
+				param = new StaticParamSupplier(symbolName, nf.createComplexNumber(0, 0));
+//					throw new IllegalStateException("didnt find parameter "+symbolName);
+			mappedParams.put(param, copyCounter);
+		} else { //is raw value
+			ComplexNumber constant = explicitValues.get(symbolName);
+			ParamSupplier supp = new StaticParamSupplier(symbolName, constant);
+			mappedParams.put(supp, copyCounter);
+		}
+	}
+
 	public ExpressionSymbol getReferenceExpressionSymbol(String name){
 		return getSymbol(referenceSymbols, name);
 	}

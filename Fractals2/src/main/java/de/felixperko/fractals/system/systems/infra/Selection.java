@@ -40,4 +40,47 @@ public class Selection<T> implements Serializable{
 	public String getName() {
 		return name;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((descriptions == null) ? 0 : descriptions.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((nameList == null) ? 0 : nameList.hashCode());
+		result = prime * result + ((options == null) ? 0 : options.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Selection other = (Selection) obj;
+		if (descriptions == null) {
+			if (other.descriptions != null)
+				return false;
+		} else if (!descriptions.equals(other.descriptions))
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (nameList == null) {
+			if (other.nameList != null)
+				return false;
+		} else if (!nameList.equals(other.nameList))
+			return false;
+		if (options == null) {
+			if (other.options != null)
+				return false;
+		} else if (!options.equals(other.options))
+			return false;
+		return true;
+	}
 }

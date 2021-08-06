@@ -92,8 +92,13 @@ public class ParamConfiguration implements Serializable{
 		return selections.get(name);
 	}
 	
+	
 	public void addSelection(Selection<?> selection) {
 		selections.put(selection.getName(), selection);
+	}
+	
+	public Map<String, Selection<?>> getSelections(){
+		return selections;
 	}
 
 	public void addListTypes(String listId, ParamValueType... possibleTypes) {
