@@ -10,7 +10,7 @@ import de.felixperko.fractals.system.numbers.Number;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.statistics.IStats;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
-import de.felixperko.fractals.system.systems.common.BFOrbitCommon;
+import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 import de.felixperko.fractals.system.thread.FractalsThread;
@@ -49,7 +49,7 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 		this.taskStats = taskStats;
 		
 		limit = systemContext.getParamValue("limit", Number.class).toDouble();
-		p_current = systemContext.getParameters().get(BFOrbitCommon.PARAM_ZSTART);
+		p_current = systemContext.getParameters().get(CommonFractalParameters.PARAM_ZSTART);
 		p_pow = systemContext.getParameters().get("pow");
 		p_c = systemContext.getParameters().get("c");
 		Layer layer = chunk.getCurrentTask().getStateInfo().getLayer();

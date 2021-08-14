@@ -1,11 +1,11 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
 
-import static de.felixperko.fractals.system.systems.common.BFOrbitCommon.booleanType;
-import static de.felixperko.fractals.system.systems.common.BFOrbitCommon.doubleType;
-import static de.felixperko.fractals.system.systems.common.BFOrbitCommon.integerType;
-import static de.felixperko.fractals.system.systems.common.BFOrbitCommon.listType;
-import static de.felixperko.fractals.system.systems.common.BFOrbitCommon.numberType;
+import static de.felixperko.fractals.system.systems.common.CommonFractalParameters.booleanType;
+import static de.felixperko.fractals.system.systems.common.CommonFractalParameters.doubleType;
+import static de.felixperko.fractals.system.systems.common.CommonFractalParameters.integerType;
+import static de.felixperko.fractals.system.systems.common.CommonFractalParameters.listType;
+import static de.felixperko.fractals.system.systems.common.CommonFractalParameters.numberType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ import de.felixperko.fractals.system.parameters.ParamConfiguration;
 import de.felixperko.fractals.system.parameters.ParamDefinition;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
-import de.felixperko.fractals.system.systems.common.BFOrbitCommon;
+import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 import de.felixperko.fractals.system.systems.infra.AbstractCalcSystem;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.task.ClassTaskFactory;
@@ -48,7 +48,7 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 
 	@Override
 	public ParamConfiguration createParameterConfiguration() {
-		ParamConfiguration config = BFOrbitCommon.getCommonParameterConfiguration();
+		ParamConfiguration config = CommonFractalParameters.getCommonParameterConfiguration();
 		
 		ParamValueType layerType = new ParamValueType("BreadthFirstLayer",
 				new ParamValueField("priority_shift", doubleType, 0d),
@@ -96,7 +96,7 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		defaultValues.add(new StaticParamSupplier("border_dispose", 7.0));
 		defaultValues.add(new StaticParamSupplier("task_buffer", 5));
         List<Layer> layers = new ArrayList<>();
-        layers.add(new BreadthFirstLayer(BFOrbitCommon.DEFAULT_CHUNK_SIZE).with_samples(1).with_rendering(true).with_priority_shift(0));
+        layers.add(new BreadthFirstLayer(CommonFractalParameters.DEFAULT_CHUNK_SIZE).with_samples(1).with_rendering(true).with_priority_shift(0));
 //        layers.add(new BreadthFirstUpsampleLayer(16, BFOrbitCommon.DEFAULT_CHUNK_SIZE).with_samples(1).with_rendering(true).with_priority_shift(0));
 //        layers.add(new BreadthFirstUpsampleLayer(8, BFOrbitCommon.DEFAULT_CHUNK_SIZE).with_samples(1).with_rendering(true).with_priority_shift(10));
 //        layers.add(new BreadthFirstUpsampleLayer(4, BFOrbitCommon.DEFAULT_CHUNK_SIZE).with_samples(1).with_rendering(true).with_priority_shift(20));
