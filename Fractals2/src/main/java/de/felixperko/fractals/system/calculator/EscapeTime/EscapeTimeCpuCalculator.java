@@ -28,7 +28,7 @@ import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.statistics.IStats;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
-import de.felixperko.fractals.system.systems.common.BFOrbitCommon;
+import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 import de.felixperko.fractals.util.NumberUtil;

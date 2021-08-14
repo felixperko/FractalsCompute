@@ -19,9 +19,9 @@ public abstract class EscapeTimeGpuKernel64 extends EscapeTimeGpuKernelAbstract{
 	protected EscapeTimeGpuKernel64(Device device, ComputeKernelParameters kernelParameters){
 		super(device, kernelParameters);
 		
-		List<ComputeInstruction> instructions = kernelParameters.getExpression().getInstructions();
+		List<ComputeInstruction> instructions = kernelParameters.getMainExpression().getInstructions();
 		
-		int dataBufferSize = kernelParameters.getExpression().getRequiredVariableSlots();
+		int dataBufferSize = kernelParameters.getMainExpression().getRequiredVariableSlots();
 		int instructionsBufferSize = 2+instructions.size();
 		this.instructions = new int[instructionsBufferSize];
 		this.instructions[0] = instructionsBufferSize;

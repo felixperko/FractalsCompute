@@ -6,7 +6,7 @@ import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.manager.server.ServerManagers;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.system.parameters.ParamConfiguration;
-import de.felixperko.fractals.system.systems.common.BFOrbitCommon;
+import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 import de.felixperko.fractals.system.systems.infra.AbstractCalcSystem;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 
@@ -27,7 +27,7 @@ public class OrbitSystem extends AbstractCalcSystem {
 	@Override
 	public ParamConfiguration createParameterConfiguration() {
 		//iterations, calculator, midpoint, numberFactory, chunkFactory, systemName, view, calculator specifics
-		ParamConfiguration config = BFOrbitCommon.getCommonParameterConfiguration();
+		ParamConfiguration config = CommonFractalParameters.getCommonParameterConfiguration();
 		return config;
 	}
 

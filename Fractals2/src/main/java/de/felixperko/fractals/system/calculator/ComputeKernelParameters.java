@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.felixperko.expressions.ComputeExpressionDomain;
 import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
@@ -12,29 +13,35 @@ import de.felixperko.fractals.system.task.Layer;
 
 public class ComputeKernelParameters {
 	
-	ComputeExpression expression;
+	ComputeExpressionDomain expressionDomain;;
 	int precision;
 	int pixelCount;
 	List<Layer> layers;
 	
-	public ComputeKernelParameters(ComputeExpression expression, List<Layer> layers, int pixelCount, int precision) {
-		this.expression = expression;
+	public ComputeKernelParameters(ComputeExpressionDomain expressionDomain, List<Layer> layers, int pixelCount, int precision) {
+		this.expressionDomain = expressionDomain;
 		this.layers = layers;
 		this.pixelCount = pixelCount;
 		this.precision = precision;
 	}
 	
+	public void setComputeExpressionDomain(ComputeExpressionDomain expressionDomain) {
+		this.expressionDomain = expressionDomain;
+	}
+	
 	public boolean isCompartible(ComputeKernelParameters other, ParamContainer params){
 		
+		ComputeExpression expression = expressionDomain.getMainExpressions().get(0);
+		
 		//check basic values and array sizes
-		if (this.precision != other.precision || this.pixelCount != other.pixelCount || this.expression.instructions.size() != other.expression.instructions.size())
+		if (this.precision != other.precision || this.pixelCount != other.pixelCount || expression.instructions.size() != expression.instructions.size())
 			return false;
 		if ((this.layers == null) != (other.layers == null) || (this.layers != null && (this.layers.size() != other.layers.size())))
 			return false;
 		
 		//check expression instructions
-		for (int i = 0 ; i < this.expression.instructions.size() ; i++){
-			if (!this.expression.instructions.get(i).equals(other.expression.instructions.get(i)))
+		for (int i = 0 ; i < expression.instructions.size() ; i++){
+			if (!expression.instructions.get(i).equals(expression.instructions.get(i)))
 				return false;
 		}
 
@@ -78,8 +85,8 @@ public class ComputeKernelParameters {
 		return true;
 	}
 
-	public ComputeExpression getExpression() {
-		return expression;
+	public ComputeExpression getMainExpression() {
+		return expressionDomain.getMainExpressions().get(0);
 	}
 
 	public int getPrecision() {
@@ -95,6 +102,6 @@ public class ComputeKernelParameters {
 	}
 
 	public Map<String, ComplexNumber> getFixedValues() {
-		return expression.getFixedValues();
+		return getMainExpression().getFixedValues();
 	}	
 }

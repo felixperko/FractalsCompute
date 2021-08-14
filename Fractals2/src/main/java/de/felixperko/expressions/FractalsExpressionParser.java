@@ -73,8 +73,8 @@ public class FractalsExpressionParser {
 				return new VariablePastIterationExpression(input);
 			}
 			try {
-				//TODO remove risk of stack overflow, no clue under which conditions it occurs, but it has something to do with the '*'...
-				if (input.matches("[a-zA-Z]([a-zA-Z0-9]*)")){
+				//TODO remove risk of stack overflow, not sure under which conditions it occurs, but it has something to do with the '*'...
+				if (input.matches("[a-zA-Z]([a-zA-Z0-9]*)(_n)?")){
 					if (input.equalsIgnoreCase("pi"))
 						return new ConstantExpression(Math.PI, 0);
 					if (input.equalsIgnoreCase("e"))

@@ -1,6 +1,8 @@
 package de.felixperko.expressions;
 
 import java.util.List;
+import java.util.Set;
+
 import de.felixperko.fractals.system.calculator.ComputeInstruction;
 import de.felixperko.fractals.system.numbers.NumberFactory;
 
@@ -175,6 +177,25 @@ public class ChainExpression extends AbstractExpression {
 				smoothstepConstant = exprSmoothstepConstant; //TODO overwrite for div!
 		}
 		return smoothstepConstant;
+	}
+
+	@Override
+	public void extractStaticExpressions(List<FractalsExpression> staticSubFractalsExpressions, Set<String> iterateVarNames) {
+		for (int i = 0 ; i < subExpressions.size() ; i++) {
+			FractalsExpression expr = subExpressions.get(i);
+			StaticSubExpression staticSubExpression = extractSubExpressionOrPropagate(staticSubFractalsExpressions, iterateVarNames, expr);
+			if (staticSubExpression != null)
+				subExpressions.set(i, staticSubExpression);
+		}
+	}
+
+	@Override
+	public boolean isStatic(Set<String> iterateVarNames) {
+		for (FractalsExpression expr : subExpressions) {
+			if (!expr.isStatic(iterateVarNames))
+				return false;
+		}
+		return true;
 	}
 	
 }

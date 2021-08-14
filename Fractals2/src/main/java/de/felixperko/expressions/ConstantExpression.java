@@ -124,4 +124,13 @@ public class ConstantExpression extends AbstractExpression {
 		return 0;
 	}
 
+	@Override
+	public void extractStaticExpressions(List<FractalsExpression> staticSubFractalsExpressions, Set<String> iterateVarNames) {
+	}
+
+	@Override
+	public boolean isStatic(Set<String> iterateVarNames) {
+		return true;
+	}
+
 }

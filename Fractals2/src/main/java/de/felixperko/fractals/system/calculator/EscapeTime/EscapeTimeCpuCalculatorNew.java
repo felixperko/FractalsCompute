@@ -3,17 +3,19 @@ package de.felixperko.fractals.system.calculator.EscapeTime;
 import java.util.List;
 
 import de.felixperko.expressions.ComputeExpressionBuilder;
+import de.felixperko.expressions.ComputeExpressionDomain;
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.BorderAlignment;
 import de.felixperko.fractals.system.calculator.ComputeExpression;
 import de.felixperko.fractals.system.calculator.ComputeKernelParameters;
 import de.felixperko.fractals.system.calculator.infra.AbstractFractalsCalculator;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
+import de.felixperko.fractals.system.parameters.ExpressionsParam;
 import de.felixperko.fractals.system.parameters.suppliers.CoordinateBasicShiftParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.statistics.IStats;
-import de.felixperko.fractals.system.systems.common.BFOrbitCommon;
+import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 import de.felixperko.fractals.system.numbers.Number;
@@ -123,20 +125,14 @@ public class EscapeTimeCpuCalculatorNew extends AbstractFractalsCalculator{
 	
 	private EscapeTimeCpuKernelNew getCurrentKernel() {
 			
-		String new_expression = systemContext.getParamContainer().getClientParameter(BFOrbitCommon.PARAM_EXPRESSION).getGeneral(String.class);
+		ExpressionsParam expressions = systemContext.getParamContainer().getClientParameter(CommonFractalParameters.PARAM_EXPRESSIONS).getGeneral(ExpressionsParam.class);
 		
-		String inputVarName = null;
-		if (new_expression.contains("X")) inputVarName = "X";
-		if (new_expression.contains("x")) inputVarName = "x";
-		if (new_expression.contains("Z")) inputVarName = "Z";
-		if (new_expression.contains("z")) inputVarName = "z";
-		
-		ComputeExpressionBuilder expressionBuilder = new ComputeExpressionBuilder(new_expression, inputVarName, systemContext.getParamContainer().getClientParameters());
-		ComputeExpression expression = expressionBuilder.getComputeExpression();
+		ComputeExpressionBuilder expressionBuilder = new ComputeExpressionBuilder(expressions, systemContext.getParamContainer().getClientParameters());
+		ComputeExpressionDomain expressionDomain = expressionBuilder.getComputeExpressionDomain(false);
 		
 		List<Layer> layers = systemContext.getLayerConfiguration().getLayers();
 		
-		ComputeKernelParameters newKernelParameters = new ComputeKernelParameters(expression, layers, 0, 64);
+		ComputeKernelParameters newKernelParameters = new ComputeKernelParameters(expressionDomain, layers, 0, 64);
 		
 		ComputeKernelParameters kernelParameters = tl_kernelParameters.get();
 		if (kernelParameters == null || !kernelParameters.isCompartible(newKernelParameters, systemContext.getParamContainer())){

@@ -145,7 +145,6 @@ public class ParamContainer implements Serializable{
 				ParamSupplier oldSupp = oldParams.get(supplier.getName());
 				supplier.updateChanged(oldSupp);
 				if (supplier.isChanged()) {
-					if (supplier.isSystemRelevant() || supplier.isLayerRelevant())
 						changed = true;
 				}
 			}

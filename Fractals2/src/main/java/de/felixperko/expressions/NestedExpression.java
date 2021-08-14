@@ -123,4 +123,16 @@ public class NestedExpression extends AbstractExpression {
 		return complexIgnoreImag;
 	}
 
+	@Override
+	public void extractStaticExpressions(List<FractalsExpression> staticSubFractalsExpressions, Set<String> iterateVarNames) {
+		StaticSubExpression staticContent = extractSubExpressionOrPropagate(staticSubFractalsExpressions, iterateVarNames, contentExpression);
+		if (staticContent != null)
+			contentExpression = staticContent;
+	}
+
+	@Override
+	public boolean isStatic(Set<String> iterateVarNames) {
+		return contentExpression.isStatic(iterateVarNames);
+	}
+
 }

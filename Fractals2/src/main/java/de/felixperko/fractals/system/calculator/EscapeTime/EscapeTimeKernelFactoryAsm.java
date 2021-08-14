@@ -45,7 +45,7 @@ public class EscapeTimeKernelFactoryAsm implements IGpuKernelFactory{
 	@Override
 	public EscapeTimeGpuKernelAbstract createKernel(Device device, ComputeKernelParameters kernelParameters) {
 		
-		ComputeExpression expression = kernelParameters.getExpression();
+		ComputeExpression expression = kernelParameters.getMainExpression();
 		
 		Class<?> superclass = null;
 		if (kernelParameters.getPrecision() == 32)
@@ -67,7 +67,7 @@ public class EscapeTimeKernelFactoryAsm implements IGpuKernelFactory{
 	}
 
 	public EscapeTimeCpuKernel createKernelCpu(ComputeKernelParameters kernelParameters) {
-		Class<?> clazz = createClass(kernelParameters.getExpression(), EscapeTimeCpuKernel.class, DeviceType.CPU);
+		Class<?> clazz = createClass(kernelParameters.getMainExpression(), EscapeTimeCpuKernel.class, DeviceType.CPU);
 		
 		EscapeTimeCpuKernel kernel = null;
 		try {
@@ -79,7 +79,7 @@ public class EscapeTimeKernelFactoryAsm implements IGpuKernelFactory{
 	}
 
 	public ComputeKernel createKernelCpu(Class<? extends ComputeKernel> kernelClass, ComputeKernelParameters kernelParameters) {
-		Class<?> clazz = createClass(kernelParameters.getExpression(), kernelClass, DeviceType.CPU);
+		Class<?> clazz = createClass(kernelParameters.getMainExpression(), kernelClass, DeviceType.CPU);
 		
 		ComputeKernel kernel = null;
 		try {

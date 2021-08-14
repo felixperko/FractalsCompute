@@ -2,24 +2,31 @@ package de.felixperko.expressions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import com.aparapi.internal.model.ClassModel.ConstantPool.Entry;
+
 import de.felixperko.fractals.system.calculator.ComputeExpression;
 import de.felixperko.fractals.system.calculator.ComputeInstruction;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.NumberFactory;
 import de.felixperko.fractals.system.numbers.impl.DoubleComplexNumber;
 import de.felixperko.fractals.system.numbers.impl.DoubleNumber;
+import de.felixperko.fractals.system.parameters.ExpressionsParam;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
-import de.felixperko.fractals.system.systems.common.BFOrbitCommon;
+import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 
 public class ComputeExpressionBuilder {
 	
-	FractalsExpression expression;
+	List<FractalsExpression> expressions;
 	
-	String input;
+	List<String> inputStrings = new ArrayList<>();
+	List<String> varNames = new ArrayList<>();
 	String inputVarName;
 	Map<String, ParamSupplier> parameters;
 	
@@ -37,20 +44,67 @@ public class ComputeExpressionBuilder {
 	double smoothstepConstant;
 	
 	public ComputeExpressionBuilder(String input, String inputVarName, Map<String, ParamSupplier> parameters){
-		this.input = input;
+		this.inputStrings.add(input);
 		this.inputVarName = inputVarName;
 		this.parameters = parameters;
 	}
 	
-	public ComputeExpression getComputeExpression(){
+	public ComputeExpressionBuilder(ExpressionsParam expressions, Map<String, ParamSupplier> parameters){
+		this.parameters = parameters;
+		this.inputVarName = expressions.getMainInputVar();
+		for (java.util.Map.Entry<String, String> e : expressions.getExpressions().entrySet()) {
+			addMainExpression(e.getValue(), e.getKey());
+		}
+	}
+	
+	public void addMainExpression(String input, String inputVarName) {
+		inputStrings.add(input);
+		this.varNames.add(inputVarName);
+	}
+	
+	public ComputeExpression getComputeExpression() {
+		List<ComputeExpression> computeExpressions = getComputeExpressionDomain(false).getMainExpressions();
+		return computeExpressions != null && !computeExpressions.isEmpty() ? computeExpressions.get(0) : null;
+	}
+	
+	public ComputeExpressionDomain getComputeExpressionDomain(boolean extractStaticExpressions){
 		
 		Map<ParamSupplier, Integer> mappedParams = new HashMap<>();
 		
-		expression = FractalsExpressionParser.parse(input);
-
+		expressions = new ArrayList<>();
+		List<FractalsExpression> processExpressions = new ArrayList<>();
+		
+		for (String input : inputStrings) {
+			FractalsExpression mainExpression = FractalsExpressionParser.parse(input);
+			expressions.add(mainExpression);
+		}
+		
+		List<FractalsExpression> subFractalsExpressions = new ArrayList<>();
+		if (extractStaticExpressions) {
+			Set<String> varNameSet = new HashSet<>();
+			for (int i = 0 ; i < varNames.size() ; i++) {
+				String varName = varNames.get(i);
+				FractalsExpression expr = expressions.get(i);
+				boolean isIdentity = expr instanceof VariableExpression && varName.equals(((VariableExpression)expr).getVariableName());
+				if (!isIdentity)
+					varNameSet.add(varName);
+			}
+			for (FractalsExpression expression : expressions)
+				expression.extractStaticExpressions(subFractalsExpressions, varNameSet);
+		}
+		
+		for (FractalsExpression subExpression : subFractalsExpressions) {
+			processExpressions.add(subExpression);
+		}
+		for (FractalsExpression expression : expressions) {
+			processExpressions.add(expression);
+		}
+		
+		
 		NumberFactory nf = new NumberFactory(DoubleNumber.class, DoubleComplexNumber.class);
 		
-		expression.registerSymbolUses(this, nf, true);
+		for (FractalsExpression expression : processExpressions)
+			expression.registerSymbolUses(this, nf, true);
 
 		int copyCounter = 0;
 		
@@ -64,11 +118,31 @@ public class ComputeExpressionBuilder {
 		}
 		
 		instructions = new ArrayList<>();
-		expression.addInitInstructions(instructions, this);
-		expression.addInstructions(instructions, this);
-		expression.addEndInstructions(instructions, this);
-		smoothstepConstant = Math.log(expression.getSmoothstepConstant(this));
-		return new ComputeExpression(input, instructions, mappedParams, copyCounter, fixedValues, explicitValues, smoothstepConstant);
+		
+		List<ComputeExpression> mainExpressions = new ArrayList<>();
+		List<ComputeExpression> preExpressions = new ArrayList<>();
+		
+		for (FractalsExpression expression : processExpressions)
+			expression.addInitInstructions(instructions, this);
+		for (FractalsExpression expression : processExpressions)
+			expression.addInstructions(instructions, this);
+		for (FractalsExpression expression : processExpressions)
+			expression.addEndInstructions(instructions, this);
+		for (int i = 0 ; i < processExpressions.size() ; i++) {
+			FractalsExpression expression = processExpressions.get(i);
+			String input = inputStrings.get(i);
+			smoothstepConstant = Math.log(expression.getSmoothstepConstant(this));
+			
+			ComputeExpression computeExpression = new ComputeExpression(input, instructions, mappedParams, copyCounter, fixedValues, explicitValues, smoothstepConstant);
+			
+			if (expressions.contains(expression))
+				mainExpressions.add(computeExpression);
+			else if (subFractalsExpressions.contains(expression))
+				preExpressions.add(computeExpression);
+		}
+		ComputeExpressionDomain domain = new ComputeExpressionDomain(mainExpressions);
+		domain.addStaticExpressions(preExpressions);
+		return domain;
 	}
 
 	public void mapParamToSymbol(Map<ParamSupplier, Integer> mappedParams, NumberFactory nf, Integer copyCounter, ExpressionSymbol symbol) {
@@ -76,7 +150,7 @@ public class ComputeExpressionBuilder {
 		boolean isReference = referenceSymbols.containsKey(symbolName);
 		if (isReference){
 			if (symbolName.equalsIgnoreCase(inputVarName))
-				symbolName = BFOrbitCommon.PARAM_ZSTART; //get start param instead of inputVarName (e.g. "z")
+				symbolName = CommonFractalParameters.PARAM_ZSTART; //get start param instead of inputVarName (e.g. "z")
 			ParamSupplier param = parameters.get(symbolName);
 			if (param == null)
 				param = new StaticParamSupplier(symbolName, nf.createComplexNumber(0, 0));

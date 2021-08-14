@@ -26,10 +26,10 @@ public abstract class EscapeTimeCpuKernelNew implements ComputeKernel {
 	public EscapeTimeCpuKernelNew(ComputeKernelParameters kernelParameters) {
 		
 		this.kernelParameters = kernelParameters;
-		this.expression = kernelParameters.getExpression().getText();
+		this.expression = kernelParameters.getMainExpression().getText();
 		
-		List<ParamSupplier> paramSuppliers = kernelParameters.getExpression().getParameterList();
-		constantSuppliers = kernelParameters.getExpression().getConstants();
+		List<ParamSupplier> paramSuppliers = kernelParameters.getMainExpression().getParameterList();
+		constantSuppliers = kernelParameters.getMainExpression().getConstants();
 		
 		int pixelCount = kernelParameters.getPixelCount();
 //		pixelItArr = new int[pixelCount];
@@ -46,9 +46,9 @@ public abstract class EscapeTimeCpuKernelNew implements ComputeKernel {
 		
 //		this.constantNames = new String[constantNames.size()];
 //		this.constants = new double[constantSuppliers.size()*2];
-		this.data = new double[kernelParameters.getExpression().getRequiredVariableSlots()*2];
+		this.data = new double[kernelParameters.getMainExpression().getRequiredVariableSlots()*2];
 		
-		this.smoothstepConstant = kernelParameters.getExpression().getSmoothstepConstant();
+		this.smoothstepConstant = kernelParameters.getMainExpression().getSmoothstepConstant();
 	}
 	
 	public void setTraces(int count){

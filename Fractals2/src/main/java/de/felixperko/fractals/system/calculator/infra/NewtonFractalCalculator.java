@@ -6,7 +6,7 @@ import de.felixperko.fractals.system.numbers.Number;
 import de.felixperko.fractals.system.numbers.impl.DoubleComplexNumber;
 import de.felixperko.fractals.system.statistics.IStats;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
-import de.felixperko.fractals.system.systems.common.BFOrbitCommon;
+import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 
@@ -55,7 +55,7 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 			for (int sample = 0 ; sample < samples ; sample++){
 				if (cancelled)
 					break loop;
-				ComplexNumber current = systemContext.getParamValue(BFOrbitCommon.PARAM_ZSTART, ComplexNumber.class, chunk.chunkPos, pixel, sample).copy();
+				ComplexNumber current = systemContext.getParamValue(CommonFractalParameters.PARAM_ZSTART, ComplexNumber.class, chunk.chunkPos, pixel, sample).copy();
 //				boolean test = current.realDouble() == -2. && current.imagDouble() == -2.;
 				ComplexNumber c = systemContext.getParamValue("c", ComplexNumber.class, chunk.chunkPos, pixel, sample);
 				ComplexNumber copy1;

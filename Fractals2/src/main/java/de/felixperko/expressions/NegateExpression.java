@@ -1,11 +1,12 @@
 package de.felixperko.expressions;
 
 import java.util.List;
+import java.util.Set;
 
 import de.felixperko.fractals.system.calculator.ComputeInstruction;
 import de.felixperko.fractals.system.numbers.NumberFactory;
 
-public class NegateExpression implements FractalsExpression {
+public class NegateExpression extends AbstractExpression {
 	
 	FractalsExpression subExpr;
 	
@@ -74,6 +75,18 @@ public class NegateExpression implements FractalsExpression {
 	@Override
 	public double getSmoothstepConstant(ComputeExpressionBuilder expressionBuilder) {
 		return subExpr.getSmoothstepConstant(expressionBuilder);
+	}
+
+	@Override
+	public void extractStaticExpressions(List<FractalsExpression> staticSubFractalsExpressions, Set<String> iterateVarNames) {
+		StaticSubExpression staticSubExpr = extractSubExpressionOrPropagate(staticSubFractalsExpressions, iterateVarNames, subExpr);
+		if (staticSubExpr != null)
+			this.subExpr = staticSubExpr;
+	}
+
+	@Override
+	public boolean isStatic(Set<String> iterateVarNames) {
+		return subExpr.isStatic(iterateVarNames);
 	}
 
 }

@@ -2,6 +2,8 @@ package de.felixperko.expressions;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import de.felixperko.fractals.system.calculator.ComputeInstruction;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.NumberFactory;
@@ -14,7 +16,15 @@ public class VariableExpression extends AbstractExpression {
 	int symbolSlot = -1;
 	
 	public VariableExpression(String name){
+		if (name.endsWith("_n"))
+			name = name.substring(0, name.length()-2);
+		else if (name.endsWith("_(n)"))
+			name = name.substring(0, name.length()-4);
 		this.name = name;
+	}
+	
+	public String getVariableName() {
+		return name;
 	}
 
 	@Override
@@ -30,7 +40,11 @@ public class VariableExpression extends AbstractExpression {
 		ExpressionSymbol symbol = expressionBuilder.getReferenceExpressionSymbol(name);
 		resultIndexReal = symbol.getIndexReal(symbolSlot);
 		resultIndexImag = symbol.getIndexImag(symbolSlot);
-		removeVarOccurenceAndIsLast(symbol);
+		boolean last = removeVarOccurenceAndIsLast(symbol);
+		if (last) {
+			resultIndexReal = symbol.getPristineIndexReal();
+			resultIndexImag = symbol.getPristineIndexImag();
+		}
 		//not using pristine slot -> init copy
 		if ((symbol.getPristineIndexReal() != resultIndexReal && resultIndexReal >= 0) || (symbol.getPristineIndexImag() != resultIndexImag && resultIndexImag >= 0)){
 			initCopy(instructions, symbol);
@@ -92,6 +106,15 @@ public class VariableExpression extends AbstractExpression {
 	@Override
 	public double getSmoothstepConstant(ComputeExpressionBuilder expressionBuilder) {
 		return 1;
+	}
+
+	@Override
+	public void extractStaticExpressions(List<FractalsExpression> staticSubFractalsExpressions, Set<String> iterateVarNames) {
+	}
+
+	@Override
+	public boolean isStatic(Set<String> iterateVarNames) {
+		return !iterateVarNames.contains(name);
 	}
 
 }

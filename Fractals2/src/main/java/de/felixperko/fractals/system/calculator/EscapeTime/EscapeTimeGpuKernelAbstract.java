@@ -39,10 +39,10 @@ public abstract class EscapeTimeGpuKernelAbstract extends Kernel {
 		this.device = device;
 		
 		this.kernelParameters = kernelParameters;
-		this.expression = kernelParameters.getExpression().getText();
+		this.expression = kernelParameters.getMainExpression().getText();
 		
-		List<ParamSupplier> paramSuppliers = kernelParameters.getExpression().getParameterList();
-		constantSuppliers = kernelParameters.getExpression().getConstants();
+		List<ParamSupplier> paramSuppliers = kernelParameters.getMainExpression().getParameterList();
+		constantSuppliers = kernelParameters.getMainExpression().getConstants();
 		
 		int pixelCount = kernelParameters.getPixelCount();
 		pixelItArr = new int[pixelCount];
@@ -57,7 +57,7 @@ public abstract class EscapeTimeGpuKernelAbstract extends Kernel {
 		List<Layer> layers = kernelParameters.getLayers();
 		sampleOffsets = new float[layers.get(layers.size()-1).getSampleCount()*2];
 		
-		this.optionsFloat[1] = (float)kernelParameters.getExpression().getSmoothstepConstant();
+		this.optionsFloat[1] = (float)kernelParameters.getMainExpression().getSmoothstepConstant();
 		
 //		this.constantNames = new String[constantNames.size()];
 		this.constants = new double[constantSuppliers.size()*2];

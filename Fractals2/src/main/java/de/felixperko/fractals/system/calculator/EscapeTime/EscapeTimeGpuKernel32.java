@@ -30,9 +30,9 @@ public abstract class EscapeTimeGpuKernel32 extends EscapeTimeGpuKernelAbstract{
 //			this.constants[i*2+1] = value.imagDouble();
 //		}
 		
-		List<ComputeInstruction> instructions = kernelParameters.getExpression().getInstructions();
+		List<ComputeInstruction> instructions = kernelParameters.getMainExpression().getInstructions();
 		
-		int dataBufferSize = kernelParameters.getExpression().getRequiredVariableSlots();
+		int dataBufferSize = kernelParameters.getMainExpression().getRequiredVariableSlots();
 		int instructionsBufferSize = 2+instructions.size();
 		this.instructions = new int[instructionsBufferSize];
 		this.instructions[0] = instructionsBufferSize;

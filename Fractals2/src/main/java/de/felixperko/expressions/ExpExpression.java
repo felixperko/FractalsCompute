@@ -265,6 +265,21 @@ public class ExpExpression extends AbstractExpression {
 	public boolean isSingleImagExpression() {
 		return singleImagExpression;
 	}
+
+	@Override
+	public void extractStaticExpressions(List<FractalsExpression> staticSubFractalsExpressions, Set<String> iterateVarNames) {
+		StaticSubExpression staticBase = extractSubExpressionOrPropagate(staticSubFractalsExpressions, iterateVarNames, baseExpr);
+		StaticSubExpression staticExp = extractSubExpressionOrPropagate(staticSubFractalsExpressions, iterateVarNames, expExpr);
+		if (staticBase != null)
+			baseExpr = staticBase;
+		if (staticExp != null)
+			expExpr = staticExp;
+	}
+
+	@Override
+	public boolean isStatic(Set<String> iterateVarNames) {
+		return baseExpr.isStatic(iterateVarNames) && expExpr.isStatic(iterateVarNames);
+	}
 	
 
 }

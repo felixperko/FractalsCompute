@@ -19,12 +19,12 @@ import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.infra.Selection;
 
-public class BFOrbitCommon {
+public class CommonFractalParameters {
 	
 	public static final int DEFAULT_CHUNK_SIZE = 256;
 	
 	public static String PARAM_ZSTART = "z_0";
-	public static String PARAM_EXPRESSION = "z_(n+1) = ";
+	public static String PARAM_EXPRESSIONS = "z_(n+1) = ";
 	
 	public static ParamValueType integerType = new ParamValueType("integer");
 	public static ParamValueType doubleType = new ParamValueType("double");
@@ -39,6 +39,8 @@ public class BFOrbitCommon {
 	public static ParamValueType numberfactoryType = new ParamValueType("numberfactory",
 			new ParamValueField("numberClass", classType, DoubleNumber.class),
 			new ParamValueField("complexNumberClass", classType, DoubleComplexNumber.class));
+	
+	public static ParamValueType expressionsType = new ParamValueType("expressions");
 	
 	public static ParamValueType arraychunkfactoryType = new ParamValueType("arraychunkfactory",
 			new ParamValueField("chunkClass", classType, ReducedNaiveChunk.class),
@@ -97,13 +99,13 @@ public class BFOrbitCommon {
 		mandelbrot_calculator_defs.add(new ParamDefinition("c", "Calculator", varList, complexnumberType)
 				.withDescription("The shift parameter that is applied at every calculation step.")
 				.withHints("ui-element[default]:plane soft-min=-2 soft-max=2", "ui-element:fields"));
-		mandelbrot_calculator_defs.add(new ParamDefinition(BFOrbitCommon.PARAM_ZSTART, "Calculator", varList, complexnumberType)
+		mandelbrot_calculator_defs.add(new ParamDefinition(CommonFractalParameters.PARAM_ZSTART, "Calculator", varList, complexnumberType)
 				.withDescription("The input number parameter that is used for the first calculation step.")
 				.withHints("ui-element[default]:plane soft-min=-2 soft-max=2", "ui-element:fields"));
 
 		List<ParamDefinition> custom_calculator_defs = new ArrayList<>();
 		List<ParamSupplier> custom_calculator_defaults = new ArrayList<>();
-		custom_calculator_defs.add(new ParamDefinition(BFOrbitCommon.PARAM_EXPRESSION, "Calculator", StaticParamSupplier.class, stringType)
+		custom_calculator_defs.add(new ParamDefinition(CommonFractalParameters.PARAM_EXPRESSIONS, "Calculator", StaticParamSupplier.class, expressionsType)
 				.withDescription("The formula of the fractal"));
 		custom_calculator_defs.add(new ParamDefinition("precision", "Calculator", StaticParamSupplier.class, selectionType)
 				.withDescription("Bits of precision. Increase if image becomes pixelated."));
@@ -119,7 +121,7 @@ public class BFOrbitCommon {
 		parameterConfiguration.addCalculatorParameters("FibonacciPowCalculator", mandelbrot_calculator_defs, null);
 		
 		List<ParamDefinition> newton_calculator_defs = new ArrayList<>();
-		newton_calculator_defs.add(new ParamDefinition(BFOrbitCommon.PARAM_ZSTART, "Calculator", CoordinateBasicShiftParamSupplier.class, complexnumberType)
+		newton_calculator_defs.add(new ParamDefinition(CommonFractalParameters.PARAM_ZSTART, "Calculator", CoordinateBasicShiftParamSupplier.class, complexnumberType)
 				.withDescription("The start position for Newton's method."));
 		
 		parameterConfiguration.addCalculatorParameters("NewtonThridPowerMinusOneCalculator", newton_calculator_defs, null);									//TODO test -> newton_calculator_defs!

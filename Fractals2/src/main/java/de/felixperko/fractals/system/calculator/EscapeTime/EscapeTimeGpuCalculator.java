@@ -14,6 +14,7 @@ import com.aparapi.internal.kernel.KernelPreferences;
 import com.aparapi.internal.model.CacheEnabler;
 
 import de.felixperko.expressions.ComputeExpressionBuilder;
+import de.felixperko.expressions.ComputeExpressionDomain;
 import de.felixperko.fractals.FractalsMain;
 import de.felixperko.fractals.data.AbstractArrayChunk;
 import de.felixperko.fractals.data.BorderAlignment;
@@ -23,12 +24,13 @@ import de.felixperko.fractals.system.calculator.ComputeKernelParameters;
 import de.felixperko.fractals.system.calculator.infra.AbstractFractalsCalculator;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.Number;
+import de.felixperko.fractals.system.parameters.ExpressionsParam;
 import de.felixperko.fractals.system.parameters.suppliers.CoordinateBasicShiftParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.statistics.IStats;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
-import de.felixperko.fractals.system.systems.common.BFOrbitCommon;
+import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
 import de.felixperko.fractals.util.NumberUtil;
@@ -93,18 +95,13 @@ public class EscapeTimeGpuCalculator extends AbstractFractalsCalculator{
 	
 	private EscapeTimeGpuKernelAbstract getCurrentKernel(int pixelCount, List<Layer> layers) {
 		
-		String new_expression = systemContext.getParamContainer().getClientParameter(BFOrbitCommon.PARAM_EXPRESSION).getGeneral(String.class);
+		ExpressionsParam expressions = systemContext.getParamContainer().getClientParameter(CommonFractalParameters.PARAM_EXPRESSIONS).getGeneral(ExpressionsParam.class);
 		
-		String inputVarName = null;
-		if (new_expression.contains("X")) inputVarName = "X";
-		if (new_expression.contains("x")) inputVarName = "x";
-		if (new_expression.contains("Z")) inputVarName = "Z";
-		if (new_expression.contains("z")) inputVarName = "z";
+		ComputeExpressionBuilder expressionBuilder = new ComputeExpressionBuilder(expressions, systemContext.getParamContainer().getClientParameters());
 		
-		ComputeExpressionBuilder expressionBuilder = new ComputeExpressionBuilder(new_expression, inputVarName, systemContext.getParamContainer().getClientParameters());
-		ComputeExpression expression = expressionBuilder.getComputeExpression();
+		ComputeExpressionDomain expressionDomain = expressionBuilder.getComputeExpressionDomain(false);
 		
-		if (expression == null)
+		if (expressionDomain == null)
 			throw new InvalidParameterException("The input expression can't be parsed");
 		
 		String precisionString = systemContext.getParamValue("precision", String.class);
@@ -119,7 +116,7 @@ public class EscapeTimeGpuCalculator extends AbstractFractalsCalculator{
 			}
 		}
 		
-		ComputeKernelParameters kernelParams = new ComputeKernelParameters(expression, layers, pixelCount, precision);
+		ComputeKernelParameters kernelParams = new ComputeKernelParameters(expressionDomain, layers, pixelCount, precision);
 		EscapeTimeGpuKernelAbstract kernel = FractalsMain.getManagers().getResourceManager().getGpuKernelManager().getKernel(kernelParams, systemContext.getParamContainer());
 		
 //		CacheEnabler.setCachesEnabled(false);
