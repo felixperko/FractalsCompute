@@ -54,13 +54,14 @@ public class ConstantExpression extends AbstractExpression {
 			boolean copyVariable) {
 		
 		complexNumber = numberFactory.createComplexNumber(real, imag);
-		name = "CONST_EXPR_"+complexNumber.toString();
+		name = "CON_"+complexNumber.toString();
 		
 		ExpressionSymbol varSymbol = expressionBuilder.getValueExpressionSymbol(name);
 		expressionBuilder.setExplicitValue(name, complexNumber);
-		varSymbol.addOccurence();
-		if (copyVariable)
+		if (copyVariable) {
+			varSymbol.addOccurence();
 			symbolSlot = varSymbol.getSlot(true, true);
+		}
 	}
 
 	@Override
@@ -72,6 +73,11 @@ public class ConstantExpression extends AbstractExpression {
 		if (symbol.getPristineIndexReal() != resultIndexReal || symbol.getPristineIndexImag() != resultIndexImag){
 			initCopy(instructions, symbol);
 		}
+	}
+	
+	@Override
+	public FractalsExpression getFirstChildlessExpression() {
+		return this;
 	}
 	
 	@Override

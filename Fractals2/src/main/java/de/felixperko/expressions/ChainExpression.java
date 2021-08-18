@@ -38,7 +38,7 @@ public class ChainExpression extends AbstractExpression {
 			boolean copyVariable) {
 		boolean first = true;
 		for (FractalsExpression subExpr : subExpressions){
-			subExpr.registerSymbolUses(expressionBuilder, numberFactory, !first);
+			subExpr.registerSymbolUses(expressionBuilder, numberFactory, first);
 			if (first)
 				first = false;
 		}
@@ -136,6 +136,11 @@ public class ChainExpression extends AbstractExpression {
 				instructions.add(new ComputeInstruction(partInstructions.get(i-1), tempResultIndexReal, subExpr.getResultIndexReal(), -1, -1));
 			}
 		}
+	}
+	
+	@Override
+	public FractalsExpression getFirstChildlessExpression() {
+		return subExpressions.get(0).getFirstChildlessExpression();
 	}
 
 	@Override

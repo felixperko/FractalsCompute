@@ -13,7 +13,7 @@ import de.felixperko.fractals.system.task.Layer;
 
 public class ComputeKernelParameters {
 	
-	ComputeExpressionDomain expressionDomain;;
+	ComputeExpressionDomain expressionDomain;
 	int precision;
 	int pixelCount;
 	List<Layer> layers;
@@ -31,17 +31,17 @@ public class ComputeKernelParameters {
 	
 	public boolean isCompartible(ComputeKernelParameters other, ParamContainer params){
 		
-		ComputeExpression expression = expressionDomain.getMainExpressions().get(0);
+		ComputeExpression firstExpression = expressionDomain.getMainExpressions().get(0);
 		
 		//check basic values and array sizes
-		if (this.precision != other.precision || this.pixelCount != other.pixelCount || expression.instructions.size() != expression.instructions.size())
+		if (this.precision != other.precision || this.pixelCount != other.pixelCount || !this.expressionDomain.equals(other.expressionDomain))
 			return false;
 		if ((this.layers == null) != (other.layers == null) || (this.layers != null && (this.layers.size() != other.layers.size())))
 			return false;
 		
 		//check expression instructions
-		for (int i = 0 ; i < expression.instructions.size() ; i++){
-			if (!expression.instructions.get(i).equals(expression.instructions.get(i)))
+		for (int i = 0 ; i < firstExpression.instructions.size() ; i++){
+			if (!firstExpression.instructions.get(i).equals(firstExpression.instructions.get(i)))
 				return false;
 		}
 
@@ -52,7 +52,7 @@ public class ComputeKernelParameters {
 				String name = e.getKey();
 				ParamSupplier supp = params.getClientParameter(name);
 				if (supp == null){
-					if (expression.getConstants().containsKey(name))
+					if (firstExpression.getConstants().containsKey(name))
 						continue;
 					else
 						return false;

@@ -235,6 +235,11 @@ public class ExpExpression extends AbstractExpression {
 		}
 		return 0;
 	}
+	
+	@Override
+	public FractalsExpression getFirstChildlessExpression() {
+		return baseExpr.getFirstChildlessExpression();
+	}
 
 	@Override
 	public boolean hasTempResult() {

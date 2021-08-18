@@ -10,7 +10,7 @@ import javax.imageio.stream.*;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.sun.imageio.plugins.png.PNGMetadata;
+//import com.sun.imageio.plugins.png.PNGMetadata;
 
 //Source:   https://stackoverflow.com/a/8735707
 //			https://stackoverflow.com/a/41282314
@@ -66,17 +66,23 @@ public class ImageMetadataHelper {
 	    IIOMetadata metadata = imageReader.getImageMetadata(0);
 
 	    //this cast helps getting the contents
-	    PNGMetadata pngmeta = (PNGMetadata) metadata; 
-	    NodeList childNodes = pngmeta.getStandardTextNode().getChildNodes();
-
-	    for (int i = 0; i < childNodes.getLength(); i++) {
-	        Node node = childNodes.item(i);
-	        String keyword = node.getAttributes().getNamedItem("keyword").getNodeValue();
-	        String value = node.getAttributes().getNamedItem("value").getNodeValue();
-	        if(key.equals(keyword)){
-	            return value;
-	        }
-	    }
+	    
+	    
+	    
+//TODO disabled Image metadata!
+	    
+	    
+//	    PNGMetadata pngmeta = (PNGMetadata) metadata; 
+//	    NodeList childNodes = pngmeta.getStandardTextNode().getChildNodes();
+//
+//	    for (int i = 0; i < childNodes.getLength(); i++) {
+//	        Node node = childNodes.item(i);
+//	        String keyword = node.getAttributes().getNamedItem("keyword").getNodeValue();
+//	        String value = node.getAttributes().getNamedItem("value").getNodeValue();
+//	        if(key.equals(keyword)){
+//	            return value;
+//	        }
+//	    }
 	    return null;
 	}
 

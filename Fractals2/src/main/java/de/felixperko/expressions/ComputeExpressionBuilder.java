@@ -103,8 +103,15 @@ public class ComputeExpressionBuilder {
 		
 		NumberFactory nf = new NumberFactory(DoubleNumber.class, DoubleComplexNumber.class);
 		
-		for (FractalsExpression expression : processExpressions)
-			expression.registerSymbolUses(this, nf, true);
+		int ind = 0;
+		for (FractalsExpression expression : processExpressions) {
+			String inputVar = varNames.get(ind);
+			ind++;
+			FractalsExpression firstExpr = expression.getFirstChildlessExpression();
+			boolean startsWithInputVar = firstExpr instanceof VariableExpression && ((VariableExpression)firstExpr).getVariableName().equals(inputVar);
+			//identity doesn't need a copy
+			expression.registerSymbolUses(this, nf, !startsWithInputVar);
+		}
 
 		int copyCounter = 0;
 		
@@ -169,6 +176,10 @@ public class ComputeExpressionBuilder {
 	
 	public ExpressionSymbol getValueExpressionSymbol(String name){
 		return getSymbol(valueSymbols, name);
+	}
+	
+	public ExpressionSymbol getExpressionSymbol(String name) {
+		return getSymbol(allSymbols, name);
 	}
 	
 	private ExpressionSymbol getSymbol(LinkedHashMap<String, ExpressionSymbol> symbolList, String name){

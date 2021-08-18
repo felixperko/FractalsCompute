@@ -57,4 +57,35 @@ public class ComputeExpressionDomain {
 		}
 		return map;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((mainExpressions == null) ? 0 : mainExpressions.hashCode());
+		result = prime * result + ((staticExpressions == null) ? 0 : staticExpressions.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ComputeExpressionDomain other = (ComputeExpressionDomain) obj;
+		if (mainExpressions == null) {
+			if (other.mainExpressions != null)
+				return false;
+		} else if (!mainExpressions.equals(other.mainExpressions))
+			return false;
+		if (staticExpressions == null) {
+			if (other.staticExpressions != null)
+				return false;
+		} else if (!staticExpressions.equals(other.staticExpressions))
+			return false;
+		return true;
+	}
 }

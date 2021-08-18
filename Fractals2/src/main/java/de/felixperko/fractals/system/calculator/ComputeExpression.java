@@ -62,13 +62,6 @@ public class ComputeExpression {
 		}
 	}
 	
-	public ComputeExpression(String text, List<ComputeInstruction> instructions, Map<ParamSupplier, Integer> constants, Map<ParamSupplier, Integer> variables) {
-		this.text = text;
-		this.instructions = instructions;
-		this.constants = constants;
-		this.variables = variables;
-	}
-	
 	public String getText(){
 		return text;
 	}

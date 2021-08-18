@@ -28,6 +28,8 @@ public interface FractalsExpression {
 	public int getResultIndexReal();
 	public int getResultIndexImag();
 
+	public FractalsExpression getFirstChildlessExpression();
+
 	
 //	FractalsExpression getDerivative(String derivativeVariableName);
 //	FractalsExpression simplify();

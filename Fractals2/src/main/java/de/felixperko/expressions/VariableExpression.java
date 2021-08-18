@@ -30,9 +30,10 @@ public class VariableExpression extends AbstractExpression {
 	@Override
 	public void registerSymbolUses(ComputeExpressionBuilder expressionBuilder, NumberFactory numberFactory, boolean copyVariable) {
 		ExpressionSymbol varSymbol = expressionBuilder.getReferenceExpressionSymbol(name);
-		addVarOccurence(varSymbol);
-		if (copyVariable)
+		if (copyVariable) {
+			addVarOccurence(varSymbol);
 			symbolSlot = varSymbol.getSlot(true, true);
+		}
 	}
 	
 	@Override
@@ -40,10 +41,12 @@ public class VariableExpression extends AbstractExpression {
 		ExpressionSymbol symbol = expressionBuilder.getReferenceExpressionSymbol(name);
 		resultIndexReal = symbol.getIndexReal(symbolSlot);
 		resultIndexImag = symbol.getIndexImag(symbolSlot);
-		boolean last = removeVarOccurenceAndIsLast(symbol);
-		if (last) {
-			resultIndexReal = symbol.getPristineIndexReal();
-			resultIndexImag = symbol.getPristineIndexImag();
+		if (resultIndexReal != symbol.getPristineIndexReal()) {
+			boolean last = removeVarOccurenceAndIsLast(symbol);
+			if (last) {
+				resultIndexReal = symbol.getPristineIndexReal();
+				resultIndexImag = symbol.getPristineIndexImag();
+			}
 		}
 		//not using pristine slot -> init copy
 		if ((symbol.getPristineIndexReal() != resultIndexReal && resultIndexReal >= 0) || (symbol.getPristineIndexImag() != resultIndexImag && resultIndexImag >= 0)){
@@ -70,7 +73,8 @@ public class VariableExpression extends AbstractExpression {
 	@Override
 	public void addInstructions(List<ComputeInstruction> instructions, ComputeExpressionBuilder expressionBuilder) {
 		ExpressionSymbol symbol = expressionBuilder.getReferenceExpressionSymbol(name);
-		removeVarOccurenceAndIsLast(symbol);
+		
+			removeVarOccurenceAndIsLast(symbol);
 	}
 
 	@Override
@@ -115,6 +119,11 @@ public class VariableExpression extends AbstractExpression {
 	@Override
 	public boolean isStatic(Set<String> iterateVarNames) {
 		return !iterateVarNames.contains(name);
+	}
+	
+	@Override
+	public FractalsExpression getFirstChildlessExpression() {
+		return this;
 	}
 
 }

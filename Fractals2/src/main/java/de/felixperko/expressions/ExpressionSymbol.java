@@ -71,6 +71,10 @@ public class ExpressionSymbol {
 		return slot;
 	}
 	
+	public boolean isSlotUsed(int slot) {
+		return slotsUsed.get(slot);
+	}
+	
 	public void freeVarSlot(int varSlot){
 		this.slotsUsed.set(varSlot, false);
 	}
@@ -156,5 +160,9 @@ public class ExpressionSymbol {
 
 	public String getName() {
 		return name;
+	}
+	
+	public int[] getCopyIndices(){
+		return copyIndices;
 	}
 }

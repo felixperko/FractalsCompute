@@ -41,6 +41,11 @@ public class NegateExpression extends AbstractExpression {
 			instructions.add(new ComputeInstruction(ComputeInstruction.INSTR_NEGATE_PART, subExpr.getResultIndexReal(), -1, -1, -1));
 		}
 	}
+	
+	@Override
+	public FractalsExpression getFirstChildlessExpression() {
+		return subExpr.getFirstChildlessExpression();
+	}
 
 	@Override
 	public boolean isComplexExpression() {

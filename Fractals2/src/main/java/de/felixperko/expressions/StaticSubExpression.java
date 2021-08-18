@@ -101,4 +101,10 @@ public class StaticSubExpression extends AbstractExpression {
 		return true;
 	}
 
+	@Override
+	public FractalsExpression getFirstChildlessExpression() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

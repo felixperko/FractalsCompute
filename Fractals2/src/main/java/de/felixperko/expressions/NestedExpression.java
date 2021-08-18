@@ -70,14 +70,14 @@ public class NestedExpression extends AbstractExpression {
 		if (complex){ //add a complex expression
 			if (instructionComplex >= 0 && !(complexIgnoreReal && complexIgnoreImag)){ //not empty/disabled
 				if (complexIgnoreReal){ //apply to imag part of complex input, ignore other (pass)
-					instructions.add(new ComputeInstruction(instructionPart, contentExpression.getResultIndexImag(), contentExpression.getResultIndexImag(), -1, -1));
+					instructions.add(new ComputeInstruction(instructionPart, contentExpression.getResultIndexImag(), -1, -1, -1));
 				}
 				else if (complexIgnoreImag){ //apply to real part of complex input, ignore other (pass)
-					instructions.add(new ComputeInstruction(instructionPart, contentExpression.getResultIndexReal(), contentExpression.getResultIndexReal(), -1, -1));
+					instructions.add(new ComputeInstruction(instructionPart, contentExpression.getResultIndexReal(), -1, -1, -1));
 				}
 				else { //nothing filtered, apply complex instruction
 					instructions.add(new ComputeInstruction(instructionComplex, contentExpression.getResultIndexReal(), contentExpression.getResultIndexImag(),
-							contentExpression.getResultIndexReal(), contentExpression.getResultIndexImag()));
+							-1, -1));
 				}
 			}
 		} else { //add a part expression
@@ -85,6 +85,11 @@ public class NestedExpression extends AbstractExpression {
 					instructions.add(new ComputeInstruction(instructionPart, contentExpression.getResultIndexReal(), contentExpression.getResultIndexReal(), -1, -1));
 			}
 		}
+	}
+	
+	@Override
+	public FractalsExpression getFirstChildlessExpression() {
+		return contentExpression.getFirstChildlessExpression();
 	}
 
 	@Override

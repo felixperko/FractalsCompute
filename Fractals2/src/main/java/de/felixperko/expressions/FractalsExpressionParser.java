@@ -296,20 +296,4 @@ public class FractalsExpressionParser {
 		}
 		return bracketTerms;
 	}
-	
-//	private static FractalsExpression tryPolynom(String input){
-//		//factor*x^b + c*x^d
-//		String[] summands = input.split("\\+");
-//		Map<String, Boolean> dashParts = new HashMap<>(); //dashPart, negative
-//		for (int i = 0 ; i < summands.length ; i++){
-//			String summand = summands[i];
-//			String[] substractions = summand.split("-");
-//			if (substractions.length == 1)
-//				dashParts.put(summand, false);
-//			for (String substraction : substractions){
-//				dashParts.put(substraction, true);
-//			}
-//		}
-//		
-//	}
 }
