@@ -137,7 +137,7 @@ public class EscapeTimeCpuCalculatorNew extends AbstractFractalsCalculator{
 		ComputeKernelParameters kernelParameters = tl_kernelParameters.get();
 		if (kernelParameters == null || !kernelParameters.isCompartible(newKernelParameters, systemContext.getParamContainer())){
 			tl_kernelParameters.set(newKernelParameters);
-			EscapeTimeCpuKernelNew newKernel = (EscapeTimeCpuKernelNew) kernel_factory.createKernelCpu(EscapeTimeCpuKernelNew.class, newKernelParameters);
+			EscapeTimeCpuKernelNew newKernel = (EscapeTimeCpuKernelNew) kernel_factory.createKernelCpu(EscapeTimeCpuKernelGeneralized.class, newKernelParameters);
 			tl_kernel.set(newKernel);
 		}
 		return tl_kernel.get();

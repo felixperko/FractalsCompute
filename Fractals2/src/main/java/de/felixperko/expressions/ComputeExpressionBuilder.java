@@ -108,9 +108,10 @@ public class ComputeExpressionBuilder {
 			String inputVar = varNames.get(ind);
 			ind++;
 			FractalsExpression firstExpr = expression.getFirstChildlessExpression();
-			boolean startsWithInputVar = firstExpr instanceof VariableExpression && ((VariableExpression)firstExpr).getVariableName().equals(inputVar);
-			//identity doesn't need a copy
-			expression.registerSymbolUses(this, nf, !startsWithInputVar);
+//			boolean startsWithInputVar = firstExpr instanceof VariableExpression && ((VariableExpression)firstExpr).getVariableName().equals(inputVar);
+//			//identity doesn't need a copy
+//			expression.registerSymbolUses(this, nf, !startsWithInputVar);
+			expression.registerSymbolUses(this, nf, false);
 		}
 
 		int copyCounter = 0;

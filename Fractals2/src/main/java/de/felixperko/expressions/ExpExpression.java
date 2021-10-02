@@ -108,7 +108,7 @@ public class ExpExpression extends AbstractExpression {
 	@Override
 	public void registerSymbolUses(ComputeExpressionBuilder expressionBuilder, NumberFactory numberFactory,
 			boolean copyVariable) {
-		baseExpr.registerSymbolUses(expressionBuilder, numberFactory, true);
+		baseExpr.registerSymbolUses(expressionBuilder, numberFactory, copyVariable);
 		expExpr.registerSymbolUses(expressionBuilder, numberFactory, false);
 	}
 
@@ -212,12 +212,15 @@ public class ExpExpression extends AbstractExpression {
 
 	@Override
 	public double getSmoothstepConstant(ComputeExpressionBuilder expressionBuilder) {
+
+		double baseSmoothstepConstant = baseExpr.getSmoothstepConstant(expressionBuilder);
+
 		ParamSupplier supplier = null;
 		if (expExpr instanceof VariableExpression){
 			supplier = expressionBuilder.parameters.get(((VariableExpression)expExpr).name);
 		}
 		if (expExpr instanceof ConstantExpression){
-			return ((ConstantExpression)expExpr).complexNumber.absDouble();
+			return baseSmoothstepConstant * ((ConstantExpression)expExpr).complexNumber.absDouble();
 		}
 		
 		if (supplier == null)
@@ -230,7 +233,7 @@ public class ExpExpression extends AbstractExpression {
 			if (obj instanceof ComplexNumber){
 				double r = ((ComplexNumber)obj).realDouble();
 				double i = ((ComplexNumber)obj).imagDouble();
-				return Math.sqrt(r*r + i*i);
+				return baseSmoothstepConstant * Math.sqrt(r*r + i*i);
 			}
 		}
 		return 0;

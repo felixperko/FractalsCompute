@@ -19,6 +19,7 @@ public class ExpressionSymbol {
 	private int occurences = 0;
 	private int occurencesReal = 0;
 	private int occurencesImag = 0;
+	private boolean modified = false;
 	
 	private int pristineIndex;
 	private int[] copyIndices;
@@ -164,5 +165,13 @@ public class ExpressionSymbol {
 	
 	public int[] getCopyIndices(){
 		return copyIndices;
+	}
+
+	public boolean isModified() {
+		return modified;
+	}
+
+	public void setModified(boolean modified) {
+		this.modified = modified;
 	}
 }

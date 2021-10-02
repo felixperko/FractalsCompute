@@ -30,8 +30,8 @@ public class VariableExpression extends AbstractExpression {
 	@Override
 	public void registerSymbolUses(ComputeExpressionBuilder expressionBuilder, NumberFactory numberFactory, boolean copyVariable) {
 		ExpressionSymbol varSymbol = expressionBuilder.getReferenceExpressionSymbol(name);
+		addVarOccurence(varSymbol);
 		if (copyVariable) {
-			addVarOccurence(varSymbol);
 			symbolSlot = varSymbol.getSlot(true, true);
 		}
 	}
@@ -43,11 +43,12 @@ public class VariableExpression extends AbstractExpression {
 		resultIndexImag = symbol.getIndexImag(symbolSlot);
 		if (resultIndexReal != symbol.getPristineIndexReal()) {
 			boolean last = removeVarOccurenceAndIsLast(symbol);
-			if (last) {
+			if (last && !symbol.isModified()) {
 				resultIndexReal = symbol.getPristineIndexReal();
 				resultIndexImag = symbol.getPristineIndexImag();
 			}
 		}
+		symbol.setModified(true);
 		//not using pristine slot -> init copy
 		if ((symbol.getPristineIndexReal() != resultIndexReal && resultIndexReal >= 0) || (symbol.getPristineIndexImag() != resultIndexImag && resultIndexImag >= 0)){
 			initCopy(instructions, symbol);
@@ -109,6 +110,7 @@ public class VariableExpression extends AbstractExpression {
 
 	@Override
 	public double getSmoothstepConstant(ComputeExpressionBuilder expressionBuilder) {
+		//TODO only for current inputVar, otherwise return 0?
 		return 1;
 	}
 

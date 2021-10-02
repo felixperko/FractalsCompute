@@ -97,11 +97,11 @@ public class CommonFractalParameters {
 				.withDescription("The exponent parameter that is applied at every calculation step.")
 				.withHints("ui-element[default]: fields", "ui-element:plane soft-min=-2 soft-max=2"));
 		mandelbrot_calculator_defs.add(new ParamDefinition("c", "Calculator", varList, complexnumberType)
-				.withDescription("The shift parameter that is applied at every calculation step.")
+				.withDescription("The shift parameter that is added at every calculation step.")
 				.withHints("ui-element[default]:plane soft-min=-2 soft-max=2", "ui-element:fields"));
 		mandelbrot_calculator_defs.add(new ParamDefinition(CommonFractalParameters.PARAM_ZSTART, "Calculator", varList, complexnumberType)
 				.withDescription("The input number parameter that is used for the first calculation step.")
-				.withHints("ui-element[default]:plane soft-min=-2 soft-max=2", "ui-element:fields"));
+				.withHints("ui-element[default]:slider soft-min=-2 soft-max=2", "ui-element:fields"));
 
 		List<ParamDefinition> custom_calculator_defs = new ArrayList<>();
 		List<ParamSupplier> custom_calculator_defaults = new ArrayList<>();

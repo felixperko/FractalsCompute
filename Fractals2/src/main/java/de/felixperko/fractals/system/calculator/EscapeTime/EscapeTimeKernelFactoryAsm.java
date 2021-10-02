@@ -79,7 +79,9 @@ public class EscapeTimeKernelFactoryAsm implements IGpuKernelFactory{
 	}
 
 	public ComputeKernel createKernelCpu(Class<? extends ComputeKernel> kernelClass, ComputeKernelParameters kernelParameters) {
-		Class<?> clazz = createClass(kernelParameters.getMainExpression(), kernelClass, DeviceType.CPU);
+		
+		boolean createClass = kernelClass != EscapeTimeCpuKernelGeneralized.class;
+		Class<?> clazz = !createClass ? kernelClass : createClass(kernelParameters.getMainExpression(), kernelClass, DeviceType.CPU);
 		
 		ComputeKernel kernel = null;
 		try {
