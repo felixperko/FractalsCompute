@@ -1,0 +1,2 @@
+include 'Fractals2'
+//project('Fractals2').projectDir = new File('C:/Users/Felix/git/FractalsCompute/')

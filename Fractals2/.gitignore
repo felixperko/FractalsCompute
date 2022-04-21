@@ -1,1 +1,3 @@
-bin/de/
+/bin/
+/.gradle/
+/build/

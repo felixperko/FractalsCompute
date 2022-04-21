@@ -1,0 +1,25 @@
+// class version 52.0 (52)
+// access flags 0x1
+public class de/felixperko/fractals/util/codegen/AsmImpl implements de/felixperko/fractals/util/codegen/IAsm {
+
+
+  // access flags 0x1
+  public <init>()V
+    ALOAD 0
+    INVOKESPECIAL java/lang/Object.<init> ()V
+    RETURN
+    MAXSTACK = 1
+    MAXLOCALS = 1
+
+  // access flags 0x1
+  public add(II)I
+   L0
+    ILOAD 1
+    ILOAD 2
+    IADD
+   L1
+   L2
+    IRETURN
+    MAXSTACK = 2
+    MAXLOCALS = 3
+}
