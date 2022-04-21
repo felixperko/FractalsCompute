@@ -137,7 +137,7 @@ public class EscapeTimeCpuCalculatorNew extends AbstractFractalsCalculator{
 		ComputeKernelParameters kernelParameters = tl_kernelParameters.get();
 		if (kernelParameters == null || !kernelParameters.isCompartible(newKernelParameters, systemContext.getParamContainer())){
 			tl_kernelParameters.set(newKernelParameters);
-			EscapeTimeCpuKernelNew newKernel = (EscapeTimeCpuKernelNew) kernel_factory.createKernelCpu(EscapeTimeCpuKernelGeneralized.class, newKernelParameters);
+			EscapeTimeCpuKernelNew newKernel = (EscapeTimeCpuKernelNew) kernel_factory.createKernelCpu(EscapeTimeCpuKernelGeneral.class, newKernelParameters);
 			tl_kernel.set(newKernel);
 		}
 		return tl_kernel.get();
@@ -148,8 +148,8 @@ public class EscapeTimeCpuCalculatorNew extends AbstractFractalsCalculator{
 	}
 	
 	
-	public void setTraceCount(int traceCount){
-		getCurrentKernel().setTraces(traceCount);
+	public void setTraceCount(int traceCount, boolean tracePerInstruction){
+		getCurrentKernel().setTraces(traceCount, tracePerInstruction);
 	}
 	
 	private void sample_first_success(AbstractArrayChunk chunk, EscapeTimeCpuKernelNew kernel, int upsample, int maxIterations,

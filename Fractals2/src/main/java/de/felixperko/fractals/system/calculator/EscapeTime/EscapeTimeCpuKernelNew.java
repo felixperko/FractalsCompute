@@ -20,8 +20,10 @@ public abstract class EscapeTimeCpuKernelNew implements ComputeKernel {
 	
     int traceArrayFilledSize = 0;
     int tracesCount = 0;
+    boolean tracePerInstruction = true;
     double[] tracesReal = null;
     double[] tracesImag = null;
+    double[] tracesIterations = null;
 	
 	public EscapeTimeCpuKernelNew(ComputeKernelParameters kernelParameters) {
 		
@@ -51,12 +53,13 @@ public abstract class EscapeTimeCpuKernelNew implements ComputeKernel {
 		this.smoothstepConstant = kernelParameters.getMainExpression().getSmoothstepConstant();
 	}
 	
-	public void setTraces(int count){
+	public void setTraces(int count, boolean tracePerInstruction){
 		this.tracesCount = count;
+		this.tracePerInstruction = tracePerInstruction;
 	}
 	
 	public double[][] getTraces(){
-		return new double[][]{tracesReal, tracesImag};
+		return new double[][]{tracesReal, tracesImag, tracesIterations};
 	}
 	
 	public float run(int pixel, double[] params, float[] sampleOffsets, int chunkSize, int currentSamples, int maxIterations, double limitSq) {
@@ -77,16 +80,21 @@ public abstract class EscapeTimeCpuKernelNew implements ComputeKernel {
 		if (tracesCount > 0){
 			tracesReal = new double[tracesCount];
 			tracesImag = new double[tracesCount];
+			tracesIterations = new double[tracesCount];
+
+			tracesReal[0] = data[0];
+			tracesImag[0] = data[1];
+			tracesIterations[0] = 0.0;
 		}
 		
 		boolean finished = false;
 		for (int pixelIt = 0; pixelIt < maxIterations ; pixelIt++){
 
 			//trace
-			if (pixelIt < tracesCount){
-				tracesReal[pixelIt] = data[0];
-				tracesImag[pixelIt] = data[1];
-			}
+//			if (pixelIt < tracesCount){
+//				tracesReal[pixelIt] = data[0];
+//				tracesImag[pixelIt] = dCata[1];
+//			}
 			
 			iterate(0);
 			
@@ -96,10 +104,10 @@ public abstract class EscapeTimeCpuKernelNew implements ComputeKernel {
 				result = (float) (pixelIt + 1 - Math.log(Math.log(data[0]*data[0] + data[1]*data[1])*0.5 / Math.log(2)) /smoothstepConstant);
 				
 				//trace end position
-				if (pixelIt+1 < tracesCount){
-					tracesReal[pixelIt+1] = data[0];
-					tracesImag[pixelIt+1] = data[1];
-				}
+//				if (pixelIt+1 < tracesCount){
+//					tracesReal[pixelIt+1] = data[0];
+//					tracesImag[pixelIt+1] = data[1];
+//				}
 				break;
 			}
 		}
@@ -273,6 +281,23 @@ public abstract class EscapeTimeCpuKernelNew implements ComputeKernel {
 	@Override
 	public void instr_mult_part(int p1, int p2) {
 		data[p1] = data[p1]*data[p2];
+	}
+	
+	@Override
+	public void instr_div_complex(int r1, int i1, int r2, int i2) {
+		//determine reciprocal for complex number r2, i2
+		double temp = data[r1]*data[r2] + data[i1]*data[i2];
+		double temp2 = data[r2]*data[r2] + data[i2]*data[i2];
+		data[i1] = data[i1]*data[r2] - data[r1]*data[i2];
+		if (temp2 != 0.){
+			data[r1] = temp/temp2;
+			data[i1] = data[i1]/temp2;
+		}
+	}
+	
+	@Override
+	public void instr_div_part(int p1, int p2) {
+		data[p1] /= data[p2];
 	}
 	
 	@Override

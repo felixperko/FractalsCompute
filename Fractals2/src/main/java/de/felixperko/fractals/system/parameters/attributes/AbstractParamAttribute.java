@@ -19,4 +19,18 @@ public abstract class AbstractParamAttribute<T> implements ParamAttribute<T> {
 	public String getQualifiedName() {
 		return prefix+"."+name;
 	}
+	
+	@Override
+	public T getMinValue() {
+		return null;
+	}
+	
+	@Override
+	public T getMaxValue() {
+		return null;
+	}
+	
+	@Override
+	public void setRange(Object newMin, Object newMax) {
+	}
 }

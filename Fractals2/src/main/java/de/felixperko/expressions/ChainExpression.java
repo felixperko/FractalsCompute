@@ -1,5 +1,6 @@
 package de.felixperko.expressions;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -23,11 +24,17 @@ public class ChainExpression extends AbstractExpression {
 	int tempResultIndexImag = -1;
 	int tempResultSlot = -1;
 	
-	boolean complexExpression = false;
+	boolean complexExpression = true;
 	boolean singleRealExpression = false;
 	boolean singleImagExpression = false;
 	
 	public ChainExpression(List<FractalsExpression> subExpressions, List<Integer> partLinkInstructions, List<Integer> complexLinkInstructions) {
+		int counter = 0;
+		for (FractalsExpression expr : subExpressions) {
+			if (expr == null)
+				throw new IllegalArgumentException("expression "+counter+" in chain expression is null");
+			counter++;
+		}
 		this.subExpressions = subExpressions;
 		this.partInstructions = partLinkInstructions;
 		this.complexInstructions = complexLinkInstructions;
@@ -39,15 +46,19 @@ public class ChainExpression extends AbstractExpression {
 		boolean first = true;
 		for (FractalsExpression subExpr : subExpressions){
 			boolean isModifyingPart = !(subExpr instanceof VariableExpression || subExpr instanceof ConstantExpression);
-			subExpr.registerSymbolUses(expressionBuilder, numberFactory, first || isModifyingPart);
-			if (first)
-				first = false;
+			boolean isOutputVar = subExpr instanceof VariableExpression && ((VariableExpression)subExpr).name.equals(expressionBuilder.inputVarName);
+			boolean copySubVar = (first && copyVariable) || (!first && (isOutputVar || isModifyingPart));
+			subExpr.registerSymbolUses(expressionBuilder, numberFactory, copySubVar);
+			first = false;
 		}
 	}
 
 	@Override
 	public void addInitInstructions(List<ComputeInstruction> instructions, ComputeExpressionBuilder expressionBuilder) {
-		subExpressions.forEach(expr -> expr.addInitInstructions(instructions, expressionBuilder));
+		for (int i = subExpressions.size()-1 ; i >= 0 ; i--) {
+			subExpressions.get(i).addInitInstructions(instructions, expressionBuilder);
+		}
+//		subExpressions.forEach(expr -> expr.addInitInstructions(instructions, expressionBuilder));
 	}
 
 	@Override
@@ -57,22 +68,22 @@ public class ChainExpression extends AbstractExpression {
 
 	@Override
 	public void addInstructions(List<ComputeInstruction> instructions, ComputeExpressionBuilder expressionBuilder) {
-		int i = 0;
+		int counter = 0;
 		boolean[] addedSubInstructions = new boolean[subExpressions.size()];
 		for (FractalsExpression subExpr : subExpressions){
-			boolean added = addSubInstructions(instructions, expressionBuilder, subExpr, i);
-			addedSubInstructions[i] = added;
+			boolean added = addSubInstructions(instructions, expressionBuilder, subExpr, counter);
+			addedSubInstructions[counter] = added;
 			if (added){
-				registerSubIndices(subExpr, i);
+				registerSubIndices(subExpr, counter);
 			}
-			i++;
+			counter++;
 		}
-		i = 0;
+		counter = 0;
 		for (FractalsExpression subExpr : subExpressions){
-			if (i > 0 && addedSubInstructions[i]){
-				linkSubExpression(instructions, subExpr, i);
+			if (counter > 0 && addedSubInstructions[counter]){
+				linkSubExpression(instructions, subExpr, counter);
 			}
-			i++;
+			counter++;
 		}
 		
 		if (singleImagExpression){ //still uses "real" slot since single value
@@ -98,9 +109,11 @@ public class ChainExpression extends AbstractExpression {
 				} else if (subExpr.isSingleRealExpression()){
 					tempResultIndexReal = subExpr.getResultIndexReal();
 					singleRealExpression = true;
+					complexExpression = false;
 				} else {
 					tempResultIndexImag = subExpr.getResultIndexReal();//still uses "real" slot since single value
 					singleImagExpression = true;
+					complexExpression = false;
 				}
 			}
 		} else {
@@ -125,17 +138,15 @@ public class ChainExpression extends AbstractExpression {
 	}
 
 	protected void linkSubExpression(List<ComputeInstruction> instructions, FractalsExpression subExpr, int i) {
-		if (i > 0){
-			if (complexExpression){
-				if (subExpr.isComplexExpression())
-					instructions.add(new ComputeInstruction(complexInstructions.get(i-1), tempResultIndexReal, tempResultIndexImag, subExpr.getResultIndexReal(), subExpr.getResultIndexImag()));
-				else if (subExpr.isSingleRealExpression() && subExpr.getResultIndexReal() != tempResultIndexReal)
-					instructions.add(new ComputeInstruction(partInstructions.get(i-1), tempResultIndexReal, subExpr.getResultIndexReal(), -1, -1));
-				else if (subExpr.isSingleImagExpression() && subExpr.getResultIndexReal() != tempResultIndexImag)
-					instructions.add(new ComputeInstruction(partInstructions.get(i-1), tempResultIndexImag, subExpr.getResultIndexReal(), -1, -1));
-			} else {
+		if (complexExpression){
+			if (subExpr.isComplexExpression())
+				instructions.add(new ComputeInstruction(complexInstructions.get(i-1), tempResultIndexReal, tempResultIndexImag, subExpr.getResultIndexReal(), subExpr.getResultIndexImag()));
+			else if (subExpr.isSingleRealExpression() && subExpr.getResultIndexReal() != tempResultIndexReal)
 				instructions.add(new ComputeInstruction(partInstructions.get(i-1), tempResultIndexReal, subExpr.getResultIndexReal(), -1, -1));
-			}
+			else if (subExpr.isSingleImagExpression() && subExpr.getResultIndexReal() != tempResultIndexImag)
+				instructions.add(new ComputeInstruction(partInstructions.get(i-1), tempResultIndexImag, subExpr.getResultIndexReal(), -1, -1));
+		} else {
+			instructions.add(new ComputeInstruction(partInstructions.get(i-1), tempResultIndexReal, subExpr.getResultIndexReal(), -1, -1));
 		}
 	}
 	
@@ -202,6 +213,29 @@ public class ChainExpression extends AbstractExpression {
 				return false;
 		}
 		return true;
+	}
+	
+	@Override
+	public FractalsExpression getDerivative(String derivativeVariableName) {
+		List<FractalsExpression> derivExpressions = new ArrayList<>();
+		for (FractalsExpression expr : subExpressions)
+			derivExpressions.add(expr.getDerivative(derivativeVariableName));
+		return new ChainExpression(derivExpressions, partInstructions, complexInstructions);
+	}
+
+	@Override
+	public boolean modifiesFirstVariable() {
+		return subExpressions.size() > 1;
+	}
+
+	@Override
+	public FractalsExpression copy() {
+		List<FractalsExpression> subExpressions = new ArrayList<>();
+		for (FractalsExpression expr : this.subExpressions)
+			subExpressions.add(expr.copy());
+		List<Integer> partInstructions = new ArrayList<>(this.partInstructions);
+		List<Integer> complexInstructions = new ArrayList<>(this.complexInstructions);
+		return new ChainExpression(subExpressions, partInstructions, complexInstructions);
 	}
 	
 }

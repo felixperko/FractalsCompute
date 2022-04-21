@@ -41,7 +41,7 @@ public class FractalsExpressionParser {
 		}
 	};
 	
-	public static FractalsExpression parse(String input){
+	public static FractalsExpression parse(String input) throws IllegalArgumentException, IllegalStateException{
 		
 		input = input.trim();
 		
@@ -76,15 +76,15 @@ public class FractalsExpressionParser {
 				//TODO remove risk of stack overflow, not sure under which conditions it occurs, but it has something to do with the '*'...
 				if (input.matches("[a-zA-Z]([a-zA-Z0-9]*)(_n)?")){
 					if (input.equalsIgnoreCase("pi"))
-						return new ConstantExpression(Math.PI, 0);
+						return new ConstantExpression(Math.PI, 0, "CON_pi");
 					if (input.equalsIgnoreCase("e"))
-						return new ConstantExpression(Math.E, 0);
+						return new ConstantExpression(Math.E, 0, "CON_e");
 					return new VariableExpression(input);
 				}
 			} catch (StackOverflowError e) {
 				System.err.println("Stackoverflow while parsing expression");
 				System.err.println(e.getMessage());
-				return null;
+				throw new IllegalStateException("Parse error: Stackoverflow");
 			}
 		}
 		
@@ -247,8 +247,7 @@ public class FractalsExpressionParser {
 //		
 //		List<String> bracketParts = splitBrackets(input, '(', ')');
 		
-		
-		return null;
+		throw new IllegalArgumentException("No parsable expression found");
 	}
 	
 	/**

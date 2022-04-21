@@ -14,6 +14,7 @@ public class VariableExpression extends AbstractExpression {
 	int resultIndexReal = -1;
 	int resultIndexImag = -1;
 	int symbolSlot = -1;
+	boolean varModifiable = false;
 	
 	public VariableExpression(String name){
 		if (name.endsWith("_n"))
@@ -31,6 +32,7 @@ public class VariableExpression extends AbstractExpression {
 	public void registerSymbolUses(ComputeExpressionBuilder expressionBuilder, NumberFactory numberFactory, boolean copyVariable) {
 		ExpressionSymbol varSymbol = expressionBuilder.getReferenceExpressionSymbol(name);
 		addVarOccurence(varSymbol);
+		this.varModifiable = varSymbol.isModifiable();
 		if (copyVariable) {
 			symbolSlot = varSymbol.getSlot(true, true);
 		}
@@ -41,14 +43,19 @@ public class VariableExpression extends AbstractExpression {
 		ExpressionSymbol symbol = expressionBuilder.getReferenceExpressionSymbol(name);
 		resultIndexReal = symbol.getIndexReal(symbolSlot);
 		resultIndexImag = symbol.getIndexImag(symbolSlot);
-		if (resultIndexReal != symbol.getPristineIndexReal()) {
-			boolean last = removeVarOccurenceAndIsLast(symbol);
-			if (last && !symbol.isModified()) {
-				resultIndexReal = symbol.getPristineIndexReal();
-				resultIndexImag = symbol.getPristineIndexImag();
-			}
-		}
-		symbol.setModified(true);
+		boolean last = removeVarOccurenceAndIsLast(symbol);
+//		if (symbolSlot < 0 || (last && varModifiable)) {
+//			resultIndexReal = symbol.getPristineIndexReal();
+//			resultIndexImag = symbol.getPristineIndexImag();
+//			symbol.setModified(true);
+//		}
+		
+//		if (resultIndexReal != symbol.getPristineIndexReal()) {
+//			if (last && !symbol.isModified()) {
+//				resultIndexReal = symbol.getPristineIndexReal();
+//				resultIndexImag = symbol.getPristineIndexImag();
+//			}
+//		}
 		//not using pristine slot -> init copy
 		if ((symbol.getPristineIndexReal() != resultIndexReal && resultIndexReal >= 0) || (symbol.getPristineIndexImag() != resultIndexImag && resultIndexImag >= 0)){
 			initCopy(instructions, symbol);
@@ -126,6 +133,24 @@ public class VariableExpression extends AbstractExpression {
 	@Override
 	public FractalsExpression getFirstChildlessExpression() {
 		return this;
+	}
+
+	@Override
+	public FractalsExpression getDerivative(String derivativeVariableName) {
+		if (name.equals(derivativeVariableName))
+			return new ConstantExpression(1f, 0f);
+		else
+			return new ConstantExpression(0f, 0f);
+	}
+
+	@Override
+	public boolean modifiesFirstVariable() {
+		return false;
+	}
+
+	@Override
+	public FractalsExpression copy() {
+		return new VariableExpression(name);
 	}
 
 }

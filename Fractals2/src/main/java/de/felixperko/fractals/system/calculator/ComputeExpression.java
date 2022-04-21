@@ -12,6 +12,8 @@ import de.felixperko.fractals.data.ParamContainer;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.parameters.ParamConfiguration;
 import de.felixperko.fractals.system.parameters.ParamDefinition;
+import de.felixperko.fractals.system.parameters.suppliers.CoordinateDiscreteParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.CoordinateModuloParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.MappedParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
@@ -47,14 +49,16 @@ public class ComputeExpression {
 		for (Entry<ParamSupplier, Integer> e : parameters.entrySet()){
 			ParamSupplier supp = e.getKey();
 			Integer index = e.getValue();
+			if (index/2 >= params.length) {
+				throw new IllegalArgumentException("Slot "+index+" invalid for parameter "+supp.getName());
+			}
 			params[index/2] = supp;
-			if (supp instanceof StaticParamSupplier){
+			if (supp instanceof StaticParamSupplier || supp instanceof CoordinateDiscreteParamSupplier){
 				constants.put(supp, index);
-			} else if (supp instanceof MappedParamSupplier){
+			} else if (supp instanceof MappedParamSupplier || supp instanceof CoordinateModuloParamSupplier){
 				variables.put(supp, index);
 			} else {
-				throw new IllegalArgumentException(ComputeExpression.class.getName()+" only supports "+
-				StaticParamSupplier.class.getName()+" and "+MappedParamSupplier.class.getName()+" as parameters.\nGot "+supp == null ? "null" : supp.getClass().getName());
+				throw new IllegalArgumentException(ComputeExpression.class.getName()+" doesn't support "+supp == null ? "null" : supp.getClass().getName());
 			}
 		}
 		for (int i = parameters.size()*2 ; i < requiredVariableSlots ; i+=2){

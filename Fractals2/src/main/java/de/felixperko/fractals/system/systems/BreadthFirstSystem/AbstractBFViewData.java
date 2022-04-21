@@ -1,5 +1,7 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
+import java.io.Serializable;
+
 import de.felixperko.fractals.data.Chunk;
 import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.data.ReducedNaiveChunk;
@@ -19,8 +21,22 @@ public abstract class AbstractBFViewData<VIEWDATA extends AbstractBFViewData<VIE
 	
 	boolean active = false;
 
+	Class<? extends Serializable> compressedCls = null;
+
 	double bufferTimeout = 5;
 	transient NestedMap<Integer, Long> lastSeen = new NestedMap<>();
+	
+	public AbstractBFViewData() {
+	}
+	
+	/**
+	 * @return The class that should be used for the compressed representation to lower network requirements in remote mode.
+	 * null means Compression is disabled.
+	 */
+	public Class<? extends Serializable> getCompressionCls(){
+		return null;
+//		return CompressedChunk.class;
+	}
 	
 	@Override
 	public VIEWDATA setContext(BFSystemContext systemContext) {
@@ -92,18 +108,27 @@ public abstract class AbstractBFViewData<VIEWDATA extends AbstractBFViewData<VIE
 		lastSeen.getOrMakeChild(chunkX).getOrMakeChild(chunkY).setValue(System.nanoTime());
 	}
 
+	/**
+	 * returns the compressed transport object, or the chunk object if compression is disabled 
+	 */
 	@Override
-	public CompressedChunk updateBufferedAndCompressedChunk(Chunk chunk) {
+	public Serializable updateBufferedAndCompressedChunk(Chunk chunk) {
 		updateBufferedChunk(chunk);
 		
 		getViewContainer().updatedBufferedChunk(chunk, this);
 		
-		CompressedChunk compressedChunk = new CompressedChunk((ReducedNaiveChunk) chunk);
-		updateCompressedChunk(compressedChunk, false);
-		
-		getViewContainer().updatedCompressedChunk(compressedChunk, this);
-		
-		return compressedChunk;
+		Class<? extends Serializable> compressionCls = getCompressionCls();
+		if (compressionCls != null) { //compression enabled?
+			if (!(compressionCls.equals(CompressedChunk.class)))
+				throw new IllegalStateException("Only CompressedChunk is supported for the compression class at the moment.");
+			CompressedChunk compressedChunk = new CompressedChunk((ReducedNaiveChunk) chunk);
+			updateCompressedChunk(compressedChunk, false);
+			
+			getViewContainer().updatedCompressedChunk(compressedChunk, this);
+			
+			return compressedChunk;
+		}
+		return chunk;
 	}
 	
 	@Override

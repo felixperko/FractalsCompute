@@ -17,10 +17,39 @@ public class NumberFactory extends JsonAbstractTypedObject implements Serializab
 	Class<? extends ComplexNumber> complexNumberClass;
 	
 	@JsonCreator
-	public NumberFactory(@JsonProperty("numberClass") Class<? extends Number> numberClass, @JsonProperty("complexNumberClass") Class<? extends ComplexNumber> complexNumberClass) {
+	public NumberFactory(
+			@JsonProperty("numberClass") Class<? extends Number> numberClass,
+			@JsonProperty("complexNumberClass") Class<? extends ComplexNumber> complexNumberClass) {
 		super(TYPE_NAME);
 		this.numberClass = numberClass;
 		this.complexNumberClass = complexNumberClass;
+	}
+	
+	public Number cn(double v) {
+		return createNumber(v);
+	}
+	
+	public Number cn(String s) {
+		return createNumber(s);
+	}
+
+	public ComplexNumber ccn(double r, double i) {
+		return createComplexNumber(r, i);
+	}
+	
+	public ComplexNumber ccn(String r, String i) {
+		return createComplexNumber(r, i);
+	}
+	
+	public ComplexNumber ccn(String a_plus_bi) {
+		if (!a_plus_bi.contains("\\+")) {
+			return createComplexNumber(a_plus_bi, "0");
+		} else {
+			String[] split = a_plus_bi.split("\\+");
+			if (split.length != 2)
+				return null;
+			return createComplexNumber(split[0], split[1].replace("*i", ""));
+		}
 	}
 	
 	public Number createNumber(double value) {

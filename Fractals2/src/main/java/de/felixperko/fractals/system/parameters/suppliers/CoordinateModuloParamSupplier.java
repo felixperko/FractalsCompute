@@ -28,7 +28,7 @@ public class CoordinateModuloParamSupplier extends MappedParamSupplier {
 
 	@Override
 	public ParamSupplier copy() {
-		return new CoordinateDiscreteModuloParamSupplier(name);
+		return new CoordinateModuloParamSupplier(name);
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class CoordinateModuloParamSupplier extends MappedParamSupplier {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		CoordinateDiscreteModuloParamSupplier other = (CoordinateDiscreteModuloParamSupplier) obj;
+		CoordinateModuloParamSupplier other = (CoordinateModuloParamSupplier) obj;
 		if (modulo == null) {
 			if (other.modulo != null)
 				return false;

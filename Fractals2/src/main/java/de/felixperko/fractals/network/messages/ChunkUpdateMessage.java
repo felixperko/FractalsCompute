@@ -1,5 +1,6 @@
 package de.felixperko.fractals.network.messages;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,9 +18,11 @@ public class ChunkUpdateMessage extends SystemServerMessage {
 	List<DataContainer> sharedDataStateUpdates;
 	//ServerStateInfo serverStateInfo;
 	
-	public ChunkUpdateMessage(ClientConnection connection, UUID systemId, CompressedChunk chunk, ServerStateInfo serverStateInfo) {
+	public ChunkUpdateMessage(ClientConnection connection, UUID systemId, Serializable chunk, ServerStateInfo serverStateInfo) {
 		super(systemId);
-		this.chunk = chunk;
+		if (!chunk.getClass().equals(CompressedChunk.class))
+			throw new IllegalArgumentException("Only CompressedChunk is supported for the Chunk class at the moment.");
+		this.chunk = (CompressedChunk)chunk;
 		this.sharedDataStateUpdates = serverStateInfo.getSharedDataUpdates(connection);
 		//this.serverStateInfo = serverStateInfo;
  	}

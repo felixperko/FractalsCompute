@@ -27,6 +27,12 @@ public class ConstantExpression extends AbstractExpression {
 		this.real = real+"";
 		this.imag = imag+"";
 	}
+	
+	public ConstantExpression(double real, double imag, String name) {
+		this.real = real+"";
+		this.imag = imag+"";
+		this.name = name;
+	}
 
 //	@Override
 //	public void registerVariableUses(Map<String, ExpressionSymbol> variables, String inputVar) {
@@ -54,7 +60,8 @@ public class ConstantExpression extends AbstractExpression {
 			boolean copyVariable) {
 		
 		complexNumber = numberFactory.createComplexNumber(real, imag);
-		name = "CON_"+complexNumber.toString();
+		if (name == null)
+			name = "CON_"+complexNumber.toString();
 		
 		ExpressionSymbol varSymbol = expressionBuilder.getValueExpressionSymbol(name);
 		expressionBuilder.setExplicitValue(name, complexNumber);
@@ -127,6 +134,11 @@ public class ConstantExpression extends AbstractExpression {
 
 	@Override
 	public double getSmoothstepConstant(ComputeExpressionBuilder expressionBuilder) {
+//		double r = Double.parseDouble(real);
+//		double i = Double.parseDouble(imag);
+//		double mod = Math.sqrt(r*r+i*i);
+//		return mod;
+//		return mod == 0 ? 0 : Math.log(mod);
 		return 0;
 	}
 
@@ -137,6 +149,21 @@ public class ConstantExpression extends AbstractExpression {
 	@Override
 	public boolean isStatic(Set<String> iterateVarNames) {
 		return true;
+	}
+
+	@Override
+	public FractalsExpression getDerivative(String derivativeVariableName) {
+		return new ConstantExpression(0, 0);
+	}
+
+	@Override
+	public boolean modifiesFirstVariable() {
+		return false;
+	}
+
+	@Override
+	public FractalsExpression copy() {
+		return new ConstantExpression(real, imag);
 	}
 
 }

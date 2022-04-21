@@ -107,4 +107,19 @@ public class StaticSubExpression extends AbstractExpression {
 		return null;
 	}
 
+	@Override
+	public FractalsExpression getDerivative(String derivativeVariableName) {
+		return new StaticSubExpression(containedExpression.getDerivative(derivativeVariableName));
+	}
+
+	@Override
+	public boolean modifiesFirstVariable() {
+		return false;
+	}
+
+	@Override
+	public FractalsExpression copy() {
+		return new StaticSubExpression(containedExpression.copy());
+	}
+
 }

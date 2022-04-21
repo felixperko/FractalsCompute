@@ -15,6 +15,8 @@ import de.felixperko.fractals.system.parameters.ParamValueType;
 import de.felixperko.fractals.system.parameters.ParamConfiguration;
 import de.felixperko.fractals.system.parameters.ParamDefinition;
 import de.felixperko.fractals.system.parameters.suppliers.CoordinateBasicShiftParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.CoordinateDiscreteParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.CoordinateModuloParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.infra.Selection;
@@ -60,9 +62,11 @@ public class CommonFractalParameters {
 		};
 		parameterConfiguration.addValueTypes(types);
 		
-		List<Class<? extends ParamSupplier>> varList = new ArrayList<>();
-		varList.add(StaticParamSupplier.class);
-		varList.add(CoordinateBasicShiftParamSupplier.class);
+		List<Class<? extends ParamSupplier>> suppClasses = new ArrayList<>();
+		suppClasses.add(StaticParamSupplier.class);
+		suppClasses.add(CoordinateBasicShiftParamSupplier.class);
+		suppClasses.add(CoordinateDiscreteParamSupplier.class);
+		suppClasses.add(CoordinateModuloParamSupplier.class);
 
 		List<ParamDefinition> defs = new ArrayList<>();
 		List<ParamSupplier> defaultValues = new ArrayList<>();
@@ -73,9 +77,9 @@ public class CommonFractalParameters {
 				.withDescription("Choose the calculator to render different fractals."));
 		defaultValues.add(new StaticParamSupplier("calculator", "CustomCalculator"));
 		
-		defs.add(new ParamDefinition("midpoint", "Position", StaticParamSupplier.class, complexnumberType)
+		defs.add(new ParamDefinition("midpoint", "Mapping", StaticParamSupplier.class, complexnumberType)
 				.withDescription("The current default coordinate center."));
-		defs.add(new ParamDefinition("numberFactory", "Position", StaticParamSupplier.class, numberfactoryType)
+		defs.add(new ParamDefinition("numberFactory", "Mapping", StaticParamSupplier.class, numberfactoryType)
 				.withDescription("Manages the used number and complex number class."));
 		defaultValues.add(new StaticParamSupplier("numberFactory", nf));
 		
@@ -93,13 +97,13 @@ public class CommonFractalParameters {
 		parameterConfiguration.addDefaultValues(defaultValues);
 
 		List<ParamDefinition> mandelbrot_calculator_defs = new ArrayList<>();
-		mandelbrot_calculator_defs.add(new ParamDefinition("pow", "Calculator", varList, complexnumberType)
+		mandelbrot_calculator_defs.add(new ParamDefinition("pow", "Calculator", suppClasses, complexnumberType)
 				.withDescription("The exponent parameter that is applied at every calculation step.")
 				.withHints("ui-element[default]: fields", "ui-element:plane soft-min=-2 soft-max=2"));
-		mandelbrot_calculator_defs.add(new ParamDefinition("c", "Calculator", varList, complexnumberType)
+		mandelbrot_calculator_defs.add(new ParamDefinition("c", "Calculator", suppClasses, complexnumberType)
 				.withDescription("The shift parameter that is added at every calculation step.")
 				.withHints("ui-element[default]:plane soft-min=-2 soft-max=2", "ui-element:fields"));
-		mandelbrot_calculator_defs.add(new ParamDefinition(CommonFractalParameters.PARAM_ZSTART, "Calculator", varList, complexnumberType)
+		mandelbrot_calculator_defs.add(new ParamDefinition(CommonFractalParameters.PARAM_ZSTART, "Calculator", suppClasses, complexnumberType)
 				.withDescription("The input number parameter that is used for the first calculation step.")
 				.withHints("ui-element[default]:slider soft-min=-2 soft-max=2", "ui-element:fields"));
 

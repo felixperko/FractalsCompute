@@ -140,4 +140,20 @@ public class NestedExpression extends AbstractExpression {
 		return contentExpression.isStatic(iterateVarNames);
 	}
 
+	@Override
+	public FractalsExpression getDerivative(String derivativeVariableName) {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public boolean modifiesFirstVariable() {
+		return instructionPart != -1 || instructionComplex != -1 || contentExpression.modifiesFirstVariable();
+	}
+
+	@Override
+	public FractalsExpression copy() {
+		return new NegateExpression(contentExpression.copy());
+	}
+
 }

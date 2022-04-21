@@ -29,8 +29,11 @@ public interface FractalsExpression {
 	public int getResultIndexImag();
 
 	public FractalsExpression getFirstChildlessExpression();
-
 	
-//	FractalsExpression getDerivative(String derivativeVariableName);
+	FractalsExpression getDerivative(String derivativeVariableName);
 //	FractalsExpression simplify();
+
+	public boolean modifiesFirstVariable();
+
+	public FractalsExpression copy();
 }

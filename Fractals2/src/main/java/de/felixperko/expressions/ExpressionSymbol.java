@@ -1,7 +1,9 @@
 package de.felixperko.expressions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.felixperko.fractals.system.calculator.ComputeInstruction;
 
@@ -19,12 +21,15 @@ public class ExpressionSymbol {
 	private int occurences = 0;
 	private int occurencesReal = 0;
 	private int occurencesImag = 0;
+	private boolean modifiable = false;
 	private boolean modified = false;
 	
-	private int pristineIndex;
+	private int pristineIndex; //TODO "originalIndex" would be more fitting now since the slot might get modified at the last usage
 	private int[] copyIndices;
 	
-	private boolean copiesAdded = false;
+	private boolean visible = true;
+	
+	private Map<String, ExpressionSymbolTempVariant> variants = new HashMap<>();
 	
 	public ExpressionSymbol(String name, boolean outputVar){
 		this.name = name;
@@ -87,7 +92,8 @@ public class ExpressionSymbol {
 	
 	public int assignCopyIndices(int copyCounter){
 		this.copyIndices = new int[slotsCounter];
-		int startCopiesIndex = outputVar ? 1 : 0;
+		int startCopiesIndex = 0;
+//		int startCopiesIndex = outputVar ? 1 : 0;
 		for (int i = startCopiesIndex ; i < slotsCounter ; i++){
 			copyIndices[i] = copyCounter;
 			if (slotReal.get(i))
@@ -101,7 +107,8 @@ public class ExpressionSymbol {
 	public int getIndexReal(int symbolSlot) {
 		if (symbolSlot < 0)
 			return getPristineIndexReal();
-		boolean pristine = outputVar;
+		boolean pristine = false;
+//		boolean pristine = outputVar;
 		if (pristine){
 			for (int i = 0 ; i < symbolSlot ; i++){
 				if (slotReal.get(i)){
@@ -118,7 +125,8 @@ public class ExpressionSymbol {
 	public int getIndexImag(int symbolSlot) {
 		if (symbolSlot < 0)
 			return getPristineIndexImag();
-		boolean pristine = outputVar;
+//		boolean pristine = outputVar;
+		boolean pristine = false;
 		if (pristine){
 			for (int i = 0 ; i < symbolSlot ; i++){
 				if (slotImag.get(i)){
@@ -173,5 +181,29 @@ public class ExpressionSymbol {
 
 	public void setModified(boolean modified) {
 		this.modified = modified;
+	}
+
+	public boolean isVisible() {
+		return visible;
+	}
+
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+	}
+	
+	public void setModifiable(boolean modifiable) {
+		this.modifiable = modifiable;
+	}
+
+	public boolean isModifiable() {
+		return modifiable;
+	}
+	
+	public ExpressionSymbolTempVariant getVariant(String name) {
+		ExpressionSymbolTempVariant existing = variants.get(name);
+		if (existing != null)
+			return existing;
+		ExpressionSymbolTempVariant variant = new ExpressionSymbolTempVariant(name);
+		return variant;
 	}
 }

@@ -1,5 +1,6 @@
 package de.felixperko.fractals.system.systems.infra;
 
+import java.io.Serializable;
 import java.util.List;
 
 import de.felixperko.fractals.data.Chunk;
@@ -23,7 +24,7 @@ public interface BufferedChunkedViewData<CONTEXT extends SystemContext<?>> exten
 	//compressed chunk operations
 	boolean insertCompressedChunk(CompressedChunk compressedChunk, boolean insertBuffered);
 	boolean updateCompressedChunk(CompressedChunk compressedChunk, boolean updateBuffered);
-	CompressedChunk updateBufferedAndCompressedChunk(Chunk chunk);
+	Serializable updateBufferedAndCompressedChunk(Chunk chunk);
 	CompressedChunk getCompressedChunk(Integer chunkX, Integer chunkY);
 	List<CompressedChunk> getCompressedChunks();
 	boolean hasCompressedChunk(Integer chunkX, Integer chunkY);

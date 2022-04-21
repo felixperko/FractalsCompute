@@ -1,12 +1,12 @@
 package de.felixperko.fractals.manager.server;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.felixperko.fractals.data.CompressedChunk;
 import de.felixperko.fractals.manager.common.INetworkManager;
 import de.felixperko.fractals.manager.common.NetworkManager;
 import de.felixperko.fractals.network.ClientConfiguration;
@@ -95,7 +95,7 @@ public class ServerNetworkManager extends NetworkManager implements INetworkMana
 		return getClientConnection(senderInfo.getClientId());
 	}
 
-	public ChunkUpdateMessage updateChunk(ClientConfiguration client, CalcSystem system, CompressedChunk compressedChunk) {
+	public ChunkUpdateMessage updateChunk(ClientConfiguration client, CalcSystem system, Serializable compressedChunk) {
 		ClientConnection connection = client.getConnection();
 		if (connection != null){
 			ChunkUpdateMessage message = new ChunkUpdateMessage(connection, system.getId(), compressedChunk, managers.getSystemManager().getStateInfo());

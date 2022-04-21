@@ -94,4 +94,19 @@ public class NegateExpression extends AbstractExpression {
 		return subExpr.isStatic(iterateVarNames);
 	}
 
+	@Override
+	public FractalsExpression getDerivative(String derivativeVariableName) {
+		return this;
+	}
+
+	@Override
+	public boolean modifiesFirstVariable() {
+		return true;
+	}
+
+	@Override
+	public FractalsExpression copy() {
+		return new NegateExpression(subExpr.copy());
+	}
+
 }

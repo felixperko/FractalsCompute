@@ -84,8 +84,8 @@ public class VariablePartExpression extends VariableExpression {
 		return false;
 	}
 	
-	@Override
-	public int getResultIndexImag() {
-		return -1;
-	}
+//	@Override
+//	public int getResultIndexImag() {
+//		return -1;
+//	}
 }

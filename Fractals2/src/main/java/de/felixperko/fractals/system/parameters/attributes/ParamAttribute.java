@@ -11,5 +11,10 @@ public interface ParamAttribute<T> {
 	Class<?> getAttributeClass();
 	
 	T getValue();
+	
+	T getMinValue();
+	T getMaxValue();
+	
 	void applyValue(Object value);
+	void setRange(Object newMin, Object newMax);
 }

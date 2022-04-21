@@ -54,6 +54,10 @@ public interface ComputeKernel {
 
 	void instr_mult_part(int p1, int p2);
 
+	void instr_div_complex(int r1, int i1, int r2, int i2);
+	
+	void instr_div_part(int p1, int p2);
+
 	void instr_pow_complex_or_square(int r1, int i1, int r2, int i2);
 
 	void instr_pow_complex(int r1, int i1, int r2, int i2);

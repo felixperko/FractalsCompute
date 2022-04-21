@@ -11,7 +11,7 @@ import de.felixperko.fractals.system.systems.infra.SystemContext;
  * 1,2 1,2 2,2 2,2
  * 1,2 1,2 2,2 2,2
  */
-public class CoordinateDiscreteModuloParamSupplier extends MappedParamSupplier{
+public class CoordinateDiscreteParamSupplier extends MappedParamSupplier{
 	
 	private static final long serialVersionUID = -7923917428809913571L;
 	
@@ -19,11 +19,11 @@ public class CoordinateDiscreteModuloParamSupplier extends MappedParamSupplier{
 	Number modulo;
 	ComplexNumber offset;
 
-	public CoordinateDiscreteModuloParamSupplier(String name) {
+	public CoordinateDiscreteParamSupplier(String name) {
 		super(name);
 	}
 	
-	public CoordinateDiscreteModuloParamSupplier(String name, Number modulo, Number stepSize, ComplexNumber offset) {
+	public CoordinateDiscreteParamSupplier(String name, Number modulo, Number stepSize, ComplexNumber offset) {
 		super(name);
 		this.modulo = modulo;
 		this.stepSize = stepSize;
@@ -32,7 +32,7 @@ public class CoordinateDiscreteModuloParamSupplier extends MappedParamSupplier{
 
 	@Override
 	public ParamSupplier copy() {
-		return new CoordinateDiscreteModuloParamSupplier(name);
+		return new CoordinateDiscreteParamSupplier(name);
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class CoordinateDiscreteModuloParamSupplier extends MappedParamSupplier{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		CoordinateDiscreteModuloParamSupplier other = (CoordinateDiscreteModuloParamSupplier) obj;
+		CoordinateDiscreteParamSupplier other = (CoordinateDiscreteParamSupplier) obj;
 		if (modulo == null) {
 			if (other.modulo != null)
 				return false;

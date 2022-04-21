@@ -23,7 +23,7 @@ import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 
 public class ComputeExpressionBuilder {
 	
-	List<FractalsExpression> expressions;
+//	List<FractalsExpression> expressions;
 	
 	List<String> inputStrings = new ArrayList<>();
 	List<String> varNames = new ArrayList<>();
@@ -67,17 +67,22 @@ public class ComputeExpressionBuilder {
 		return computeExpressions != null && !computeExpressions.isEmpty() ? computeExpressions.get(0) : null;
 	}
 	
-	public ComputeExpressionDomain getComputeExpressionDomain(boolean extractStaticExpressions){
-		
-		Map<ParamSupplier, Integer> mappedParams = new HashMap<>();
-		
-		expressions = new ArrayList<>();
-		List<FractalsExpression> processExpressions = new ArrayList<>();
-		
+	public List<FractalsExpression> getFractalsExpressions() {
+		List<FractalsExpression> expressions = new ArrayList<>();
 		for (String input : inputStrings) {
 			FractalsExpression mainExpression = FractalsExpressionParser.parse(input);
 			expressions.add(mainExpression);
 		}
+		return expressions;
+	}
+	
+	public ComputeExpressionDomain getComputeExpressionDomain(boolean extractStaticExpressions){
+		return getComputeExpressionDomain(extractStaticExpressions, getFractalsExpressions());
+	}
+	
+	public ComputeExpressionDomain getComputeExpressionDomain(boolean extractStaticExpressions, List<FractalsExpression> expressions) {
+		List<FractalsExpression> processExpressions = new ArrayList<>();
+		Map<ParamSupplier, Integer> mappedParams = new HashMap<>();
 		
 		List<FractalsExpression> subFractalsExpressions = new ArrayList<>();
 		if (extractStaticExpressions) {
@@ -108,10 +113,10 @@ public class ComputeExpressionBuilder {
 			String inputVar = varNames.get(ind);
 			ind++;
 			FractalsExpression firstExpr = expression.getFirstChildlessExpression();
-//			boolean startsWithInputVar = firstExpr instanceof VariableExpression && ((VariableExpression)firstExpr).getVariableName().equals(inputVar);
+			boolean startsWithInputVar = firstExpr instanceof VariableExpression && ((VariableExpression)firstExpr).getVariableName().equals(inputVar);
 //			//identity doesn't need a copy
-//			expression.registerSymbolUses(this, nf, !startsWithInputVar);
-			expression.registerSymbolUses(this, nf, false);
+			expression.registerSymbolUses(this, nf, !startsWithInputVar);
+//			expression.registerSymbolUses(this, nf, false);
 		}
 
 		int copyCounter = 0;
@@ -130,8 +135,9 @@ public class ComputeExpressionBuilder {
 		List<ComputeExpression> mainExpressions = new ArrayList<>();
 		List<ComputeExpression> preExpressions = new ArrayList<>();
 		
-		for (FractalsExpression expression : processExpressions)
-			expression.addInitInstructions(instructions, this);
+		for (int i = processExpressions.size()-1 ; i >= 0 ; i--) {
+			processExpressions.get(i).addInitInstructions(instructions, this);
+		}
 		for (FractalsExpression expression : processExpressions)
 			expression.addInstructions(instructions, this);
 		for (FractalsExpression expression : processExpressions)

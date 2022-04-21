@@ -1,5 +1,6 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -370,7 +371,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 
 			if (!paused) {
 				Chunk chunk = task.getChunk();
-				CompressedChunk compressedChunk = activeViewData.updateBufferedAndCompressedChunk(chunk);
+				Serializable compressedChunk = activeViewData.updateBufferedAndCompressedChunk(chunk);
 				
 				//distribute
 				if (task.getStateInfo().getLayer().renderingEnabled()) {

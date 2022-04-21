@@ -30,6 +30,7 @@ public class ComputeInstruction {
 			put(counter++, "INSTR_TANH_COMPLEX");
 			put(counter++, "INSTR_SQUARE_COMPLEX");
 			put(counter++, "INSTR_NEGATE_COMPLEX");
+			put(counter++, "INSTR_RECIPROCAL_COMPLEX");
 			put(counter++, "INSTR_LOG_COMPLEX");
 			
 			counter = OFFSET_INSTR_PART;
@@ -48,6 +49,7 @@ public class ComputeInstruction {
 			put(counter++, "INSTR_TANH_PART");;
 			put(counter++, "INSTR_SQUARE_PART");
 			put(counter++, "INSTR_NEGATE_PART");
+			put(counter++, "INSTR_RECIPROCAL_PART");
 			put(counter++, "INSTR_LOG_PART");
 		}
 	};
@@ -109,7 +111,7 @@ public class ComputeInstruction {
 	
 	@Override
 	public String toString() {
-		return CONSTANT_NAMES.get(type)+" ("+fromReal+", "+fromImag+") -> ("+toReal+", "+toImag+")";
+		return CONSTANT_NAMES.get(type)+" ("+fromReal+", "+fromImag+", "+toReal+", "+toImag+")";
 	}
 
 	@Override

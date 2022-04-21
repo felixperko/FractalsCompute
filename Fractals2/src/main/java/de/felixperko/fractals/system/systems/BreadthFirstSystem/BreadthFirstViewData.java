@@ -1,5 +1,6 @@
 package de.felixperko.fractals.system.systems.BreadthFirstSystem;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -51,9 +52,14 @@ public class BreadthFirstViewData extends AbstractBFViewData<BreadthFirstViewDat
 		boolean overwrite = xMap.containsKey(chunk.getChunkY());
 		xMap.put(chunk.getChunkY(), chunk);
 		lastSeenNow(chunk.getChunkX(), chunk.getChunkY());
-		if (insertCompressedChunk){
-			CompressedChunk compressedChunk = new CompressedChunk((ReducedNaiveChunk)chunk);
-			insertCompressedChunk(compressedChunk, false);
+		if (insertCompressedChunk && compressedCls != null){
+			Class<? extends Serializable> compressionCls = getCompressionCls();
+			if (compressionCls != null) { //compression enabled?
+				if (!(compressionCls.equals(CompressedChunk.class)))
+					throw new IllegalStateException("Only CompressedChunk is supported for the compression class at the moment.");
+				CompressedChunk compressedChunk = new CompressedChunk((ReducedNaiveChunk)chunk);
+				insertCompressedChunk(compressedChunk, false);
+			}
 		}
 		return overwrite;
 	}

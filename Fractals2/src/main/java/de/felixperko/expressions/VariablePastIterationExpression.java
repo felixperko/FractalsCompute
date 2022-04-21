@@ -19,6 +19,7 @@ public class VariablePastIterationExpression extends VariableExpression implemen
 		super.registerSymbolUses(expressionBuilder, numberFactory, copyVariable);
 		ExpressionSymbol symbol = expressionBuilder.getReferenceExpressionSymbol(name);
 		copySlot = symbol.getSlot(true, true);
+		symbol.setVisible(false);
 	}
 	
 	@Override
