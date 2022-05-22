@@ -17,18 +17,18 @@ public class CoordinateModuloParamSupplier extends MappedParamSupplier {
 	
 	Number modulo;
 
-	public CoordinateModuloParamSupplier(String name) {
-		super(name);
+	public CoordinateModuloParamSupplier(String uid) {
+		super(uid);
 	}
 	
-	public CoordinateModuloParamSupplier(String name, Number modulo) {
-		super(name);
+	public CoordinateModuloParamSupplier(String uid, Number modulo) {
+		super(uid);
 		this.modulo = modulo;
 	}
 
 	@Override
 	public ParamSupplier copy() {
-		return new CoordinateModuloParamSupplier(name);
+		return new CoordinateModuloParamSupplier(uid);
 	}
 
 	@Override

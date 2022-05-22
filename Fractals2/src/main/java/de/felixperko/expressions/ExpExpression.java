@@ -3,13 +3,11 @@ package de.felixperko.expressions;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import de.felixperko.fractals.system.calculator.ComputeInstruction;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.NumberFactory;
-import de.felixperko.fractals.system.parameters.suppliers.CoordinateBasicShiftParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.MappedParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
@@ -128,7 +126,7 @@ public class ExpExpression extends AbstractExpression {
 			expParamName = ((ConstantExpression) expExpr).name;
 		} else if (expExpr instanceof VariableExpression) {
 			String variableName = ((VariableExpression) expExpr).name;
-			ParamSupplier supp = expressionBuilder.parameters.get(variableName);
+			ParamSupplier supp = expressionBuilder.paramsByUID.get(variableName);
 			if (supp instanceof StaticParamSupplier) {
 				Object obj = ((StaticParamSupplier) supp).getObj();
 				if (obj instanceof ComplexNumber) {
@@ -307,7 +305,7 @@ public class ExpExpression extends AbstractExpression {
 
 		ParamSupplier supplier = null;
 		if (expExpr instanceof VariableExpression) {
-			supplier = expressionBuilder.parameters.get(((VariableExpression) expExpr).name);
+			supplier = expressionBuilder.paramsByUID.get(((VariableExpression) expExpr).name);
 		}
 		if (expExpr instanceof ConstantExpression) {
 			return baseSmoothstepConstant * ((ConstantExpression) expExpr).complexNumber.absDouble();

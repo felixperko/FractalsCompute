@@ -76,7 +76,7 @@ public class EscapeTimeCpuCalculator
 //
 //		upsample = layer.getUpsample();
 //		maxIterations = layer.getMaxIterations();
-//		maxIterationsGlobal = systemContext.getParamValue("iterations", Integer.class);
+//		maxIterationsGlobal = systemContext.getParamValue(CommonFractalParameters.PARAM_ITERATIONS, Integer.class);
 //		storeEndResults = maxIterations != -1 && maxIterations < maxIterationsGlobal;
 //		if (maxIterations == -1) {
 //			maxIterations = maxIterationsGlobal;

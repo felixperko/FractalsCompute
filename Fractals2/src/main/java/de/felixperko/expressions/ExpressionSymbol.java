@@ -206,4 +206,8 @@ public class ExpressionSymbol {
 		ExpressionSymbolTempVariant variant = new ExpressionSymbolTempVariant(name);
 		return variant;
 	}
+
+	public boolean isOutputVar(){
+		return outputVar;
+	}
 }

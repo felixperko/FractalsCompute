@@ -15,7 +15,7 @@ public abstract class EscapeTimeCpuKernelNew implements ComputeKernel {
 	String expression;
 	Map<String, ParamSupplier> constantSuppliers;
 //	double[] constants;
-	String[] paramNames;
+	String[] paramUids;
 	double smoothstepConstant;
 	
     int traceArrayFilledSize = 0;
@@ -40,9 +40,9 @@ public abstract class EscapeTimeCpuKernelNew implements ComputeKernel {
 //		pixelWasSampled = new int[pixelCount];
 //		
 //		params = new double[paramSuppliers.size()*3];
-		paramNames = new String[paramSuppliers.size()];
+		paramUids = new String[paramSuppliers.size()];
 		for (int i = 0 ; i < paramSuppliers.size() ; i++)
-			paramNames[i] = paramSuppliers.get(i).getName();
+			paramUids[i] = paramSuppliers.get(i).getUID();
 		List<Layer> layers = kernelParameters.getLayers();
 //		sampleOffsets = new float[layers.get(layers.size()-1).getSampleCount()*2];
 		

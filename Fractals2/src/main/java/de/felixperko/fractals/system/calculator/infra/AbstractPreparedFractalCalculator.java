@@ -9,6 +9,7 @@ import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.Number;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.statistics.IStats;
+import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstSystem;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
 import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 import de.felixperko.fractals.system.task.Layer;
@@ -48,16 +49,16 @@ public abstract class AbstractPreparedFractalCalculator extends AbstractFractals
 		this.chunk = chunk;
 		this.taskStats = taskStats;
 		
-		limit = systemContext.getParamValue("limit", Number.class).toDouble();
+		limit = systemContext.getParamValue(BreadthFirstSystem.PARAM_LIMIT, Number.class).toDouble();
 		p_current = systemContext.getParameters().get(CommonFractalParameters.PARAM_ZSTART);
-		p_pow = systemContext.getParameters().get("pow");
-		p_c = systemContext.getParameters().get("c");
+		p_pow = systemContext.getParameters().get(CommonFractalParameters.PARAM_POW);
+		p_c = systemContext.getParameters().get(CommonFractalParameters.PARAM_C);
 		Layer layer = chunk.getCurrentTask().getStateInfo().getLayer();
 
 		upsample = layer.getUpsample();
 		int samples = layer.getSampleCount();
 		maxIterations = layer.getMaxIterations();
-		maxIterationsGlobal = systemContext.getParamValue("iterations", Integer.class);
+		maxIterationsGlobal = systemContext.getParamValue(CommonFractalParameters.PARAM_ITERATIONS, Integer.class);
 		storeEndResults = maxIterations != -1 && maxIterations < maxIterationsGlobal;
 		if (maxIterations == -1) {
 			maxIterations = maxIterationsGlobal;

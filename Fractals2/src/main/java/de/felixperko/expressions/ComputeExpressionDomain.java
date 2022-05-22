@@ -7,6 +7,7 @@ import java.util.Map;
 
 import de.felixperko.fractals.system.calculator.ComputeExpression;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
+import de.felixperko.fractals.system.parameters.ParamDefinition;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 
 public class ComputeExpressionDomain {

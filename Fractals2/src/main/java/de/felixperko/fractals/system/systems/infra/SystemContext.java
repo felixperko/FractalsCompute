@@ -35,6 +35,10 @@ public interface SystemContext<C extends ViewContainer> extends Serializable{
 
 	ParamContainer getParamContainer();
 	Map<String, ParamSupplier> getParameters();
+	
+    Map<String, ParamSupplier> getParametersByName();
+
+    Map<String, ParamSupplier> getParametersByUID();
 
 	Object getParamValue(String parameterKey);
 	<T> T getParamValue(String parameterKey, Class<T> valueCls);

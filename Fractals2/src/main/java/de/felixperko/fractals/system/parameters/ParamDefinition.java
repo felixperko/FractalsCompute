@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 
@@ -13,7 +14,8 @@ public class ParamDefinition implements Serializable{
 
 	ParamConfiguration configuration;
 	
-	String name;
+	String uid;
+	String displayName;
 	String description;
 	List<String> hints = new ArrayList<>();
 	
@@ -27,23 +29,26 @@ public class ParamDefinition implements Serializable{
 	
 	Object defaultValue = null;
 	
-	public ParamDefinition(String name, String category, Class<? extends ParamSupplier> cls, ParamValueType... possibleValueTypes) {
-		this.name = name;
+	public ParamDefinition(String uid, String displayName, String category, Class<? extends ParamSupplier> cls, ParamValueType... possibleValueTypes) {
+		this.uid = uid;
+		this.displayName = displayName;
 		this.category = category;
 		this.possibleClasses = new ArrayList<>();
 		this.possibleValueTypes = Arrays.asList(possibleValueTypes);
 		this.possibleClasses.add(cls);
 	}
 	
-	public ParamDefinition(String name, String category, List<Class<? extends ParamSupplier>> classes, ParamValueType... possibleValueTypes) {
-		this.name = name;
+	public ParamDefinition(String uid, String displayName, String category, List<Class<? extends ParamSupplier>> classes, ParamValueType... possibleValueTypes) {
+		this.uid = uid;
+		this.displayName = displayName;
 		this.category = category;
 		this.possibleClasses = classes;
 		this.possibleValueTypes = Arrays.asList(possibleValueTypes);
 	}
 	
-	public ParamDefinition(String name, String category, ParamValueType possibleValue, Class<? extends ParamSupplier>... classes) {
-		this.name = name;
+	public ParamDefinition(String uid, String displayName, String category, ParamValueType possibleValue, Class<? extends ParamSupplier>... classes) {
+		this.uid = uid;
+		this.displayName = displayName;
 		this.category = category;
 		this.possibleClasses = Arrays.asList(classes);
 		this.possibleValueTypes = new ArrayList<>();
@@ -65,9 +70,13 @@ public class ParamDefinition implements Serializable{
 	public void setConfiguration(ParamConfiguration configuration) {
 		this.configuration = configuration;
 	}
+	
+	public String getUID() {
+		return uid;
+	}
 
 	public String getName() {
-		return name;
+		return displayName;
 	}
 	
 	public String getDescription() {
@@ -150,18 +159,7 @@ public class ParamDefinition implements Serializable{
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((category == null) ? 0 : category.hashCode());
-		result = prime * result + ((defaultValue == null) ? 0 : defaultValue.hashCode());
-		result = prime * result + ((description == null) ? 0 : description.hashCode());
-		result = prime * result + ((hints == null) ? 0 : hints.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((possibleClasses == null) ? 0 : possibleClasses.hashCode());
-		result = prime * result + ((possibleValueTypes == null) ? 0 : possibleValueTypes.hashCode());
-		result = prime * result + (resetRendererOnChange ? 1231 : 1237);
-		result = prime * result + (visible ? 1231 : 1237);
-		return result;
+		return Objects.hash(uid);
 	}
 
 	@Override
@@ -173,45 +171,6 @@ public class ParamDefinition implements Serializable{
 		if (getClass() != obj.getClass())
 			return false;
 		ParamDefinition other = (ParamDefinition) obj;
-		if (category == null) {
-			if (other.category != null)
-				return false;
-		} else if (!category.equals(other.category))
-			return false;
-		if (defaultValue == null) {
-			if (other.defaultValue != null)
-				return false;
-		} else if (!defaultValue.equals(other.defaultValue))
-			return false;
-		if (description == null) {
-			if (other.description != null)
-				return false;
-		} else if (!description.equals(other.description))
-			return false;
-		if (hints == null) {
-			if (other.hints != null)
-				return false;
-		} else if (!hints.equals(other.hints))
-			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		if (possibleClasses == null) {
-			if (other.possibleClasses != null)
-				return false;
-		} else if (!possibleClasses.equals(other.possibleClasses))
-			return false;
-		if (possibleValueTypes == null) {
-			if (other.possibleValueTypes != null)
-				return false;
-		} else if (!possibleValueTypes.equals(other.possibleValueTypes))
-			return false;
-		if (resetRendererOnChange != other.resetRendererOnChange)
-			return false;
-		if (visible != other.visible)
-			return false;
-		return true;
+		return Objects.equals(uid, other.uid);
 	}
 }

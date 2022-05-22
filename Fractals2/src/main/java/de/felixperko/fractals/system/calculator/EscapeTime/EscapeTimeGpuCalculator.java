@@ -29,6 +29,7 @@ import de.felixperko.fractals.system.parameters.suppliers.CoordinateBasicShiftPa
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.statistics.IStats;
+import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstSystem;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
 import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 import de.felixperko.fractals.system.task.Layer;
@@ -64,7 +65,7 @@ public class EscapeTimeGpuCalculator extends AbstractFractalsCalculator{
 		this.chunk = chunk;
 		this.taskStats = taskStats;
 		
-		limit = systemContext.getParamValue("limit", Number.class).toDouble();
+		limit = systemContext.getParamValue(BreadthFirstSystem.PARAM_LIMIT, Number.class).toDouble();
 //		p_current = systemContext.getParameters().get(BFOrbitCommon.PARAM_ZSTART);
 //		p_pow = systemContext.getParameters().get("pow");
 //		p_c = systemContext.getParameters().get("c");
@@ -72,7 +73,7 @@ public class EscapeTimeGpuCalculator extends AbstractFractalsCalculator{
 
 		upsample = layer.getUpsample();
 		maxIterations = layer.getMaxIterations();
-		maxIterationsGlobal = systemContext.getParamValue("iterations", Integer.class);
+		maxIterationsGlobal = systemContext.getParamValue(CommonFractalParameters.PARAM_ITERATIONS, Integer.class);
 		storeEndResults = maxIterations != -1 && maxIterations < maxIterationsGlobal;
 		if (maxIterations == -1) {
 			maxIterations = maxIterationsGlobal;
@@ -95,16 +96,16 @@ public class EscapeTimeGpuCalculator extends AbstractFractalsCalculator{
 	
 	private EscapeTimeGpuKernelAbstract getCurrentKernel(int pixelCount, List<Layer> layers) {
 		
-		ExpressionsParam expressions = systemContext.getParamContainer().getClientParameter(CommonFractalParameters.PARAM_EXPRESSIONS).getGeneral(ExpressionsParam.class);
+		ExpressionsParam expressions = systemContext.getParamContainer().getParam(CommonFractalParameters.PARAM_EXPRESSIONS).getGeneral(ExpressionsParam.class);
 		
-		ComputeExpressionBuilder expressionBuilder = new ComputeExpressionBuilder(expressions, systemContext.getParamContainer().getClientParameters());
+		ComputeExpressionBuilder expressionBuilder = new ComputeExpressionBuilder(expressions, systemContext.getParamContainer().getParamMap(), null);
 		
 		ComputeExpressionDomain expressionDomain = expressionBuilder.getComputeExpressionDomain(false);
 		
 		if (expressionDomain == null)
 			throw new InvalidParameterException("The input expression can't be parsed");
 		
-		String precisionString = systemContext.getParamValue("precision", String.class);
+		String precisionString = systemContext.getParamValue(CommonFractalParameters.PARAM_PRECISION, String.class);
 		int precision = -1;
 		if (precisionString.equalsIgnoreCase("auto"))
 			precision = 32;
@@ -127,7 +128,7 @@ public class EscapeTimeGpuCalculator extends AbstractFractalsCalculator{
 		kernel.optionsInt[0] = maxIterations;
 		kernel.optionsInt[1] = chunkSize;
 		kernel.optionsInt[2] = samples;
-		kernel.optionsFloat[0] = (float)(double)systemContext.getParamValue("limit", Number.class).toDouble();
+		kernel.optionsFloat[0] = (float)(double)systemContext.getParamValue(BreadthFirstSystem.PARAM_LIMIT, Number.class).toDouble();
 
 		for (int i = 0 ; i < layerSampleCount ; i++){
 			ComplexNumber offset = systemContext.getLayerConfiguration().getOffsetForSample(i);
@@ -138,7 +139,7 @@ public class EscapeTimeGpuCalculator extends AbstractFractalsCalculator{
 		paramLoop:
 			for (int i = 0 ; i < kernel.paramNames.length ; i++){
 				String name = kernel.paramNames[i];
-				ParamSupplier supp = systemContext.getParamContainer().getClientParameter(name);
+				ParamSupplier supp = systemContext.getParamContainer().getParam(name);
 				
 				if (supp == null){
 					//search constant
@@ -161,7 +162,7 @@ public class EscapeTimeGpuCalculator extends AbstractFractalsCalculator{
 					kernel.params[i*3+2] = systemContext.getPixelzoom().toDouble();
 				}
 				else
-					throw new IllegalArgumentException("Unsupported ParamSupplier "+supp.getName()+": "+supp.getClass().getName());
+					throw new IllegalArgumentException("Unsupported ParamSupplier "+supp.getUID()+": "+supp.getClass().getName());
 			}
 	}
 

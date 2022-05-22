@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,6 +30,7 @@ public class ComputeExpression {
 	String text;
 
 	ParamSupplier[] params;
+	Map<String, String> uidsByName;
 	
 	Map<String, ComplexNumber> fixedValues;
 	Map<String, ComplexNumber> explicitValues;
@@ -38,7 +40,7 @@ public class ComputeExpression {
 	double smoothstepConstant;
 	
 	public ComputeExpression(String text, List<ComputeInstruction> instructions, Map<ParamSupplier, Integer> parameters, int requiredVariableSlots,
-			Map<String, ComplexNumber> fixedValues, Map<String, ComplexNumber> explicitValues, double smoothstepConstant) {
+							 Map<String, ComplexNumber> fixedValues, Map<String, ComplexNumber> explicitValues, double smoothstepConstant, Map<String, String> uidsByName) {
 		this.text = text;
 		this.instructions = instructions;
 		this.requiredVariableSlots = requiredVariableSlots;
@@ -46,11 +48,12 @@ public class ComputeExpression {
 		this.fixedValues = fixedValues;
 		this.explicitValues = explicitValues;
 		this.smoothstepConstant = smoothstepConstant;
+		this.uidsByName = uidsByName;
 		for (Entry<ParamSupplier, Integer> e : parameters.entrySet()){
 			ParamSupplier supp = e.getKey();
 			Integer index = e.getValue();
 			if (index/2 >= params.length) {
-				throw new IllegalArgumentException("Slot "+index+" invalid for parameter "+supp.getName());
+				throw new IllegalArgumentException("Slot "+index+" invalid for parameter "+supp.getUID());
 			}
 			params[index/2] = supp;
 			if (supp instanceof StaticParamSupplier || supp instanceof CoordinateDiscreteParamSupplier){
@@ -73,6 +76,24 @@ public class ComputeExpression {
 	public List<ParamSupplier> getParameterList() {
 		return Arrays.asList(params);
 	}
+
+	public Map<String, ParamSupplier> getParamsByName(){
+
+		Map<String, ParamSupplier> paramMap = new LinkedHashMap<>();
+		Arrays.stream(params).forEach(e -> paramMap.put(e.getUID(), e));
+
+		Map<String, String> namesByUid = new LinkedHashMap<>();
+		uidsByName.forEach((uid,name) -> {namesByUid.put(name,uid);});
+
+		Map<String, ParamSupplier> paramsByName = new LinkedHashMap<>();
+		for (String uid : paramMap.keySet()){
+			String name = namesByUid.get(uid);
+			if (name == null)
+				name = uid;
+			paramsByName.put(name, paramMap.get(uid));
+		}
+		return paramsByName;
+	}
 	
 	public List<ParamSupplier> getMissingParams(ParamConfiguration paramConfiguration){
 		HashSet<String> definedSet = new HashSet<>();
@@ -81,7 +102,7 @@ public class ComputeExpression {
 		}
 		List<ParamSupplier> list = new ArrayList<>();
         for (ParamSupplier exprParam : params){
-            if (!definedSet.contains(exprParam.getName()))
+            if (!definedSet.contains(exprParam.getUID()))
             	list.add(exprParam);
         }
         return list;
@@ -90,14 +111,14 @@ public class ComputeExpression {
 	public List<String> getConstantNames() {
 		List<String> list = new ArrayList<>();
 		for (ParamSupplier constant : constants.keySet())
-			list.add(constant.getName());
+			list.add(constant.getUID());
 		return list;
 	}
 	
 	public Map<String, ParamSupplier> getConstants(){
 		Map<String, ParamSupplier> res = new HashMap<>();
 		for (ParamSupplier constant : constants.keySet()){
-			res.put(constant.getName(), constant);
+			res.put(constant.getUID(), constant);
 		}
 		return res;
 	}

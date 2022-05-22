@@ -28,10 +28,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.felixperko.fractals.system.PadovanLayerConfiguration;
 import de.felixperko.fractals.system.numbers.impl.DoubleComplexNumber;
 import de.felixperko.fractals.system.parameters.ParamConfiguration;
+import de.felixperko.fractals.system.parameters.ParamDefinition;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstLayer;
+import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstSystem;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
+import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.util.serialization.Compression;
 
@@ -45,30 +48,17 @@ public class ParamContainer implements Serializable{
 	private static final Logger LOG = LoggerFactory.getLogger(ParamContainer.class);
 	private final static String UTF8 = "UTF-8";
 	
-//	public static void main(String[] args) {
-//		ParamContainer container = new ParamContainer();
-//		container.addClientParameter(new StaticParamSupplier("midpoint", new DoubleComplexNumber(0.123, 0.246)));
-//		container.addClientParameter(new StaticParamSupplier("c", new DoubleComplexNumber(0.369, 0.482)));
-//		try {
-//			String serialized = container.serializeBase64();
-//			System.out.println(serialized);
-//			ParamContainer container2 = deserializeBase64(serialized);
-//			System.out.println(container2.getClientParameter("midpoint").getGeneral(DoubleComplexNumber.class).toString());
-//		} catch (IOException | ClassNotFoundException e) {
-//			e.printStackTrace();
-//		}
-//	}
-	
 	public static void main(String[] args) {
-		ParamContainer container = new ParamContainer();
+		ParamConfiguration config = new ParamConfiguration();
+		ParamContainer container = new ParamContainer(config);
 		List<Layer> layers = new ArrayList<>();
 		BreadthFirstLayer layer = new BreadthFirstLayer().with_culling(true).with_max_iterations(1000).with_priority_multiplier(3).with_priority_shift(20).with_samples(42);
 		BreadthFirstLayer layer2 = new BreadthFirstUpsampleLayer(4, 256).with_culling(true).with_rendering(true).with_priority_shift(10);
 		layers.add(layer);
 		layers.add(layer2);
 		PadovanLayerConfiguration layerConfig = new PadovanLayerConfiguration(layers);
-		container.addClientParameter(new StaticParamSupplier("midpoint", new DoubleComplexNumber(1,2)));
-		container.addClientParameter(new StaticParamSupplier("layerConfiguration", layerConfig));
+		container.addParam(new StaticParamSupplier(CommonFractalParameters.PARAM_MIDPOINT, new DoubleComplexNumber(1,2)));
+		container.addParam(new StaticParamSupplier(BreadthFirstSystem.PARAM_LAYER_CONFIG, layerConfig));
 		
 		try {
 			System.out.println(container.serializeJson(false));
@@ -107,33 +97,30 @@ public class ParamContainer implements Serializable{
 	// CLASS
 	//
 	
-	private Map<String, ParamSupplier> clientParameters;
+	private Map<String, ParamSupplier> paramMap;
+	private Map<String, ParamSupplier> paramsByName;
 	private ParamConfiguration paramConfiguration;
 
-	public ParamContainer() {
-		this.clientParameters = new LinkedHashMap<>();
-	}
-	
-	public ParamContainer(List<ParamSupplier> params){
-		this.clientParameters = new LinkedHashMap<>();
-		for (ParamSupplier supp : params){
-			if (supp.getName() == null)
-				throw new IllegalStateException("ParamSupplier doesn't has a name");
-			this.clientParameters.put(supp.getName(), supp);
-		}
-	}
-
-	public ParamContainer(LinkedHashMap<String, ParamSupplier> clientParameters) {
-		this.clientParameters = clientParameters;
+	public ParamContainer(ParamConfiguration paramConfig) {
+		this.paramMap = new LinkedHashMap<>();
+		this.paramsByName = new LinkedHashMap<>();
+		this.paramConfiguration = paramConfig;
 	}
 
 	public ParamContainer(ParamContainer parent, boolean newInstances) {
-		if (!newInstances)
-			this.clientParameters = parent.getClientParameters();
+		this.paramConfiguration = parent.paramConfiguration;
+		if (!newInstances) {
+			this.paramMap = parent.getParamMap();
+			this.paramsByName = parent.paramsByName;
+		}
 		else {
-			this.clientParameters = new LinkedHashMap<String, ParamSupplier>();
-			for (Entry<String, ParamSupplier> e : parent.getClientParameters().entrySet()){
-				this.clientParameters.put(e.getKey(), e.getValue().copy());
+			this.paramMap = new LinkedHashMap<String, ParamSupplier>();
+			this.paramsByName = new LinkedHashMap<String, ParamSupplier>();
+			for (Entry<String, ParamSupplier> e : parent.getParamMap().entrySet()){
+				this.paramMap.put(e.getKey(), e.getValue().copy());
+			}
+			for (Entry<String, ParamSupplier> e : parent.paramsByName.entrySet()){
+				this.paramsByName.put(e.getKey(), this.paramMap.get(e.getValue().getUID()));
 			}
 		}
 	}
@@ -141,11 +128,11 @@ public class ParamContainer implements Serializable{
 	public boolean updateChangedFlag(Map<String, ParamSupplier> oldParams){
 		boolean changed = false;
 		if (oldParams != null) {
-			for (ParamSupplier supplier : clientParameters.values()) {
-				ParamSupplier oldSupp = oldParams.get(supplier.getName());
+			for (ParamSupplier supplier : paramMap.values()) {
+				ParamSupplier oldSupp = oldParams.get(supplier.getUID());
 				supplier.updateChanged(oldSupp);
 				if (supplier.isChanged()) {
-						changed = true;
+					changed = true;
 				}
 			}
 		}
@@ -158,28 +145,28 @@ public class ParamContainer implements Serializable{
 
 	/**
 	 * Applies the given parameters to this container. old values are overwritten and the changed property is updated.
-	 * @param paramContainer - the container to take the new values from
+	 * @param copyContainer - the container to take the new values from
 	 * @param onlyOverrideExisting
 	 */
 	public void applyParams(ParamContainer copyContainer, boolean onlyOverrideExisting) {
-		for (Entry<String, ParamSupplier> e : copyContainer.getClientParameters().entrySet()) {
-			String name = e.getKey();
-			ParamSupplier oldSupplier = this.clientParameters.get(name);
+		for (Entry<String, ParamSupplier> e : copyContainer.getParamMap().entrySet()) {
+			String uid = e.getKey();
+			ParamSupplier oldSupplier = getParam(uid);
 			ParamSupplier newSupplier = e.getValue().copy();
 			if (oldSupplier != null) {
 				newSupplier.updateChanged(oldSupplier);
 			}
 			if (oldSupplier != null || !onlyOverrideExisting) {
-				this.clientParameters.put(name, newSupplier);
+				addParam(newSupplier);
 			}
 		}
 	}
 	
 	public void applyParams(ParamContainer copyContainer, Collection<String> overrideParamNames) {
-		for (Entry<String, ParamSupplier> e : copyContainer.getClientParameters().entrySet()) {
+		for (Entry<String, ParamSupplier> e : copyContainer.getParamMap().entrySet()) {
 			String name = e.getKey();
 			if (overrideParamNames.contains(name))
-				this.clientParameters.put(name, e.getValue().copy());
+				addParam(e.getValue().copy());
 		}
 	}
 
@@ -187,8 +174,8 @@ public class ParamContainer implements Serializable{
 		if (oldParams == null)
 			return true;
 		boolean reset = false;
-		for (ParamSupplier supplier : clientParameters.values()) {
-			supplier.updateChanged(oldParams.get(supplier.getName()));
+		for (ParamSupplier supplier : paramMap.values()) {
+			supplier.updateChanged(oldParams.get(supplier.getUID()));
 			if (supplier.isChanged()) {
 				if (supplier.isSystemRelevant() || supplier.isLayerRelevant())
 					reset = true;
@@ -204,13 +191,13 @@ public class ParamContainer implements Serializable{
 	 * @return
 	 */
 	public ParamContainer createSubContainer(boolean newInstances, String... includeParams) {
-		ParamContainer container = new ParamContainer();
-		for (String paramName : includeParams) {
-			ParamSupplier paramSupplier = this.clientParameters.get(paramName);
-			if (paramSupplier != null) {
-				container.addClientParameter(newInstances ? paramSupplier.copy() : paramSupplier);
+		ParamContainer container = new ParamContainer(paramConfiguration);
+		for (String uid : includeParams) {
+			ParamSupplier supp = getParam(uid);
+			if (supp != null) {
+				container.addParam(newInstances ? supp.copy() : supp);
 			} else {
-				LOG.warn("Tried to include sub ParamCountainer with missing parameter "+paramName);
+				LOG.warn("Tried to include sub ParamCountainer with missing parameter "+uid);
 			}
 		}
 		return container;
@@ -218,62 +205,77 @@ public class ParamContainer implements Serializable{
 	
 	public void applyParams(ParamContainer paramContainer) {
 		
-		Map<String, ParamSupplier> old = getClientParameters();
-		this.clientParameters = new HashMap<>(paramContainer.getClientParameters());
+		Map<String, ParamSupplier> old = getParamMap();
+		this.paramMap = new HashMap<>(paramContainer.getParamMap());
+		this.paramsByName = new HashMap<>(paramContainer.paramsByName);
 		
 		for (String key : old.keySet()) {
 			ParamSupplier oldSupplier = old.get(key);
-			ParamSupplier newSupplier = this.getClientParameter(key);
+			ParamSupplier newSupplier = this.getParam(key);
 			if (newSupplier != null)
 				newSupplier.updateChanged(oldSupplier);
 			else //readd old values
-				this.clientParameters.put(key, oldSupplier.copy());				
+				addParam(oldSupplier.copy());				
 		}
 	}
 	
 	public boolean applyParamsAndNeedsReset(ParamContainer paramContainer) {
-		Map<String, ParamSupplier> old = getClientParameters();
+		Map<String, ParamSupplier> old = getParamMap();
 		applyParams(paramContainer);
 		return needsReset(old);
 	}
 
-	public void addClientParameter(ParamSupplier paramSupplier) {
-		clientParameters.put(paramSupplier.getName(), paramSupplier);
+	public void addParam(ParamSupplier paramSupplier) {
+		if (paramConfiguration == null)
+			throw new IllegalStateException("ParamConfiguration not set");
+		paramMap.put(paramSupplier.getUID(), paramSupplier);
+		ParamDefinition def = paramConfiguration.getParamDefinition(paramSupplier);
+		String name = def != null ? def.getName() : paramSupplier.getUID();
+		paramsByName.put(name, paramSupplier);
 	}
 
 	public boolean hasClientParameters() {
-		return clientParameters.size() > 0;
+		return paramMap.size() > 0;
 	}
 
-	public ParamSupplier getClientParameter(String name) {
-		ParamSupplier supp = clientParameters.get(name);
+	public ParamSupplier getParam(String uid) {
+		ParamSupplier supp = paramMap.get(uid);
+		//TODO generalize sub params
 		if (supp == null && paramConfiguration != null){
-			ParamSupplier calcNameSupp = clientParameters.get("calculator");
+			ParamSupplier calcNameSupp = paramMap.get(CommonFractalParameters.PARAM_CALCULATOR);
 			String calcName = calcNameSupp == null ? null : calcNameSupp.getGeneral(String.class);
-			supp = paramConfiguration.getDefaultValue(calcName, name);
+			supp = paramConfiguration.getDefaultValue(calcName, uid);
 		}
 		return supp;
 	}
 	
 	@JsonIgnore
-	public Map<String, ParamSupplier> getClientParameters() {
-		return clientParameters;
+	public Map<String, ParamSupplier> getParamMap() {
+		return paramMap;
 	}
 
 	@JsonIgnore
-	public void setClientParameters(Map<String, ParamSupplier> clientParameters) {
-		this.clientParameters = clientParameters;
+	public void setParams(Map<String, ParamSupplier> clientParameters, Map<String, String> namesByUID) {
+		this.paramMap = clientParameters;
+		this.paramsByName = new LinkedHashMap<>();
+		for (String uid : namesByUID.keySet()) {
+			ParamSupplier supp = paramMap.get(uid);
+			if (supp != null)
+				this.paramsByName.put(namesByUID.get(uid), supp);
+		}
 	}
 	
 	public Collection<ParamSupplier> getParameters(){
-		return clientParameters.values();
+		return paramMap.values();
 	}
 	
 	public void setParameters(Collection<ParamSupplier> parameters, boolean clearExisting) {
-		if (clearExisting)
-			clientParameters.clear();
+		if (clearExisting) {
+			paramMap.clear();
+			paramsByName.clear();
+		}
 		for (ParamSupplier supplier : parameters)
-			clientParameters.put(supplier.getName(), supplier);
+			paramMap.put(supplier.getUID(), supplier);
 	}
 	
 	public String serializeObjectBase64() throws IOException{

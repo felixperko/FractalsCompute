@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.aparapi.internal.model.ClassModel.ConstantPool.Entry;
-
 import de.felixperko.fractals.system.calculator.ComputeExpression;
 import de.felixperko.fractals.system.calculator.ComputeInstruction;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
@@ -22,36 +20,42 @@ import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 
 public class ComputeExpressionBuilder {
-	
+
 //	List<FractalsExpression> expressions;
-	
+
 	List<String> inputStrings = new ArrayList<>();
 	List<String> varNames = new ArrayList<>();
 	String inputVarName;
-	Map<String, ParamSupplier> parameters;
-	
+	Map<String, ParamSupplier> paramsByUID;
+	Map<String, String> uidsByName = new HashMap<>();
+
 	LinkedHashMap<String, ExpressionSymbol> referenceSymbols = new LinkedHashMap<>();
-	
+
 	LinkedHashMap<String, ExpressionSymbol> valueSymbols = new LinkedHashMap<>();
 	Map<String, ComplexNumber> explicitValues = new HashMap<>();
-	
+
 	private LinkedHashMap<String, ExpressionSymbol> allSymbols = new LinkedHashMap<>();
-	
+
 	List<ComputeInstruction> instructions;
-	
+
 	Map<String, ComplexNumber> fixedValues = new HashMap<>();
-	
+
+
 	double smoothstepConstant;
 	
-	public ComputeExpressionBuilder(String input, String inputVarName, Map<String, ParamSupplier> parameters){
+	public ComputeExpressionBuilder(String input, String inputVarName, Map<String, ParamSupplier> paramsByUID, Map<String, String> uidsByName){
 		this.inputStrings.add(input);
 		this.inputVarName = inputVarName;
-		this.parameters = parameters;
+		this.paramsByUID = paramsByUID;
+		if (uidsByName != null)
+			this.uidsByName = uidsByName;
 	}
 	
-	public ComputeExpressionBuilder(ExpressionsParam expressions, Map<String, ParamSupplier> parameters){
-		this.parameters = parameters;
+	public ComputeExpressionBuilder(ExpressionsParam expressions, Map<String, ParamSupplier> paramsByUID, Map<String, String> uidsByName){
+		this.paramsByUID = paramsByUID;
 		this.inputVarName = expressions.getMainInputVar();
+		if (uidsByName != null)
+			this.uidsByName = uidsByName;
 		for (java.util.Map.Entry<String, String> e : expressions.getExpressions().entrySet()) {
 			addMainExpression(e.getValue(), e.getKey());
 		}
@@ -147,7 +151,7 @@ public class ComputeExpressionBuilder {
 			String input = inputStrings.get(i);
 			smoothstepConstant = Math.log(expression.getSmoothstepConstant(this));
 			
-			ComputeExpression computeExpression = new ComputeExpression(input, instructions, mappedParams, copyCounter, fixedValues, explicitValues, smoothstepConstant);
+			ComputeExpression computeExpression = new ComputeExpression(input, instructions, mappedParams, copyCounter, fixedValues, explicitValues, smoothstepConstant, uidsByName);
 			
 			if (expressions.contains(expression))
 				mainExpressions.add(computeExpression);
@@ -162,13 +166,15 @@ public class ComputeExpressionBuilder {
 	public void mapParamToSymbol(Map<ParamSupplier, Integer> mappedParams, NumberFactory nf, Integer copyCounter, ExpressionSymbol symbol) {
 		String symbolName = symbol.getName();
 		boolean isReference = referenceSymbols.containsKey(symbolName);
+		if (symbolName.equalsIgnoreCase(inputVarName))
+			symbolName = symbolName+"_0"; //get start param instead of inputVarName (e.g. "z")
 		if (isReference){
-			if (symbolName.equalsIgnoreCase(inputVarName))
-				symbolName = CommonFractalParameters.PARAM_ZSTART; //get start param instead of inputVarName (e.g. "z")
-			ParamSupplier param = parameters.get(symbolName);
+			String symbolUID = uidsByName.containsKey(symbolName) ? uidsByName.get(symbolName) : symbolName; //also dynamically defined params where uid == name
+//			String symbolUID = uidsByName.get(symbolName);
+			ParamSupplier param = paramsByUID.get(symbolUID);
 			if (param == null)
-				param = new StaticParamSupplier(symbolName, nf.createComplexNumber(0, 0));
-//					throw new IllegalStateException("didnt find parameter "+symbolName);
+				param = new StaticParamSupplier(symbolName, nf.createComplexNumber(1, 0));
+//				throw new IllegalStateException("didn't find parameter: "+symbolName+" uid: "+symbolUID); //hen-egg problem
 			mappedParams.put(param, copyCounter);
 		} else { //is raw value
 			ComplexNumber constant = explicitValues.get(symbolName);

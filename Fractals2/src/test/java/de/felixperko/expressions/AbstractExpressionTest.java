@@ -82,7 +82,7 @@ public class AbstractExpressionTest {
 		}
 		
 		ExpressionsParam exprParam = new ExpressionsParam(expression, outputVarName);
-		ComputeExpressionBuilder builder = new ComputeExpressionBuilder(exprParam, params);
+		ComputeExpressionBuilder builder = new ComputeExpressionBuilder(exprParam, params, null);
 		return builder;
 	}
 	

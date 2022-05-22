@@ -20,6 +20,7 @@ import de.felixperko.fractals.system.numbers.Number;
 import de.felixperko.fractals.system.numbers.NumberFactory;
 import de.felixperko.fractals.system.parameters.ParamConfiguration;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
+import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.systems.stateinfo.TaskStateInfo;
 import de.felixperko.fractals.system.task.Layer;
@@ -55,23 +56,23 @@ public class OrbitSystemContext extends AbstractSystemContext<OrbitViewData, Orb
 
 	@Override
 	public boolean setParameters(ParamContainer paramContainer) {
-		boolean reset = this.paramContainer != null && paramContainer.needsReset(this.paramContainer.getClientParameters());
+		boolean reset = this.paramContainer != null && paramContainer.needsReset(this.paramContainer.getParamMap());
 		
-		Map<String, ParamSupplier> oldParams = this.paramContainer != null ? this.paramContainer.getClientParameters() : null;
+		Map<String, ParamSupplier> oldParams = this.paramContainer != null ? this.paramContainer.getParamMap() : null;
 
 		synchronized (this) {
 			this.paramContainer = paramContainer;
-			Map<String, ParamSupplier> parameters = paramContainer.getClientParameters();
+			Map<String, ParamSupplier> parameters = paramContainer.getParamMap();
 			
-			calculatorClass = availableCalculators.get(getParamValue("calculator", String.class));
+			calculatorClass = availableCalculators.get(getParamValue(CommonFractalParameters.PARAM_CALCULATOR, String.class));
 			if (calculatorClass == null)
-				throw new IllegalStateException("Couldn't find calculator for name: "+getParamValue("calculator", String.class));
+				throw new IllegalStateException("Couldn't find calculator for name: "+getParamValue(CommonFractalParameters.PARAM_CALCULATOR, String.class));
 			
-			midpoint = parameters.get("midpoint").getGeneral(ComplexNumber.class);
+			midpoint = parameters.get(CommonFractalParameters.PARAM_MIDPOINT).getGeneral(ComplexNumber.class);
 			//zoom = parameters.get("zoom").getGeneral(Number.class);
 			
-			numberFactory = parameters.get("numberFactory").getGeneral(NumberFactory.class);
-			chunkFactory = parameters.get("chunkFactory").getGeneral(ArrayChunkFactory.class);
+			numberFactory = parameters.get(CommonFractalParameters.PARAM_NUMBERFACTORY).getGeneral(NumberFactory.class);
+			chunkFactory = parameters.get(CommonFractalParameters.PARAM_CHUNKFACTORY).getGeneral(ArrayChunkFactory.class);
 			
 			if (reset && taskManager != null)
 				taskManager.reset();
@@ -82,7 +83,7 @@ public class OrbitSystemContext extends AbstractSystemContext<OrbitViewData, Orb
 			} else {
 				activeViewData.setParams(paramContainer);
 			}
-			ParamSupplier jobIdSupplier = parameters.get("view");
+			ParamSupplier jobIdSupplier = parameters.get(CommonFractalParameters.PARAM_VIEW);
 			if (jobIdSupplier == null)
 				viewId = 0;
 			else
@@ -110,6 +111,18 @@ public class OrbitSystemContext extends AbstractSystemContext<OrbitViewData, Orb
 
 	@Override
 	public FractalsCalculator createCalculator(DeviceType deviceType) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<String, ParamSupplier> getParametersByName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<String, ParamSupplier> getParametersByUID() {
 		// TODO Auto-generated method stub
 		return null;
 	}

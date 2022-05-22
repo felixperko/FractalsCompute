@@ -24,9 +24,27 @@ import de.felixperko.fractals.system.systems.infra.Selection;
 public class CommonFractalParameters {
 	
 	public static final int DEFAULT_CHUNK_SIZE = 256;
-	
+
 	public static String PARAM_ZSTART = "z_0";
-	public static String PARAM_EXPRESSIONS = "z_(n+1) = ";
+	public static String PARAMNAME_ZSTART = "z_0";
+	
+	public static String PARAM_EXPRESSIONS = "WNT14e";
+	public static String PARAMNAME_EXPRESSIONS = "z_(n+1) = ";
+
+	public static String PARAM_ITERATIONS = "_sZulJ";
+	
+	public static String PARAM_CALCULATOR = "_TqHam";
+	
+	public static String PARAM_MIDPOINT = "ZSJUao";
+
+	public static String PARAM_NUMBERFACTORY = "juul7S";
+	
+	public static String PARAM_CHUNKFACTORY = "1xzYUd";
+	public static String PARAM_SYSTEMNAME = "7A-_59";
+	public static String PARAM_VIEW = "zqzAfz";
+	public static String PARAM_POW = "BRXzAz";
+	public static String PARAM_C = "qNXcrF";
+	public static String PARAM_PRECISION = "FI8ZdL";
 	
 	public static ParamValueType integerType = new ParamValueType("integer");
 	public static ParamValueType doubleType = new ParamValueType("double");
@@ -70,53 +88,53 @@ public class CommonFractalParameters {
 
 		List<ParamDefinition> defs = new ArrayList<>();
 		List<ParamSupplier> defaultValues = new ArrayList<>();
-		defs.add(new ParamDefinition("iterations", "Calculator", StaticParamSupplier.class, integerType)
+		defs.add(new ParamDefinition(PARAM_ITERATIONS, "iterations", "Calculator", StaticParamSupplier.class, integerType)
 				.withDescription("The maximum number of iterations until a sample is marked as unsuccessful.\n"
 						+ "Increase to allow more black regions to be filled at the cost of slower computation."));
-		defs.add(new ParamDefinition("calculator", "Calculator", StaticParamSupplier.class, selectionType)
+		defs.add(new ParamDefinition(PARAM_CALCULATOR, "calculator", "Calculator", StaticParamSupplier.class, selectionType)
 				.withDescription("Choose the calculator to render different fractals."));
-		defaultValues.add(new StaticParamSupplier("calculator", "CustomCalculator"));
+		defaultValues.add(new StaticParamSupplier(PARAM_CALCULATOR, "CustomCalculator"));
 		
-		defs.add(new ParamDefinition("midpoint", "Mapping", StaticParamSupplier.class, complexnumberType)
+		defs.add(new ParamDefinition(PARAM_MIDPOINT, "midpoint", "Mapping", StaticParamSupplier.class, complexnumberType)
 				.withDescription("The current default coordinate center."));
-		defs.add(new ParamDefinition("numberFactory", "Mapping", StaticParamSupplier.class, numberfactoryType)
+		defs.add(new ParamDefinition(PARAM_NUMBERFACTORY, "numberFactory", "Mapping", StaticParamSupplier.class, numberfactoryType)
 				.withDescription("Manages the used number and complex number class."));
-		defaultValues.add(new StaticParamSupplier("numberFactory", nf));
+		defaultValues.add(new StaticParamSupplier(PARAM_NUMBERFACTORY, nf));
 		
-		defs.add(new ParamDefinition("chunkFactory", "Advanced", StaticParamSupplier.class, arraychunkfactoryType)
+		defs.add(new ParamDefinition(PARAM_CHUNKFACTORY, "chunkFactory", "Advanced", StaticParamSupplier.class, arraychunkfactoryType)
 				.withDescription("Details about the chunks, e.g. the size of used chunks."));
-		defaultValues.add(new StaticParamSupplier("chunkFactory", new ArrayChunkFactory(ReducedNaiveChunk.class, DEFAULT_CHUNK_SIZE)));
-		defs.add(new ParamDefinition("systemName", "Automatic", StaticParamSupplier.class, selectionType)
+		defaultValues.add(new StaticParamSupplier(PARAM_CHUNKFACTORY, new ArrayChunkFactory(ReducedNaiveChunk.class, DEFAULT_CHUNK_SIZE)));
+		defs.add(new ParamDefinition(PARAM_SYSTEMNAME, "systemName", "Automatic", StaticParamSupplier.class, selectionType)
 				.withDescription("The internal calculation system to use for task management."));
-		defaultValues.add(new StaticParamSupplier("systemName", "BreadthFirstSystem"));
-		defs.add(new ParamDefinition("view", "Automatic", StaticParamSupplier.class, integerType)
+		defaultValues.add(new StaticParamSupplier(PARAM_SYSTEMNAME, "BreadthFirstSystem"));
+		defs.add(new ParamDefinition(PARAM_VIEW, "view", "Automatic", StaticParamSupplier.class, integerType)
 				.withDescription("The current view to calculate for."));
-		defaultValues.add(new StaticParamSupplier("view", 1));
+		defaultValues.add(new StaticParamSupplier(CommonFractalParameters.PARAM_VIEW, 1));
 		
 		parameterConfiguration.addParameterDefinitions(defs);
 		parameterConfiguration.addDefaultValues(defaultValues);
 
 		List<ParamDefinition> mandelbrot_calculator_defs = new ArrayList<>();
-		mandelbrot_calculator_defs.add(new ParamDefinition("pow", "Calculator", suppClasses, complexnumberType)
+		mandelbrot_calculator_defs.add(new ParamDefinition(PARAM_POW, "pow", "Calculator", suppClasses, complexnumberType)
 				.withDescription("The exponent parameter that is applied at every calculation step.")
 				.withHints("ui-element[default]: fields", "ui-element:plane soft-min=-2 soft-max=2"));
-		mandelbrot_calculator_defs.add(new ParamDefinition("c", "Calculator", suppClasses, complexnumberType)
+		mandelbrot_calculator_defs.add(new ParamDefinition(PARAM_C, "c", "Calculator", suppClasses, complexnumberType)
 				.withDescription("The shift parameter that is added at every calculation step.")
 				.withHints("ui-element[default]:plane soft-min=-2 soft-max=2", "ui-element:fields"));
-		mandelbrot_calculator_defs.add(new ParamDefinition(CommonFractalParameters.PARAM_ZSTART, "Calculator", suppClasses, complexnumberType)
+		mandelbrot_calculator_defs.add(new ParamDefinition(PARAM_ZSTART, PARAMNAME_ZSTART, "Calculator", suppClasses, complexnumberType)
 				.withDescription("The input number parameter that is used for the first calculation step.")
 				.withHints("ui-element[default]:slider soft-min=-2 soft-max=2", "ui-element:fields"));
 
 		List<ParamDefinition> custom_calculator_defs = new ArrayList<>();
 		List<ParamSupplier> custom_calculator_defaults = new ArrayList<>();
-		custom_calculator_defs.add(new ParamDefinition(CommonFractalParameters.PARAM_EXPRESSIONS, "Calculator", StaticParamSupplier.class, expressionsType)
+		custom_calculator_defs.add(new ParamDefinition(PARAM_EXPRESSIONS, PARAMNAME_EXPRESSIONS, "Calculator", StaticParamSupplier.class, expressionsType)
 				.withDescription("The formula of the fractal"));
-		custom_calculator_defs.add(new ParamDefinition("precision", "Calculator", StaticParamSupplier.class, selectionType)
+		custom_calculator_defs.add(new ParamDefinition(PARAM_PRECISION, "precision", "Calculator", StaticParamSupplier.class, selectionType)
 				.withDescription("Bits of precision. Increase if image becomes pixelated."));
 		custom_calculator_defs.addAll(mandelbrot_calculator_defs);
 		
-		custom_calculator_defaults.add(new StaticParamSupplier("precision", "32"));
-		custom_calculator_defaults.add(new StaticParamSupplier("pow", nf.createComplexNumber(2.0, 0.0)));
+		custom_calculator_defaults.add(new StaticParamSupplier(PARAM_PRECISION, "32"));
+		custom_calculator_defaults.add(new StaticParamSupplier(PARAM_POW, nf.createComplexNumber(2.0, 0.0)));
 		
 		parameterConfiguration.addCalculatorParameters("MandelbrotCalculator", mandelbrot_calculator_defs, null);
 		parameterConfiguration.addCalculatorParameters("BurningShipCalculator", mandelbrot_calculator_defs, null);
@@ -125,15 +143,15 @@ public class CommonFractalParameters {
 		parameterConfiguration.addCalculatorParameters("FibonacciPowCalculator", mandelbrot_calculator_defs, null);
 		
 		List<ParamDefinition> newton_calculator_defs = new ArrayList<>();
-		newton_calculator_defs.add(new ParamDefinition(CommonFractalParameters.PARAM_ZSTART, "Calculator", CoordinateBasicShiftParamSupplier.class, complexnumberType)
+		newton_calculator_defs.add(new ParamDefinition(PARAM_ZSTART, PARAMNAME_ZSTART, "Calculator", CoordinateBasicShiftParamSupplier.class, complexnumberType)
 				.withDescription("The start position for Newton's method."));
 		
 		parameterConfiguration.addCalculatorParameters("NewtonThridPowerMinusOneCalculator", newton_calculator_defs, null);									//TODO test -> newton_calculator_defs!
 		parameterConfiguration.addCalculatorParameters("NewtonEighthPowerPlusFifteenTimesForthPowerMinusSixteenCalculator", newton_calculator_defs, null);	//
 		
-		Selection<String> calculatorSelection = new Selection<>("calculator");
+		Selection<String> calculatorSelection = new Selection<>(PARAM_CALCULATOR);
 		calculatorSelection.addOption("Mandelbrot", "MandelbrotCalculator",
-				"The famous Mandelbrot set.\n"
+				"The Mandelbrot set.\n"
 				+ "f(z_n+1) = f(z_n)^pow + c; z_0 = start");
 		calculatorSelection.addOption("BurningShip", "BurningShipCalculator",
 				"A variation of the Mandelbrot set.\n"
@@ -165,7 +183,7 @@ public class CommonFractalParameters {
 		complexNumberClassSelection.addOption("double-complex", DoubleComplexNumber.class, "A complex number wrapping two Java double primitives.");
 		parameterConfiguration.addSelection(complexNumberClassSelection);
 		
-		Selection<String> precisionSelection = new Selection<>("precision");
+		Selection<String> precisionSelection = new Selection<>(PARAM_PRECISION);
 		precisionSelection.addOption("Auto", "Auto", "Uses default precision or a value based on the zoom level.");
 		precisionSelection.addOption("32 bit", "32", "");
 		precisionSelection.addOption("64 bit", "64", "");

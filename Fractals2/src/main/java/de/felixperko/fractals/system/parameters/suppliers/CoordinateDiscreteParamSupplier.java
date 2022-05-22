@@ -19,12 +19,12 @@ public class CoordinateDiscreteParamSupplier extends MappedParamSupplier{
 	Number modulo;
 	ComplexNumber offset;
 
-	public CoordinateDiscreteParamSupplier(String name) {
-		super(name);
+	public CoordinateDiscreteParamSupplier(String uid) {
+		super(uid);
 	}
 	
-	public CoordinateDiscreteParamSupplier(String name, Number modulo, Number stepSize, ComplexNumber offset) {
-		super(name);
+	public CoordinateDiscreteParamSupplier(String uid, Number modulo, Number stepSize, ComplexNumber offset) {
+		super(uid);
 		this.modulo = modulo;
 		this.stepSize = stepSize;
 		this.offset = offset;
@@ -32,7 +32,7 @@ public class CoordinateDiscreteParamSupplier extends MappedParamSupplier{
 
 	@Override
 	public ParamSupplier copy() {
-		return new CoordinateDiscreteParamSupplier(name);
+		return new CoordinateDiscreteParamSupplier(uid);
 	}
 
 	@Override

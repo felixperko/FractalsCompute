@@ -38,6 +38,15 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(BreadthFirstSystem.class);
 	
+	public static String PARAM_ZOOM = "MlDwyj";
+	public static String PARAM_WIDTH = "GbcB-v";
+	public static String PARAM_HEIGHT = "I-doFz";
+	public static String PARAM_LIMIT = "DReboF";
+	public static String PARAM_BORDER_GENERATION = "SqTe7v";
+	public static String PARAM_BORDER_DISPOSE = "ihFxRd";
+	public static String PARAM_TASK_BUFFER = "N8FxFT";
+	public static String PARAM_LAYER_CONFIG = "u2EpDL";
+	
 	TaskFactory factory_task = new ClassTaskFactory(BreadthFirstTask.class);
 	
 	BreadthFirstTaskManager taskManager;
@@ -72,22 +81,22 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		
 		List<ParamDefinition> defs_bf = new ArrayList<>();
 		List<ParamSupplier> defaultValues = new ArrayList<>();
-		defs_bf.add(new ParamDefinition("zoom", "Mapping", StaticParamSupplier.class, numberType)
+		defs_bf.add(new ParamDefinition(PARAM_ZOOM, "zoom", "Mapping", StaticParamSupplier.class, numberType)
 				.withDescription("The current default coordinate zoom factor."));
-		defs_bf.add(new ParamDefinition("width", "Automatic", StaticParamSupplier.class, integerType)
+		defs_bf.add(new ParamDefinition(PARAM_WIDTH, "width", "Automatic", StaticParamSupplier.class, integerType)
 				.withDescription("The calculation width."));
-		defs_bf.add(new ParamDefinition("height", "Automatic", StaticParamSupplier.class, integerType)
+		defs_bf.add(new ParamDefinition(PARAM_HEIGHT, "height", "Automatic", StaticParamSupplier.class, integerType)
 				.withDescription("The calculation height."));
 		
-		defs_bf.add(new ParamDefinition("limit", "Advanced", StaticParamSupplier.class, numberType)
+		defs_bf.add(new ParamDefinition(PARAM_LIMIT, "limit", "Advanced", StaticParamSupplier.class, numberType)
 				.withDescription("Bailout radius. Increase to reduce coloring artifacts, Decrease to improve performance."));
-		defs_bf.add(new ParamDefinition("border_generation", "Advanced", StaticParamSupplier.class, doubleType)
+		defs_bf.add(new ParamDefinition(PARAM_BORDER_GENERATION, "border_generation", "Advanced", StaticParamSupplier.class, doubleType)
 				.withDescription("The chunk distance from rendered area for which chunk calculation should continue."));
-		defs_bf.add(new ParamDefinition("border_dispose", "Advanced", StaticParamSupplier.class, doubleType)
+		defs_bf.add(new ParamDefinition(PARAM_BORDER_DISPOSE, "border_dispose", "Advanced", StaticParamSupplier.class, doubleType)
 				.withDescription("The chunk distance at which chunks are deleted to preserve memory."));
-		defs_bf.add(new ParamDefinition("task_buffer", "Advanced", StaticParamSupplier.class, integerType)
+		defs_bf.add(new ParamDefinition(PARAM_TASK_BUFFER, "task_buffer", "Advanced", StaticParamSupplier.class, integerType)
 				.withDescription("The amount of tasks that should be buffered for the calculation workers."));
-		defs_bf.add(new ParamDefinition("layerConfiguration", "Advanced", StaticParamSupplier.class, layerconfigurationType)
+		defs_bf.add(new ParamDefinition(PARAM_LAYER_CONFIG, "layerConfiguration", "Advanced", StaticParamSupplier.class, layerconfigurationType)
 				.withDescription("Manages the layer order in which the calculation is performed."));
 			
 		NumberFactory nf = new NumberFactory(Number.class, ComplexNumber.class);

@@ -15,6 +15,7 @@ import de.felixperko.fractals.system.parameters.suppliers.CoordinateBasicShiftPa
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.statistics.IStats;
+import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstSystem;
 import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 import de.felixperko.fractals.system.task.Layer;
 import de.felixperko.fractals.system.thread.CalculateFractalsThread;
@@ -44,8 +45,8 @@ public class EscapeTimeCpuCalculatorNew extends AbstractFractalsCalculator{
 		int upsample = layer.getUpsample();
 		int maxIterations = layer.getMaxIterations();
 		if (maxIterations < 0)
-			maxIterations = (int)systemContext.getParamValue("iterations", Integer.class);
-		double limit = systemContext.getParamValue("limit", Number.class).toDouble();
+			maxIterations = (int)systemContext.getParamValue(CommonFractalParameters.PARAM_ITERATIONS, Integer.class);
+		double limit = systemContext.getParamValue(BreadthFirstSystem.PARAM_LIMIT, Number.class).toDouble();
 		double limitSq = limit*limit;
 
 		List<Layer> layers = systemContext.getLayerConfiguration().getLayers();
@@ -56,18 +57,18 @@ public class EscapeTimeCpuCalculatorNew extends AbstractFractalsCalculator{
 			sampleOffsets[i*2+1] = (float)offset.imagDouble();
 		}
 		
-		double[] params = new double[kernel.paramNames.length*3];
+		double[] params = new double[kernel.paramUids.length*3];
 		
-		for (int i = 0 ; i < kernel.paramNames.length ; i++){
-			String name = kernel.paramNames[i];
-			ParamSupplier supp = systemContext.getParamContainer().getClientParameter(name);
+		for (int i = 0 ; i < kernel.paramUids.length ; i++){
+			String uid = kernel.paramUids[i];
+			ParamSupplier supp = systemContext.getParametersByName().get(uid);
 			
 			if (supp == null){
 				//search constant
-				supp = kernel.constantSuppliers.get(name);
+				supp = kernel.constantSuppliers.get(uid);
 				//no constant found -> missing supplier
 				if (supp == null)
-					throw new IllegalStateException("Missing ParamSupplier "+name);
+					throw new IllegalStateException("Missing ParamSupplier "+uid);
 			}
 			
 			if (supp instanceof StaticParamSupplier){
@@ -83,7 +84,7 @@ public class EscapeTimeCpuCalculatorNew extends AbstractFractalsCalculator{
 				params[i*3+2] = systemContext.getPixelzoom().toDouble();
 			}
 			else
-				throw new IllegalArgumentException("Unsupported ParamSupplier "+supp.getName()+": "+supp.getClass().getName());
+				throw new IllegalArgumentException("Unsupported ParamSupplier "+supp.getUID()+": "+supp.getClass().getName());
 		}
 		
 		for (int pixel = 0 ; pixel < chunk.getArrayLength() ; pixel++) {
@@ -125,9 +126,9 @@ public class EscapeTimeCpuCalculatorNew extends AbstractFractalsCalculator{
 	
 	private EscapeTimeCpuKernelNew getCurrentKernel() {
 			
-		ExpressionsParam expressions = systemContext.getParamContainer().getClientParameter(CommonFractalParameters.PARAM_EXPRESSIONS).getGeneral(ExpressionsParam.class);
+		ExpressionsParam expressions = systemContext.getParamContainer().getParam(CommonFractalParameters.PARAM_EXPRESSIONS).getGeneral(ExpressionsParam.class);
 		
-		ComputeExpressionBuilder expressionBuilder = new ComputeExpressionBuilder(expressions, systemContext.getParamContainer().getClientParameters());
+		ComputeExpressionBuilder expressionBuilder = new ComputeExpressionBuilder(expressions, systemContext.getParamContainer().getParamMap(), null);
 		ComputeExpressionDomain expressionDomain = expressionBuilder.getComputeExpressionDomain(false);
 		
 		List<Layer> layers = systemContext.getLayerConfiguration().getLayers();

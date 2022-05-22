@@ -15,7 +15,8 @@ public class ParamConfiguration implements Serializable{
 	private static final long serialVersionUID = -6181978740061515601L;
 	
 	List<ParamDefinition> parameters = new ArrayList<>();
-	Map<String, ParamDefinition> definitionMap = new HashMap<>();
+	Map<String, ParamDefinition> definitionsByName = new HashMap<>();
+	Map<String, ParamDefinition> definitionsByUID = new HashMap<>();
 	Map<String, ParamSupplier> defaultValues = new HashMap<>();
 	Map<String, List<ParamDefinition>> calculatorParameters = new HashMap<>();
 	Map<String, Map<String, ParamSupplier>> calculatorDefaultValues = new HashMap<>();
@@ -25,14 +26,15 @@ public class ParamConfiguration implements Serializable{
 	
 	public void addParameterDefinition(ParamDefinition definition, ParamSupplier defaultValue) {
 		parameters.add(definition);
-		definitionMap.put(definition.getName(), definition);
+		definitionsByName.put(definition.getName(), definition);
+		definitionsByUID.put(definition.getUID(), definition);
 		definition.setConfiguration(this);
 		if (defaultValue != null)
 			addDefaultValue(defaultValue);
 	}
 
 	public void addDefaultValue(ParamSupplier defaultValue) {
-		defaultValues.put(defaultValue.getName(), defaultValue);
+		defaultValues.put(defaultValue.getUID(), defaultValue);
 	}
 	
 	public void addValueType(ParamValueType valueType) {
@@ -58,7 +60,7 @@ public class ParamConfiguration implements Serializable{
 		if (defaultValues != null){
 			Map<String, ParamSupplier> calculatorDefaultMap = new HashMap<>();
 			for (ParamSupplier supp : defaultValues)
-				calculatorDefaultMap.put(supp.getName(), supp);
+				calculatorDefaultMap.put(supp.getUID(), supp);
 			this.calculatorDefaultValues.put(calculatorName, calculatorDefaultMap);
 		}
 		for (ParamDefinition definition : parameterDefinitions)
@@ -124,7 +126,32 @@ public class ParamConfiguration implements Serializable{
 		return map == null ? null : map.get(name);
 	}
 	
-	public ParamDefinition getParamDefinition(String name){
-		return definitionMap.get(name);
+	public ParamDefinition getParamDefinitionByName(String name){
+		return definitionsByName.get(name);
+	}
+	
+	public ParamDefinition getParamDefinitionByUID(String uid){
+		return definitionsByUID.get(uid);
+	}
+	
+	public Map<String, String> getUIDsByName(){
+        Map<String, String> uidsByName = new HashMap<>();
+        for (ParamDefinition def : parameters){
+            uidsByName.put(def.getName(), def.getUID());
+        }
+        return uidsByName;
+	}
+
+	public ParamDefinition getParamDefinition(ParamSupplier supp) {
+		return getParamDefinitionByUID(supp.getUID());
+	}
+	
+	public String getName(String uid) {
+		ParamDefinition def = getParamDefinitionByUID(uid);
+		return def != null ? def.getName() : null;
+	}
+	
+	public String getName(ParamSupplier supp) {
+		return getName(supp.getUID());
 	}
 }

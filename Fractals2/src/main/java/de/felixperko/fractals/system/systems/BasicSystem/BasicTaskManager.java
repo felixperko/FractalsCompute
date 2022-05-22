@@ -1,3 +1,5 @@
+//import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
+//
 //package de.felixperko.fractals.system.systems.BasicSystem;
 //
 //import java.awt.image.BufferedImage;
@@ -114,9 +116,9 @@
 //			zoom = (Number) params.get("zoom").get(0,0);
 //			width = (Integer) params.get("width").get(0,0);
 //			height = (Integer) params.get("height").get(0,0);
-//			calculatorClass = availableCalculators.get(((String)params.get("calculator").get(0, 0)));
+//			calculatorClass = availableCalculators.get(((String)params.get(CommonFractalParameters.PARAM_CALCULATOR).get(0, 0)));
 //			if (calculatorClass == null)
-//				throw new IllegalStateException("Couldn't find calculator for name: "+params.get("calculator").get(0, 0).toString());
+//				throw new IllegalStateException("Couldn't find calculator for name: "+params.get(CommonFractalParameters.PARAM_CALCULATOR).get(0, 0).toString());
 //			chunkFactory = new ArrayChunkFactory(NaiveChunk.class, (int)params.get("chunkSize").get(0, 0));
 //			
 //			Number pixelzoom = numberFactory.createNumber(1./width);

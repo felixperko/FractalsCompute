@@ -12,8 +12,8 @@ public class CoordinateBasicShiftParamSupplier extends MappedParamSupplier {
 	private static final long serialVersionUID = 2317887367642326504L;
 	
 	@JsonCreator
-	public CoordinateBasicShiftParamSupplier(@JsonProperty("name") String name) {
-		super(name);
+	public CoordinateBasicShiftParamSupplier(@JsonProperty("uid") String uid) {
+		super(uid);
 	}
 	
 	@Override
@@ -32,7 +32,7 @@ public class CoordinateBasicShiftParamSupplier extends MappedParamSupplier {
 
 	@Override
 	public ParamSupplier copy() {
-		return new CoordinateBasicShiftParamSupplier(name);
+		return new CoordinateBasicShiftParamSupplier(uid);
 	}
 
 	@Override
@@ -52,6 +52,6 @@ public class CoordinateBasicShiftParamSupplier extends MappedParamSupplier {
 	}
 	
 	public String toString() {
-		return this.getClass().getSimpleName()+" (name="+getName()+")";
+		return this.getClass().getSimpleName()+" (uid="+getUID()+")";
 	};
 }

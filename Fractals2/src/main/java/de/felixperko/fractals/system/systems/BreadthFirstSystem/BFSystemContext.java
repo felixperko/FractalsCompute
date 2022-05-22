@@ -33,6 +33,7 @@ import de.felixperko.fractals.system.numbers.NumberFactory;
 import de.felixperko.fractals.system.parameters.ParamConfiguration;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
+import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 import de.felixperko.fractals.system.systems.infra.DrawRegion;
 import de.felixperko.fractals.system.task.TaskManager;
 
@@ -125,17 +126,18 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 	@Override
 	public boolean setParameters(ParamContainer paramContainer) {
 		
-		boolean reset = this.paramContainer != null && needsReset(paramContainer.getClientParameters(), this.paramContainer.getClientParameters());
+		boolean reset = this.paramContainer != null && needsReset(paramContainer.getParamMap(), this.paramContainer.getParamMap());
 		
 		//if params aren't applicable to current ViewData, search inactive ViewDatas
 		if (reset) {
 			Collection<BreadthFirstViewData> oldViews = viewContainer.getInactiveViews();
 			if (!oldViews.isEmpty()) {
-				ParamContainer temp = new ParamContainer(new LinkedHashMap<>(paramContainer.getClientParameters()));
+				ParamContainer temp = new ParamContainer(paramConfiguration);
+				temp.setParams(paramContainer.getParamMap(), new LinkedHashMap<>());
 				for (BreadthFirstViewData oldViewData : oldViews) {
 					ParamContainer oldParams = oldViewData.getParams();
 					if (oldParams != null){ //TODO should these be buffered at all? shouldn't contain chunks anyways
-						if (!needsReset(temp.getClientParameters(), oldParams.getClientParameters())) {
+						if (!needsReset(temp.getParamMap(), oldParams.getParamMap())) {
 							reset = false;
 							viewContainer.reactivateViewData(oldViewData);
 							this.paramContainer = oldParams; //TODO correct?
@@ -146,36 +148,36 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 			}
 		}
 		
-		Map<String, ParamSupplier> oldParams = this.paramContainer != null ? this.paramContainer.getClientParameters() : null;
+		Map<String, ParamSupplier> oldParams = this.paramContainer != null ? this.paramContainer.getParamMap() : null;
 		
 		synchronized (this) {
 			this.paramContainer = paramContainer;
 			paramContainer.setParamConfiguration(paramConfiguration);
 //			Map<String, ParamSupplier> parameters = paramContainer.getClientParameters();
 			
-			String calculatorName = getParamValue("calculator", String.class);
+			String calculatorName = getParamValue(CommonFractalParameters.PARAM_CALCULATOR, String.class);
 			cpuCalculatorClass = availableCpuCalculators.get(calculatorName);
 			gpuCalculatorClass = availableGpuCalculators.get(calculatorName);
 			if (cpuCalculatorClass == null && gpuCalculatorClass == null)
 				throw new IllegalStateException("Couldn't find calculator for name: "+calculatorName);
 			
-			chunkSize = paramContainer.getClientParameter("chunkFactory").getGeneral(ArrayChunkFactory.class).getChunkSize();
-			midpoint = paramContainer.getClientParameter("midpoint").getGeneral(ComplexNumber.class);
-			zoom = paramContainer.getClientParameter("zoom").getGeneral(Number.class);
+			chunkSize = paramContainer.getParam(CommonFractalParameters.PARAM_CHUNKFACTORY).getGeneral(ArrayChunkFactory.class).getChunkSize();
+			midpoint = paramContainer.getParam(CommonFractalParameters.PARAM_MIDPOINT).getGeneral(ComplexNumber.class);
+			zoom = paramContainer.getParam(BreadthFirstSystem.PARAM_ZOOM).getGeneral(Number.class);
 			
-			numberFactory = paramContainer.getClientParameter("numberFactory").getGeneral(NumberFactory.class);
-			chunkFactory = paramContainer.getClientParameter("chunkFactory").getGeneral(ArrayChunkFactory.class);
+			numberFactory = paramContainer.getParam(CommonFractalParameters.PARAM_NUMBERFACTORY).getGeneral(NumberFactory.class);
+			chunkFactory = paramContainer.getParam(CommonFractalParameters.PARAM_CHUNKFACTORY).getGeneral(ArrayChunkFactory.class);
 			
-			boolean layersChanged = updateLayerConfig(paramContainer, "layerConfiguration", oldParams, paramContainer.getClientParameters());
+			boolean layersChanged = updateLayerConfig(paramContainer, BreadthFirstSystem.PARAM_LAYER_CONFIG, oldParams, paramContainer.getParamMap());
 			if (layersChanged)
 				reset = true;
 		
-			width = paramContainer.getClientParameter("width").getGeneral(Integer.class);
-			height = paramContainer.getClientParameter("height").getGeneral(Integer.class);
+			width = paramContainer.getParam(BreadthFirstSystem.PARAM_WIDTH).getGeneral(Integer.class);
+			height = paramContainer.getParam(BreadthFirstSystem.PARAM_HEIGHT).getGeneral(Integer.class);
 			
-			border_generation = paramContainer.getClientParameter("border_generation").getGeneral(Double.class);
-			border_dispose = paramContainer.getClientParameter("border_dispose").getGeneral(Double.class);
-			buffer = paramContainer.getClientParameter("task_buffer").getGeneral(Integer.class);
+			border_generation = paramContainer.getParam(BreadthFirstSystem.PARAM_BORDER_GENERATION).getGeneral(Double.class);
+			border_dispose = paramContainer.getParam(BreadthFirstSystem.PARAM_BORDER_DISPOSE).getGeneral(Double.class);
+			buffer = paramContainer.getParam(BreadthFirstSystem.PARAM_TASK_BUFFER).getGeneral(Integer.class);
 	
 			if (getActiveViewData() == null || reset) {
 				chunksWidth = (int)Math.ceil(width/(double)chunkSize);
@@ -186,11 +188,10 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 			
 			pixelzoom = numberFactory.createNumber(width >= height ? 1./height : 1./width);
 			pixelzoom.mult(zoom);
-			paramContainer.addClientParameter(new StaticParamSupplier("pixelzoom", pixelzoom));
+			paramContainer.addParam(new StaticParamSupplier("pixelzoom", pixelzoom)); //TODO deprecated
 			chunkZoom = pixelzoom.copy();
 			chunkZoom.mult(numberFactory.createNumber(chunkSize));
-			paramContainer.addClientParameter(new StaticParamSupplier("chunkzoom", chunkZoom));
-			
+			paramContainer.addParam(new StaticParamSupplier("chunkzoom", chunkZoom)); //TODO deprecated			
 			Number rX = numberFactory.createNumber(0.5*(width+chunkSize));
 			rX.mult(pixelzoom);
 	//		Number rY = numberFactory.createNumber(0.5 * ((width > height) ? width/(double)height : 1));
@@ -214,7 +215,7 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 			} else {
 				activeViewData.setParams(paramContainer);
 			}
-			ParamSupplier jobIdSupplier = paramContainer.getClientParameter("view");
+			ParamSupplier jobIdSupplier = paramContainer.getParam(CommonFractalParameters.PARAM_VIEW);
 			if (jobIdSupplier == null)
 				viewId = 0;
 			else
@@ -241,7 +242,7 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 		boolean reset = false;
 		if (oldParams != null) {
 			for (ParamSupplier supplier : newParams.values()) {
-				supplier.updateChanged(oldParams.get(supplier.getName()));
+				supplier.updateChanged(oldParams.get(supplier.getUID()));
 				if (supplier.isChanged()) {
 					if (supplier.isSystemRelevant() || supplier.isLayerRelevant())
 						reset = true;
@@ -320,9 +321,9 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 	@Override
 	public void setZoom(Number zoom) {
 		this.zoom = zoom;
-		StaticParamSupplier supplier = new StaticParamSupplier("zoom", zoom);
+		StaticParamSupplier supplier = new StaticParamSupplier("zoom", zoom); //TODO deprecated
 		supplier.setLayerRelevant(true);
-		paramContainer.addClientParameter(supplier);	
+		paramContainer.addParam(supplier);	
 	}
 	
 	@Override
@@ -353,5 +354,17 @@ public class BFSystemContext extends AbstractSystemContext<BreadthFirstViewData,
 
 	public Class<? extends FractalsCalculator> getGpuCalculatorClass() {
 		return gpuCalculatorClass;
+	}
+
+	@Override
+	public Map<String, ParamSupplier> getParametersByName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<String, ParamSupplier> getParametersByUID() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -18,6 +18,7 @@ import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.statistics.HistogramStats;
 import de.felixperko.fractals.system.statistics.IHistogramStats;
 import de.felixperko.fractals.system.statistics.SummedHistogramStats;
+import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.systems.stateinfo.TaskState;
 import de.felixperko.fractals.system.task.AbstractFractalsTask;
@@ -57,7 +58,7 @@ public class BreadthFirstTask extends AbstractFractalsTask<BreadthFirstTask> imp
 	public void run() {
 		try {
 			int layerId = getStateInfo().getLayerId();
-			taskStats = new HistogramStats(1000, ((BFSystemContext)getContext()).getParamValue("iterations", Integer.class));
+			taskStats = new HistogramStats(1000, ((BFSystemContext)getContext()).getParamValue(CommonFractalParameters.PARAM_ITERATIONS, Integer.class));
 			
 			taskStats.executionStart();
 			

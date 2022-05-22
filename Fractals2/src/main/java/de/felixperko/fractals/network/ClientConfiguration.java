@@ -55,7 +55,7 @@ public class ClientConfiguration implements Serializable{
 	
 	public ParamSupplier getParameter(UUID systemId, String name) {
 		ParamContainer data = instances.get(systemId);
-		return data.getClientParameter(name);
+		return data.getParam(name);
 	}
 	
 	public <T> T getParameterGeneralValue(UUID systemId, String name, Class<T> cls) {

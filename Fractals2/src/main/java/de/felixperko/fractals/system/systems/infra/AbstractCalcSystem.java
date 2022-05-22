@@ -140,7 +140,7 @@ public abstract class AbstractCalcSystem implements CalcSystem {
 				return true;
 			
 		}
-		for (ParamSupplier param : paramContainer.getClientParameters().values()) {
+		for (ParamSupplier param : paramContainer.getParamMap().values()) {
 			if (param.isSystemRelevant() || param.isLayerRelevant()) {
 				return false;
 			}

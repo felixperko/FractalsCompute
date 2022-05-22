@@ -53,7 +53,7 @@ public abstract class EscapeTimeGpuKernelAbstract extends Kernel {
 		params = new double[paramSuppliers.size()*3];
 		paramNames = new String[paramSuppliers.size()];
 		for (int i = 0 ; i < paramSuppliers.size() ; i++)
-			paramNames[i] = paramSuppliers.get(i).getName();
+			paramNames[i] = paramSuppliers.get(i).getUID();
 		List<Layer> layers = kernelParameters.getLayers();
 		sampleOffsets = new float[layers.get(layers.size()-1).getSampleCount()*2];
 		

@@ -17,8 +17,8 @@ public class StaticParamSupplier extends AbstractParamSupplier {
 		super(null);
 	}
 	
-	public StaticParamSupplier(String name, Object obj) {
-		super(name);
+	public StaticParamSupplier(String uid, Object obj) {
+		super(uid);
 		this.obj = obj;
 	}
 
@@ -31,9 +31,9 @@ public class StaticParamSupplier extends AbstractParamSupplier {
 	public ParamSupplier copy() {
 		ParamSupplier other = null;
 		if (obj instanceof Copyable<?>)
-			other =  new StaticParamSupplier(name, ((Copyable) obj).copy());
+			other =  new StaticParamSupplier(uid, ((Copyable) obj).copy());
 		else
-			other = new StaticParamSupplier(name, obj);
+			other = new StaticParamSupplier(uid, obj);
 		other.setLayerRelevant(layerRelevant).setSystemRelevant(systemRelevant);
 		return other;
 	}
@@ -55,7 +55,7 @@ public class StaticParamSupplier extends AbstractParamSupplier {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((uid == null) ? 0 : uid.hashCode());
 		result = prime * result + ((obj == null) ? 0 : obj.hashCode());
 		return result;
 	}
@@ -69,10 +69,10 @@ public class StaticParamSupplier extends AbstractParamSupplier {
 		if (getClass() != obj.getClass())
 			return false;
 		StaticParamSupplier other = (StaticParamSupplier) obj;
-		if (name == null) {
-			if (other.name != null)
+		if (uid == null) {
+			if (other.uid != null)
 				return false;
-		} else if (!name.equals(other.name))
+		} else if (!uid.equals(other.uid))
 			return false;
 		if (this.obj == null) {
 			if (other.obj != null)
@@ -92,6 +92,6 @@ public class StaticParamSupplier extends AbstractParamSupplier {
 	
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName()+" (name="+getName()+" obj="+obj+")";
+		return this.getClass().getSimpleName()+" (uid="+getUID()+" obj="+obj+")";
 	}
 }

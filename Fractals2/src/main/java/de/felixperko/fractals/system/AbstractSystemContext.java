@@ -18,6 +18,7 @@ import de.felixperko.fractals.system.parameters.ParamConfiguration;
 import de.felixperko.fractals.system.parameters.ParamDefinition;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
+import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 import de.felixperko.fractals.system.systems.infra.SystemContext;
 import de.felixperko.fractals.system.systems.infra.ViewContainer;
 import de.felixperko.fractals.system.systems.infra.ViewData;
@@ -93,7 +94,7 @@ public abstract class AbstractSystemContext<D extends ViewData, C extends ViewCo
 		LayerConfiguration oldLayerConfig = null;
 		if (oldParams != null)
 			oldLayerConfig = oldParams.get(layerConfigParamName).getGeneral(LayerConfiguration.class);
-		ParamSupplier newLayerConfigSupplier = paramContainer.getClientParameter(layerConfigParamName);
+		ParamSupplier newLayerConfigSupplier = paramContainer.getParam(layerConfigParamName);
 		LayerConfiguration newLayerConfig = newLayerConfigSupplier.getGeneral(LayerConfiguration.class);
 		if (oldLayerConfig == null || newLayerConfigSupplier.isChanged()) {
 			layerConfig = newLayerConfig;
@@ -140,12 +141,12 @@ public abstract class AbstractSystemContext<D extends ViewData, C extends ViewCo
 
 	@Override
 	public synchronized Map<String, ParamSupplier> getParameters() {
-		return paramContainer.getClientParameters();
+		return paramContainer.getParamMap();
 	}
 
 	@Override
 	public synchronized <T> T getParamValue(String parameterKey, Class<T> valueCls) {
-		ParamSupplier supp = paramContainer.getClientParameter(parameterKey);
+		ParamSupplier supp = paramContainer.getParam(parameterKey);
 		if (supp == null)
 			return null;
 		return supp.get(this, valueCls, null, 0, 0);
@@ -153,7 +154,7 @@ public abstract class AbstractSystemContext<D extends ViewData, C extends ViewCo
 
 	@Override
 	public synchronized Object getParamValue(String parameterKey) {
-		ParamSupplier supp = paramContainer.getClientParameter(parameterKey);
+		ParamSupplier supp = paramContainer.getParam(parameterKey);
 		if (supp == null)
 			return null;
 		return supp.get(this, null, 0, 0);
@@ -161,7 +162,7 @@ public abstract class AbstractSystemContext<D extends ViewData, C extends ViewCo
 
 	@Override
 	public synchronized <T> T getParamValue(String parameterKey, Class<T> valueCls, ComplexNumber chunkPos, int pixel, int sample) {
-		ParamSupplier supp = paramContainer.getClientParameter(parameterKey);
+		ParamSupplier supp = paramContainer.getParam(parameterKey);
 		if (supp == null)
 			return null;
 		return supp.get(this, valueCls, chunkPos, pixel, sample);
@@ -196,21 +197,21 @@ public abstract class AbstractSystemContext<D extends ViewData, C extends ViewCo
 	@Override
 	public void setMidpoint(ComplexNumber midpoint) {
 		this.midpoint = midpoint;
-		StaticParamSupplier supplier = new StaticParamSupplier("midpoint", midpoint);
-		supplier.updateChanged(paramContainer.getClientParameter("midpoint"));
-		paramContainer.addClientParameter(supplier);
+		StaticParamSupplier supplier = new StaticParamSupplier(CommonFractalParameters.PARAM_MIDPOINT, midpoint);
+		supplier.updateChanged(paramContainer.getParam(CommonFractalParameters.PARAM_MIDPOINT));
+		paramContainer.addParam(supplier);
 	}
 
 	@Override
 	public void incrementViewId() {
-		viewId = getParamValue("view", Integer.class) + 1;
-		paramContainer.addClientParameter(new StaticParamSupplier("view", viewId));
+		viewId = getParamValue(CommonFractalParameters.PARAM_VIEW, Integer.class) + 1;
+		paramContainer.addParam(new StaticParamSupplier(CommonFractalParameters.PARAM_VIEW, viewId));
 	}
 
 	@Override
 	public void setViewId(Integer viewId) {
 		this.viewId = viewId;
-		paramContainer.addClientParameter(new StaticParamSupplier("view", viewId));
+		paramContainer.addParam(new StaticParamSupplier(CommonFractalParameters.PARAM_VIEW, viewId));
 	}
 
 	@Override

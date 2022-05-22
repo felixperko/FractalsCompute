@@ -16,6 +16,7 @@ import de.felixperko.fractals.manager.common.Manager;
 import de.felixperko.fractals.network.ClientConfiguration;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstSystem;
+import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.ClassSystemFactory;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
@@ -78,10 +79,10 @@ public class SystemManager extends Manager{
 				ParamContainer oldData = null;
 				if (oldConfiguration != null) {
 					oldData = oldConfiguration.getParamContainer(e.getKey());
-					for (Entry<String, ParamSupplier> param : paramContainer.getClientParameters().entrySet()) {
+					for (Entry<String, ParamSupplier> param : paramContainer.getParamMap().entrySet()) {
 						String paramName = param.getKey();
 						ParamSupplier newParam = param.getValue();
-						ParamSupplier oldParam = oldData.getClientParameter(paramName);
+						ParamSupplier oldParam = oldData.getParam(paramName);
 						if (!newParam.equals(oldParam)) {
 							changed = true;
 						}
@@ -141,7 +142,7 @@ public class SystemManager extends Manager{
 	}
 
 	private CalcSystem initSystem(UUID systemId, ParamContainer data) {
-		ParamSupplier systemNameParam = data.getClientParameter("systemName");
+		ParamSupplier systemNameParam = data.getParam(CommonFractalParameters.PARAM_SYSTEMNAME);
 //		if (systemNameParam == null) {
 //			LOG.error("Invalid system request: systemName parameters not set.");
 //			return null;

@@ -50,7 +50,7 @@ public class ComputeKernelParameters {
 		if (fixedValues != null){
 			for (Entry<String, ComplexNumber> e : fixedValues.entrySet()){
 				String name = e.getKey();
-				ParamSupplier supp = params.getClientParameter(name);
+				ParamSupplier supp = params.getParam(name);
 				if (supp == null){
 					if (firstExpression.getConstants().containsKey(name))
 						continue;

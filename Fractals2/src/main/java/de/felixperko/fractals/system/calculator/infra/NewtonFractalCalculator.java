@@ -5,6 +5,7 @@ import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.Number;
 import de.felixperko.fractals.system.numbers.impl.DoubleComplexNumber;
 import de.felixperko.fractals.system.statistics.IStats;
+import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstSystem;
 import de.felixperko.fractals.system.systems.BreadthFirstSystem.BreadthFirstUpsampleLayer;
 import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 import de.felixperko.fractals.system.task.Layer;
@@ -35,12 +36,12 @@ public abstract class NewtonFractalCalculator extends AbstractFractalsCalculator
 	public void calculate(AbstractArrayChunk chunk, IStats taskStats, CalculateFractalsThread thread) {
 		this.taskStats = taskStats;
 		setRoots();
-		double limit = (Double) systemContext.getParamValue("limit", Number.class).toDouble();
-		int it = (Integer) systemContext.getParamValue("iterations", Integer.class);
+		double limit = (Double) systemContext.getParamValue(BreadthFirstSystem.PARAM_LIMIT, Number.class).toDouble();
+		int it = (Integer) systemContext.getParamValue(CommonFractalParameters.PARAM_ITERATIONS, Integer.class);
 		Layer layer = chunk.getCurrentTask().getStateInfo().getLayer();
 		
 		maxIterations = layer.getMaxIterations();
-		maxIterationsGlobal = systemContext.getParamValue("iterations", Integer.class);
+		maxIterationsGlobal = systemContext.getParamValue(CommonFractalParameters.PARAM_ITERATIONS, Integer.class);
 		storeEndResults = maxIterations != -1 && maxIterations < maxIterationsGlobal;
 		if (maxIterations == -1) {
 			maxIterations = maxIterationsGlobal;

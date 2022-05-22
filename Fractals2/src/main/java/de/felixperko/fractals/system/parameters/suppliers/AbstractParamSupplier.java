@@ -16,7 +16,7 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 	
 	private static final long serialVersionUID = -7127742325514423406L;
 	
-	protected String name;
+	protected String uid;
 	
 	@JsonIgnore
 	boolean systemRelevant = false;
@@ -28,8 +28,8 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 	@JsonIgnore
 	protected boolean changed = false;
 	
-	public AbstractParamSupplier(String name) {
-		this.name = name;
+	public AbstractParamSupplier(String uid) {
+		this.uid = uid;
 	}
 	
 	public boolean isViewRelevant() {
@@ -41,7 +41,7 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.uid = name;
 	}
 
 	public void setChanged(boolean changed) {
@@ -49,8 +49,8 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 	}
 
 	@Override
-	public String getName() {
-		return name;
+	public String getUID() {
+		return uid;
 	}
 
 	public boolean isSystemRelevant() {
@@ -129,7 +129,7 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((uid == null) ? 0 : uid.hashCode());
 		return result;
 	}
 
@@ -142,10 +142,10 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 		if (getClass() != obj.getClass())
 			return false;
 		AbstractParamSupplier other = (AbstractParamSupplier) obj;
-		if (name == null) {
-			if (other.name != null)
+		if (uid == null) {
+			if (other.uid != null)
 				return false;
-		} else if (!name.equals(other.name))
+		} else if (!uid.equals(other.uid))
 			return false;
 		return true;
 	}

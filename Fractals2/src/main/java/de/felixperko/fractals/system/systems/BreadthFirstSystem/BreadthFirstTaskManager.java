@@ -35,6 +35,7 @@ import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.statistics.HistogramStats;
 import de.felixperko.fractals.system.statistics.SummedHistogramStats;
 import de.felixperko.fractals.system.statistics.TimesliceProvider;
+import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 import de.felixperko.fractals.system.systems.infra.CalcSystem;
 import de.felixperko.fractals.system.systems.infra.LifeCycleState;
 import de.felixperko.fractals.system.systems.infra.ViewData;
@@ -246,8 +247,9 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 		
 		boolean reset = context.setParameters(paramContainer);
 		
-		Map<String, ParamSupplier> params = paramContainer.getClientParameters();
-		if (params.get("midpoint").isChanged() || params.get("width").isChanged() || params.get("height").isChanged() || params.get("zoom").isChanged()) {
+		Map<String, ParamSupplier> params = paramContainer.getParamMap();
+		if (params.get(CommonFractalParameters.PARAM_MIDPOINT).isChanged() || params.get(BreadthFirstSystem.PARAM_WIDTH).isChanged()
+				|| params.get(BreadthFirstSystem.PARAM_HEIGHT).isChanged() || params.get(BreadthFirstSystem.PARAM_ZOOM).isChanged()) {
 			updatePredictedMidpoint();
 //			if (!reset)
 				updatedPredictedMidpoint = true;
@@ -259,7 +261,7 @@ public class BreadthFirstTaskManager extends AbstractTaskManager<BreadthFirstTas
 			List<String> changed = new ArrayList<>();
 			for (ParamSupplier supp : params.values())
 				if (supp.isChanged())
-					changed.add(supp.getName());
+					changed.add(supp.getUID());
 			LOG.info("resetting with changed parameters "+Arrays.toString(changed.toArray()));
 //			reset();
 			updatePredictedMidpoint();

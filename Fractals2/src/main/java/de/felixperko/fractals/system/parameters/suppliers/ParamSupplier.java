@@ -18,7 +18,11 @@ import de.felixperko.fractals.system.systems.infra.SystemContext;
 	    @Type(value = CoordinateBasicShiftParamSupplier.class, name = "coordinateBasicShiftSupplier")})
 public interface ParamSupplier extends Serializable{
 	
-	public String getName();
+	/**
+	 * Get the Param UID
+	 * @return
+	 */
+	public String getUID();
 
 	/**
 	 * Retrieves the object based on the default input parameters.

@@ -10,6 +10,7 @@ import de.felixperko.fractals.system.AbstractViewContainer;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.Number;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
+import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 import de.felixperko.fractals.system.systems.infra.ViewData;
 
 public class BFViewContainer extends AbstractViewContainer<BreadthFirstViewData> {
@@ -38,7 +39,7 @@ public class BFViewContainer extends AbstractViewContainer<BreadthFirstViewData>
 	private void copyData(BreadthFirstViewData fromViewData, BreadthFirstViewData toViewData) {
 		ComplexNumber complex11 = context.getNumberFactory().createComplexNumber(1, 1);
 
-		Number oldChunkZoom = fromViewData.paramContainer.getClientParameter("chunkzoom").getGeneral(Number.class);
+		Number oldChunkZoom = fromViewData.paramContainer.getParam("chunkzoom").getGeneral(Number.class);
 		Number zoomFactorN = oldChunkZoom;
 		zoomFactorN.div(context.getChunkZoom());
 		float zoomFactor = (float)zoomFactorN.toDouble();
@@ -50,11 +51,11 @@ public class BFViewContainer extends AbstractViewContainer<BreadthFirstViewData>
 		//check other relevant parameters
 		ParamContainer oldParamContainer = fromViewData.paramContainer;
 		ParamContainer tempParamContainer = new ParamContainer(context.getParamContainer(), true);
-		for (String name : tempParamContainer.getClientParameters().keySet()) {
-			if (name.equals("zoom") || name.equals("midpoint"))
+		for (String uid : tempParamContainer.getParamMap().keySet()) {
+			if (uid.equals(BreadthFirstSystem.PARAM_ZOOM) || uid.equals(CommonFractalParameters.PARAM_MIDPOINT))
 				continue;
-			ParamSupplier tempSupplier = tempParamContainer.getClientParameter(name);
-			ParamSupplier oldSupplier = oldParamContainer.getClientParameter(name);
+			ParamSupplier tempSupplier = tempParamContainer.getParam(uid);
+			ParamSupplier oldSupplier = oldParamContainer.getParam(uid);
 			if (tempSupplier.evaluateChanged(oldSupplier) && tempSupplier.isLayerRelevant())
 				return;
 		}
