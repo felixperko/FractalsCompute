@@ -18,6 +18,14 @@ public class ExpressionsParam implements ParamAttributeHolder{
 		this.mainInputVar = mainInputVar;
 	}
 	
+	public ExpressionsParam(LinkedHashMap<String, String> expressionsForVars) {
+		for (String var : expressionsForVars.keySet()) {
+			if (this.mainInputVar == null)
+				this.mainInputVar = var;
+			this.expressions.put(var, expressionsForVars.get(var));
+		}
+	}
+
 	public void putExpression(String inputVar, String expr) {
 		this.expressions.put(inputVar, expr);
 	}

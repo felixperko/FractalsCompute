@@ -24,6 +24,7 @@ public abstract class EscapeTimeCpuKernelNew implements ComputeKernel {
     double[] tracesReal = null;
     double[] tracesImag = null;
     double[] tracesIterations = null;
+	double[] tracesIterationCount = null;
 	
 	public EscapeTimeCpuKernelNew(ComputeKernelParameters kernelParameters) {
 		
@@ -59,7 +60,7 @@ public abstract class EscapeTimeCpuKernelNew implements ComputeKernel {
 	}
 	
 	public double[][] getTraces(){
-		return new double[][]{tracesReal, tracesImag, tracesIterations};
+		return new double[][]{tracesReal, tracesImag, tracesIterations, tracesIterationCount};
 	}
 	
 	public float run(int pixel, double[] params, float[] sampleOffsets, int chunkSize, int currentSamples, int maxIterations, double limitSq) {
@@ -81,6 +82,7 @@ public abstract class EscapeTimeCpuKernelNew implements ComputeKernel {
 			tracesReal = new double[tracesCount];
 			tracesImag = new double[tracesCount];
 			tracesIterations = new double[tracesCount];
+			tracesIterationCount = new double[1];
 
 			tracesReal[0] = data[0];
 			tracesImag[0] = data[1];
@@ -102,7 +104,7 @@ public abstract class EscapeTimeCpuKernelNew implements ComputeKernel {
 			finished = data[0]*data[0] + data[1]*data[1] > limitSq;
 			if (finished){
 				result = (float) (pixelIt + 1 - Math.log(Math.log(data[0]*data[0] + data[1]*data[1])*0.5 / Math.log(2)) /smoothstepConstant);
-				
+				tracesIterationCount[0] = pixelIt+1;
 				//trace end position
 //				if (pixelIt+1 < tracesCount){
 //					tracesReal[pixelIt+1] = data[0];
@@ -114,6 +116,7 @@ public abstract class EscapeTimeCpuKernelNew implements ComputeKernel {
 		
 		if (finished)
 			return result;
+		tracesIterationCount[0] = maxIterations;
 		return -1;
 		
 	}

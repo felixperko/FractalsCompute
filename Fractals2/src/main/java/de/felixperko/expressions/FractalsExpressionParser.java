@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 import static de.felixperko.fractals.system.calculator.ComputeInstruction.*;
@@ -40,6 +41,18 @@ public class FractalsExpressionParser {
 			put("log", INSTR_LOG_PART);
 		}
 	};
+	
+	public static String getInstructionName(int instr) {
+		for (Entry<String, Integer> e : complexFunctionExpressions.entrySet()) {
+			if (e.getValue() == instr)
+				return e.getKey();
+		}
+		for (Entry<String, Integer> e : singleFunctionExpressions.entrySet()) {
+			if (e.getValue() == instr)
+				return e.getKey();
+		}
+		return null;
+	}
 	
 	public static FractalsExpression parse(String input) throws IllegalArgumentException, IllegalStateException{
 		

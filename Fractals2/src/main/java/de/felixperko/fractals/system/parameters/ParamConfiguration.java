@@ -14,6 +14,9 @@ public class ParamConfiguration implements Serializable{
 	
 	private static final long serialVersionUID = -6181978740061515601L;
 	
+	String uid;
+	double version;
+	
 	List<ParamDefinition> parameters = new ArrayList<>();
 	Map<String, ParamDefinition> definitionsByName = new HashMap<>();
 	Map<String, ParamDefinition> definitionsByUID = new HashMap<>();
@@ -23,6 +26,11 @@ public class ParamConfiguration implements Serializable{
 	Map<String, ParamValueType> types = new HashMap<>();
 	Map<String, Selection<?>> selections = new HashMap<>();
 	Map<String, List<ParamValueType>> listTypes = new HashMap<>();
+	
+	public ParamConfiguration(String uid, double version) {
+		this.uid = uid;
+		this.version = version;
+	}
 	
 	public void addParameterDefinition(ParamDefinition definition, ParamSupplier defaultValue) {
 		parameters.add(definition);
@@ -118,12 +126,12 @@ public class ParamConfiguration implements Serializable{
 		return calculatorDefaultValues;
 	}
 
-	public ParamSupplier getDefaultValue(String calculator, String name) {
-		ParamSupplier supp = defaultValues.get(name);
+	public ParamSupplier getDefaultValue(String calculator, String uid) {
+		ParamSupplier supp = defaultValues.get(uid);
 		if (supp != null || calculator == null)
 			return supp;
 		Map<String, ParamSupplier> map = calculatorDefaultValues.get(calculator);
-		return map == null ? null : map.get(name);
+		return map == null ? null : map.get(uid);
 	}
 	
 	public ParamDefinition getParamDefinitionByName(String name){
@@ -153,5 +161,13 @@ public class ParamConfiguration implements Serializable{
 	
 	public String getName(ParamSupplier supp) {
 		return getName(supp.getUID());
+	}
+
+	public String getUid() {
+		return uid;
+	}
+
+	public double getVersion() {
+		return version;
 	}
 }

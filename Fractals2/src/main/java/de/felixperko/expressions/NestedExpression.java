@@ -156,4 +156,14 @@ public class NestedExpression extends AbstractExpression {
 		return new NegateExpression(contentExpression.copy());
 	}
 
+	@Override
+	public void serialize(StringBuilder sb, boolean pretty) {
+		if (instructionComplex != -1) {
+			sb.append(FractalsExpressionParser.getInstructionName(instructionComplex));
+		}
+		sb.append("(");
+		contentExpression.serialize(sb, pretty);
+		sb.append(")");
+	}
+
 }

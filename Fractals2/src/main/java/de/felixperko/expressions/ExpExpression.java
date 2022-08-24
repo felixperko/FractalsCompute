@@ -308,7 +308,13 @@ public class ExpExpression extends AbstractExpression {
 			supplier = expressionBuilder.paramsByUID.get(((VariableExpression) expExpr).name);
 		}
 		if (expExpr instanceof ConstantExpression) {
-			return baseSmoothstepConstant * ((ConstantExpression) expExpr).complexNumber.absDouble();
+			
+			ComplexNumber cn = ((ConstantExpression) expExpr).complexNumber;
+			boolean negative = cn.realDouble()+cn.imagDouble() < 0.0;
+			if (!negative)
+				return baseSmoothstepConstant * cn.absDouble();
+			else
+				return -baseSmoothstepConstant * cn.absDouble();
 		}
 
 		if (supplier == null)
@@ -321,7 +327,11 @@ public class ExpExpression extends AbstractExpression {
 			if (obj instanceof ComplexNumber) {
 				double r = ((ComplexNumber) obj).realDouble();
 				double i = ((ComplexNumber) obj).imagDouble();
-				return baseSmoothstepConstant * Math.sqrt(r * r + i * i);
+				boolean negative = r+i < 0.0;
+				if (!negative)
+					return baseSmoothstepConstant * Math.sqrt(r * r + i * i);
+				else
+					return -baseSmoothstepConstant * Math.sqrt(r * r + i * i);
 			}
 		}
 		return 0;
@@ -388,6 +398,14 @@ public class ExpExpression extends AbstractExpression {
 	@Override
 	public FractalsExpression copy() {
 		return new ExpExpression(baseExpr.copy(), expExpr.copy());
+	}
+
+	@Override
+	public void serialize(StringBuilder sb, boolean pretty) {
+		baseExpr.serialize(sb, pretty);
+		sb.append("^(");
+		expExpr.serialize(sb, pretty);
+		sb.append(")");
 	}
 
 }

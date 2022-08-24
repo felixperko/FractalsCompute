@@ -153,4 +153,9 @@ public class VariableExpression extends AbstractExpression {
 		return new VariableExpression(name);
 	}
 
+	@Override
+	public void serialize(StringBuilder sb, boolean pretty) {
+		sb.append(name);
+	}
+
 }

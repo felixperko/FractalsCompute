@@ -49,7 +49,7 @@ public class ParamContainer implements Serializable{
 	private final static String UTF8 = "UTF-8";
 	
 	public static void main(String[] args) {
-		ParamConfiguration config = new ParamConfiguration();
+		ParamConfiguration config = new ParamConfiguration("qkuTtk", 1.0);
 		ParamContainer container = new ParamContainer(config);
 		List<Layer> layers = new ArrayList<>();
 		BreadthFirstLayer layer = new BreadthFirstLayer().with_culling(true).with_max_iterations(1000).with_priority_multiplier(3).with_priority_shift(20).with_samples(42);
@@ -301,6 +301,15 @@ public class ParamContainer implements Serializable{
 	
 	public String serializeJsonCompressedBase64() throws IOException {
 		return new String(Base64.getEncoder().encode(serializeJsonCompressed()));
+	}
+	
+	public String serializeCustom(ParamConfiguration paramConfig) {
+		if (paramConfig == null && this.paramConfiguration != null)
+			paramConfig = this.paramConfiguration;
+		StringBuilder sb = new StringBuilder();
+		
+		
+		return sb.toString();
 	}
 
 }

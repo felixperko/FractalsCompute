@@ -22,45 +22,48 @@ public class ParamDefinition implements Serializable{
 	String category;
 	
 	List<Class<? extends ParamSupplier>> possibleClasses;
-	List<ParamValueType> possibleValueTypes;
+	ParamValueType valueType;
+	double valueTypeVersion;
 	
 	boolean resetRendererOnChange = true;
 	boolean visible = true;
 	
 	Object defaultValue = null;
 	
-	public ParamDefinition(String uid, String displayName, String category, Class<? extends ParamSupplier> cls, ParamValueType... possibleValueTypes) {
+	public ParamDefinition(String uid, String displayName, String category, Class<? extends ParamSupplier> cls, ParamValueType valueType, double valueTypeVersion) {
 		this.uid = uid;
 		this.displayName = displayName;
 		this.category = category;
 		this.possibleClasses = new ArrayList<>();
-		this.possibleValueTypes = Arrays.asList(possibleValueTypes);
+		this.valueType = valueType;
+		this.valueTypeVersion = valueTypeVersion;
 		this.possibleClasses.add(cls);
 	}
 	
-	public ParamDefinition(String uid, String displayName, String category, List<Class<? extends ParamSupplier>> classes, ParamValueType... possibleValueTypes) {
+	public ParamDefinition(String uid, String displayName, String category, List<Class<? extends ParamSupplier>> classes, ParamValueType valueType, double valueTypeVersion) {
 		this.uid = uid;
 		this.displayName = displayName;
 		this.category = category;
 		this.possibleClasses = classes;
-		this.possibleValueTypes = Arrays.asList(possibleValueTypes);
+		this.valueType = valueType;
+		this.valueTypeVersion = valueTypeVersion;
 	}
 	
-	public ParamDefinition(String uid, String displayName, String category, ParamValueType possibleValue, Class<? extends ParamSupplier>... classes) {
+	public ParamDefinition(String uid, String displayName, String category, ParamValueType valueType, double valueTypeVersion, Class<? extends ParamSupplier>... classes) {
 		this.uid = uid;
 		this.displayName = displayName;
 		this.category = category;
 		this.possibleClasses = Arrays.asList(classes);
-		this.possibleValueTypes = new ArrayList<>();
-		this.possibleValueTypes.add(possibleValue);
+		this.valueType = valueType;
+		this.valueTypeVersion = valueTypeVersion;
 	}
 
 	public List<Class<? extends ParamSupplier>> getPossibleClasses() {
 		return possibleClasses;
 	}
 
-	public List<ParamValueType> getPossibleValueTypes() {
-		return possibleValueTypes;
+	public ParamValueType getValueType() {
+		return valueType;
 	}
 
 	public ParamConfiguration getConfiguration() {
@@ -94,9 +97,9 @@ public class ParamDefinition implements Serializable{
 		return this;
 	}
 
-	public Object getDefaultValue() {
-		return defaultValue;
-	}
+//	public Object getDefaultValue() {
+//		return defaultValue;
+//	}
 	
 	public String getCategory() {
 		return category;
@@ -172,5 +175,13 @@ public class ParamDefinition implements Serializable{
 			return false;
 		ParamDefinition other = (ParamDefinition) obj;
 		return Objects.equals(uid, other.uid);
+	}
+
+	public double getValueTypeVersion() {
+		return valueTypeVersion;
+	}
+
+	public void setValueTypeVersion(double valueTypeVersion) {
+		this.valueTypeVersion = valueTypeVersion;
 	}
 }

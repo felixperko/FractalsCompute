@@ -9,10 +9,12 @@ public class ParamValueType implements Serializable{
 	private static final long serialVersionUID = -1932439926056557969L;
 	
 	ParamConfiguration configuration;
+	String uid;
 	String name;
 	List<ParamValueField> fields = null;
 	
-	public ParamValueType(String name, ParamValueField... fields) {
+	public ParamValueType(String uid, String name, ParamValueField... fields) {
+		this.uid = uid;
 		this.name = name;
 		this.fields = new ArrayList<>();
 		if (fields != null) {
@@ -28,6 +30,10 @@ public class ParamValueType implements Serializable{
 
 	public void setConfiguration(ParamConfiguration configuration) {
 		this.configuration = configuration;
+	}
+	
+	public String getUID() {
+		return uid;
 	}
 
 	public String getName() {

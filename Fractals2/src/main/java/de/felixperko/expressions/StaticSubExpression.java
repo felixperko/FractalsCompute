@@ -122,4 +122,9 @@ public class StaticSubExpression extends AbstractExpression {
 		return new StaticSubExpression(containedExpression.copy());
 	}
 
+	@Override
+	public void serialize(StringBuilder sb, boolean pretty) {
+		containedExpression.serialize(sb, pretty);
+	}
+
 }

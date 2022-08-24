@@ -36,4 +36,6 @@ public interface FractalsExpression {
 	public boolean modifiesFirstVariable();
 
 	public FractalsExpression copy();
+	
+	public void serialize(StringBuilder sb, boolean pretty);
 }

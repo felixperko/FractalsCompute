@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.objectweb.asm.util.ASMifier;
 
-import com.aparapi.device.Device;
+//import com.aparapi.device.Device;
 
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.task.Layer;

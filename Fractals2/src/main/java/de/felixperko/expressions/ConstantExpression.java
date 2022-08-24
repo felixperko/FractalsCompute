@@ -166,4 +166,22 @@ public class ConstantExpression extends AbstractExpression {
 		return new ConstantExpression(real, imag);
 	}
 
+	@Override
+	public void serialize(StringBuilder sb, boolean pretty) {
+		boolean complex = imag != null && Double.parseDouble(imag) != 0.0;
+		if (complex) {
+			sb.append("(");
+		}
+		
+		double r = Double.parseDouble(real);
+		if (r == (double)((int)r))
+			sb.append((int)r);
+		else
+			sb.append(real);
+		
+		if (complex){
+			sb.append(imag).append("*i").append(")");
+		}
+	}
+
 }

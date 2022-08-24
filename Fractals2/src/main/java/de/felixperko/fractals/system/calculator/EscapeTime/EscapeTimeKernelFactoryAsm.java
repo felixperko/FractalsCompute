@@ -18,8 +18,8 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.util.TraceClassVisitor;
 
-import com.aparapi.device.Device;
-import com.aparapi.internal.model.CacheEnabler;
+//import com.aparapi.device.Device;
+//import com.aparapi.internal.model.CacheEnabler;
 
 import de.felixperko.fractals.system.calculator.ComputeExpression;
 import de.felixperko.fractals.system.calculator.ComputeInstruction;
@@ -42,29 +42,29 @@ public class EscapeTimeKernelFactoryAsm implements IGpuKernelFactory{
 	boolean printClass = false;
 	boolean printJasm = false;
 
-	@Override
-	public EscapeTimeGpuKernelAbstract createKernel(Device device, ComputeKernelParameters kernelParameters) {
-		
-		ComputeExpression expression = kernelParameters.getMainExpression();
-		
-		Class<?> superclass = null;
-		if (kernelParameters.getPrecision() == 32)
-			superclass = EscapeTimeGpuKernel32.class;
-		else if (kernelParameters.getPrecision() == 64)
-			superclass = EscapeTimeGpuKernel64.class;
-		else
-			throw new IllegalArgumentException("precision not supported: "+kernelParameters.getPrecision()+" supported values: 32, 64");
-
-		Class<?> clazz = createClass(expression, superclass, DeviceType.GPU);
-		
-		EscapeTimeGpuKernelAbstract kernel = null;
-		try {
-			kernel = (EscapeTimeGpuKernelAbstract) clazz.getDeclaredConstructor(Device.class, ComputeKernelParameters.class).newInstance(device, kernelParameters);
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-			e.printStackTrace();
-		}
-		return kernel;
-	}
+//	@Override
+//	public EscapeTimeGpuKernelAbstract createKernel(Device device, ComputeKernelParameters kernelParameters) {
+//		
+//		ComputeExpression expression = kernelParameters.getMainExpression();
+//		
+//		Class<?> superclass = null;
+//		if (kernelParameters.getPrecision() == 32)
+//			superclass = EscapeTimeGpuKernel32.class;
+//		else if (kernelParameters.getPrecision() == 64)
+//			superclass = EscapeTimeGpuKernel64.class;
+//		else
+//			throw new IllegalArgumentException("precision not supported: "+kernelParameters.getPrecision()+" supported values: 32, 64");
+//
+//		Class<?> clazz = createClass(expression, superclass, DeviceType.GPU);
+//		
+//		EscapeTimeGpuKernelAbstract kernel = null;
+//		try {
+//			kernel = (EscapeTimeGpuKernelAbstract) clazz.getDeclaredConstructor(Device.class, ComputeKernelParameters.class).newInstance(device, kernelParameters);
+//		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+//			e.printStackTrace();
+//		}
+//		return kernel;
+//	}
 
 	public EscapeTimeCpuKernel createKernelCpu(ComputeKernelParameters kernelParameters) {
 		Class<?> clazz = createClass(kernelParameters.getMainExpression(), EscapeTimeCpuKernel.class, DeviceType.CPU);

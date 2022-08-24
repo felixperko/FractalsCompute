@@ -108,5 +108,12 @@ public class NegateExpression extends AbstractExpression {
 	public FractalsExpression copy() {
 		return new NegateExpression(subExpr.copy());
 	}
+	
+	@Override
+	public void serialize(StringBuilder sb, boolean pretty) {
+		sb.append("-(");
+		subExpr.serialize(sb, pretty);
+		sb.append(")");
+	}
 
 }

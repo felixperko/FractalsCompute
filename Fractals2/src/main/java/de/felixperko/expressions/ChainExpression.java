@@ -238,4 +238,36 @@ public class ChainExpression extends AbstractExpression {
 		return new ChainExpression(subExpressions, partInstructions, complexInstructions);
 	}
 	
+	@Override
+	public void serialize(StringBuilder sb, boolean pretty) {
+		boolean closeBracket = false;
+		for (int i = 0 ; i < subExpressions.size() ; i++) {
+			
+			FractalsExpression subExpr = subExpressions.get(i);
+			
+			subExpr.serialize(sb, pretty);
+			
+			if (closeBracket) {
+				sb.append(")");
+				closeBracket = false;
+			}
+			
+			if (i < complexInstructions.size()) {
+				Integer instr = complexInstructions.get(i);
+				if (instr == ComputeInstruction.INSTR_ADD_COMPLEX) {
+					sb.append(pretty ? " + " : "+");
+				}
+				else if (instr == ComputeInstruction.INSTR_SUB_COMPLEX) {
+					sb.append(pretty ? " - " : "-");
+				}
+				else if (instr == ComputeInstruction.INSTR_MULT_COMPLEX) {
+					sb.append("*");
+				}
+				else if (instr == ComputeInstruction.INSTR_DIV_COMPLEX) {
+					sb.append("/(");
+					closeBracket = true;
+				}
+			}
+		}
+	}
 }
