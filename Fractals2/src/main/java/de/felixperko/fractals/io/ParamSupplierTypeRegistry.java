@@ -1,4 +1,4 @@
-package de.felixperko.io;
+package de.felixperko.fractals.io;
 
 import de.felixperko.fractals.system.parameters.suppliers.CoordinateBasicShiftParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.CoordinateDiscreteParamSupplier;

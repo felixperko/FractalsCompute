@@ -1,4 +1,4 @@
-package de.felixperko.io;
+package de.felixperko.fractals.io;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

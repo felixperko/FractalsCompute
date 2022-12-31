@@ -95,12 +95,18 @@ public abstract class AbstractParamSupplier implements ParamSupplier {
 	@JsonIgnore
 	@Override
 	public <C> C getGeneral(Class<C> cls) {
-		return cast(getGeneral(), cls);
+		Object obj = getGeneral();
+		if (obj == null)
+			return null;
+		return cast(obj, cls);
 	}
 	
 	@Override
 	public <C> C get(SystemContext systemContext, Class<C> valueCls, ComplexNumber chunkPos, int pixel, int sample) {
-		return cast(get(systemContext, chunkPos, pixel, sample), valueCls);
+		Object obj = get(systemContext, chunkPos, pixel, sample);
+		if (obj == null)
+			return null;
+		return cast(obj, valueCls);
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -40,5 +40,23 @@ class TestChainExpression extends AbstractExpressionTest{
 				new ComputeInstruction(INSTR_SUB_COMPLEX, 4, 5, 0, 1),
 				new ComputeInstruction(INSTR_COPY_COMPLEX, 4, 5, 0, 1));
 	}
+	
+	@Test
+	void testAddConstSub() {
+		
+		expr("z", "z+(1-z)");
+		checkInstrs(new ComputeInstruction(INSTR_COPY_COMPLEX, 2, 3, 4, 5),
+				new ComputeInstruction(INSTR_SUB_COMPLEX, 4, 5, 0, 1),
+				new ComputeInstruction(INSTR_ADD_COMPLEX, 0, 1, 4, 5));
+	}
+	
+	@Test
+	void testMultConstSub() {
+		
+		expr("z", "z^2*(1-z)");
+		checkInstrs(new ComputeInstruction(INSTR_COPY_COMPLEX, 2, 3, 4, 5),
+				new ComputeInstruction(INSTR_SUB_COMPLEX, 4, 5, 0, 1),
+				new ComputeInstruction(INSTR_MULT_COMPLEX, 0, 1, 4, 5));
+	}
 
 }

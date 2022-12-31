@@ -1,4 +1,4 @@
-package de.felixperko.io.deserializers;
+package de.felixperko.fractals.io.deserializers;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;

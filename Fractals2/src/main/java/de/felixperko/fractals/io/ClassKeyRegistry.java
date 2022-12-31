@@ -1,4 +1,4 @@
-package de.felixperko.io;
+package de.felixperko.fractals.io;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -232,6 +233,22 @@ public class ParamContainer implements Serializable{
 		ParamDefinition def = paramConfiguration.getParamDefinition(paramSupplier);
 		String name = def != null ? def.getName() : paramSupplier.getUID();
 		paramsByName.put(name, paramSupplier);
+	}
+	
+	public boolean removeParam(String uid) {
+		ParamSupplier supp = paramMap.remove(uid);
+		if (supp == null)
+			return false;
+		String name = null;
+		for (Entry<String, ParamSupplier> e : paramsByName.entrySet()) {
+			if (e.getValue().getUID().equals(uid)) {
+				name = e.getKey();
+				break;
+			}
+		}
+		if (name != null)
+			paramsByName.remove(name);
+		return true;
 	}
 
 	public boolean hasClientParameters() {

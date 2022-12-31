@@ -122,7 +122,8 @@ public class AbstractExpressionTest {
 			ComputeInstruction checkInstr = instrs.length <= i ? null : instrs[i];
 			boolean matches = (exprInstr != null && exprInstr.equals(checkInstr));
 			String importanceStr = matches ? "  " : "! ";
-			debugStrBuilder.append(importanceStr+i+" is: "+exprInstrStr+(matches ? "" : " expected: "+checkInstr.toString())).append("\n");
+			String debugInstrStr = checkInstr != null ? checkInstr.toString() : "NULL";
+			debugStrBuilder.append(importanceStr+i+" is: "+exprInstrStr+(matches ? "" : " expected: "+debugInstrStr)).append("\n");
 		}
 		int i = 0;
 		String debugStr = debugStrBuilder.toString();

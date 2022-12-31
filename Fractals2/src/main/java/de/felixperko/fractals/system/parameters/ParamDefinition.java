@@ -143,8 +143,9 @@ public class ParamDefinition implements Serializable{
 		return resetRendererOnChange;
 	}
 	
-	public void setResetRendererOnChange(boolean resetOnChange){
+	public ParamDefinition setResetRendererOnChange(boolean resetOnChange){
 		this.resetRendererOnChange = resetOnChange;
+		return this;
 	}
 
 	public boolean isVisible() {

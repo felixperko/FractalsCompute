@@ -117,6 +117,11 @@ public class ChainExpression extends AbstractExpression {
 				}
 			}
 		} else {
+			if (complexExpression) {
+				complexExpression = true;
+				tempResultIndexReal = subExpressions.get(0).getResultIndexReal();
+				tempResultIndexImag = subExpressions.get(0).getResultIndexImag();
+			}
 			if (!complexExpression) {
 				if (subExpr.hasTempResult()){
 					if (tempResultIndexReal == -1 && subExpr.isSingleRealExpression()){

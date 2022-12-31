@@ -59,17 +59,17 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 	public ParamConfiguration createParameterConfiguration() {
 		ParamConfiguration config = CommonFractalParameters.getCommonParameterConfiguration();
 		
-		ParamValueType layerType = new ParamValueType("BreadthFirstLayer",
+		ParamValueType layerType = new ParamValueType("BreadthFirstLayer", "BreadthFirstLayer",
 				new ParamValueField("priority_shift", doubleType, 0d),
 				new ParamValueField("priority_multiplier", doubleType, 0d),
 				new ParamValueField("samples", integerType, 1));
-		ParamValueType upsampleLayerType = new ParamValueType("BreadthFirstUpsampleLayer", 
+		ParamValueType upsampleLayerType = new ParamValueType("BreadthFirstUpsampleLayer", "BreadthFirstUpsampleLayer", 
 				new ParamValueField("priority_shift", doubleType, 0d),
 				new ParamValueField("priority_multiplier", doubleType, 0d),
 				new ParamValueField("upsample", integerType, 1),
 				new ParamValueField("culling", booleanType, true));
 		
-		ParamValueType layerconfigurationType = new ParamValueType("LayerConfiguration",
+		ParamValueType layerconfigurationType = new ParamValueType("LayerConfiguration", "LayerConfiguration",
 				new ParamValueField("layers", listType),
 				new ParamValueField("simStep", doubleType, 0.05),
 				new ParamValueField("simCount", integerType, 20),
@@ -81,22 +81,22 @@ public class BreadthFirstSystem extends AbstractCalcSystem {
 		
 		List<ParamDefinition> defs_bf = new ArrayList<>();
 		List<ParamSupplier> defaultValues = new ArrayList<>();
-		defs_bf.add(new ParamDefinition(PARAM_ZOOM, "zoom", "Mapping", StaticParamSupplier.class, numberType)
+		defs_bf.add(new ParamDefinition(PARAM_ZOOM, "zoom", "Mapping", StaticParamSupplier.class, numberType, 1.0)
 				.withDescription("The current default coordinate zoom factor."));
-		defs_bf.add(new ParamDefinition(PARAM_WIDTH, "width", "Automatic", StaticParamSupplier.class, integerType)
+		defs_bf.add(new ParamDefinition(PARAM_WIDTH, "width", "Automatic", StaticParamSupplier.class, integerType, 1.0)
 				.withDescription("The calculation width."));
-		defs_bf.add(new ParamDefinition(PARAM_HEIGHT, "height", "Automatic", StaticParamSupplier.class, integerType)
+		defs_bf.add(new ParamDefinition(PARAM_HEIGHT, "height", "Automatic", StaticParamSupplier.class, integerType, 1.0)
 				.withDescription("The calculation height."));
 		
-		defs_bf.add(new ParamDefinition(PARAM_LIMIT, "limit", "Advanced", StaticParamSupplier.class, numberType)
+		defs_bf.add(new ParamDefinition(PARAM_LIMIT, "limit", "Advanced", StaticParamSupplier.class, numberType, 1.0)
 				.withDescription("Bailout radius. Increase to reduce coloring artifacts, Decrease to improve performance."));
-		defs_bf.add(new ParamDefinition(PARAM_BORDER_GENERATION, "border_generation", "Advanced", StaticParamSupplier.class, doubleType)
+		defs_bf.add(new ParamDefinition(PARAM_BORDER_GENERATION, "border_generation", "Advanced", StaticParamSupplier.class, doubleType, 1.0)
 				.withDescription("The chunk distance from rendered area for which chunk calculation should continue."));
-		defs_bf.add(new ParamDefinition(PARAM_BORDER_DISPOSE, "border_dispose", "Advanced", StaticParamSupplier.class, doubleType)
+		defs_bf.add(new ParamDefinition(PARAM_BORDER_DISPOSE, "border_dispose", "Advanced", StaticParamSupplier.class, doubleType, 1.0)
 				.withDescription("The chunk distance at which chunks are deleted to preserve memory."));
-		defs_bf.add(new ParamDefinition(PARAM_TASK_BUFFER, "task_buffer", "Advanced", StaticParamSupplier.class, integerType)
+		defs_bf.add(new ParamDefinition(PARAM_TASK_BUFFER, "task_buffer", "Advanced", StaticParamSupplier.class, integerType, 1.0)
 				.withDescription("The amount of tasks that should be buffered for the calculation workers."));
-		defs_bf.add(new ParamDefinition(PARAM_LAYER_CONFIG, "layerConfiguration", "Advanced", StaticParamSupplier.class, layerconfigurationType)
+		defs_bf.add(new ParamDefinition(PARAM_LAYER_CONFIG, "layerConfiguration", "Advanced", StaticParamSupplier.class, layerconfigurationType, 1.0)
 				.withDescription("Manages the layer order in which the calculation is performed."));
 			
 		NumberFactory nf = new NumberFactory(Number.class, ComplexNumber.class);

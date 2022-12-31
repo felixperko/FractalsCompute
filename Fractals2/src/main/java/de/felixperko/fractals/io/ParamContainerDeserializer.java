@@ -1,4 +1,4 @@
-package de.felixperko.io;
+package de.felixperko.fractals.io;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -19,11 +19,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import de.felixperko.fractals.data.ParamContainer;
+import de.felixperko.fractals.io.deserializers.AbstractParamXMLDeserializer;
 import de.felixperko.fractals.system.parameters.ParamConfiguration;
 import de.felixperko.fractals.system.parameters.ParamDefinition;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
-import de.felixperko.io.deserializers.AbstractParamXMLDeserializer;
 
 public class ParamContainerDeserializer {
 	
@@ -38,23 +38,62 @@ public class ParamContainerDeserializer {
 		this.deserializerRegistry = deserializerRegistry;
 	}
 
-	public ParamContainer deserialize(byte[] data, ParamConfiguration config, ParamContainer baseContainer, boolean failOnParamError) {
+	public ParamContainer[] deserialize(byte[] data, ParamConfiguration computeConfig, ParamContainer computeBaseContainer,
+			ParamConfiguration drawConfig, ParamContainer drawBaseContainer, boolean failOnParamError) {
 		ByteArrayInputStream bais = new ByteArrayInputStream(data);
-		return deserialize(bais, config, baseContainer, failOnParamError);
+		return deserialize(bais, computeConfig, computeBaseContainer, drawConfig, drawBaseContainer, failOnParamError);
 	}
 	
-	public ParamContainer deserialize(InputStream is, ParamConfiguration config, ParamContainer baseContainer, boolean failOnParamError) {
+	public ParamContainer[] deserialize(InputStream is, ParamConfiguration computeConfig, ParamContainer computeBaseContainer,
+			ParamConfiguration drawConfig, ParamContainer drawBaseContainer, boolean failOnParamError) {
 		try {
 			DocumentBuilderFactory factory =DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			Document doc = builder.parse(is);
 			
-			NodeList root = doc.getElementsByTagName("params");
-			
-			Node containerNode = root.item(0);
-			if (containerNode == null)
+			NodeList roots = doc.getElementsByTagName(ParamContainerSerializer.NODE_NAME_ROOT);
+			Node rootNode = roots.item(0);
+			if (rootNode == null)
 				return null;
 			
+			ParamContainer[] containers = new ParamContainer[2];
+			containers[0] = deserializeContainer(computeConfig, computeBaseContainer, failOnParamError, doc, ParamContainerSerializer.NODE_NAME_COMPUTE, rootNode);
+			containers[1] = deserializeContainer(drawConfig, drawBaseContainer, failOnParamError, doc, ParamContainerSerializer.NODE_NAME_DRAW, rootNode);
+			
+			return containers;
+			
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	protected ParamContainer deserializeContainer(ParamConfiguration config, ParamContainer baseContainer,
+			boolean failOnParamError, Document doc, String parentNodeName, Node rootNode)
+			throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+		
+		NodeList containerNodes = rootNode.getChildNodes();
+		for (int i = 0 ; i < containerNodes.getLength() ; i++) {
+			Node containerNode = containerNodes.item(i);
+			if (!containerNode.getNodeName().equals(parentNodeName))
+				continue;
+		
 			ParamContainer container;
 			if (baseContainer == null)
 				container = new ParamContainer(config);
@@ -62,8 +101,8 @@ public class ParamContainerDeserializer {
 				container = new ParamContainer(baseContainer, true);
 			
 			NodeList paramNodes = containerNode.getChildNodes();
-			for (int i = 0 ; i < paramNodes.getLength() ; i++) {
-				Node paramNode = paramNodes.item(i);
+			for (int j = 0 ; j < paramNodes.getLength() ; j++) {
+				Node paramNode = paramNodes.item(j);
 				if (!"p".equals(paramNode.getNodeName()))
 					continue;
 				NamedNodeMap attrs = paramNode.getAttributes();
@@ -102,7 +141,7 @@ public class ParamContainerDeserializer {
 					container.addParam(supp);
 				}
 			}
-			
+		
 			//add defaults
 			for (ParamDefinition def : config.getParameters()) {
 				String uid = def.getUID();
@@ -116,27 +155,7 @@ public class ParamContainerDeserializer {
 					}
 				}
 			}
-			
 			return container;
-			
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
 		}
 		return null;
 	}

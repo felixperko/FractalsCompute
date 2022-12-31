@@ -1,12 +1,12 @@
-package de.felixperko.io;
+package de.felixperko.fractals.io;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.felixperko.io.deserializers.AbstractParamXMLDeserializer;
-import de.felixperko.io.serializers.AbstractParamXMLSerializer;
+import de.felixperko.fractals.io.deserializers.AbstractParamXMLDeserializer;
+import de.felixperko.fractals.io.serializers.AbstractParamXMLSerializer;
 
 public class ParamXMLDeserializerRegistry {
 	

@@ -1,4 +1,4 @@
-package de.felixperko.io.serializers;
+package de.felixperko.fractals.io.serializers;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -48,7 +48,7 @@ public abstract class AbstractParamXMLSerializer {
 		if (!(paramSupp instanceof StaticParamSupplier))
 			throw new IllegalArgumentException("Serializer for type "+checkObjCls.getName()+" expects StaticParamSupplier as container");
 		if (!checkObjCls.isInstance(paramSupp.getGeneral()))
-			throw new IllegalArgumentException("Expressions can only be serialized from class "+checkObjCls.getName());
+			throw new IllegalArgumentException(paramTypeUid+" ('"+paramTypeName+"') can only be serialized from class "+checkObjCls.getName()+" not: "+paramSupp.getGeneral().getClass().getName());
 	}
 
 	protected void setText(Node paramRootNode, String text) {

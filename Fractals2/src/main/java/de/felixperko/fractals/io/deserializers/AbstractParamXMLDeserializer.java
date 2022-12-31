@@ -1,11 +1,11 @@
-package de.felixperko.io.deserializers;
+package de.felixperko.fractals.io.deserializers;
 
 import org.w3c.dom.Node;
 
 import de.felixperko.fractals.data.ParamContainer;
+import de.felixperko.fractals.io.serializers.AbstractParamXMLSerializer;
 import de.felixperko.fractals.system.parameters.ParamConfiguration;
 import de.felixperko.fractals.system.parameters.ParamValueType;
-import de.felixperko.io.serializers.AbstractParamXMLSerializer;
 
 public abstract class AbstractParamXMLDeserializer {
 	

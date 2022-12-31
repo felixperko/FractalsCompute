@@ -19,6 +19,8 @@ import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
  * 
  */
 public class ExpExpression extends AbstractExpression {
+	
+	public static String tempOptimizationSymbolName = "temp_exp";
 
 //	static int counter = 0;
 
@@ -28,7 +30,6 @@ public class ExpExpression extends AbstractExpression {
 	int maxOptimizedPow = 32;
 	int minOptimizedPow = -32;
 	int tempVarSlotOptimization = -1;
-	String tempOptimizationSymbolName = "temp_exp";
 
 	// temp results:
 	// b^e
@@ -61,7 +62,7 @@ public class ExpExpression extends AbstractExpression {
 //		boolean copyExpVar = !(firstExpExpr instanceof VariableExpression && ((VariableExpression)firstExpExpr).getVariableName().equals(expressionBuilder.inputVarName));
 		boolean copyExpVar = expExpr.modifiesFirstVariable();
 		expExpr.registerSymbolUses(expressionBuilder, numberFactory, copyExpVar);
-		if (needsTempOptimizationVar()) {
+		if (needsTempOptimizationVar(expressionBuilder)) {
 			ExpressionSymbol symbol = expressionBuilder.getReferenceExpressionSymbol(tempOptimizationSymbolName);
 			symbol.setVisible(false);
 			symbol.addOccurence();
@@ -81,14 +82,24 @@ public class ExpExpression extends AbstractExpression {
 		this.expExpr.addEndInstructions(instructions, expressionBuilder);
 	}
 
-	protected boolean needsTempOptimizationVar() {
+	protected boolean needsTempOptimizationVar(ComputeExpressionBuilder expressionBuilder) {
 		FractalsExpression expExpr = this.expExpr;
 		while (expExpr instanceof NestedExpression)
 			expExpr = ((NestedExpression) expExpr).contentExpression;
-		ComplexNumber value;
+		ComplexNumber value = null;
+		if (expExpr instanceof VariableExpression) {
+			String uid = expressionBuilder.uidsByName.get(((VariableExpression)expExpr).name);
+			if (uid == null)
+				uid = ((VariableExpression)expExpr).name;
+			ParamSupplier supp = expressionBuilder.paramsByUID.get(uid);
+			if (supp instanceof StaticParamSupplier && supp.getGeneral() instanceof ComplexNumber)
+				value = supp.getGeneral(ComplexNumber.class);
+		}
+		
 		if (expExpr instanceof ConstantExpression) {
 			value = ((ConstantExpression) expExpr).complexNumber;
-		} else {
+		}
+		if (value == null) {
 			return false;
 		}
 		double r = value.realDouble();

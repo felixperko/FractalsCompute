@@ -47,6 +47,8 @@ public class StaticParamSupplier extends AbstractParamSupplier {
 		} else {
 			StaticParamSupplier oldStatic = (StaticParamSupplier)old;
 			Object oldObj = oldStatic.getGeneral();
+			if (obj == null)
+				return oldObj == null;
 			return !obj.equals(oldObj);
 		}
 	}

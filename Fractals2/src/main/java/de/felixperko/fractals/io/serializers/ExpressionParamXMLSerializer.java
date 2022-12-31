@@ -1,4 +1,4 @@
-package de.felixperko.io.serializers;
+package de.felixperko.fractals.io.serializers;
 
 import java.util.Map.Entry;
 

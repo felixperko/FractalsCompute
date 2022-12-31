@@ -1,4 +1,4 @@
-package de.felixperko.io;
+package de.felixperko.fractals.io;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,16 +6,20 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.felixperko.fractals.data.ParamContainer;
+import de.felixperko.fractals.io.serializers.AbstractParamXMLSerializer;
 import de.felixperko.fractals.system.parameters.ParamConfiguration;
 import de.felixperko.fractals.system.parameters.ParamDefinition;
 import de.felixperko.fractals.system.parameters.ParamValueType;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
 import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
-import de.felixperko.io.serializers.AbstractParamXMLSerializer;
 
 public class ParamContainerSerializer {
-	
+
+	public static final String NODE_NAME_ROOT = "params";
+	public static final String NODE_NAME_COMPUTE = "compute";
+	public static final String NODE_NAME_DRAW = "draw";
+
 	static Logger LOG = LoggerFactory.getLogger(ParamContainerSerializer.class);
 	
 	ParamXMLSerializerRegistry xmlRegistry;
@@ -26,13 +30,25 @@ public class ParamContainerSerializer {
 		this.typeRegistry = paramSupplierTypeRegistry;
 	}
 	
-	public byte[] serialize(ParamContainer container, ParamConfiguration config, boolean exi, boolean encodeBase64, boolean skipDefaults, boolean failOnParamError) {
+	public byte[] serialize(ParamContainer computeContainer, ParamConfiguration computeConfig, ParamContainer drawContainer, ParamConfiguration drawConfig, boolean exi, boolean encodeBase64, boolean skipDefaults, boolean failOnParamError) {
 		Document document = XMLIO.createDocument();
 		
-    	Element configEl = document.createElement("params");
+		Element rootElement = document.createElement(NODE_NAME_ROOT);
+    	document.appendChild(rootElement);
+		serializeContainer(NODE_NAME_COMPUTE, computeContainer, computeConfig, skipDefaults, failOnParamError, document, rootElement);
+		serializeContainer(NODE_NAME_DRAW, drawContainer, drawConfig, skipDefaults, failOnParamError, document, rootElement);
+		
+		byte[] data = XMLIO.encodeToByteArray(document, exi, encodeBase64);
+		return data;
+	}
+
+	protected void serializeContainer(String parentNodeName, ParamContainer container, ParamConfiguration config,
+			boolean skipDefaults, boolean failOnParamError, Document document, Element rootElement) {
+		
+		Element configEl = document.createElement(parentNodeName);
     	configEl.setAttribute("def", config.getUid());
     	configEl.setAttribute("v", ""+config.getVersion());
-    	document.appendChild(configEl);
+    	rootElement.appendChild(configEl);
     	
     	for (ParamDefinition def : config.getParameters()) {
 
@@ -75,9 +91,6 @@ public class ParamContainerSerializer {
 			}
 			configEl.appendChild(paramEl);
     	}
-		
-		byte[] data = XMLIO.encodeToByteArray(document, exi, encodeBase64);
-		return data;
 	}
 
 	protected void handleError(boolean failOnParamError, String error) {

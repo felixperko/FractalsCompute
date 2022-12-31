@@ -7,7 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.felixperko.fractals.data.ParamContainer;
+import de.felixperko.fractals.system.numbers.NumberFactory;
+import de.felixperko.fractals.system.parameters.suppliers.CoordinateBasicShiftParamSupplier;
 import de.felixperko.fractals.system.parameters.suppliers.ParamSupplier;
+import de.felixperko.fractals.system.parameters.suppliers.StaticParamSupplier;
+import de.felixperko.fractals.system.systems.common.CommonFractalParameters;
 import de.felixperko.fractals.system.systems.infra.Selection;
 
 public class ParamConfiguration implements Serializable{
@@ -40,6 +45,16 @@ public class ParamConfiguration implements Serializable{
 		if (defaultValue != null)
 			addDefaultValue(defaultValue);
 	}
+	
+	public boolean removeParameterDefinition(String uid) {
+		ParamDefinition def = definitionsByUID.remove(uid);
+		if (def == null)
+			return false;
+		definitionsByName.remove(def.getName());
+		parameters.remove(def);
+		def.configuration = null;
+		return true;
+	}
 
 	public void addDefaultValue(ParamSupplier defaultValue) {
 		defaultValues.put(defaultValue.getUID(), defaultValue);
@@ -49,6 +64,18 @@ public class ParamConfiguration implements Serializable{
 		types.put(valueType.getName(), valueType);
 		valueType.setConfiguration(this);
 	}
+	
+    public ParamDefinition createTempParam(String uid, String name, ParamValueType type, ParamSupplier supplier, ParamContainer paramContainer) {
+        //String uid = UIDGenerator.fromRandomBytes(6);
+        ParamDefinition newDef = new ParamDefinition(uid, name, "Calculator",
+                type, 1.0, StaticParamSupplier.class, CoordinateBasicShiftParamSupplier.class);
+        addDefaultValue(supplier);
+        NumberFactory nf = paramContainer.getParam(CommonFractalParameters.PARAM_NUMBERFACTORY).getGeneral(NumberFactory.class);
+        StaticParamSupplier defaultVal = new StaticParamSupplier(uid, nf.ccn(1, 0));
+        addParameterDefinition(newDef, defaultVal);
+        paramContainer.addParam(supplier);
+        return newDef;
+    }
 	
 	public ParamValueType getType(String name) {
 		return types.get(name);
@@ -92,7 +119,7 @@ public class ParamConfiguration implements Serializable{
 		addDefaultValues(defaultValues);
 	}
 
-	public void addValueTypes(ParamValueType[] types) {
+	public void addValueTypes(ParamValueType... types) {
 		for (ParamValueType type : types) {
 			addValueType(type);
 		}

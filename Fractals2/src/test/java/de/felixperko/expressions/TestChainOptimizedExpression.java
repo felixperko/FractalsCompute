@@ -60,5 +60,12 @@ public class TestChainOptimizedExpression extends AbstractExpressionTest{
 	public void testOptimizedPow3PlusPow2() {
 		checkInstrs("z", "z^3+z^2", INSTR_COPY_COMPLEX, INSTR_SQUARE_COMPLEX, INSTR_MULT_COMPLEX, INSTR_ADD_COMPLEX);
 	}
+	
+	@Test
+	public void testOptimizedVariable3() {
+		setConstant("p", nf.ccn(3.0, 0.0));
+		expr("z", "z^p");
+		checkInstrs(INSTR_COPY_COMPLEX, INSTR_SQUARE_COMPLEX, INSTR_ADD_COMPLEX);
+	}
 
 }
