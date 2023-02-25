@@ -258,55 +258,68 @@ public class ExpExpression extends AbstractExpression {
 
 	@Override
 	public FractalsExpression getDerivative(String derivativeVariableName) {
-		if (baseExpr instanceof VariableExpression
-				&& derivativeVariableName.equals(((VariableExpression) baseExpr).getVariableName())) {
-			FractalsExpression expExpr = this.expExpr;
-			if (expExpr instanceof NestedExpression) {
-				NestedExpression ne = ((NestedExpression) expExpr);
-				if (ne.instructionComplex < 0 && ne.instructionPart < 0)
-					expExpr = ne.contentExpression;
-			}
-			boolean expConstant = expExpr instanceof ConstantExpression;
-			if (expConstant) {
-				ConstantExpression ce = (ConstantExpression) expExpr;
-				double r = Double.parseDouble(ce.real);
-				double i = Double.parseDouble(ce.imag);
-				if (i == 0.0) {
-					if (r == 1.0) // 1*x^0
-						return new ConstantExpression("1", "0");
-					else if (r == 2.0) { // 2*x^1
-						List<FractalsExpression> subExprParts = new ArrayList<>();
-						List<Integer> subExprPartLinks = new ArrayList<>();
-						List<Integer> subExprComplexLinks = new ArrayList<>();
-						subExprParts.add(baseExpr.copy());
-						subExprParts.add(new ConstantExpression(2, 0));
-						subExprPartLinks.add(-1);
-						subExprComplexLinks.add(ComputeInstruction.INSTR_MULT_COMPLEX);
-						return new MultExpression(subExprParts, subExprPartLinks, subExprComplexLinks);
-					}
-					else if (r == -1.0) // -x^-2
-						return new NegateExpression(new ExpExpression(baseExpr.copy(), new ConstantExpression(r - 1, i)));
-					else { // x^(pow-1)*pow
-						ExpExpression derivExp = new ExpExpression(baseExpr.copy(), new ConstantExpression(r - 1, i));
-						return new MultExpression(Arrays.asList(derivExp, new ConstantExpression(r, i)),
-								Arrays.asList(ComputeInstruction.INSTR_MULT_PART),
-								Arrays.asList(ComputeInstruction.INSTR_MULT_COMPLEX));
-					}
+		boolean baseIdentity = baseExpr instanceof VariableExpression
+				&& derivativeVariableName.equals(((VariableExpression) baseExpr).getVariableName());
+		
+		FractalsExpression newExpExpr = null;
+		
+		FractalsExpression expExpr = this.expExpr;
+		if (expExpr instanceof NestedExpression) {
+			NestedExpression ne = ((NestedExpression) expExpr);
+			if (ne.instructionComplex < 0 && ne.instructionPart < 0)
+				expExpr = ne.contentExpression;
+		}
+		boolean expConstant = expExpr instanceof ConstantExpression;
+		if (expConstant) {
+			ConstantExpression ce = (ConstantExpression) expExpr;
+			double r = Double.parseDouble(ce.real);
+			double i = Double.parseDouble(ce.imag);
+			if (i == 0.0) {
+				if (r == 1.0) // 1*x^0
+					newExpExpr = new ConstantExpression("1", "0");
+				else if (r == 2.0) { // 2*x^1
+					List<FractalsExpression> subExprParts = new ArrayList<>();
+					List<Integer> subExprPartLinks = new ArrayList<>();
+					List<Integer> subExprComplexLinks = new ArrayList<>();
+					subExprParts.add(baseExpr.copy());
+					subExprParts.add(new ConstantExpression(2, 0));
+					subExprPartLinks.add(-1);
+					subExprComplexLinks.add(ComputeInstruction.INSTR_MULT_COMPLEX);
+					newExpExpr = new MultExpression(subExprParts, subExprPartLinks, subExprComplexLinks);
+				}
+				else if (r == -1.0) // -x^-2
+					newExpExpr = new NegateExpression(new ExpExpression(baseExpr.copy(), new ConstantExpression(r - 1, i)));
+				else { // x^(pow-1)*pow
+					ExpExpression derivExp = new ExpExpression(baseExpr.copy(), new ConstantExpression(r - 1, i));
+					newExpExpr = new MultExpression(Arrays.asList(derivExp, new ConstantExpression(r, i)),
+							Arrays.asList(ComputeInstruction.INSTR_MULT_PART),
+							Arrays.asList(ComputeInstruction.INSTR_MULT_COMPLEX));
 				}
 			}
+		}
+		else {
 			//remaining cases:
 			ArrayList<FractalsExpression> subExprs = new ArrayList<>();
 			subExprs.add(expExpr.copy());
 			subExprs.add(new ConstantExpression(1f, 0f));
 			ChainExpression decrExpExpr = new ChainExpression(subExprs, Arrays.asList(-1), Arrays.asList(ComputeInstruction.INSTR_SUB_COMPLEX));
-			ExpExpression derivedExpression = new ExpExpression(baseExpr.copy(), decrExpExpr);
-			ArrayList<FractalsExpression> subExprs2 = new ArrayList<>();
-			subExprs2.add(derivedExpression);
-			subExprs2.add(expExpr.copy());
-			MultExpression multExpression = new MultExpression(subExprs2, Arrays.asList(-1), Arrays.asList(ComputeInstruction.INSTR_MULT_COMPLEX));
-			return multExpression;
+			newExpExpr = new ExpExpression(baseExpr.copy(), decrExpExpr);
 		}
-		return copy();
+		
+		ArrayList<FractalsExpression> subExprs2 = new ArrayList<>();
+		subExprs2.add(newExpExpr);
+		if (!baseIdentity)
+			subExprs2.add(baseExpr.getDerivative(derivativeVariableName));
+		if (!expConstant)
+			subExprs2.add(expExpr.copy());
+		
+		if (subExprs2.size() == 1)
+			return newExpExpr;
+		List<Integer> instrs = new ArrayList<>();
+		for (int i = 0 ; i < subExprs2.size()-1 ; i++)
+			instrs.add(ComputeInstruction.INSTR_MULT_COMPLEX);
+		MultExpression multExpression = new MultExpression(subExprs2, Arrays.asList(-1), instrs);
+		return multExpression;
 	}
 
 	@Override

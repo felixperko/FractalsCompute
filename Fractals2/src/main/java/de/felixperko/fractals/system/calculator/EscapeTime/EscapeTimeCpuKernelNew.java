@@ -95,7 +95,8 @@ public abstract class EscapeTimeCpuKernelNew implements ComputeKernel {
 			//trace
 //			if (pixelIt < tracesCount){
 //				tracesReal[pixelIt] = data[0];
-//				tracesImag[pixelIt] = dCata[1];
+//				tracesImag[pixelIt] = data[1];
+//				tracesIterations[pixelIt] = pixelIt;
 //			}
 			
 			iterate(0);
@@ -109,6 +110,7 @@ public abstract class EscapeTimeCpuKernelNew implements ComputeKernel {
 //				if (pixelIt+1 < tracesCount){
 //					tracesReal[pixelIt+1] = data[0];
 //					tracesImag[pixelIt+1] = data[1];
+//					tracesIterations[pixelIt+1] = pixelIt+1;
 //				}
 				break;
 			}

@@ -37,13 +37,25 @@ public class ParamConfiguration implements Serializable{
 		this.version = version;
 	}
 	
-	public void addParameterDefinition(ParamDefinition definition, ParamSupplier defaultValue) {
+	public ParamDefinition addParameterDefinition(ParamDefinition definition, ParamSupplier defaultValue) {
+		if (!types.containsKey(definition.getValueType().getName()))
+			addValueType(definition.getValueType());
 		parameters.add(definition);
 		definitionsByName.put(definition.getName(), definition);
 		definitionsByUID.put(definition.getUID(), definition);
 		definition.setConfiguration(this);
 		if (defaultValue != null)
 			addDefaultValue(defaultValue);
+		return definition;
+	}
+	
+	public ParamDefinition addParamDefStatic(String uid, String displayName, String category, ParamValueType valueType, double valueTypeVersion, Object defaultValue){
+		StaticParamSupplier supplier = null;
+		if (defaultValue != null)
+			supplier = new StaticParamSupplier(uid, defaultValue);
+		ParamDefinition definition = new ParamDefinition(uid, displayName, category, StaticParamSupplier.class, valueType, valueTypeVersion);
+		addParameterDefinition(definition, supplier);
+		return definition;
 	}
 	
 	public boolean removeParameterDefinition(String uid) {
@@ -65,14 +77,12 @@ public class ParamConfiguration implements Serializable{
 		valueType.setConfiguration(this);
 	}
 	
-    public ParamDefinition createTempParam(String uid, String name, ParamValueType type, ParamSupplier supplier, ParamContainer paramContainer) {
+    public ParamDefinition createTempParam(String uid, String name, String category, ParamValueType type,
+    		ParamSupplier supplier, ParamContainer paramContainer, Class<? extends ParamSupplier>[] supplierClasses) {
         //String uid = UIDGenerator.fromRandomBytes(6);
-        ParamDefinition newDef = new ParamDefinition(uid, name, "Calculator",
-                type, 1.0, StaticParamSupplier.class, CoordinateBasicShiftParamSupplier.class);
+        ParamDefinition newDef = new ParamDefinition(uid, name, category, type, 1.0, supplierClasses);
         addDefaultValue(supplier);
-        NumberFactory nf = paramContainer.getParam(CommonFractalParameters.PARAM_NUMBERFACTORY).getGeneral(NumberFactory.class);
-        StaticParamSupplier defaultVal = new StaticParamSupplier(uid, nf.ccn(1, 0));
-        addParameterDefinition(newDef, defaultVal);
+        addParameterDefinition(newDef, supplier);
         paramContainer.addParam(supplier);
         return newDef;
     }

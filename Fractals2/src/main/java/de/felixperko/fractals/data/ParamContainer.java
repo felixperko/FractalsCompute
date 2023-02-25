@@ -144,6 +144,11 @@ public class ParamContainer implements Serializable{
 		this.paramConfiguration = paramConfiguration;
 	}
 
+
+	public ParamConfiguration getParamConfiguration() {
+		return paramConfiguration;
+	}
+
 	/**
 	 * Applies the given parameters to this container. old values are overwritten and the changed property is updated.
 	 * @param copyContainer - the container to take the new values from
@@ -320,13 +325,13 @@ public class ParamContainer implements Serializable{
 		return new String(Base64.getEncoder().encode(serializeJsonCompressed()));
 	}
 	
-	public String serializeCustom(ParamConfiguration paramConfig) {
-		if (paramConfig == null && this.paramConfiguration != null)
-			paramConfig = this.paramConfiguration;
-		StringBuilder sb = new StringBuilder();
-		
-		
-		return sb.toString();
-	}
+//	public String serializeCustom(ParamConfiguration paramConfig) {
+//		if (paramConfig == null && this.paramConfiguration != null)
+//			paramConfig = this.paramConfiguration;
+//		StringBuilder sb = new StringBuilder();
+//		
+//		
+//		return sb.toString();
+//	}
 
 }

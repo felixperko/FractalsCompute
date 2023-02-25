@@ -1,5 +1,7 @@
 package de.felixperko.expressions;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -7,6 +9,8 @@ import java.util.Set;
 import de.felixperko.fractals.system.calculator.ComputeInstruction;
 import de.felixperko.fractals.system.numbers.ComplexNumber;
 import de.felixperko.fractals.system.numbers.NumberFactory;
+
+import static de.felixperko.fractals.system.calculator.ComputeInstruction.*;
 
 /**
  * eg.
@@ -142,7 +146,26 @@ public class NestedExpression extends AbstractExpression {
 
 	@Override
 	public FractalsExpression getDerivative(String derivativeVariableName) {
-		// TODO
+		if (instructionComplex == -1 && instructionPart == -1)
+			return contentExpression.getDerivative(derivativeVariableName);
+		else if (instructionComplex == INSTR_SIN_COMPLEX)
+			return new NestedExpression(contentExpression, INSTR_COS_PART, INSTR_COS_COMPLEX);
+		else if (instructionComplex == INSTR_COS_COMPLEX)
+			return new NegateExpression(new NestedExpression(contentExpression, INSTR_SIN_PART, INSTR_SIN_COMPLEX));
+		else if (instructionComplex == INSTR_TAN_COMPLEX) {
+			FractalsExpression higher = new ConstantExpression("1", "0");
+			FractalsExpression lower = new ExpExpression(new NestedExpression(contentExpression, INSTR_COS_PART, INSTR_COS_COMPLEX), new ConstantExpression("2", "0"));
+			return new MultExpression(Arrays.asList(new FractalsExpression[] {higher, lower}), Arrays.asList(INSTR_DIV_PART), Arrays.asList(INSTR_DIV_COMPLEX));
+		}
+		else if (instructionComplex == INSTR_SINH_COMPLEX)
+			return new NestedExpression(contentExpression, INSTR_COSH_PART, INSTR_COSH_COMPLEX);
+		else if (instructionComplex == INSTR_COSH_COMPLEX)
+			return new NestedExpression(contentExpression, INSTR_SINH_PART, INSTR_SINH_COMPLEX);
+		else if (instructionComplex == INSTR_TANH_COMPLEX) {
+			FractalsExpression higher = new ConstantExpression("1", "0");
+			FractalsExpression lower = new ExpExpression(new NestedExpression(contentExpression, INSTR_COSH_PART, INSTR_COSH_COMPLEX), new ConstantExpression("2", "0"));
+			return new MultExpression(Arrays.asList(new FractalsExpression[] {higher, lower}), Arrays.asList(INSTR_DIV_PART), Arrays.asList(INSTR_DIV_COMPLEX));
+		}
 		return null;
 	}
 
@@ -153,7 +176,7 @@ public class NestedExpression extends AbstractExpression {
 
 	@Override
 	public FractalsExpression copy() {
-		return new NegateExpression(contentExpression.copy());
+		return new NestedExpression(contentExpression.copy(), instructionPart, instructionComplex);
 	}
 
 	@Override

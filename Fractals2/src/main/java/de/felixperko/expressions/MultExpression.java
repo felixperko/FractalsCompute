@@ -38,7 +38,15 @@ public class MultExpression extends ChainExpression {
 	protected void linkSubExpression(List<ComputeInstruction> instructions, FractalsExpression subExpr, int i) {
 		if (!imagResult) {
 			boolean optimized = false;
-			if (subExpr instanceof ConstantExpression) {
+			FractalsExpression firstExpr = subExpressions.get(0);
+			if (firstExpr instanceof NestedExpression) {
+				NestedExpression ne = ((NestedExpression)firstExpr);
+				if (ne.instructionComplex == -1 && ne.instructionPart == -1)
+					firstExpr = ne.contentExpression;
+			}
+			boolean firstExprIdentity = firstExpr instanceof VariableExpression;
+			
+			if (subExpr instanceof ConstantExpression && complexInstructions.size() == 1 && firstExprIdentity) {
 				ConstantExpression expr = (ConstantExpression)subExpr;
 				if (expr.complexNumber.realDouble() == 2. && expr.complexNumber.imagDouble() == 0. && complexInstructions.get(i-1) == ComputeInstruction.INSTR_MULT_COMPLEX){
 					instructions.add(new ComputeInstruction(ComputeInstruction.INSTR_ADD_COMPLEX, tempResultIndexReal, tempResultIndexImag, expr.getResultIndexReal(), expr.getResultIndexImag()));
